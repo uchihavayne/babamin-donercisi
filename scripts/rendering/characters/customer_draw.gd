@@ -412,7 +412,10 @@ func f_drawCustomer(p_c: Variant = null, p_t: Variant = null) -> Variant:
 		game.f_px(v_hx, J.add(v_hy, 9.0), J.getv(v_s, 3.0))
 		game.f_px(v_hx, J.add(v_hy, 10.0), J.getv(v_s, 3.0))
 	else:
-		if ((J.eq(J.getv(v_F, "cene"), 2.0) and J.gt(v_ceG, 2.0)) and (not J.truth(v_cocuk))):
+		# BIRLESIK: HD yuzde bu duz koyu elips + ust cizgi cenenin tum genisligini
+		# kesen bir serit gibi duruyordu (kullanici: "yuzde ipe benzer bir sey").
+		# HD kafanin kendi cene golgesi var; eski (piksel) cizimde aynen kalir.
+		if ((J.eq(J.getv(v_F, "cene"), 2.0) and J.gt(v_ceG, 2.0)) and (not J.truth(v_cocuk))) and not game.hd("musteri"):
 			game.f_ell(v_hx, J.add(v_hy, 10.0), max(2.0, v_ceG), 2.0, J.getv(v_s, 2.0))
 			J.setv(game.j_ctx, "globalAlpha", 0.4)
 			game.f_hl(J.add((v_hx - v_ceG), 1.0), J.add(v_hy, 9.0), ((v_ceG * 2.0) - 1.0), J.getv(v_s, 3.0))

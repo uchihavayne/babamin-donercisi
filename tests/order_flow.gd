@@ -48,8 +48,8 @@ func run() -> void:
 	hold("meat"); hold("yogurt"); hold("friesT")
 	check(w.meat==4 and w.yogurtN==4 and w.friesN==4 and w.pickleN==0,"holding adds complete portions without unwanted pickles")
 	check(game.j_G.meat==36 and game.j_G.stock.yogurt==36 and game.j_G.friesTray==36,"hold consumes exactly the actual ingredient amounts")
-	hold("board:0",20)
-	check(w.state=="open" and w.roll==0,"missing requested sauce prevents premature rolling")
+	# Birlesik surum: siparis sirasi dayatilmaz (sossuz sarma engellenmez; asagidaki
+	# ayri senaryo). Bu akista sos once eklenir.
 	hold("hot",1); hold("board:0",20)
 	check(w.state=="rolled" and w.quality==1,"correct custom recipe rolls at full quality")
 	hold("board:0",55); hold("board:0",1)
@@ -58,6 +58,22 @@ func run() -> void:
 	check(c.done==[true,false] and game.j_G.hand==null and c.state=="wait","serving main dish preserves outstanding drink")
 	game.j_G.hand={"kind":"drink","type":"ayran"}; game.f_deliver(c)
 	check(c.done==[true,true] and game.j_G.hand==null,"correct drink completes the combo")
+	# Siparis sirasi dayatilmaz: yeni durum ilk musteriye baglanir ama baska bir
+	# musterinin siparisine uyarsa ona gecer ve sarilir; hicbirine uymazsa da sarilir.
+	fresh({"secim":2.0,"sauce":1.0})
+	var c1 := customer([{"kind":"wrap","sauce":"hot"}])
+	var c2 := customer([{"kind":"wrap","sauce":"garlic"}])
+	game.f_newWrap()
+	var w2: Dictionary=game.j_G.boards[0]
+	check(is_same(w2.get("_order_owner"),c1),"new bread still suggests the first waiting order")
+	hold("meat"); hold("pickle"); hold("yogurt"); hold("friesT"); hold("garlic",1); hold("board:0",20)
+	check(w2.state=="rolled" and is_same(w2.get("_order_owner"),c2),"a wrap matching another order is rebound and rolls without being blocked")
+	fresh({"secim":2.0,"sauce":1.0})
+	c1 = customer([{"kind":"wrap","sauce":"hot"}])
+	game.f_newWrap()
+	var w3: Dictionary=game.j_G.boards[0]
+	hold("meat"); hold("pickle"); hold("yogurt"); hold("friesT"); hold("board:0",20)
+	check(w3.state=="rolled" and not w3.has("_order_recipe"),"a wrap matching no order still rolls and becomes a free wrap")
 	fresh({"secim":2.0})
 	c=customer([{"kind":"wrap","yok":["pickle","fries"]}])
 	w=ready(["fries"]); w.pickleN=1; game.j_G.hand=w

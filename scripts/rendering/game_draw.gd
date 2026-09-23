@@ -70,6 +70,12 @@ func f_drawPlay(p_t: Variant = null) -> Variant:
 	while J.lt(_v["i"], J.getv(J.getv(game.j_G, "customers"), "length")):
 		game.f_drawCustomer(J.getv(J.getv(game.j_G, "customers"), _v["i"]), _cells["t"][0])
 		_v["i"] = J.add(_v["i"], 1.0)
+	# BIRLESIK: karsi dukkanin adami MUSTERI katmaninda (tezgah ve makinelerin
+	# arkasinda); konusma balonu asagida, arayuz katmaninda (HD'de iki gecis)
+	if game.hd_gpu():
+		game.rakip_kip = "govde"
+		game.incident_draw.f_drawRakip(_cells["t"][0])
+		game.rakip_kip = ""
 	game.regulation_draw.f_drawInspector(_cells["t"][0])
 	game.shop_background.f_drawStoneFG()
 	if (J.truth(game.shop_background.f_dayiVar()) and ((not J.truth(J.getv(game.j_G, "courier"))) or J.eq(J.getv(J.getv(game.j_G, "courier"), "state"), "in"))):
@@ -325,15 +331,10 @@ func f_drawPlay(p_t: Variant = null) -> Variant:
 			J.setv(game.j_ctx, "globalAlpha", 1.0)
 		game.f_drawOrderBubble(_v["cc"], _cells["t"][0])
 		_v["j"] = J.add(_v["j"], 1.0)
-	# BIRLESIK: karsi dukkanin adami musteri sirasinda ama tezgahtan SONRA
-	# ciziliyor; yeni tezgahin rafi (ledgeY 140) daha yukarida oldugu icin govde
-	# tezgahin ustune biniyordu -> raf hizasinda kirpilir (tezgahin arkasinda)
-	J.method(game.j_ctx, "save", [])
-	J.method(game.j_ctx, "beginPath", [])
-	J.method(game.j_ctx, "rect", [0.0, 0.0, game.j_W, J.getv(game.j_LAY, "ledgeY")])
-	J.method(game.j_ctx, "clip", [])
+	# HD'de burada yalniz konusma balonu (govde musteri katmaninda cizildi)
+	if game.hd_gpu(): game.rakip_kip = "balon"
 	game.incident_draw.f_drawRakip(_cells["t"][0])
-	J.method(game.j_ctx, "restore", [])
+	game.rakip_kip = ""
 	game.weather_draw.f_drawWeather(_cells["t"][0])
 	game.incident_draw.f_drawKesinti(_cells["t"][0])
 	game.game_draw.f_drawFlyCoins(_cells["t"][0])

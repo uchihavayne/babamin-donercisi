@@ -285,78 +285,158 @@ def rakip():
 
 
 # ================================================================ kedi
-KG, KK, KA = "#4a4038", "#332c26", "#6b5c50"
+# BIRLESIK: kullanici "kedinin modellemesi iyi degil". Tekir kedi: gogus + kalca
+# hatli govde, dort bacak (beyaz patiler), tek parca kivrik kuyruk (egri tup),
+# sirtta ve kuyrukta tekir seritleri, beyaz agiz/gogus, pembe ic kulak, badem
+# gozler, biyiklar. Parca adlari ve capalari eskisiyle ayni (oyun kodu degismez).
+KG, KK, KA = "#6b5c50", "#3f352d", "#8a7a6c"
+KB = "#ece6dc"
 
 
 def kedi_malz():
-    return I.cel("Kedi", [KK, KG, KA, hexmul(KA, 1.25)], [0, .3, .62, .9], noise=0.1, noise_scale=16)
+    return I.cel("Kedi", [KK, "#54483e", KG, KA], [0, .3, .6, .88], noise=0.08, noise_scale=18)
+
+
+def kedi_beyaz():
+    return I.cel("KediBeyaz", ["#a89e92", "#cfc7bc", KB, "#ffffff"], [0, .3, .6, .88])
+
+
+def kedi_serit():
+    return mat_duz("#3a3029")
+
+
+def _tup_egri(ad, noktalar, r_bas, r_son, mat):
+    """(x, derinlik, gy) noktalarindan gecen, kalinligi azalan yumusak tup."""
+    cu = bpy.data.curves.new(ad, "CURVE")
+    cu.dimensions = "3D"
+    cu.bevel_depth = 1.0
+    cu.bevel_resolution = 3
+    cu.use_fill_caps = True
+    sp = cu.splines.new("BEZIER")
+    sp.bezier_points.add(len(noktalar) - 1)
+    for q, (x, y, gy) in enumerate(noktalar):
+        bp = sp.bezier_points[q]
+        bp.co = (x, y, ez(gy, y, K))
+        bp.handle_left_type = bp.handle_right_type = "AUTO"
+        bp.radius = r_bas + (r_son - r_bas) * q / max(1, len(noktalar) - 1)
+    ob = bpy.data.objects.new(ad, cu)
+    bpy.context.collection.objects.link(ob)
+    ob.data.materials.append(mat)
+    return L.meshle(ob, mat)
 
 
 def _kedi_bas(cx, gy, cephe):
     M = kedi_malz()
-    elipsoid(cx, gy, 3.3, 2.9, 2.6, -0.5, M, seg=16, ring=10)
-    for sx in (-2.0, 2.0):
-        bm = bmesh.new()
-        y = -0.8
-        p = [bm.verts.new((cx + sx - 1.2, y, ez(gy - 1.6, y, K))), bm.verts.new((cx + sx + 1.2, y, ez(gy - 1.6, y, K))),
-             bm.verts.new((cx + sx * 1.1, y, ez(gy - 4.4, y, K)))]
-        bm.faces.new(p)
-        bmesh.ops.solidify(bm, geom=bm.faces[:], thickness=0.6)
-        I.mesh_ob("kulak", bm, M, smooth=False)
-    ex = (-1.3, 1.4) if cephe else (0.4, 2.3)
+    Mb = kedi_beyaz()
+    elipsoid(cx, gy, 3.4, 3.0, 2.7, -0.5, M, seg=18, ring=12)
+    # yanaklar (yuzu yuvarlar) + beyaz agiz
+    for sx in ((-1.6, 1.6) if cephe else (0.8, 2.6)):
+        elipsoid(cx + sx, gy + 1.2, 1.5, 1.2, 1.2, -1.6, M, seg=10, ring=6)
+    ag = (0.0 if cephe else 2.2)
+    elipsoid(cx + ag, gy + 1.5, 1.6, 1.1, 1.0, -2.3, Mb, seg=10, ring=6)
+    # kulaklar: dis koyu, ic pembe
+    for sx in ((-2.1, 2.1) if cephe else (-0.8, 2.0)):
+        for kat, (gen, mat, y) in enumerate(((1.3, M, -0.8), (0.7, mat_duz("#c98c8c"), -1.5))):
+            bm = bmesh.new()
+            p = [bm.verts.new((cx + sx - gen, y, ez(gy - 1.8, y, K))), bm.verts.new((cx + sx + gen, y, ez(gy - 1.8, y, K))),
+                 bm.verts.new((cx + sx * 1.15, y, ez(gy - 4.8 + kat * 0.9, y, K)))]
+            bm.faces.new(p)
+            bmesh.ops.solidify(bm, geom=bm.faces[:], thickness=0.5)
+            I.mesh_ob("kulak%d" % kat, bm, mat, smooth=False)
+    # alin cizgileri (tekir "M")
+    for dx in (-0.7, 0.0, 0.7):
+        kutu(cx + (0.0 if cephe else 1.0) + dx - 0.12, cx + (0.0 if cephe else 1.0) + dx + 0.12, gy - 2.4, gy - 1.2, -3.0, -2.9, kedi_serit())
+    # badem gozler + gozbebegi + parlama
+    ex = (-1.3, 1.4) if cephe else (1.0, 2.9)
     for x in ex:
-        elipsoid(cx + x, gy + 0.2, 0.55, 0.6, 0.2, -3.1, mat_duz("#c8e070"), seg=8, ring=5)
-        kutu(cx + x - 0.12, cx + x + 0.12, gy - 0.3, gy + 0.7, -3.35, -3.3, mat_duz("#1a1410"))
-    nx = 0.0 if cephe else 2.8
-    elipsoid(cx + nx, gy + 1.5, 0.45, 0.35, 0.2, -3.2, mat_duz("#d8a0a0"), seg=6, ring=4)
+        elipsoid(cx + x, gy - 0.1, 0.7, 0.5, 0.2, -3.1, mat_duz("#b8d060"), seg=10, ring=5)
+        kutu(cx + x - 0.13, cx + x + 0.13, gy - 0.55, gy + 0.35, -3.35, -3.3, mat_duz("#141010"))
+        kutu(cx + x - 0.45, cx + x - 0.2, gy - 0.45, gy - 0.2, -3.4, -3.35, mat_duz("#ffffff"))
+    nx = 0.0 if cephe else 3.0
+    elipsoid(cx + nx, gy + 1.0, 0.45, 0.35, 0.2, -3.3, mat_duz("#d88a90"), seg=6, ring=4)
+    # biyiklar
+    # biyiklar: kisa, ince, yanaklardan disari
+    for dy in (-0.1, 0.6):
+        for sx in ((-1, 1) if cephe else (1,)):
+            x0 = cx + nx + sx * (2.0 if cephe else 0.9)
+            kutu(min(x0, x0 + sx * 1.7), max(x0, x0 + sx * 1.7), gy + 1.3 + dy, gy + 1.42 + dy, -3.4, -3.35, mat_duz("#cfc8bc"))
+
+
+def _kedi_govde(gy_sirt, egik=0.0):
+    """Yan govde: gogus (onde, iri) + kalca; beyaz gogus/karin; tekir seritleri."""
+    M = kedi_malz()
+    Mb = kedi_beyaz()
+    for (x, gy, rx, rz, ry) in ((2.6, gy_sirt + 0.2, 4.0, 2.9, 2.9), (-3.0, gy_sirt, 3.8, 2.7, 2.8), (-0.2, gy_sirt + 0.5, 3.8, 2.4, 2.7)):
+        e = I.elipsoid("govde", x, gy, rx, rz, ry, 0.0, M, seg=18, ring=10)
+        e.location = (x, 0.0, ez(gy, 0.0, K))
+    e = I.elipsoid("gogus", 4.6, gy_sirt + 1.4, 2.0, 2.0, 1.8, -1.6, Mb, seg=12, ring=8)
+    e.location = (4.6, -1.6, ez(gy_sirt + 1.4, -1.6, K))
+    e = I.elipsoid("karin", 0.0, gy_sirt + 2.2, 3.4, 0.9, 1.8, -1.2, Mb, seg=12, ring=6)
+    e.location = (0.0, -1.2, ez(gy_sirt + 2.2, -1.2, K))
+    # sirt seritleri: govdenin ustunde kisa koyu kavisler
+    for q, x in enumerate((-5.0, -3.0, -1.0, 1.0, 3.0)):
+        uzuv((x + 0.4, gy_sirt - 2.4), (x - 0.4, gy_sirt - 0.2), 0.35, -2.6, kedi_serit())
+
+
+def _kedi_bacak(x, gy_ust, gy_alt, y, M, Mb, uzun=0.0):
+    uzuv((x, gy_ust), (x + uzun, gy_alt - 0.6), 0.85, y, M)
+    elipsoid(x + uzun + 0.3, gy_alt - 0.4, 1.0, 0.55, 0.8, y - 0.2, Mb, seg=8, ring=5)
 
 
 def kedi_yuru():
-    M = kedi_malz()
-    e = I.elipsoid("govde", -0.5, -4.3, 6.8, 2.9, 3.0, 0.0, M, seg=18, ring=10)
-    e.location = (-0.5, 0.0, ez(-4.3, 0.0, K))
-    _kedi_bas(6.8, -9.0, False)
+    _kedi_govde(-5.2)
+    _kedi_bas(7.0, -9.0, False)
 
 
 def kedi_bacak(on):
     def fn():
         M = kedi_malz()
-        x = 4.0 if on else -4.0
-        uzuv((x, -3.0), (x, -0.4), 0.9, -1.2, M)
+        Mb = kedi_beyaz()
+        Mk = I.cel("KediUzak", ["#2e2620", KK, "#54483e", KG], [0, .3, .6, .88])
+        x = 4.0 if on else -4.2
+        _kedi_bacak(x + 0.9, -3.4, 0.0, 1.6, Mk, Mb, uzun=-0.4)   # uzak bacak (koyu)
+        _kedi_bacak(x, -3.4, 0.0, -1.4, M, Mb, uzun=0.3)           # yakin bacak
     return fn
 
 
 def kedi_kuyruk():
     M = kedi_malz()
-    pts = [(-6.5, -5.0), (-8.5, -6.5), (-9.5, -8.6), (-9.0, -10.2)]
-    for a, b in zip(pts, pts[1:]):
-        uzuv(a, b, 0.8, 0.8, M)
+    _tup_egri("kuyruk", [(-6.4, 0.4, -5.2), (-8.6, 0.6, -6.6), (-9.6, 0.8, -9.0), (-8.8, 1.0, -11.2)], 0.95, 0.55, M)
+    for gy in (-7.2, -9.2):
+        uzuv((-9.6, gy), (-8.4, gy - 0.4), 0.3, -0.3, kedi_serit())
 
 
 def kedi_otur():
     M = kedi_malz()
-    T.torna("govde", [(3.6, 0), (4.4, 2.5), (4.0, 6.0), (2.6, 9.0), (1.5, 10.0)], 0.0, 0.0, 0.0, 0.8, M, K, seg=18)
+    Mb = kedi_beyaz()
+    T.torna("govde", [(3.6, 0), (4.5, 2.5), (4.2, 6.0), (2.9, 8.8), (1.6, 10.0)], 0.0, 0.0, 0.0, 0.8, M, K, seg=22)
+    # beyaz gogus onlugu (yuvarlak, govdeye yapisik)
+    e = I.elipsoid("onluk", 0.0, -6.2, 1.9, 3.6, 1.2, -3.1, Mb, seg=14, ring=8)
+    e.location = (0.0, -3.1, ez(-6.2, -3.1, K))
+    # on bacaklar + beyaz patiler
     for sx in (-1.5, 1.5):
-        elipsoid(sx, -0.6, 1.2, 0.7, 1.0, -3.0, M, seg=8, ring=5)
-    on_levha([(-1.2, -8.0), (1.2, -8.0), (0.8, -2.0), (-0.8, -2.0)], -3.6, S.mat_alfa(KA, 0.6))
-    _kedi_bas(0.0, -13.2, True)
+        uzuv((sx, -6.0), (sx * 0.9, -0.8), 0.8, -3.0, M)
+        elipsoid(sx * 0.9, -0.5, 1.1, 0.6, 0.9, -3.2, Mb, seg=8, ring=5)
+    # yan tekir seritleri
+    for q, gy in enumerate((-2.5, -4.5, -6.5)):
+        uzuv((3.2, gy), (4.2, gy + 0.8), 0.3, -1.2, kedi_serit())
+        uzuv((-3.2, gy), (-4.2, gy + 0.8), 0.3, -1.2, kedi_serit())
+    _kedi_bas(0.0, -12.4, True)
 
 
 def kedi_otur_kuyruk():
     M = kedi_malz()
-    pts = [(3.5, -1.0), (6.0, -1.6), (8.2, -3.0), (8.8, -5.8)]
-    for a, b in zip(pts, pts[1:]):
-        uzuv(a, b, 0.85, 1.5, M)
+    _tup_egri("kuyruk", [(3.4, 1.4, -0.8), (6.2, 1.0, -1.2), (8.2, 0.6, -2.6), (8.7, 0.3, -5.4)], 0.9, 0.55, M)
 
 
 def kedi_yiyor():
     M = kedi_malz()
-    e = I.elipsoid("govde", -0.5, -3.3, 6.2, 2.7, 3.0, 0.0, M, seg=18, ring=10)
-    e.location = (-0.5, 0.0, ez(-3.3, 0.0, K))
-    _kedi_bas(6.0, -5.5, False)
-    pts = [(-6.0, -4.0), (-8.0, -5.5), (-8.8, -7.2)]
-    for a, b in zip(pts, pts[1:]):
-        uzuv(a, b, 0.8, 0.8, M)
+    Mb = kedi_beyaz()
+    _kedi_govde(-4.4)
+    for x, y, mat in ((4.2, 1.6, M), (3.6, -1.4, M), (-4.2, 1.6, M), (-4.6, -1.4, M)):
+        _kedi_bacak(x, -2.6, 0.0, y, mat, Mb)
+    _kedi_bas(6.4, -5.2, False)
+    _tup_egri("kuyruk", [(-6.4, 0.4, -4.6), (-8.4, 0.6, -5.8), (-9.4, 0.8, -7.4)], 0.9, 0.55, M)
 
 
 # ================================================================ scooter
@@ -418,13 +498,13 @@ parca("hirsiz_kol_sol", (-19, -27, 10, 30), hirsiz_kol(True))
 parca("hirsiz_kol_sag", (9, -27, 10, 30), hirsiz_kol(False))
 parca("hirsiz_canta", (-12, -3, 24, 22), hirsiz_canta)
 parca("rakip", (-18, -54, 37, 57), rakip)
-parca("kedi_yuru", (-9, -15, 20, 14), kedi_yuru)
-parca("kedi_bacak_on", (2, -5, 5, 6), kedi_bacak(True), cizgi_alfa=90)
-parca("kedi_bacak_arka", (-6, -5, 5, 6), kedi_bacak(False), cizgi_alfa=90)
-parca("kedi_kuyruk", (-12, -13, 8, 10), kedi_kuyruk)
-parca("kedi_otur", (-6, -20, 12, 22), kedi_otur)
-parca("kedi_otur_kuyruk", (2, -8, 9, 9), kedi_otur_kuyruk)
-parca("kedi_yiyor", (-11, -12, 22, 13), kedi_yiyor)
+parca("kedi_yuru", (-10, -15, 26, 14), kedi_yuru)
+parca("kedi_bacak_on", (1, -5, 7, 6), kedi_bacak(True), cizgi_alfa=90)
+parca("kedi_bacak_arka", (-7, -5, 7, 6), kedi_bacak(False), cizgi_alfa=90)
+parca("kedi_kuyruk", (-12, -13, 9, 10), kedi_kuyruk)
+parca("kedi_otur", (-7, -20, 14, 22), kedi_otur)
+parca("kedi_otur_kuyruk", (2, -8, 9, 10), kedi_otur_kuyruk)
+parca("kedi_yiyor", (-11, -12, 25, 13), kedi_yiyor)
 for _sc, _ek in ((1.0, ""), (0.6, "_60")):
     parca("scooter_arac" + _ek, (-19, -17, 36, 25), scooter_arac, olcek=_sc)
     parca("scooter_surucu" + _ek, (-8, -18, 20, 17), scooter_surucu, olcek=_sc)

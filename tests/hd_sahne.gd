@@ -72,6 +72,15 @@ func calis() -> void:
 			c.done = [false, false]
 			c.bubble = 1.0
 			g.j_G.stock.tomato = 3; g.j_G.stockAnim.tomato = 3; g.j_G.stock.pepper = 1; g.j_G.stockAnim.pepper = 1
+		if arg("--kalip") != "" and c.get("look") is Dictionary:
+			c.look.kalip = arg("--kalip")
+		if arg("--kedi") != "":
+			var M: Dictionary = g.street_background.f_stM()
+			g.j_G.kedi = {"faz": arg("--kedi"), "t": 0.0, "girisT": 0.0, "miyav": 0.0,
+				"x": M.gx + floorf(M.gw * (0.53 if arg("--kedi") in ["bekle", "yiyor"] else 0.75) + 0.5)}
+		if arg("--rakip") != "":
+			g.j_G.rakip = {"faz": "gidis", "t": 0.0, "girisT": 0.0, "x": float(arg("--rakip")), "tip": "fiyat",
+				"hedef": 0.0, "para": 0.0, "selam": "", "ilk": false, "sonT": 0.0, "son": ""}
 		if var_mi("--kesinti"):
 			g.j_G.kesinti = {"faz": "kesik", "t": 3.0, "sure": 20.0, "uyari": 0.0}
 		if var_mi("--kizart"):

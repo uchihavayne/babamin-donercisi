@@ -261,14 +261,60 @@ def kol(ad, omuz, el, derin=-2.0, yen_r=4.3, mat_yen=None, mat_ten=None, manset=
     if uz > 0.5:
         k = max(0.0, (uz - 4.0) / uz)
         mx, my = ox + (ex - ox) * k, oy + (ey - oy) * k
-        tup(ad + "_yen", (ox, oy), (mx, my), yen_r, derin, MG)
+        # BIRLESIK: duz boru yerine dirsekte hafif kirilan, bilege dogru incelen
+        # bol gomlek yeni (kullanici: "dayi modeli uzerinde daha cok calis").
+        dx_, dy_ = (mx - ox) / max(uz * k, .1), (my - oy) / max(uz * k, .1)
+        nx_, ny_ = -dy_, dx_
+        yan = 1.0 if ox >= 23.5 else -1.0
+        if nx_ * yan + ny_ * 0.3 < 0:
+            nx_, ny_ = -nx_, -ny_
+        dirsek = (ox + (mx - ox) * 0.5 + nx_ * 0.8, oy + (my - oy) * 0.5 + ny_ * 0.8)
+        r_d = yen_r * 0.97
+        tup(ad + "_yen", (ox, oy), dirsek, yen_r + 0.2, derin, MG, r_b=r_d)
+        tup(ad + "_yen2", dirsek, (mx, my), r_d, derin, MG, r_b=yen_r * 0.84)
+        elipsoid(ad + "_dirsek", dirsek[0], dirsek[1], r_d, r_d, r_d, derin, MG, seg=16, ring=10)
         elipsoid(ad + "_omuz", ox, oy, yen_r + 0.6, yen_r, yen_r, derin, MG, seg=16, ring=10)
+        if not manset:
+            # yen sivali: yen ucu ile bilek arasini ten rengi on kol doldurur
+            tup(ad + "_onkol", (mx, my), (ex, ey), yen_r * 0.62, derin - 0.2, MS, r_b=yen_r * 0.55)
         if manset:
-            MM = cel("Manset", ["#a89a80", "#d8d2c0", "#e8e2d2", "#f4efe2"])
+            MM = cel("Manset", ["#8a7e66", "#c9c1ac", "#ddd6c4", "#efe9da"])
             tup(ad + "_manset", (mx, my), (ox + (ex - ox) * min(1.0, k + 1.8 / max(uz, .1)),
                                             oy + (ey - oy) * min(1.0, k + 1.8 / max(uz, .1))),
-                yen_r + 0.4, derin, MM)
-    elipsoid(ad + "_el", ex, ey, 5.3, 5.0, 4.6, derin - 0.5, MS, seg=16, ring=10)
+                yen_r * 0.84 + 0.35, derin, MM)
+    el_ciz(ad + "_el", (ex, ey), (ex - ox, ey - oy), derin - 0.5, MS)
+
+
+def el_ciz(ad, bilek, yon, derin, MS, sol=None):
+    """BIRLESIK: kullanici "eller top gibi". Avuc + dort parmak + basparmak.
+    bilek (gx, gy): elin baglandigi nokta; yon: koldan ele dogru (ekran).
+    Parmaklar kol yonunde uzar, hafif iceri kivrik; basparmak onde (kameraya
+    yakin), avucun ic tarafinda."""
+    bx, by = bilek
+    L_ = math.hypot(yon[0], yon[1]) or 1.0
+    dx, dy = yon[0] / L_, yon[1] / L_
+    nx, ny = -dy, dx                       # yana (ekranda) dik
+    aci = math.atan2(dx, -dy)              # yerel z -> kol yonu (dunya xz)
+    # avuc: yassi, kol yonunde uzun (kol genisligiyle orantili)
+    px_, py_ = bx + dx * 1.8, by + dy * 1.8
+    ob = elipsoid(ad + "_avuc", px_, py_, 3.9, 3.6, 2.5, derin, MS, seg=20, ring=12)
+    ob.rotation_euler = (0, aci, 0)
+    # bilek (yen ile avuc arasi)
+    tup(ad + "_bilek", (bx - dx * 0.8, by - dy * 0.8), (px_, py_), 2.6, derin, MS)
+    # parmaklar: tek parca, uca dogru incelen; ortadakiler uzun, uclar hafif iceri
+    ux, uy = bx + dx * 4.6, by + dy * 4.6
+    for i, (off, boy) in enumerate(((-2.2, 2.9), (-0.75, 3.5), (0.75, 3.4), (2.2, 2.7))):
+        kx, ky = ux + nx * off, uy + ny * off
+        tx, ty = kx + dx * boy - nx * off * 0.08, ky + dy * boy - ny * off * 0.08
+        tup(ad + "_p%d" % i, (kx, ky), (tx, ty), 0.9, derin - 0.4, MS, r_b=0.72)
+        elipsoid(ad + "_p%d_uc" % i, tx, ty, 0.74, 0.74, 0.74, derin - 0.45, MS, seg=10, ring=6)
+    # basparmak govdenin orta hattina (gx 23) donuk olsun
+    yan = (1.0 if (23.0 - bx) * nx >= 0 else -1.0) if sol is None else (1.0 if sol else -1.0)
+    tbx, tby = bx + dx * 1.2 + nx * 2.6 * yan, by + dy * 1.2 + ny * 2.6 * yan
+    tex, tey = tbx + dx * 2.6 - nx * 0.8 * yan, tby + dy * 2.6 - ny * 0.8 * yan
+    tup(ad + "_bas", (tbx, tby), (tex, tey), 0.9, derin - 1.6, MS, r_b=0.75)
+    elipsoid(ad + "_bas_uc", tex, tey, 0.75, 0.75, 0.75, derin - 1.6, MS, seg=10, ring=6)
+    elipsoid(ad + "_bas_kok", tbx, tby, 1.2, 1.2, 1.0, derin - 1.2, MS, seg=10, ring=6)
 
 
 # kare sayilari: kesim kolu 1 px adimla (sw -5..5), jestler 8 kare (eskisi 5 / 4)
@@ -296,7 +342,7 @@ def kol_katmani(ad):
         tup("ust", (43, by + 9), (43.5, by + 24), 5.0, -2.0, MG)
         elipsoid("omuz", 43, by + 9, 5.4, 5, 5, -2.0, MG, seg=16, ring=10)
         tup("on", (44, by + 24), (46, by + 30 + sw), 4.0, -3.0, MS)
-        elipsoid("el", 46, by + 31.5 + sw, 4.8, 4.6, 4.2, -3.5, MS, seg=16, ring=10)
+        el_ciz("el", (46, by + 30 + sw), (2.0, 6.0 + sw), -3.5, MS)
     elif ad == "kol_sol_kesim":
         kol(ad, (4, by + 15), (4, by + 36.5))
     elif ad == "kol_sol_mutlu":
@@ -317,8 +363,29 @@ def kafa():
 
 
 def boyun():
-    MS = cel("Boyun", [SKIN[0], SKIN[0], SKIN[1], SKIN[2]])
-    L.silindir("boyun", 6, 23, 1, -47, 9, MS, seg=20)
+    """BIRLESIK: eski boyun uzun, koyu kahve bir boruydu. Simdi asagi dogru
+    genisleyen kisa boyun, cenenin altinda golge bandi, ustte ten rengi; dipte
+    onu acik dik gomlek yakasi (boyun ile govde arasini baglar)."""
+    MS = cel("Boyun", [SKIN[0], SKIN[1], SKIN[1], SKIN[2]])
+    L.silindir("boyun", 6.4, 23, 1, -47, 9, MS, seg=24, r2=5.5)
+    MG = px.flat("CeneGolge", SKIN[0])
+    e = elipsoid("cene_golge", 23, 43.6, 5.7, 1.9, 5.3, 0.6, MG, seg=20, ring=8)
+    # dik yaka: boyun dibini saran kisa halka, onde V acik
+    MY = cel("Yaka", GOMLEK)
+    bm = bmesh.new()
+    bmesh.ops.create_cone(bm, cap_ends=False, cap_tris=False, segments=32,
+                          radius1=7.6, radius2=6.9, depth=3.2)
+    sil = [f for f in bm.faces if f.calc_center_median().y < -5.0 and abs(f.calc_center_median().x) < 2.4]
+    bmesh.ops.delete(bm, geom=sil, context="FACES")
+    bmesh.ops.solidify(bm, geom=bm.faces[:], thickness=0.6)
+    me = bpy.data.meshes.new("yaka")
+    bm.to_mesh(me)
+    bm.free()
+    for p_ in me.polygons:
+        p_.use_smooth = True
+    ob = link(bpy.data.objects.new("yaka", me))
+    ob.location = (23, 1.0, -49.6)
+    me.materials.append(MY)
 
 
 def fes():

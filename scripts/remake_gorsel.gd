@@ -2731,6 +2731,10 @@ func f_hdHirsiz(x: Variant, y: Variant, t: Variant, phase: Variant, running: Var
 	hd_ciz(A, "hirsiz_canta", sx, sy)
 	return true
 
+# "govde": yalniz gövde (musteri katmani), "balon": yalniz konusma balonu,
+# "": ikisi (eski tek gecis)
+var rakip_kip := ""
+
 func f_hdRakip(t: Variant) -> bool:
 	var A := _olay()
 	if A.is_empty(): return false
@@ -2741,8 +2745,8 @@ func f_hdRakip(t: Variant) -> bool:
 	var slots: Variant = get("j_LAY").get("custSlots")
 	var Y := J.n(slots[0].y) if (slots is Array and slots.size() > 0 and J.truth(slots[0])) else 152.0
 	Y = floorf(Y + sin(J.n(t) * 2.2) * 0.8 + 0.5)
-	hd_ciz(A, "rakip", X, Y)
-	if J.n(R.get("sonT", 0.0)) > 0.0 and J.truth(R.get("son")):
+	if rakip_kip != "balon": hd_ciz(A, "rakip", X, Y)
+	if rakip_kip != "govde" and J.n(R.get("sonT", 0.0)) > 0.0 and J.truth(R.get("son")):
 		var metin: Variant = _c("f_T", R.son)
 		var bw: float = J.n(_c("f_textW", metin)) + 10.0
 		var bx := clampf(X - bw / 2.0, 4.0, J.n(get("j_W")) - bw - 4.0)

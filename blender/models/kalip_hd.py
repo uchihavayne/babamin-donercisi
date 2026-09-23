@@ -321,16 +321,18 @@ def kb_turist(G):
 
 
 def kb_kurye(G):
-    M.kubbe("kask", 0.5, -1.0, G + 2.5, 17.0, Z("ana", lambda: px.cel("KaskK", [gri(.48), gri(.58), gri(1.0), gri(1.28)], [0, .15, .45, .85])), y=0.0)
-    L.silindir("kenar", 1.4, 0.5, -0.5, ez(-4.3, -0.5, K), 2 * G + 7, Z("ana", lambda: px.cel("KenarK", [gri(.58), gri(.88)], [0, .5])), seg=12, eksen="X")
+    # BIRLESIK: kask alt kenari gy -1'deydi; alni gozlere kadar kapatiyor, kaslar
+    # kaskin USTUNE ciziliyordu (maske gibi). Eski cizimdeki gibi kenar hy-5'te.
+    M.kubbe("kask", 0.5, -4.6, G + 2.5, 14.6, Z("ana", lambda: px.cel("KaskK", [gri(.48), gri(.58), gri(1.0), gri(1.28)], [0, .15, .45, .85])), y=0.0)
+    L.silindir("kenar", 1.4, 0.5, -0.5, ez(-5.4, -0.5, K), 2 * G + 7, Z("ana", lambda: px.cel("KenarK", [gri(.58), gri(.88)], [0, .5])), seg=12, eksen="X")
     for sx, f in ((-1, .58), (1, .48)):
         x0 = -G - 2 if sx < 0 else G
         T.onkutu("kulaklik", x0, x0 + 3, -4, 4, -1.0, 2.0, Z("ana", lambda f=f: carp("Kulaklik%.2f" % f, f)), K)
-    T.onkutu("vizor", -G + 1, G - 1, -13, -10, -G - 2.6, -G - 2.4, Z("sabit", lambda: px.flat_a("Vizor", "#8ab8d8", 0.45)), K)
-    T.onkutu("vizor_isik", -G + 2, G - 2, -13, -12.5, -G - 2.7, -G - 2.5, Z("sabit", lambda: px.flat("VizorIsik", "#cfe4f2")), K)
-    for sx in (-1, 1):
-        T.on_poligon("kayis", [(sx * G - 0.5 * sx, 4), (sx * G + 0.5 * sx, 4), (sx * 2 + 0.5 * sx, 9.5), (sx * 2 - 0.5 * sx, 9.5)], -G * 0.8 - 1.0, Z("sabit", lambda: px.flat("KayisC", "#2b261f")), K, derin=0.1)
-    T.onkutu("toka", -3, 3, 9, 11, -G * 0.8 - 1.2, -G * 0.8 - 1.0, Z("sabit", lambda: px.cel("TokaC", ["#3d362e", "#7a6c58"], [0, .7])), K)
+    T.onkutu("vizor", -G + 1, G - 1, -15, -12, -G - 2.6, -G - 2.4, Z("sabit", lambda: px.flat_a("Vizor", "#8ab8d8", 0.45)), K)
+    T.onkutu("vizor_isik", -G + 2, G - 2, -15, -14.5, -G - 2.7, -G - 2.5, Z("sabit", lambda: px.flat("VizorIsik", "#cfe4f2")), K)
+    # cene kayisi YOK: once yuzun onunden capraz, sonra yuz kenarindan cene altina
+    # inen ince koyu serit denendi; iki durumda da kucuk olcekte yuzde "ip" gibi
+    # duruyordu (kullanici: "cok sacma duruyor"). Kask kulakliklarla oturuyor.
 
 
 def kb_sofor(G):

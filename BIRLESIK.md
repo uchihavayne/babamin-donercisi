@@ -64,6 +64,18 @@ Kullanıcı geri bildirimiyle gelen düzenlemeler (2026-09-23):
 | Elektrik kesintisi ışığı kare kare | `shaders/kesinti.gdshader`: karanlık + ocaktan yumuşak sıcak hale |
 | "MAÇ ÇIKIŞI" yazısı | Kaldırıldı; müşteriler ve yayalar takım atkılı |
 
+İkinci tur:
+
+| Konu | Çözüm |
+| --- | --- |
+| Dürümdeki turşu ve yoğurt olmamış | Turşu: yassı, ince oval dilimler (kabuk kenarı + çekirdekler); yoğurt: dürüme sürülmüş düzensiz kenarlı ince lekeler |
+| "Sossuz isteniyor" diye dürüm katlatılmıyordu | Engel kaldırıldı: dürüm başka bir bekleyen siparişe uyuyorsa ona bağlanır, hiçbirine uymuyorsa serbest dürüm olarak katlanır |
+| Lavaş ucundan katlanmış gibi | Açık lavaş yeniden modellendi (ön kıvrım yok, kenar halkası, kızarma lekeleri) |
+| Kedi modeli zayıf | Tekir kedi: göğüs/kalça hatlı gövde, beyaz patiler, kıvrık kuyruk, badem gözler, pembe iç kulak |
+| Rakip çıkarken içecek makinesinin üstünden geçiyordu | Rakibin gövdesi müşterilerle aynı katmanda çizilir (balonu en üstte kalır) |
+| Yüzlerde ip gibi çizgi | Kuryenin çene kayışı kaldırıldı, kask alnın üstüne alındı; HD yüzde "çene" ayrıntısının (koyu elips + çizgi) çenenin tamamını kesen şeridi çizilmez |
+| Dayı'nın elleri top gibi | Avuç + dört parmak + başparmaklı eller; dirsekte hafif kırılan, bileğe incelen yen; kısa boyun, çene gölgesi, dik gömlek yakası |
+
 Önizleme: `python blender/tezgah2_onizleme.py` (parçaları oyundaki yerlerine dizer).
 
 **Atlas yeniden paketlenince Godot içe aktarması şart**:
@@ -82,6 +94,8 @@ Yoksa `atlas.json` yeni koordinatları gösterir ama doku eski kalır; parçalar
 ```sh
 sh tests/kontrol.sh                                   # tüm betikler ayrıştırılır (tek Godot açılışı)
 godot --path . --resolution 960x540 --script tests/hd_sahne.gd -- --test --gpu-test --full [--sahne shop|title|dayend]
+godot --path . --resolution 960x540 --script tests/hd_sahne.gd -- --test --gpu-test --full --kedi gelis|bekle|yiyor --rakip 330 --kalip kurye
+godot --path . --resolution 960x540 --script tests/hd_musteri_dizi.gd -- --test --gpu-test --adet 32 [--kalip kurye]   # yüz yüz müşteri ızgarası
 godot --path . --resolution 960x540 --script tests/hd_profil.gd -- --test --gpu-test
 godot --headless --path . --script tests/module_snapshot.gd --quit-after 3000 -- --test
 ```

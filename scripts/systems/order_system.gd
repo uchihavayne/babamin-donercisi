@@ -109,14 +109,32 @@ func f_wrapKimlik(w: Variant = null) -> Variant:
 	if w.get("sauce") != null: badges.append({"tip":"sos","m":w.sauce})
 	return badges
 
+# Kullanici istegi (birlesik surum): siparis sirasi DAYATILMAZ. Yeni durum ilk
+# bekleyen siparise baglaniyordu ve o tarife uymazsa sarma reddediliyordu
+# ("Sossuz isteniyor"). Artik durum baska bir bekleyen siparise uyuyorsa ona
+# baglanir; hicbirine uymuyorsa baglanti kalkar ve yine sarilir. Teslimde her
+# musteri kendi siparisine uyani kabul eder (order_match_index).
 func f_finishRoll(index: Variant = null) -> Variant:
 	var w: Variant = game.j_G.boards[int(index)]
 	if w is Dictionary and w.has("_order_recipe") and not order_matches(w, w._order_recipe):
-		w.roll = 0.0
-		game.session_system.f_say(order_problem(w, w._order_recipe))
-		J.method(game.j_SFX, "bad", [])
-		return null
+		order_rebind_or_free(w)
 	return game.wrap_system.f_finishRoll(index)
+
+func order_rebind_or_free(w: Dictionary) -> void:
+	var owners: Array = []
+	if order_live(game.chosen_order): owners.append(game.chosen_order)
+	owners.append_array(game.j_G.customers)
+	if game.j_G.phone.state == "order": owners.append(game.j_G.phone)
+	for owner in owners:
+		if not order_live(owner): continue
+		var items := order_items(owner)
+		for i in items.size():
+			if items[i].kind != "wrap" or owner.done[i]: continue
+			if order_reserved(owner, i) and not (is_same(w.get("_order_owner"), owner) and w.get("_order_index", -1) == i): continue
+			if order_matches(w, items[i]):
+				order_bind(w, owner, i)
+				return
+	for key in ["_order_recipe", "_order_owner", "_order_index", "_order_mark"]: w.erase(key)
 
 func order_match_index(w: Dictionary, owner: Dictionary) -> int:
 	var items := order_items(owner)

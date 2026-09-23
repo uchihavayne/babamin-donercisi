@@ -72,35 +72,38 @@ def parca(ad, tuval, fn, K, olcekler, cizgi=None, cizgi_alfa=150):
 
 # ---------------------------------------------------------------- acik lavas
 def durum_acik():
+    """Acik lavas. BIRLESIK: kullanici "ucundan katlanmis gibi" dedi -> ondeki
+    koyu kivrim bandi kaldirildi, kubbe golgesinin yuzeyi capraz iki tona bolmesi
+    yumusatildi (yakin tonlu rampa); yerine cepecevre ince kizarmis kenar ve
+    dogal pisme kabarciklari."""
     K = 0.5
     rx, ry = 22.0, 9.0
-    # alt kat (kenar golgesi) + ust kat: ince, hafif kubbeli disk
-    Ma = px.flat("LavasAlt", "#c9a06a")
-    I.yatay_elips("alt", 0, 0.6, rx, 0.8, Ma, K, ry_ekran=ry, seg=48)
-    Ml = cel("LavasUst", ["#dcbb8b", "#e8c998", "#f0d5a8", "#f8e6c4"], [0, .25, .5, .86], noise=0.10, noise_scale=9)
-    ob = I.yatay_elips("ust", 0, -0.6, rx - 0.3, 1.0, Ml, K, ry_ekran=ry - 0.3, seg=48, egim=0.06)
-    # ust yuzey z'si (yatay_elips: konum z = -gy - kalin/2, kose z 0..kalin)
+    Ma = px.flat("LavasAlt", "#c49a64")
+    I.yatay_elips("alt", 0, 0.6, rx, 0.8, Ma, K, ry_ekran=ry, seg=56)
+    Ml = cel("LavasUst", ["#e2c290", "#ebcd9e", "#f0d5a8", "#f5dfb8"], [0, .3, .55, .88], noise=0.06, noise_scale=7)
+    I.yatay_elips("ust", 0, -0.6, rx - 0.3, 1.0, Ml, K, ry_ekran=ry - 0.3, seg=56, egim=0.02)
     zt = 0.6 - 0.5 + 1.0 + 0.02
-    # pisme benekleri
-    for i in range(16):
+    # kizarmis kenar: disk kenari boyunca ince, hafif koyu halka
+    Mk = px.flat("LavasKenar", "#d8b27c")
+    dis, ic = [], []
+    for j in range(56):
+        a = 2 * math.pi * j / 56
+        dis.append((math.cos(a) * (rx - 0.6), -0.6 + math.sin(a) * (ry - 0.8)))
+        ic.append((math.cos(a) * (rx - 2.0), -0.6 + math.sin(a) * (ry - 1.9)))
+    for j in range(56):
+        k = (j + 1) % 56
+        T.ust_poligon("kenar", [dis[j], dis[k], ic[k], ic[j]], zt, Mk, K, kal=0.04)
+    # pisme lekeleri (kucuk koyu) + kabarciklar (acik)
+    for i in range(18):
         a = hash1(i * 3.1) * math.tau
-        r0 = hash1(i * 7.3)
-        x = math.cos(a) * rx * r0 * 0.9
-        y = -1.0 + math.sin(a) * ry * r0 * 0.9
-        renk = "#c39a63" if hash1(i) > 0.5 else "#e0bd85"
-        pts = [(x + 0.75 * math.cos(2 * math.pi * j / 8), y + 0.45 * math.sin(2 * math.pi * j / 8)) for j in range(8)]
-        T.ust_poligon("benek", pts, zt, px.flat("Benek%s" % renk, renk), K, kal=0.05)
-    # on kivrim: on kenarin hemen icinde yay
-    pts = []
-    for j in range(25):
-        u = -1 + 2 * j / 24.0
-        yy = 5.6 + (1 - u * u) * 0.8
-        pts.append((u * (rx - 1.5) * math.sqrt(max(0.0, 1 - (yy / ry) ** 2)), yy))
-    for j in range(24, -1, -1):
-        u = -1 + 2 * j / 24.0
-        yy = 5.6 + (1 - u * u) * 0.8 + 1.1 * (1 - u * u) ** 0.5
-        pts.append((u * (rx - 1.5) * math.sqrt(max(0.0, 1 - (5.6 / ry) ** 2)) * 0.98, yy))
-    T.ust_poligon("kivrim", pts, zt, px.flat("Kivrim", "#dcbb8b"), K, kal=0.05)
+        r0 = hash1(i * 7.3) ** 0.7
+        x = math.cos(a) * rx * r0 * 0.82
+        y = -0.8 + math.sin(a) * ry * r0 * 0.78
+        koyu = hash1(i) > 0.55
+        renk = "#c89e68" if koyu else "#faeccd"
+        rr = 0.55 + hash1(i * 1.7) * 0.5
+        pts = [(x + rr * 1.3 * math.cos(2 * math.pi * q / 8), y + rr * 0.6 * math.sin(2 * math.pi * q / 8)) for q in range(8)]
+        T.ust_poligon("benek", pts, zt + 0.02, px.flat("Benek%s" % renk, renk), K, kal=0.05)
 
 
 # ---------------------------------------------------------------- sarili durum
