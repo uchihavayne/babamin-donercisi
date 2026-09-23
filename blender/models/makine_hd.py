@@ -345,6 +345,32 @@ parca("icecek_ekran", (-1, -1, 18, 7), icecek_ekran)
 for _r in (10, 12):
     for _bh in (22, 28):
         parca("ayran_%d_%d" % (_r, _bh), (-1, -1, 30, _bh + 16), ayran(_r, _bh), cizgi="#2f3740", cizgi_alfa=110)
+# BIRLESIK: yeni tezgahin fritoz yuvasi 51x43 (hazne 41 genis). Ayni model
+# modul sabitleri gecici degistirilerek render edilir; parcalar "_51" ekli.
+def _fritoz_boyut(fw, fh):
+    global FW, FH, VW, VB, OILY
+    FW, FH = fw, fh
+    VW = fw - 10
+    VB = VY + VH
+    OILY = VY + 2
+
+
+def _fritoz_olcu(fn, fw, fh):
+    def g():
+        _fritoz_boyut(fw, fh)
+        try:
+            fn()
+        finally:
+            _fritoz_boyut(58, 44)
+    return g
+
+
+parca("fritoz_govde_51", (-1, 0, 53, 45), _fritoz_olcu(fritoz_govde, 51, 43))
+parca("fritoz_on_51", (3, 8, 45, 23), _fritoz_olcu(fritoz_on, 51, 43))
+parca("fritoz_sepet_33", (-1, -1, 35, 15), fritoz_sepet(33))
+parca("fritoz_sepet_15", (-1, -1, 17, 15), fritoz_sepet(15))
+parca("fritoz_bolme_51", (22, 8, 6, 22), _fritoz_olcu(fritoz_bolme, 51, 43))
+parca("fritoz_oto_51", (2, -3, 47, 9), _fritoz_olcu(fritoz_oto, 51, 43))
 parca("fritoz_govde", (-1, 0, 60, 46), fritoz_govde)
 parca("fritoz_on", (3, 8, 52, 23), fritoz_on)
 parca("fritoz_sepet_40", (-1, -1, 42, 15), fritoz_sepet(40))

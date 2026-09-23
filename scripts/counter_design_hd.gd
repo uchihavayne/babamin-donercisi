@@ -29,16 +29,27 @@ func f_drawCounter() -> Variant:
 	hd_ciz(A, "tezgah_alt", 0.0, 0.0)
 	return null
 
+# Dayi servis bolmesinde, tezgahin ONUNDE duruyor: donerin otomatik kesim rayi
+# (sisin solu) bolmeye denk geliyor. Dayi sistan SONRA cizilir ki ray onun
+# arkasinda kalsin (eskiden rayin ustune biniyordu).
+var _dayi_sonra := false
+
 func f_drawCounterProps(time: Variant = null) -> Variant:
 	if not t2_hd(): return super.f_drawCounterProps(time)
 	hd_ciz(_t2(), "servis", 0.0, 0.0)
-	if shop_background.f_dayiVar() and (j_G.courier == null or j_G.courier.state == "in"):
+	_dayi_sonra = shop_background.f_dayiVar() and (j_G.courier == null or j_G.courier.state == "in")
+	return null
+
+func f_drawSpit(p_sp: Variant = null, p_t: Variant = null) -> Variant:
+	var sonuc: Variant = super.f_drawSpit(p_sp, p_t)
+	if _dayi_sonra:
+		_dayi_sonra = false
 		j_ctx.save()
 		j_ctx.translate(4,130)
 		j_ctx.scale(0.82,0.82)
-		game_sprites_chef(time)
+		game_sprites_chef(p_t)
 		j_ctx.restore()
-	return null
+	return sonuc
 
 # counter_design.f_drawChef bos doner (Dayi tezgah ONUNDE ciziliyor); asil
 # cizim game_sprites -> game.gd zincirinde
@@ -86,19 +97,25 @@ func f_drawPreparation(time: Variant = null) -> Variant:
 				else: wrap_draw.f_drawWrapRolled(cx, cy, item, time, scale_value)
 	return null
 
+# Ekmek altligi: yiginlar tabaksiz, altligin USTUNE oturur (tezgah2 ekmek_*).
+# Iskender acikken game_draw once pide yiginini (f_drawPideStack), sonra
+# lavasi ctx.translate(0, 12) icinde ciziyor: lavas parcasi o kaymayi geri alir.
 func f_drawBreadStack(x: Variant = null, y: Variant = null, w: Variant = null, h: Variant = null, label: Variant = null) -> Variant:
 	if not t2_hd(): return super.f_drawBreadStack(x, y, w, h, label)
-	if not tun_design("iskOn"):
-		hd_ciz(_t2(), "altlik", x, y + 3)
-	# counter_design'in super cagrisiyla (game_sprites -> HD lavas) ayni yer
-	if f_hdLavas(x + 2, y - 1, w - 4, h, ""): return null
-	return super.f_drawBreadStack(x, y, w, h, label)
+	var A := _t2()
+	if tun_design("iskOn"):
+		hd_ciz(A, "ekmek_lavas_on", x, y - 12.0)
+		return null
+	hd_ciz(A, "altlik", x, y + 3)
+	hd_ciz(A, "ekmek_lavas_tek", x, y)
+	return null
 
 func f_drawPideStack(x: Variant = null, y: Variant = null, w: Variant = null) -> Variant:
 	if not t2_hd(): return super.f_drawPideStack(x, y, w)
-	hd_ciz(_t2(), "altlik", x, y + 3)
-	if f_hdPide(x, y, w): return null
-	return super.f_drawPideStack(x, y, w)
+	var A := _t2()
+	hd_ciz(A, "altlik", x, y + 3)
+	hd_ciz(A, "ekmek_pide_arka", x, y)
+	return null
 
 func f_drawPaperStation(x: Variant = null, y: Variant = null, w: Variant = null, h: Variant = null, level: Variant = null, busy: Variant = null, time: Variant = null) -> Variant:
 	if not t2_hd(): return super.f_drawPaperStation(x, y, w, h, level, busy, time)
@@ -112,6 +129,9 @@ func f_drawPaperStation(x: Variant = null, y: Variant = null, w: Variant = null,
 
 func f_drawFryer(x: Variant = null, y: Variant = null, w: Variant = null, h: Variant = null, state: Variant = null, time: Variant = null) -> Variant:
 	if not t2_hd(): return super.f_drawFryer(x, y, w, h, state, time)
+	# Kullanici: onceki (remake) fritoz daha iyi -> ayni model 51x43 yuvada
+	# (on camdan gorunen yag, sepet yagin icinde, ekranli panel)
+	if f_hdFritoz(x, y, w, h, state, time): return null
 	var A := _t2()
 	hd_ciz(A, "fritoz_govde", x, y)
 	if state.state != "idle":
@@ -137,31 +157,83 @@ func f_drawGrill(x: Variant = null, y: Variant = null, w: Variant = null, h: Var
 	_led(x + 6, y + h - 8, 4, 4, "#78b856" if not state.slots.is_empty() else "#42584b")
 	return null
 
+# PATATES DOGRAMA (kullanici: "dumduz patates doguruyoruz, animasyon/efekt
+# ekle"): remake'in kesim asamalari (patates sagdan kisalir, kesik yuzu acik),
+# dogranan dilimler yanda birikir, oyunun kendi bicak izleri (C.slash) cizilir,
+# satir kesim yuzune inip kalkar; darbe aninda kirintilar (zaman+hash, oyunun
+# rastgele ureticisine dokunmaz). Hazir cig cubuklar tahtanin sagina dizilir.
 func f_drawCutBoard(x: Variant = null, y: Variant = null, w: Variant = null, h: Variant = null, state: Variant = null, time: Variant = null) -> Variant:
 	if not t2_hd(): return super.f_drawCutBoard(x, y, w, h, state, time)
 	var A := _t2()
+	var TZ := atlas("tezgah")
+	var T: float = float(time)
 	hd_ciz(A, "kesme_tahta", x, y)
-	if state.potato:
+	# hazir cig cubuklar: sag tarafta duzgun yigin (en fazla 12)
+	if state.raw > 0 and not TZ.is_empty():
+		var n := mini(12, int(state.raw) * 2)
+		for i in n:
+			var sira := int(i / 6)
+			hd_ciz(TZ, "cig_cubuk", x + 32.0 + (i % 6) * 2.6 - sira * 1.3, y + 22.0 - sira * 4.0)
+	var satir_x: float = x + w - 12
+	var satir_y: float = y + h / 2 - 6
+	if state.potato and not TZ.is_empty():
+		var prog: float = clampf(float(state.prog), 0.0, 1.0)
+		var pw := clampi(int(maxf(2.0, floorf(11.0 * (1.0 - prog) + .5))), 2, 11)
+		var ax: float = x + 17.0
+		var ay: float = y + 19.0
+		hd_ciz(TZ, "patates_%d" % pw, ax, ay)
+		var kesik: float = ax - 11.0 + 2.0 * pw
+		# dogranmis dilimler: kesik yuzun saginda, hafif egik dizilir
+		for i in int(floorf(prog * 7.0)):
+			hd_ciz(TZ, "patates_dilim", kesik + 3.0 + i * 2.6, ay - 5.0 + (i % 2) * 0.5)
+		chopping_draw.f_drawSlash(state)
+		if prog > 0: counter_draw.f_bar(x + 5, y + h - 6, w - 10, 3, prog, "#eacf88")
+		if state.cutting:
+			# dogrudan kesik yuze iner: hizli inis, kisa bekleme, yavas kalkis
+			var p := fposmod(T * 5.0, 1.0)
+			var yuk := (1.0 - p / 0.22) if p < 0.22 else (0.0 if p < 0.36 else (p - 0.36) / 0.64)
+			satir_x = kesik + 0.5
+			satir_y = y + 7.0 - yuk * 9.0
+			if p >= 0.22 and p < 0.5:
+				_dogrma_kirinti(kesik + 1.0, y + 17.0, (p - 0.22) / 0.28, floorf(T * 5.0))
+	elif state.potato:
 		hd_ciz(A, "patates_butun", x + w / 2, y + h / 2)
-		if state.prog > 0: counter_draw.f_bar(x + 5, y + h - 6, w - 10, 3, state.prog, "#eacf88")
-	elif state.raw > 0:
-		for i in mini(12, int(state.raw) * 2):
-			var px: float = x + 10 + fmod(i * 7.0, w - 31)
-			var py: float = y + 12 + fmod(i * 5.0, h - 21)
-			ingredient_pixels.f_fryBar(px, py, 11.0, 0.25 if i % 2 else -0.25, 0.2, "#fff6d0", "#f2e0a8", "#dcc681", "#e8d59a")
-	var cy: float = y + h / 2 + (sin(float(time) * 25) * 3 if state.cutting else 0)
-	hd_ciz(A, "satir", x + w - 12, f_hdYarimPx(cy - 6))
+	hd_ciz(A, "satir", satir_x, f_hdYarimPx(satir_y))
 	return null
+
+# darbe kirintilari: 5 minik nisasta parcasi kesik yuzden disari savrulur
+func _dogrma_kirinti(x: float, y: float, k: float, vurus: float) -> void:
+	var ctx = draw_context
+	ctx.globalAlpha = clampf(1.0 - k, 0.0, 1.0)
+	for i in 5:
+		var a: float = f_hash1(vurus * 3.7 + i * 1.9) * PI - PI
+		var hiz: float = 4.0 + f_hash1(vurus * 5.1 + i) * 5.0
+		var px: float = x + cos(a) * hiz * k
+		var py: float = y + sin(a) * hiz * k * 0.7 + 6.0 * k * k
+		ctx.rect_hd(roundf(px * 2.0), roundf(py * 2.0), 2.0, 1.0 + float(i % 2), Color("#f6ecc6") if i % 2 == 0 else Color("#dcc681"))
+	ctx.globalAlpha = 1.0
 
 func f_drawPotatoBin(x: Variant = null, y: Variant = null, w: Variant = null, h: Variant = null, time: Variant = null) -> Variant:
 	if not t2_hd(): return super.f_drawPotatoBin(x, y, w, h, time)
 	hd_ciz(_t2(), "patates_kasa", x, y)
 	return null
 
+# Depo cekmecesi: onunde ACIK olan butun stok turlerinin ikonu (kullanici:
+# "yalniz iki sey varmis gibi gorunuyor"); cekmece acilirken kayar.
 func f_drawCrate(x: Variant = null, y: Variant = null, w: Variant = null, h: Variant = null, opened: Variant = null, time: Variant = null, progress: Variant = null) -> Variant:
 	if not t2_hd(): return super.f_drawCrate(x, y, w, h, opened, time, progress)
+	var A := _t2()
 	var shift := J.n(progress) * 4
-	hd_ciz(_t2(), "stok", x, f_hdYarimPx(y - shift))
+	var yy: float = f_hdYarimPx(y - shift)
+	hd_ciz(A, "stok_bos", x, yy)
+	var turler: Array = ["pickle", "yogurt"]
+	if tun_design("ayranOn"): turler.append("ayran")
+	if tun_design("sweetOn"): turler.append("sweet")
+	if tun_design("garnishOn"): turler.append_array(["tomato", "pepper"])
+	var adim: float = minf(7.2, (w - 12.0) / maxf(1.0, turler.size() - 1.0))
+	var x0: float = x + w / 2.0 - adim * (turler.size() - 1) / 2.0
+	for i in turler.size():
+		hd_ciz(A, "stok_ikon_%s" % turler[i], f_hdYarimPx(x0 + i * adim), yy + 24.5)
 	return null
 
 func f_drawTrash(x: Variant = null, y: Variant = null, w: Variant = null, h: Variant = null, time: Variant = null, emptying: Variant = null, fullness: Variant = null) -> Variant:
@@ -207,19 +279,15 @@ func f_drawIcecekKasasi(x: Variant = null, y: Variant = null, w: Variant = null,
 					draw_context.rect_hd((cx - 0.5) * 2.0, (y + sy) * 2.0, 1.0, 2.0, Color("#f1d5a0" if type != "ayran" else "#fff7e3"))
 	return null
 
+# Tatli: bakir baklava tepsisi + kalan sayiya gore 0..6 baklava dilimi
+# (kullanici: "tatli tepsisini duzenle, yetersiz")
 func f_drawSweetTray(x: Variant = null, y: Variant = null, w: Variant = null, h: Variant = null, n: Variant = null, maximum: Variant = null, time: Variant = null, fx: Variant = null) -> Variant:
 	if not t2_hd(): return super.f_drawSweetTray(x, y, w, h, n, maximum, time, fx)
-	f_trayBase(x, y, w, h)
-	# serbet zemini: kuvetin ici (yarim piksel icerden)
-	draw_context.rect_hd((x + 3.5) * 2.0, (y + 4) * 2.0, (w - 7) * 2.0, (h - 7) * 2.0, Color("#80602e"))
-	draw_context.rect_hd((x + 3.5) * 2.0, (y + 4) * 2.0, (w - 7) * 2.0, 1.0, Color("#a07a3c"))
-	var count: int = ceili(clampf(float(n) / maxf(1, float(maximum)), 0, 1) * 4)
-	var B := atlas("istasyon")
-	for i in count:
-		var bx: float = x + 10 + (i % 2) * 14
-		var by: float = y + 9 + int(i / 2) * 9
-		if B.is_empty(): garnish_draw.f_drawBaklava(bx, by)
-		else: hd_ciz(B, "baklava", bx, by)
-	f_trayInnerShade(x, y, w, h)
+	var A := _t2()
+	hd_ciz(A, "tatli_tepsi", x, y)
+	var adet: int = ceili(clampf(float(n) / maxf(1, float(maximum)), 0, 1) * 6)
+	var bump: float = roundf(sin(clampf(J.n(fx), 0.0, 1.0) * PI) * 2.0)
+	for i in adet:
+		hd_ciz(A, "baklava_dilim", x + 8 + (i % 3) * 9, y + 8 + int(i / 3) * 8 - bump)
 	f_trayFlash(x, y, w, h, J.n(fx))
 	return null

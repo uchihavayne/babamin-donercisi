@@ -532,12 +532,14 @@ def kagit_yigin2(w=24, h=27):
 
 
 # ---------------------------------------------------------------- stok cekmecesi (49x28)
-def stok2(w=49, h=28):
+def stok2(w=49, h=28, kavanoz=True):
     K = 0.4
     makine("Stk", 0, 0, w, h, 26, K)
     Mo = cel("StkOyuk", ["#1c2628", "#26323a", "#303e42", "#56666a"], S4)
     pah_kutu("oyuk", w / 2 - 9, w / 2 + 9, 6, 10, -0.9, 0.2, Mo, K, pah=0.5)
     serit("oyuk_isik", w / 2 - 7, 6, w / 2 + 7, 6.5, -0.95, flat("OyukIsik", "#c1cdc5"), K)
+    if not kavanoz:
+        return
     # iki kavanoz: tursu (yesil) + yogurt (krem)
     for i, (govde, kapak) in enumerate((("#647633", "#c4d2cc"), ("#eee5cc", "#c4d2cc"))):
         kx = 8 + i * 9 + 3
@@ -545,6 +547,95 @@ def stok2(w=49, h=28):
         acik = "#8fa451" if i == 0 else "#fff8e6"
         L.silindir("kavanoz", 3.0, kx, -1.6, ez(20.5, -1.6, K), 7, cel("Kav%d" % i, koyu + [govde, acik], S4), seg=16)
         L.silindir("kav_kapak", 3.2, kx, -1.6, ez(16.8, -1.6, K), 1.4, cel("KavK%d" % i, ["#7d8a86", "#9dacaa", kapak, "#eef6f2"], S4), seg=16)
+
+
+# ---------------------------------------------------------------- tatli tepsisi (34x27)
+# Kullanici: "tatli tepsisini duzenle". Bakir baklava tepsisi (kalkik kenar,
+# serbet parlakligi) + ayri baklava dilimleri (oyun kalan sayiya gore dizer).
+def tatli_tepsi(w=34, h=27):
+    K = K0
+    Mb = cel("Bakir", ["#5a2a10", "#8a4a1e", "#b8703a", "#e8a86a"], S4)
+    Mi = cel("BakirIc", ["#6a3814", "#8a5020", "#a8682e", "#c88848"], S4, noise=0.05, noise_scale=20)
+    T.ust_poligon("golge", [(2, 4), (w + 1.5, 4), (w + 1.5, h + 1), (2, h + 1)], -(h + 1.2), px.flat_a("TatliGolge", "#1a1a1a", 0.35), K, kal=0.02)
+    # kalkik kenarli tepsi: kenar (flans) + ice egimli duvar + taban (kuyu gibi)
+    zt = kuyu("tepsi", 0, 0, w, h - 3, 2.2, Mb, Mb, Mi, K, cerceve=1.8)
+    onkutu("on_kenar", 0.3, w - 0.3, h - 3, h - 0.5, -0.05, 0.2, cel("BakirOn", ["#5a2a10", "#7a3e18", "#a0602e", "#c8804a"], S4), K)
+    ust_cizgi("isik", 2.5, 0.6, w - 2.5, 0.6, 0.6, zt + 0.02, px.flat("BakirIsik", "#f6c890"), K)
+    ust_poligon("serbet", [(6, 6), (15, 6), (12, 9), (5, 9)], zt - 2.18, px.flat_a("Serbet", "#ffe6a0", 0.35), K)
+
+
+def baklava_dilim():
+    """Tek baklava dilimi: eskenar dortgen ust yuz, katli yan yuz, fistik.
+    Capa: dilimin merkezi."""
+    K = K0
+    Mu = cel("BakUst", ["#8a4f14", "#c07a2c", "#dca048", "#f4c878"], S4, noise=0.06, noise_scale=16)
+    Mk = cel("BakKat", ["#6a3810", "#9a5c1c", "#c88438", "#e8b060"], S4)
+    ust = [(-5.0, 0.0), (0.0, -3.0), (5.0, 0.0), (0.0, 3.0)]
+    kal = 2.4
+    bm = bmesh.new()
+    alt = [bm.verts.new((x, (-gy) / K, -kal)) for x, gy in ust]
+    tep = [bm.verts.new((x, (-gy) / K, 0.0)) for x, gy in ust]
+    for i in range(4):
+        bm.faces.new((alt[i], alt[(i + 1) % 4], tep[(i + 1) % 4], tep[i]))
+    bm.faces.new(list(reversed(alt)))
+    bm.faces.new(tep)
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
+    ob = mesh_ob("baklava", bm, Mk, smooth=False)
+    ob.data.materials.append(Mu)
+    for p in ob.data.polygons:
+        if p.normal.z > 0.9:
+            p.material_index = 1
+    # yan yuzde yufka katlari (ince acik cizgiler)
+    for zz in (-0.7, -1.5):
+        for (x0, g0), (x1, g1) in ((ust[3], ust[0]), (ust[2], ust[3])):
+            ust_cizgi("kat", x0, g0 + (-zz) * 0.0, x1, g1, 0.25, zz, px.flat("Kat", "#f0c070"), K)
+    # fistik kirintisi
+    Mf = cel("Fistik", ["#2f5a14", "#4a7a22", "#6aa032", "#9ac85a"], S4)
+    for q, (fx, fy) in enumerate(((-0.8, -0.4), (0.6, 0.3), (0.1, -1.0), (-0.2, 0.8))):
+        e = I.elipsoid("fistik%d" % q, fx, fy, 0.7, 0.4, 0.5, 0.0, Mf, seg=8, ring=4)
+        e.location = (fx, (-fy) / K, 0.35)
+
+
+# ---------------------------------------------------------------- depo cekmecesi ikonlari
+# Kullanici: "iki sey varmis gibi gorunuyor ama ici dolu". Cekmecenin onune
+# ACIK olan butun stok turlerinin kucuk ikonu dizilir (oyun hangilerinin
+# acik oldugunu bilir). Capa: ikonun alt-orta noktasi.
+def stok_ikon(tur):
+    def fn():
+        K = 0.4
+        if tur == "pickle":
+            L.silindir("kav", 2.6, 0, -1.2, ez(-3.2, -1.2, K), 6.2, cel("IkTursu", ["#2e3a12", "#4a5c1e", "#647633", "#8fa451"], S4), seg=16)
+            L.silindir("kapak", 2.8, 0, -1.2, ez(-6.9, -1.2, K), 1.2, cel("IkKapak", ["#7d8a86", "#9dacaa", "#c4d2cc", "#eef6f2"], S4), seg=16)
+            for q in range(3):
+                e = I.elipsoid("t", -1.2 + q * 1.2, -2.6 - (q % 2) * 1.4, 0.8, 0.5, 0.3, -2.8, px.flat("IkTursuD", "#a8ca52"), seg=8, ring=4)
+                e.location.z = ez(-2.6 - (q % 2) * 1.4, -2.8, K)
+        elif tur == "yogurt":
+            T.torna("kova", [(2.4, 0.0), (3.0, 5.6)], 0, 0, 0.0, 0.8, cel("IkYog", ["#b9b19c", "#dcd6c6", "#f4f0e4", "#ffffff"], S4), K)
+            T.torna("bant", [(2.75, 2.0), (2.9, 3.4)], 0, 0, 0.0, 0.8, px.flat("IkYogBant", "#3f79c0"), K, kapak=False)
+            T.torna("kapak", [(3.2, 5.6), (3.2, 6.5)], 0, 0, 0.0, 0.8, cel("IkYogKap", ["#2f5a90", "#3f79c0", "#5a94d6", "#8ab8ea"], S4), K)
+        elif tur == "ayran":
+            T.torna("sise", [(1.8, 0.0), (2.0, 4.4), (1.1, 6.0), (0.9, 7.4)], 0, 0, 0.0, 0.8, cel("IkAyran", ["#b9c4c8", "#dfe7ec", "#f8f6ee", "#ffffff"], S4), K)
+            T.torna("bant", [(2.05, 1.6), (2.05, 3.2)], 0, 0, 0.0, 0.8, px.flat("IkAyranBant", "#3f79c0"), K, kapak=False)
+            T.torna("kapak", [(1.1, 7.4), (1.1, 8.6)], 0, 0, 0.0, 0.8, cel("IkAyranKap", ["#2f5a90", "#3f79c0", "#5a94d6", "#8ab8ea"], S4), K)
+        elif tur == "sweet":
+            # iki kat baklava dilimi (kenari kizarmis, ustu fistikli)
+            Mb = cel("IkBaklava", ["#8a4f14", "#b8702a", "#d9953e", "#f4c070"], S4)
+            L.kutu("baklava", -3.4, 3.4, 0.0, 4.2, -1.5, 3.5, Mb)
+            for zz in (1.4, 2.8):
+                onkutu("kat", -3.4, 3.4, -zz - 0.3, -zz, -1.55, 3.5, px.flat("IkKat", "#b8702a"), K)
+            onkutu("fistik", -1.4, 1.4, -5.6, -4.7, 0.2, 1.2, px.flat("IkFistik", "#6aa032"), K)
+        elif tur == "tomato":
+            e = I.elipsoid("domates", 0, -2.6, 2.8, 2.4, 2.2, 0.0, cel("IkDomates", ["#7a1a12", "#b82a1c", "#e2483a", "#ff8a70"], S4), seg=16, ring=10)
+            e.location.z = ez(-2.6, 0.0, K)
+            for q in range(4):
+                a = q * 1.57
+                onkutu("sap", math.cos(a) * 0.9 - 0.3, math.cos(a) * 0.9 + 0.3, -5.4 + math.sin(a) * 0.3, -4.8, -2.3, -2.0, px.flat("IkDomSap", "#3f7a22"), K)
+        elif tur == "pepper":
+            e = I.elipsoid("biber", 0, -3.2, 1.3, 3.2, 1.2, 0.0, cel("IkBiber", ["#2f5a14", "#4a7a22", "#6aa032", "#9ac85a"], S4), seg=12, ring=10)
+            e.location.z = ez(-3.2, 0.0, K)
+            e.rotation_euler = (0, math.radians(18), 0)
+            onkutu("sap", -0.3, 0.5, -7.2, -6.0, -0.9, -0.2, px.flat("IkBiberSap", "#2f5a14"), K)
+    return fn
 
 
 # ---------------------------------------------------------------- patates kasasi (46x28)
@@ -601,20 +692,154 @@ def altlik(w=48, h=35):
         T._damar(r, 4, w - 4, 5 + g * 6.5, zi, flat("AltDamar%d" % g, "#9a6a3e"), K)
 
 
+# ---------------------------------------------------------------- ekmek altligindaki yiginlar
+# Capa: ST.bread sol-ust (altlik 48x35 bunun (0,3)'unde). Kullanici: "ekmekler
+# tahtaya oturmuyor" -> tabaksiz, altligin USTUNE oturan yiginlar.
+def _lavas_yigin(cx, taban_gy, adet, rx, K):
+    Ml = cel("LavasY", ["#b8925a", "#d8b581", "#f0d5a8", "#f8e6c4"], S4, noise=0.10, noise_scale=14)
+    Mk = cel("LavasKenar", ["#9c7644", "#c49a62", "#dcb27a", "#ecc894"], S4, noise=0.08, noise_scale=10)
+    Mg = px.flat_a("LavasGolge", "#3a2210", 0.35)
+    I.yatay_elips("golge", cx + 1.0, taban_gy + 1.2, rx + 1.5, 0.1, Mg, K, ry_ekran=4.6)
+    for i in range(adet):
+        gy = taban_gy - i * 2.6
+        r = rx - (i % 2) * 0.6 - i * 0.25
+        I.yatay_elips("lavas%d" % i, cx + (0.6 if i % 2 else -0.4), gy, r, 1.3, Mk if i < adet - 1 else Ml, K, ry_ekran=4.2, egim=0.05)
+    ust = taban_gy - (adet - 1) * 2.6
+    Mb = px.flat("LavasBenek", "#c39a63")
+    for q in range(8):
+        a = q * 2.1
+        e = I.elipsoid("benek", cx + math.cos(a) * (2.5 + q * 1.3), ust - 1.2 + math.sin(a) * 1.4, 0.9, 0.5, 0.5, -1.4, Mb, seg=8, ring=4)
+        e.location.z = ez(ust - 1.2 + math.sin(a) * 1.4, -1.4, K) + 1.3
+
+
+def _pide_yigin(cx, taban_gy, adet, rx, K):
+    Mp = cel("PideY", ["#7a4e20", "#a06a2e", "#d9a765", "#eec78c"], S4, noise=0.12, noise_scale=12)
+    Mg = px.flat_a("PideGolge", "#3a2210", 0.35)
+    I.yatay_elips("golge", cx + 1.0, taban_gy + 1.4, rx + 1.5, 0.1, Mg, K, ry_ekran=4.0)
+    for i in range(adet):
+        I.yatay_elips("pide%d" % i, cx, taban_gy - i * 3.2, rx - i * 0.8, 2.2, Mp, K, ry_ekran=3.6, egim=0.18)
+    ust = taban_gy - (adet - 1) * 3.2
+    Mb = px.flat("PideSusam", "#8a5f31")
+    for q in range(7):
+        # ust pidenin ust yuzunde (merkez derinlik 0, yuzey z = -gy + kalinlik/2)
+        gy = ust - 0.6 + ((q * 3) % 5 - 2) * 0.45
+        e = I.elipsoid("susam", cx - 9 + q * 3, gy, 0.7, 0.4, 0.4, 0.0, Mb, seg=8, ring=4)
+        e.location = (cx - 9 + q * 3, 0.0, -gy + 1.1)
+
+
+def ekmek_lavas_tek():
+    _lavas_yigin(24.0, 27.0, 6, 17.0, K0)
+
+
+def ekmek_pide_arka():
+    _pide_yigin(24.0, 17.0, 3, 15.0, K0)
+
+
+def ekmek_lavas_on():
+    _lavas_yigin(24.0, 31.0, 4, 16.0, K0)
+
+
+# ---------------------------------------------------------------- patates sepeti (46x28)
+def patates_sepet(w=46, h=28):
+    """Remake'in patates dolabi (istasyon_hd.patates_dolap): koyu oyuklu ahsap
+    dolap + hasir sepet. Yuva alcak oldugu icin patatesler iki sira, her biri
+    ayri tonda (yigin tek yumru gibi gorunmesin)."""
+    Mah = cel("DolapAhsap", ["#2e2010", "#4e3a18", "#6d5228", "#8a6a3a"], S4)
+    L.kutu("oyuk", 0, w, -h, 0, 4, 6, px.flat("DolapIc", "#3a2a12"))
+    for ad, x0, x1, z0, z1 in (("ust", 0, w, -2, 0), ("alt", 0, w, -h, -h + 2),
+                               ("sol", 0, 2, -h, 0), ("sag", w - 2, w, -h, 0)):
+        L.kutu(ad, x0, x1, z0, z1, -1, 5, Mah)
+    sx, sw, sy, sh = 2, w - 4, 4, h - 6
+    Msep = cel("Sepet", ["#4e3a18", "#6d5228", "#a5813f", "#c9a45e"], S4)
+    L.kutu("sepet_arka", sx, sx + sw, -(sy + sh), -sy, 2.5, 3.5, cel("SepetIc", ["#3a2a12", "#4e3a18", "#5b4420", "#6d5228"], S4))
+    tonlar = [cel("Pat%d" % i, r, S4, noise=0.14, noise_scale=9) for i, r in enumerate((
+        ["#5e3e16", "#8a5e26", "#b98a48", "#dcb574"],
+        ["#6e4a1c", "#9a6a2c", "#c49a54", "#e2bf7a"],
+        ["#664418", "#906430", "#bd9250", "#d8b070"]))]
+    Mg = px.flat("PatGoz", "#5e3e16")
+    r = random.Random(11)
+    # arka sira (yuksekte, geride) + on sira (asagida, onde)
+    for sira, (n, gy0, derin, rr) in enumerate(((6, sy + 7.5, 1.2, 3.9), (5, sy + 11.0, -0.8, 4.2))):
+        for i in range(n):
+            u = (i + 0.5) / n
+            ox = sx + 3 + u * (sw - 6) + r.uniform(-0.8, 0.8) + (1.8 if sira else 0)
+            oy = gy0 + r.uniform(-0.8, 0.8)
+            e = I.elipsoid("pat%d_%d" % (sira, i), ox, oy, rr * r.uniform(0.95, 1.12), rr * 0.74, rr * 0.8, derin, tonlar[(i + sira) % 3], seg=16, ring=10)
+            e.rotation_euler = (0, r.uniform(-0.35, 0.35), 0)
+            for q in range(2):
+                a = r.uniform(0, 6.28)
+                g = I.elipsoid("goz", ox + math.cos(a) * rr * 0.5, oy - 1.0 + math.sin(a) * rr * 0.3, 0.45, 0.3, 0.3, derin - rr * 0.8, Mg, seg=6, ring=4)
+    # on orgu: yatay seritler + dikey cubuklar
+    oy0 = sy + round(sh * .5)
+    for gy in range(oy0, sy + sh, 3):
+        L.kutu("orgu", sx, sx + sw, -(gy + 2), -gy, -5.2, -4.2, Msep)
+    for gx in range(0, sw, 4):
+        L.kutu("orucu", sx + gx, sx + gx + 1, -(sy + sh), -oy0, -5.6, -5.0, cel("Orucu", ["#4e3a18", "#6d5228", "#a5813f", "#c09a52"], S4))
+    L.kutu("cember", sx - 1, sx + sw + 1, -(oy0 + 1.2), -(oy0 - 0.8), -5.8, -4.0, cel("Cember", ["#6d5228", "#8a6a3a", "#a5813f", "#c9a45e"], S4))
+    L.kutu("taban", sx - 1, sx + sw + 1, -(sy + sh), -(sy + sh - 2), -5.8, 3.6, Msep)
+
+
 # ---------------------------------------------------------------- sos siseleri
-# counter_design: govde 10x14, kapak 6x4, uc 2x5 -> tezgah_hd.sise olcusu kucultulur
-BOY2 = [{"w": 10, "gov": 10, "omuz": 3, "boyun": 2}, {"w": 11, "gov": 9, "omuz": 3, "boyun": 2},
-        {"w": 10, "gov": 10, "omuz": 3, "boyun": 2}]
+# Kullanici: "soslar kesik gibi, yarim gibi". Klasik sikma sise: TAMAMEN dolu
+# renkli govde (acik: kirmizi / sarimsak: krem / tereyag: sari), ortada
+# sarili etiket + ikon, yuvarlak omuz, vidali kapak ve sivri uc. Capa:
+# sisenin (cx, taban). Tasarim olcusu: govde 10x14, kapak 6x4, uc 2x5.
+SOS2 = [{"ramp": ["#6e140e", "#a8231a", "#d8362a", "#f25a44"], "cap": "#3a2a24"},
+        {"ramp": ["#b3aa92", "#d9d1bb", "#f1ecdd", "#ffffff"], "cap": "#6f7a84"},
+        {"ramp": ["#9a6a0c", "#d0921c", "#f0b53c", "#ffd77a"], "cap": "#7a4f16"}]
 
 
 def sise2(i):
     def fn():
-        eski = T.BOY
-        T.BOY = BOY2
-        try:
-            T.sise(i)()
-        finally:
-            T.BOY = eski
+        K = 0.3
+        d = SOS2[i]
+        ym, der = 2.5, 0.6
+        hw, gov, omuz, boyun = 5.0, 10.0, 3.0, 1.0
+        Mg = cel("Sise%d" % i, d["ramp"], S4)
+        prof = [(hw - 1.2, 0.0), (hw - 0.3, 0.5), (hw, 1.4), (hw, gov - 0.6)]
+        for k in range(1, 5):
+            a = k / 4.0
+            prof.append((hw - (hw - 2.6) * math.sin(a * math.pi / 2), gov - 0.6 + (omuz + 0.6) * (1 - math.cos(a * math.pi / 2))))
+        prof.append((2.4, gov + omuz + boyun))
+        T.torna("govde", prof, 0, 0, ym, der, Mg, K)
+        # parlak serit: sol-onde dikey yansima (plastik parlakligi)
+        yon = ym - hw * der
+        onkutu("parlak", -3.4, -2.6, -(gov - 1.0), -2.0, yon - 0.35, yon - 0.1, px.flat("Parlak%d" % i, d["ramp"][3]), K)
+        # etiket: govdenin ortasinda sarili bant + ince cerceve
+        e_alt, eh = 2.4, 5.6
+        T.torna("etiket", [(hw + 0.12, e_alt), (hw + 0.12, e_alt + eh)], 0, 0, ym, der,
+                cel("Etiket%d" % i, ["#b9b19c", "#d8d0bb", "#f6f1e3", "#ffffff"], S4), K, kapak=False)
+        for zz in (e_alt, e_alt + eh - 0.5):
+            T.torna("etiket_cizgi", [(hw + 0.16, zz), (hw + 0.16, zz + 0.5)], 0, 0, ym, der, px.flat("EtiketCizgi%d" % i, d["ramp"][1]), K, kapak=False)
+        lcy = -(e_alt + eh / 2.0)
+        yon_e = ym - (hw + 0.12) * der - 0.35
+        if i == 0:
+            b = I.elipsoid("biber", 0, lcy, 2.3, 1.3, 0.5, yon_e, cel("Biber", ["#8e1c14", "#c02a20", "#e2382a", "#ff7a62"], S4), seg=12, ring=6)
+            b.location.z = ez(lcy, yon_e, K)
+            b.rotation_euler = (0, math.radians(-20), 0)
+            sp = I.elipsoid("sap", 2.1, lcy - 1.3, 0.7, 0.4, 0.3, yon_e - 0.3, px.flat("Sap", "#5a8a2a"), seg=8, ring=4)
+            sp.location.z = ez(lcy - 1.3, yon_e - 0.3, K)
+        elif i == 1:
+            # beyaz etikette secilsin: mor-bej sarimsak basi + dis cizgileri
+            b = I.elipsoid("sarimsak", 0, lcy + 0.3, 2.2, 2.0, 0.5, yon_e, cel("Sarimsak", ["#6e5a6a", "#9a8494", "#c9b8c0", "#ebe0e4"], S4), seg=12, ring=6)
+            b.location.z = ez(lcy + 0.3, yon_e, K)
+            for dx in (-0.9, 0.9):
+                onkutu("dis", dx - 0.2, dx + 0.2, lcy - 1.4, lcy + 1.5, yon_e - 0.6, yon_e - 0.45, px.flat("SarDis", "#6e5a6a"), K)
+            u = I.elipsoid("uc", 0, lcy - 1.9, 0.4, 0.8, 0.3, yon_e - 0.2, px.flat("SarUc", "#6e5a6a"), seg=8, ring=4)
+            u.location.z = ez(lcy - 1.9, yon_e - 0.2, K)
+        else:
+            Mt = cel("Tereyag", ["#a8680a", "#d88a14", "#f0a82c", "#ffd060"], S4)
+            onkutu("tereyag_golge", -2.6, 2.9, lcy - 1.3, lcy + 1.9, yon_e - 0.5, yon_e, px.flat("TereyagGolge", "#9a6a2a"), K)
+            onkutu("tereyag", -2.4, 2.6, lcy - 1.6, lcy + 1.6, yon_e - 0.8, yon_e, Mt, K)
+            onkutu("tereyag_ust", -2.4, 2.6, lcy - 1.6, lcy - 1.1, yon_e - 0.85, yon_e, px.flat("TereyagIsik", "#ffe39a"), K)
+        # kapak: vidali halka + kapak + sivri uc
+        cap = d["cap"]
+        z0 = gov + omuz + boyun
+        T.torna("halka", [(3.1, z0 - 0.3), (3.1, z0 + 1.2)], 0, 0, ym, der, cel("KapH%d" % i, [T.hexmul(cap, .5), T.hexmul(cap, .75), cap, T.hexmul(cap, 1.3)], S4), K)
+        T.torna("kapak", [(2.9, z0 + 1.2), (2.9, z0 + 3.2), (1.6, z0 + 4.2)], 0, 0, ym, der, cel("Kap%d" % i, [T.hexmul(cap, .6), cap, T.hexmul(cap, 1.3), T.hexmul(cap, 1.6)], S4), K)
+        T.torna("uc", [(1.1, z0 + 4.0), (0.7, z0 + 7.5), (0.3, z0 + 8.2)], 0, 0, ym, der, cel("Uc%d" % i, [T.hexmul(cap, .7), cap, T.hexmul(cap, 1.3), T.hexmul(cap, 1.6)], S4), K)
+        # taban golgesi yerine alt kenar koyulugu (sise masaya oturur)
+        T.torna("taban", [(hw - 1.1, 0.0), (hw - 1.1, 0.4)], 0, 0, ym, der, px.flat("SiseTaban%d" % i, d["ramp"][0]), K)
     return fn
 
 
@@ -637,13 +862,22 @@ for _n in (1, 2, 3):
 parca("kagit_makine", (-1, 1, 27, 28), kagit_makine2, K=0.3)
 parca("kagit_yigin", (-1, 2, 26, 26), kagit_yigin2, K=0.4)
 parca("stok", (-1, -1, 52, 31), stok2, K=0.4)
-parca("patates_kasa", (-1, -1, 48, 30), patates_kasa2)
+parca("stok_bos", (-1, -1, 52, 31), lambda: stok2(kavanoz=False), K=0.4)
+parca("tatli_tepsi", (-1, -1, 38, 31), tatli_tepsi)
+parca("baklava_dilim", (-6, -5, 12, 9), baklava_dilim, cizgi="#4a2a08", cizgi_alfa=120)
+for _t in ("pickle", "yogurt", "ayran", "sweet", "tomato", "pepper"):
+    parca("stok_ikon_%s" % _t, (-5, -11, 10, 12), stok_ikon(_t), K=0.4, cizgi="#1c2426", cizgi_alfa=110)
+# Kullanici: onceki oyunun patates sepeti daha iyi -> remake'in dolap + hasir
+# sepet modeli yeni yuvanin olcusunde (46x28)
+parca("patates_kasa", (-1, -1, 48, 31), patates_sepet, K=0.3, cizgi="#2a1c0c", cizgi_alfa=120)
 parca("cop", (-1, -1, 34, 52), cop2)
 parca("altlik", (-1, -1, 50, 37), altlik)
 parca("kutu_raf_46", (0, 12, 46, 8), lambda: T.kutu_raf(46), K=0.4)
+parca("ekmek_lavas_tek", (2, 2, 44, 34), ekmek_lavas_tek, cizgi="#8a6a3a", cizgi_alfa=110)
+parca("ekmek_pide_arka", (4, 4, 40, 22), ekmek_pide_arka, cizgi="#5a3a18", cizgi_alfa=110)
+parca("ekmek_lavas_on", (3, 16, 42, 22), ekmek_lavas_on, cizgi="#8a6a3a", cizgi_alfa=110)
 for _i in range(3):
-    _t = BOY2[_i]["gov"] + BOY2[_i]["omuz"] + BOY2[_i]["boyun"] + 9
-    parca("sise_%d" % _i, (-10, -(_t + 1), 20, _t + 4), sise2(_i), K=0.3, cizgi=T.hexmul(T.SOS[_i]["c0"], .6), cizgi_alfa=150)
+    parca("sise_%d" % _i, (-8, -25, 16, 28), sise2(_i), K=0.3, cizgi=T.hexmul(SOS2[_i]["ramp"][0], .7), cizgi_alfa=150)
 
 
 def uret(ad):

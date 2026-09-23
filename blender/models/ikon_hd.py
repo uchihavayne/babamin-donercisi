@@ -359,6 +359,69 @@ def cip(m, yasak, zemin=True):
     return fn
 
 
+# BIRLESIK: siparis balonundaki icecek ikonu makinedeki bardakla AYNI olsun
+# (kullanici). yiyecek_hd kupa modeli (cam arka + dolu sivi + cam on + pipet),
+# ikon boyuna %88 kucultulur.
+ICECEK_SIVI = {"cola": ("#8a3a20", "#4a1c10", "kirmizi"), "fanta": ("#ffb03c", "#f0821c", "mavi"),
+               "ayran": ("#ffffff", "#e4e2d8", "mavi")}
+
+
+def bardak(tip):
+    def fn():
+        import yiyecek_hd as Y
+        c0, c1, pipet = ICECEK_SIVI[tip]
+        Y.kupa_arka()
+        g = Y._kupa_gen
+        sivi = [(-g(1) + 0.9, -4.6), (g(1) - 0.9, -4.6), (g(14) - 0.9, 8.8), (-g(14) + 0.9, 8.8)]
+        on_poligon("sivi", sivi, 0.5, cel("Sivi" + tip, [hexmul(c1, .8), c1, c1, c0], [0, .3, .5, .8]), 0.3, derin=0.05)
+        yuz = [(g(1) * math.cos(2 * math.pi * j / 20) * 0.85, -4.6 + 0.7 * math.sin(2 * math.pi * j / 20)) for j in range(20)]
+        on_poligon("yuz", yuz, 0.3, px.flat("SiviYuz" + tip, c0), 0.3, derin=0.02)
+        if tip == "cola":
+            for q, (bx, by) in enumerate(((-2.0, 4.0), (1.0, 1.5), (2.5, 5.5), (-0.5, -1.5))):
+                on_poligon("kopuk%d" % q, [(bx, by), (bx + 0.8, by), (bx + 0.8, by + 0.8), (bx, by + 0.8)], 0.2, px.flat("Kopuk", "#a9713f"), 0.3, derin=0.02)
+        Y.kupa_on(pipet)()
+        for ob in bpy.context.scene.objects:
+            if ob.type == "MESH":
+                ob.location = ob.location * 0.88
+                ob.scale = ob.scale * 0.88
+    return fn
+
+
+for _t in ("cola", "fanta", "ayran"):
+    parca("bardak_%s" % _t, (-8, -11, 16, 21), bardak(_t), cizgi="#3f4a52", cizgi_alfa=90)
+
+
+# BIRLESIK: balondaki "!" / "G" sos isareti anlasilmiyordu -> kucuk sos rozeti:
+# aci sos = kirmizi rozet + aci biber, sarimsakli = krem rozet + sarimsak
+def sos_rozet(tur):
+    def fn():
+        st = [0, .3, .6, .9]
+        if tur == "hot":
+            zemin = ["#c9c1ad", "#ece2c8", "#fff5de", "#ffffff"]
+            L.halka("kenar", 4.6, 4.6, 0.55, 0.0, 0.0, -0.1, cel("RKenar", ["#6e140e", "#a8231a", "#d8362a", "#f25a44"], st))
+        else:
+            zemin = ["#b3aa92", "#d9d1bb", "#f1ecdd", "#ffffff"]
+        L.disk("rozet", 4.4, 0.0, 0.0, 0.6, 0.9, 0.35, cel("SosRozet" + tur, zemin, st))
+        if tur == "hot":
+            b = I.elipsoid("biber", 0.0, 0.0, 2.6, 1.4, 0.6, 0.0, cel("RBiber", ["#7a1a12", "#b82a1c", "#e2382a", "#ff7a62"], st), seg=12, ring=6)
+            b.location = (0.2, -1.2, 0.3)
+            b.rotation_euler = (0, math.radians(-30), 0)
+            sp = I.elipsoid("sap", 0.0, 0.0, 0.9, 0.5, 0.3, 0.0, px.flat("RSap", "#6aa032"), seg=8, ring=4)
+            sp.location = (2.3, -1.4, 1.6)
+        else:
+            b = I.elipsoid("sarimsak", 0.0, 0.0, 2.3, 2.1, 0.8, 0.0, cel("RSar", ["#6e5a6a", "#9a8494", "#c9b8c0", "#ebe0e4"], st), seg=12, ring=6)
+            b.location = (0.0, -1.2, -0.3)
+            for dx in (-0.9, 0.9):
+                L.kutu("dis", dx - 0.2, dx + 0.2, -1.8, 1.4, -2.2, -2.0, px.flat("RSarDis", "#6e5a6a"))
+            u = I.elipsoid("uc", 0.0, 0.0, 0.4, 0.9, 0.3, 0.0, px.flat("RSarUc", "#6e5a6a"), seg=8, ring=4)
+            u.location = (0.0, -1.4, 2.2)
+    return fn
+
+
+for _t in ("hot", "garlic"):
+    parca("sos_%s" % _t, (-6, -6, 12, 12), sos_rozet(_t), cizgi="#2b1f14", cizgi_alfa=130)
+
+
 for _m in ("pickle", "yogurt", "fries", "meat"):
     parca("cip_%s" % _m, (-8, -7, 16, 15), cip(_m, False), cizgi="#6b5236", cizgi_alfa=110)
     parca("cip_%s_yok" % _m, (-8, -7, 16, 15), cip(_m, True), cizgi="#6b3a26", cizgi_alfa=110)

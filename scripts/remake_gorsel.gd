@@ -140,21 +140,29 @@ func f_dayiHD(x: Variant, y: Variant, st: Variant, t: Variant) -> bool:
 	var tt: float = J.n(t)
 	var mod := str(J.getv(st, "mode"))
 	var arm_t: float = J.n(J.getv(st, "armT"))
-	var bob := sin(tt * 1.7) * 1.0
-	var agirlik := sin(tt * .52) * 1.3
 	var zipla := -absf(sin(tt * 7.0)) * 3.0 if mod == "happy" else 0.0
 	var dongu := fposmod(tt, 7.4) / 7.4
 	var jest_tip := int(fposmod(floor(tt / 7.4), 3.0))
 	var jest_var := mod == "idle" and jest_tip < 2 and dongu > .55 and dongu < .82
 	var jest_k := sin((dongu - .55) / .27 * PI) if jest_var else 0.0
-	var kafa_don: float = floor(sin(tt * .43) * 1.4 + .5)
-	var ox: float = J.n(x) + floor(agirlik + .5)
-	var oy: float = J.n(y) + floor(zipla + .5) + bob
+	# BEKLEME (birlesik surum, kullanici: "saga sola kayiyor, titriyor"):
+	# eskiden BUTUN govde (ayaklar dahil) tam piksel adimlarla +-1.3 kayip
+	# +-1 inip kalkiyordu. Simdi ayaklar yerde sabit; nefes yalniz ust govdeyi
+	# 0..1 px kaldirir, agirlik aktarimi +-0.5 px, bas nefesi hafif gecikmeyle
+	# izler; hepsi yarim piksel (HD) adimli.
+	var nefes := sin(tt * 1.6) * 0.5 + 0.5
+	var nefes_bas := sin(tt * 1.6 - 0.7) * 0.5 + 0.5
+	var lx: float = J.n(x)
+	var ly: float = J.n(y) + floor(zipla + .5)
+	var ox: float = lx + f_hdYarimPx(sin(tt * .52) * 0.5)
+	var oy: float = ly - f_hdYarimPx(nefes)
+	var kafa_don: float = f_hdYarimPx(sin(tt * .43) * 0.8)
+	var kafa_y: float = ly - f_hdYarimPx(nefes_bas)
 	# golge (yari saydam elips, eski cizimle ayni)
 	draw_context.globalAlpha = 0.32
-	f_ell(ox + 23.0, oy + 152.0, 21.0, 4.0, "#000")
+	f_ell(lx + 23.0, ly + 152.0, 21.0, 4.0, "#000")
 	draw_context.globalAlpha = 1.0
-	hd_ciz(A, "bacak", ox, oy)
+	hd_ciz(A, "bacak", lx, ly)
 	hd_ciz(A, "govde", ox, oy)
 	match mod:
 		"slice":
@@ -171,28 +179,28 @@ func f_dayiHD(x: Variant, y: Variant, st: Variant, t: Variant) -> bool:
 			else: hd_ciz(A, "kol_sag_jest_%s_%d" % ["fes" if jest_tip == 1 else "biyik", n], ox, oy)
 	hd_ciz(A, "boyun", ox, oy)
 	var kx: float = ox + kafa_don
-	hd_ciz(A, "kafa", kx, oy)
-	hd_ciz(A, "fes", kx, oy)
-	hd_ciz(A, "puskul_%d" % clampi(roundi(sin(tt * 2.2) * 3.0) + 3, 0, 6), kx, oy)
+	hd_ciz(A, "kafa", kx, kafa_y)
+	hd_ciz(A, "fes", kx, kafa_y)
+	hd_ciz(A, "puskul_%d" % clampi(roundi(sin(tt * 2.2) * 3.0) + 3, 0, 6), kx, kafa_y)
 	var kas_kalk := mod == "happy" or roundi(jest_k) >= 1
-	hd_ciz(A, "kas_ust" if kas_kalk else "kas", kx, oy)
+	hd_ciz(A, "kas_ust" if kas_kalk else "kas", kx, kafa_y)
 	# eski: 0.77 sn'lik pencerenin tamaminda kapali. HD: basinda kisa kirpma
 	# (yari -> kapali -> yari); pencere secimi ayni.
 	var kirp_faz := fposmod(tt * 1.3, 1.0)
 	var kirp: bool = J.n(f_hash1(floor(tt * 1.3))) > .90 and kirp_faz < 0.22 and A.parca.has("goz_yari")
 	if kirp and kirp_faz >= 0.05 and kirp_faz < 0.15:
-		hd_ciz(A, "goz_kapali", kx, oy)
+		hd_ciz(A, "goz_kapali", kx, kafa_y)
 	elif kirp:
-		hd_ciz(A, "goz_yari", kx, oy)
+		hd_ciz(A, "goz_yari", kx, kafa_y)
 	elif J.n(f_hash1(floor(tt * 1.3))) > .90 and not A.parca.has("goz_yari"):
-		hd_ciz(A, "goz_kapali", kx, oy)
+		hd_ciz(A, "goz_kapali", kx, kafa_y)
 	else:
 		var bak := 1 if mod == "slice" or sin(tt * .6) > 0.0 else 0
-		hd_ciz(A, "goz_acik_%d" % bak, kx, oy)
-	hd_ciz(A, "burun", kx, oy)
-	hd_ciz(A, "allik", kx, oy)
-	hd_ciz(A, "biyik", kx, oy)
-	hd_ciz(A, "agiz_mutlu" if mod == "happy" else "agiz", kx, oy)
+		hd_ciz(A, "goz_acik_%d" % bak, kx, kafa_y)
+	hd_ciz(A, "burun", kx, kafa_y)
+	hd_ciz(A, "allik", kx, kafa_y)
+	hd_ciz(A, "biyik", kx, kafa_y)
+	hd_ciz(A, "agiz_mutlu" if mod == "happy" else "agiz", kx, kafa_y)
 	return true
 
 # ---------------------------------------------------------------- doner sisi
@@ -879,22 +887,25 @@ func f_hdAyran(x: Variant, y: Variant, w: Variant, h: Variant, n: Variant, mx: V
 	return true
 
 func f_hdFritoz(x: Variant, y: Variant, w: Variant, h: Variant, F: Variant, t: Variant) -> bool:
-	if not hd("fritoz") or int(J.n(w)) != 58 or int(J.n(h)) != 44: return false
+	# eski tezgah 58x44; yeni tezgah (counter_design) 51x43 -> "_51" parcalar
+	var yeni := int(J.n(w)) == 51 and int(J.n(h)) == 43
+	if not hd("fritoz") or (not yeni and (int(J.n(w)) != 58 or int(J.n(h)) != 44)): return false
 	var A := _mk()
-	if A.is_empty(): return false
+	if A.is_empty() or (yeni and not A.parca.has("fritoz_govde_51")): return false
+	var ek := "_51" if yeni else ""
 	var X: float = J.n(x)
 	var Y: float = J.n(y)
-	var W := 58.0
+	var W: float = J.n(w)
 	var T: float = J.n(t)
 	var P := _P()
 	var durum = J.getv(F, "state")
 	var vatX := X + 5
-	var vatW := 48.0
+	var vatW := W - 10.0
 	var vatY := Y + 10
 	var vatH := 19.0
 	var vatB := vatY + vatH
 	var oilY := vatY + 2
-	hd_ciz(A, "fritoz_govde", X, Y)
+	hd_ciz(A, "fritoz_govde" + ek, X, Y)
 	for sp in 6:
 		f_px(X + 8 + J.n(f_hash1(sp * 2.7)) * (W - 18), Y + 1 + J.n(f_hash1(sp * 5.1)) * 4.0, "rgba(196,164,92,.45)")
 	_yag_yuzey(vatX, vatW, oilY, T, "#c9a03a")
@@ -960,7 +971,7 @@ func f_hdFritoz(x: Variant, y: Variant, w: Variant, h: Variant, F: Variant, t: V
 			var fbx: float = bskX + 1 + J.n(f_hash1(fb * 7.3)) * (bskW - 2)
 			var fby := fmod(T * (22.0 + fb * 5.0) + fb * 13.0, (vatB - oilY) - 2)
 			_kabarcik(fbx, vatB - 2 - fby, "#ffe9a3")
-	hd_ciz(A, "fritoz_on", X, Y)
+	hd_ciz(A, "fritoz_on" + ek, X, Y)
 	for s in sepetler:
 		hd_ciz(A, "fritoz_sap", s[0] + s[1] - 5, bskY + 1)
 	var pY := vatB + 3
@@ -980,9 +991,9 @@ func f_hdFritoz(x: Variant, y: Variant, w: Variant, h: Variant, F: Variant, t: V
 	if J.eq(durum, "fry") and J.truth(_c("f_chance", .07)):
 		_c("f_smoke", vatX + J.n(_c("f_rnd", 2.0, vatW - 2)), vatY, 1.0, "rgba(255,240,210,.5)")
 	if fkd >= 3:
-		hd_ciz(A, "fritoz_bolme", X, Y)
+		hd_ciz(A, "fritoz_bolme" + ek, X, Y)
 	if fkd >= 4:
-		hd_ciz(A, "fritoz_oto", X, Y)
+		hd_ciz(A, "fritoz_oto" + ek, X, Y)
 		f_disc(vatX + vatW - 4, vatY - 10, 1.0, "#7dff7a" if sin(T * 9.0) > 0 else "#2a6a28")
 	return true
 
@@ -1596,6 +1607,64 @@ func _sabit_ayna(A: Dictionary, ad: String, x: float, y: float, ayna: bool, ekse
 	var lx: float = (x + 2.0 * eksen - p[4] - p[2] / float(A.hd)) if ayna else (x + p[4])
 	draw_context.texture_hd(A.tex, Rect2(p[0], p[1], p[2], p[3]), lx, y + p[5], 1.0, ayna)
 
+# ---------------------------------------------------------------- mac atkilari
+# Takim renk ciftleri (sari-kirmizi, sari-lacivert, siyah-beyaz, bordo-mavi,
+# yesil-beyaz); tohuma gore secilir. Oyunun rastgele ureticisine dokunmaz.
+const ATKI_RENK := [["#f7c81a", "#c8102e"], ["#fcd116", "#14285a"], ["#16161a", "#f2f2f2"], ["#7a1c2e", "#5aa6dc"], ["#1f8a3a", "#f2f2f2"]]
+
+func _atki_renk(seed: float) -> Array:
+	return ATKI_RENK[int(J.n(f_hash1(seed * 5.31 + 0.9)) * ATKI_RENK.size()) % ATKI_RENK.size()]
+
+# Musteri: boyna sarili serit (2 renk seritli) + bir yandan sarkan uc ve puskul.
+# (x, by) govdenin ust-orta noktasi, bw govde genisligi; HD piksel ayrinti.
+func f_hdAtki(x: Variant, by: Variant, bw: Variant, seed: Variant) -> void:
+	if not hd("musteri"): return
+	var R := _atki_renk(J.n(seed))
+	var c0 := Color(R[0])
+	var c1 := Color(R[1])
+	var X: float = J.n(x) * 2.0
+	var Y: float = J.n(by) * 2.0
+	var W: float = roundf(J.n(bw) * 0.62) * 2.0
+	var x0 := roundf(X - W / 2.0)
+	# boyun sargisi: 3 kat serit (ust kat biraz dar), kat arasi golge
+	for kat in 3:
+		var kx := x0 + (2.0 if kat == 0 else 0.0)
+		var kw := W - (4.0 if kat == 0 else 0.0)
+		var ky := Y - 3.0 + kat * 2.0
+		var i := 0.0
+		while i < kw:
+			var c := c0 if int((i + kat * 3.0) / 3.0) % 2 == 0 else c1
+			_hp(kx + i, ky, minf(3.0, kw - i), 2.0, c.darkened(0.18) if kat == 2 else c)
+			i += 3.0
+	_hp(x0 + 1.0, Y + 3.0, W - 2.0, 1.0, Color(0, 0, 0, 0.25))
+	# sarkan uc: govdenin onunde, sag tarafta (tohuma gore sol/sag)
+	var sag := J.n(f_hash1(J.n(seed) * 2.9)) > 0.5
+	var ux := (X + W * 0.18) if sag else (X - W * 0.18 - 5.0)
+	var j := 0.0
+	while j < 14.0:
+		var c2 := c0 if int(j / 3.0) % 2 == 0 else c1
+		_hp(ux, Y + 3.0 + j, 5.0, minf(3.0, 14.0 - j), c2)
+		j += 3.0
+	_hp(ux + 4.0, Y + 3.0, 1.0, 14.0, Color(0, 0, 0, 0.18))
+	# puskul
+	for f in 3:
+		_hp(ux + f * 2.0, Y + 17.0, 1.0, 2.0, c1.lightened(0.2))
+
+# Yaya: kucuk boyun seridi + kisa sarkan uc (sokak olcusu)
+func _yaya_atki(X: float, yy: float, gw2: int, K: float, ayna: bool) -> void:
+	var R := _atki_renk(K + 3.0)
+	var c0 := Color(R[0])
+	var c1 := Color(R[1])
+	var x0 := roundf((X - gw2 / 2.0) * 2.0)
+	var y0 := roundf((yy - 8.5) * 2.0)
+	var i := 0.0
+	while i < gw2 * 2.0:
+		_hp(x0 + i, y0, minf(2.0, gw2 * 2.0 - i), 2.0, c0 if int(i / 2.0) % 2 == 0 else c1)
+		i += 2.0
+	var ux := x0 + (gw2 * 2.0 - 3.0 if not ayna else 1.0)
+	_hp(ux, y0 + 2.0, 2.0, 2.0, c1)
+	_hp(ux, y0 + 4.0, 2.0, 2.0, c0)
+
 func f_hdYaya(x: Variant, y: Variant, k: Variant, dir: Variant, t: Variant, sc: Variant, umb: Variant) -> bool:
 	if not hd("sokak"): return false
 	var A := atlas("sokak")
@@ -1641,6 +1710,9 @@ func f_hdYaya(x: Variant, y: Variant, k: Variant, dir: Variant, t: Variant, sc: 
 	elif esya == 4:
 		_hr(gx0 + gw2, yy - 3 + arm, 2.0, 2.0, "#e8e2d0")
 		_hr(gx0 + gw2, yy - 4 + arm, 1.0, 1.0, "#a83a2a")
+	# mac cikisi: taraftarlarin cogu takim atkili (ekrandaki yazi yerine)
+	if J.truth(_c("f_macDalgada")) and J.n(f_hash1(K * 2.3 + 0.7)) < 0.8:
+		_yaya_atki(X, yy, gw2, K, ayna)
 	hd_ton(A, "yaya_bas_ten", X, yy, 0, _renk(P0.skin), ayna, .5)
 	var sac := int(J.n(P0.sac))
 	hd_ton(A, "yaya_sac_%d" % clampi(sac, 0, 3), X, yy, 0, _renk(P0.hair), ayna, .5)
@@ -1730,7 +1802,8 @@ func _ekran_x(ayna: bool, cx: float, X: float, ofs: float, w: float) -> float:
 # ---------------------------------------------------------------- arayuz ikonlari
 # food.js icon: siparis balonu, HUD, dukkan. Blender HD (blender/models/ikon_hd.py).
 # Olcekli ctx (balonun acilma animasyonu) icinde eski cizim/onbellek devrede.
-const IKON_AD := {"orange": "fanta", "fries": "fbox"}
+# icecekler: makinedeki bardakla ayni cam bardak ikonu (birlesik surum)
+const IKON_AD := {"orange": "bardak_fanta", "fanta": "bardak_fanta", "cola": "bardak_cola", "ayran": "bardak_ayran", "fries": "fbox"}
 func f_hdIkon(id: Variant, x: Variant, y: Variant) -> bool:
 	if not hd("ikon") or not (id is String): return false
 	var ad: String = IKON_AD.get(id, id)
@@ -2698,10 +2771,12 @@ func f_hdKedi(t: Variant) -> bool:
 		var sek := floorf(sin(T * 9.0) + 0.5)
 		var b := floorf(sin(T * 11.0) * 1.5 + 0.5)
 		var kt := floorf(sin(T * 6.0) * 2.0 + 0.5)
-		hd_ciz(A, "kedi_kuyruk", X, Y + sek + kt)
-		hd_ciz(A, "kedi_bacak_arka", X, Y + sek)
-		hd_ciz(A, "kedi_yuru", X, Y + sek)
-		hd_ciz(A, "kedi_bacak_on", X, Y + sek - b)
+		# kedi hep SOLA yurur (sagdan gelir, soldan gider); eski cizimde bas saga
+		# bakiyordu (geri geri yuruyordu) -> yuruyus kareleri aynali
+		hd_ciz(A, "kedi_kuyruk", X, Y + sek + kt, 1.0, true)
+		hd_ciz(A, "kedi_bacak_arka", X, Y + sek, 1.0, true)
+		hd_ciz(A, "kedi_yuru", X, Y + sek, 1.0, true)
+		hd_ciz(A, "kedi_bacak_on", X, Y + sek - b, 1.0, true)
 	else:
 		hd_ciz(A, "kedi_otur_kuyruk", X, Y + floorf(sin(T * 3.2) * 2.0 + 0.5))
 		hd_ciz(A, "kedi_otur", X, Y)
@@ -2819,6 +2894,43 @@ func f_hdFener(tx: Variant, ty: Variant, t: Variant) -> bool:
 	var a := 0.83 + 0.33 * sin(J.n(t) * 9.0)
 	hd_ciz(A, "fener_isik", J.n(tx), J.n(ty), a)
 	_hp((J.n(tx) + 8.0) * 2.0, (J.n(ty) - 20.0) * 2.0, 3.0, 2.0, Color8(0xff, 0xf6, 0xc8))
+	return true
+
+# ELEKTRIK KESINTISI (birlesik surum): tam ekran shader (shaders/kesinti.gdshader)
+# karanlik + ocaktan gauss sonumlu titrek sicak hale + pencereden soguk isik;
+# ocak rezistanslari karanligin USTUNE parlak cizilir (tek isik kaynagi onlar).
+var _kesinti_mat: ShaderMaterial
+
+func f_hdKesinti(t: Variant, acilma: Variant) -> bool:
+	if not hd("kesinti"): return false
+	if _kesinti_mat == null:
+		_kesinti_mat = ShaderMaterial.new()
+		_kesinti_mat.shader = load("res://shaders/kesinti.gdshader")
+	var LAY: Dictionary = get("j_LAY")
+	var W: float = J.n(get("j_W"))
+	var H: float = J.n(LAY.floorY)
+	var cx: float = J.n(LAY.spit.cx)
+	var top: float = J.n(LAY.spit.top)
+	var H0: float = J.n(LAY.spit.bot) - top
+	var hx := cx + 19.0
+	var hy := top + 2.0
+	var hh := H0 - 14.0
+	var T := J.n(t)
+	var titre := 0.5 + 0.5 * sin(T * 5.3) * sin(T * 1.7)
+	var G: Dictionary = LAY.glass
+	_kesinti_mat.set_shader_parameter("boyut", Vector2(W, H))
+	_kesinti_mat.set_shader_parameter("isik", Vector2(hx + 8.5, hy + hh / 2.0))
+	_kesinti_mat.set_shader_parameter("cam", Vector4(J.n(G.x), J.n(G.y), J.n(G.w), J.n(G.h)))
+	_kesinti_mat.set_shader_parameter("karanlik", 0.84 - J.n(acilma) * 0.14)
+	_kesinti_mat.set_shader_parameter("titre", titre)
+	draw_context.tutulan.append(_kesinti_mat)
+	draw_context.shader_quad(0.0, 0.0, W, H, _kesinti_mat.get_rid(), Color.WHITE)
+	# rezistanslar: karanligin ustunde tam parlak
+	var seg := floorf((hh - 8.0) / 6.0)
+	for i in 6:
+		var fl := 0.55 + 0.45 * sin(T * 6.0 + i * 1.9)
+		if not f_hdIsiticiEleman(hx + 3.0, hy + 4.0 + i * seg, fl):
+			f_fr(hx + 3.0, hy + 4.0 + i * seg, 11.0, maxf(1.0, seg - 4.0), "#e0500f")
 	return true
 
 func f_hdKesintiIsik(pcx: Variant, pcy: Variant, hx: Variant, hy: Variant, titre: Variant) -> bool:

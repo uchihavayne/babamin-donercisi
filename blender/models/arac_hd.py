@@ -146,12 +146,22 @@ def bicak(k):
 
 
 def oto_ray():
-    H0 = 168 - 58
+    # BIRLESIK: ray boyu yeni sis yuksekliginden (art.js: top-6 .. bot+8) ve
+    # alt ucta tezgaha/damlama tepsisine civatali ayak (eskiden havada bitiyordu)
+    import yerlesim as YER
+    H0 = YER.SPIT_BOT - YER.SPIT_TOP
     Mr = I.cel("Ray", ["#2a2f36", "#3a4048", "#6b737d", "#98a0a9"], [0, .25, .55, .85])
     kutu(0, 4, -6, H0 + 8, -1.0, 1.0, Mr, bevel=0.4)
     kutu(1, 3, -6, H0 + 8, -1.2, -1.0, mat_ton("#4a525a"))
-    for rv in range(0, H0 + 10, 8):
+    for rv in range(0, H0 + 6, 8):
         elipsoid(1.5, -4 + rv + 0.5, 0.7, 0.7, 0.4, -1.4, mat_ton("#98a0a9", f=(0.6, 0.85, 1.0, 1.2)), seg=8, ring=5)
+    # ayak: genis taban plakasi + iki destek kulagi + civatalar
+    Ma = I.cel("RayAyak", ["#23282e", "#353c44", "#59636d", "#8b959e"], [0, .25, .55, .85])
+    kutu(-3.5, 7.5, H0 + 7, H0 + 10.5, -2.2, 2.2, Ma, bevel=0.45)
+    for x0 in (-2.2, 4.4):
+        kutu(x0, x0 + 1.8, H0 + 3, H0 + 7.2, -1.6, 1.4, Ma, bevel=0.3)
+    for gx in (-2.0, 6.0):
+        L.silindir("civata", 0.75, gx, -2.4, ez(H0 + 8.8, -2.4, K), 0.5, mat_ton("#98a0a9", f=(0.6, 0.85, 1.0, 1.2)), seg=10, eksen="Y")
 
 
 def oto_motor():
@@ -180,7 +190,7 @@ for _k in range(4):
     _Kd = KADEME[_k]
     _sol = -(_Kd["boy"] + 3 + _Kd["sapUz"]) - 3
     parca("bicak_%d" % _k, (_sol, -7, -_sol + 3, 14), bicak(_k))
-parca("oto_ray", (-2, -8, 8, 120), oto_ray)
+parca("oto_ray", (-5, -8, 14, 132), oto_ray)
 parca("oto_motor", (-9, -19, 20, 17), oto_motor)
 parca("oto_araba", (-7, -7, 31, 15), oto_araba)
 

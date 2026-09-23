@@ -128,26 +128,27 @@ def patates(k):
 
 # ---------------------------------------------------------------- tursu
 def tursu(k):
+    """Kullanici: "cok buyuk ve cok fazla, 3-4 tane yeter". Gorsel adet
+    seviyeye gore 2 / 3 / 3 / 4, dilimler kucuk; oyunun hash yerlesimi yerine
+    lavas boyunca esit aralik + hafif hash kaymasi."""
     def fn():
-        oran = min(1.0, k / 4.0)
-        n = max(3, int(math.floor(3 + oran * 5 + 0.5)))
-        gen = 14 + oran * 16
+        n = {1: 2, 2: 3, 3: 3, 4: 4}[k]
+        gen = 10 + k * 4.0
         Mk = cel("UstTursuK", ["#12200a", "#2c4410", "#4a6a1a", "#6e9128"], S4)
         Mi = cel("UstTursuI", ["#4a6a1a", "#6e9128", "#8fb03c", "#a8ca52"], S4)
         Mc = px.flat("UstTursuC", "#c4dc74")
         for q in range(n):
             pu = 0.5 if n == 1 else q / (n - 1.0)
-            kx = math.floor(-gen / 2.0 + pu * gen + 0.5)
-            ky = math.floor(BY - 3 + int(h1(q * 4.1) * 3) + 0.5)
+            kx = -gen / 2.0 + pu * gen + (h1(q * 2.9) - 0.5) * 2.0
+            ky = BY - 3.5 + (h1(q * 4.1) - 0.5) * 2.0
             m = px.flat_a("TursuGolge%d" % q, "#12200a", 0.32)
-            I.yatay_elips("golge%d" % q, kx, ky + 2.2, 4.3, 0.2, m, K, ry_ekran=2.2)
-            # dilim: kalin kabuk halkasi + ic (cekirdekli) yuz, hafif egik
-            I.yatay_elips("kabuk%d" % q, kx, ky + 0.6, 4.4, 1.1, Mk, K, ry_ekran=2.4, egim=0.05)
-            I.yatay_elips("ic%d" % q, kx - 0.2, ky - 0.1, 3.6, 0.3, Mi, K, ry_ekran=1.9).location.z += 0.9
-            for s in range(4):
-                a = s * 1.57 + q
-                e = I.elipsoid("cek%d" % s, kx + math.cos(a) * 1.6, ky - 0.2 + math.sin(a) * 0.7, 0.45, 0.3, 0.3, -1.0, Mc, seg=6, ring=4)
-                e.location.z = ez(ky - 0.2 + math.sin(a) * 0.7, -1.0, K) + 1.0
+            I.yatay_elips("golge%d" % q, kx + 0.6, ky + 1.8, 3.2, 0.2, m, K, ry_ekran=1.7)
+            I.yatay_elips("kabuk%d" % q, kx, ky + 0.5, 3.1, 0.9, Mk, K, ry_ekran=1.8, egim=0.05)
+            I.yatay_elips("ic%d" % q, kx - 0.15, ky - 0.1, 2.5, 0.25, Mi, K, ry_ekran=1.4).location.z += 0.75
+            for c in range(3):
+                a = c * 2.1 + q
+                e = I.elipsoid("cek%d" % c, kx + math.cos(a) * 1.1, ky - 0.1 + math.sin(a) * 0.45, 0.35, 0.25, 0.25, -1.0, Mc, seg=6, ring=4)
+                e.location.z = ez(ky - 0.1 + math.sin(a) * 0.45, -1.0, K) + 0.85
     return fn
 
 
@@ -170,49 +171,52 @@ def _tup(ad, noktalar, r, mat, bevel_res=4):
 
 
 def yogurt(k):
+    """Kullanici: "serit yerine daha dogal". Kasikla konmus yogurt damlalari:
+    her biri yayvan govde + kivrik tepecik + parlak nokta; seviye arttikca
+    adet ve boy artar (2 / 3 / 4 / 5)."""
     def fn():
-        oran = min(1.0, k / 4.0)
-        gen = math.floor(14 + oran * 20 + 0.5)
-        kal = 1 + math.floor(oran * 1.6 + 0.5)
-        y0 = -gen / 2.0
-        My = cel("UstYog", ["#a89f86", "#cfc4a6", "#f1ecdd", "#ffffff"], S4)
-        m = px.flat_a("YogGolge", "#6a6252", 0.3)
-        nok, gol = [], []
-        z = 0
-        while z <= gen:
-            x = math.floor(y0 + z + 0.5) + 0.5
-            gy = BY - 5 + math.sin(z * 0.42 + 1.1) * 2.1 + kal / 2.0 + 0.5
-            nok.append((x, -1.0, -gy))
-            gol.append((x, gy + kal / 2.0 + 0.8))
-            z += 1
-        for i, (x, gy) in enumerate(gol):
-            T.ust_poligon("yg%d" % i, [(x - 0.5, gy), (x + 0.5, gy), (x + 0.5, gy + 1.6), (x - 0.5, gy + 1.6)], -(gy + 1.6) - 0.02, m, K, kal=0.01)
-        _tup("yogurt", nok, 0.55 + kal * 0.45, My)
-        # tepe parlakligi: her 5. noktada kucuk beyaz damla
+        n = {1: 2, 2: 3, 3: 4, 4: 5}[k]
+        gen = 10 + k * 4.5
+        My = cel("UstYog", ["#b0a78e", "#d6ccb0", "#f1ecdd", "#ffffff"], S4)
         Mb = px.flat("YogParlak", "#ffffff")
-        for i in range(2, len(nok), 5):
-            x, _, zz = nok[i]
-            e = I.elipsoid("parlak%d" % i, x, -zz - kal * 0.5, 0.5, 0.4, 0.3, -2.0, Mb, seg=6, ring=4)
-            e.location.z = zz + kal * 0.45 + 0.3
+        for q in range(n):
+            pu = 0.5 if n == 1 else q / (n - 1.0)
+            dx = -gen / 2.0 + pu * gen + (h1(q * 3.7 + 1.1) - 0.5) * 2.2
+            dy = BY - 5.0 + (h1(q * 5.9) - 0.5) * 2.2
+            r = 2.3 + h1(q * 1.9) * 0.9 + k * 0.12
+            m = px.flat_a("YogGolge%d" % q, "#6a6252", 0.28)
+            I.yatay_elips("golge%d" % q, dx + 0.8, dy + 1.6, r + 0.4, 0.1, m, K, ry_ekran=r * 0.5)
+            # yayvan govde (yassi elipsoid) + tepecik (kucuk, hafif kaymis)
+            e = I.elipsoid("yog%d" % q, dx, dy, r, r * 0.55, r * 0.7, 0.0, My, seg=18, ring=10)
+            e.location.z = ez(dy, 0.0, K)
+            e2 = I.elipsoid("tepe%d" % q, dx + 0.4, dy - r * 0.45, r * 0.5, r * 0.45, r * 0.4, -0.6, My, seg=12, ring=8)
+            e2.location.z = ez(dy - r * 0.45, -0.6, K)
+            e3 = I.elipsoid("parlak%d" % q, dx - r * 0.3, dy - r * 0.35, 0.45, 0.3, 0.3, -1.6, Mb, seg=6, ring=4)
+            e3.location.z = ez(dy - r * 0.35, -1.6, K)
     return fn
 
 
 # ---------------------------------------------------------------- sos
 def sos(tur):
+    """Ince, elle gezdirilmis sos: yuvarlak zikzak yerine dalgasi ve kalinligi
+    degisen iplik + birkac damla."""
     def fn():
         sicak = tur == "hot"
         ramp = ["#6e140e", "#b3241a", "#d8362a", "#f04a34"] if sicak else ["#b8b19c", "#e6dfc8", "#f4f0e2", "#fdfaf0"]
         M = cel("UstSos" + tur, ramp, S4)
         nok = []
-        for z in range(26):
-            zx = -17 + z * 1.35
-            zy = BY - 6 + math.sin(z * 1.35) * 3 + 0.5
+        n = 44
+        for z in range(n + 1):
+            u = z / float(n)
+            zx = -15 + u * 30
+            dalga = math.sin(u * 13.0 + 0.6) * (1.7 + 0.8 * math.sin(u * 4.0))
+            zy = BY - 6.2 + dalga + math.sin(u * 31.0) * 0.25
             nok.append((zx, -2.0, -zy))
-        _tup("sos", nok, 0.62, M)
-        Md = px.flat("SosDamla" + tur, "#ff8a70" if sicak else "#ffffff")
-        for (dx, dy) in (((-9, BY - 8), (7, BY - 9)) if sicak else ((-6, BY - 9), (9, BY - 8))):
-            e = I.elipsoid("damla", dx + 0.5, dy + 0.5, 0.6, 0.5, 0.4, -2.5, Md, seg=8, ring=4)
-            e.location.z = -(dy + 0.5)
+        _tup("sos", nok, 0.42, M)
+        Md = cel("SosDamla" + tur, ramp, S4)
+        for q, (dx, dy) in enumerate(((-11.5, BY - 3.6), (3.0, BY - 4.8), (12.5, BY - 4.4))):
+            e = I.elipsoid("damla%d" % q, dx, dy, 0.7, 0.55, 0.5, -2.2, Md, seg=8, ring=5)
+            e.location.z = ez(dy, -2.2, K)
     return fn
 
 

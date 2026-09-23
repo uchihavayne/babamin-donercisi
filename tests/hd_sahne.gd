@@ -3,7 +3,7 @@
 #   godot --path . --resolution 960x540 --script tests/hd_sahne.gd -- --test --gpu-test
 #       [--cikti artifacts/hd.png] [--sahne play|title|shop|dayend] [--full]
 #       [--eski] (HD kapali) [--ikili] (ust: HD, alt: eski; ayni oyun ani)
-#       [--sehir N] [--gun N] [--kare N] [--olc N] (N kare ortalama sure)
+#       [--kizart] (fritoz + kesme dolu) [--sehir N] [--gun N] [--kare N] [--olc N] (N kare ortalama sure)
 extends SceneTree
 
 var shell: Control
@@ -62,6 +62,16 @@ func calis() -> void:
 		var c: Dictionary = g.j_G.customers[0]
 		c.state = "wait"; c.x = c.tx
 		if sahne != "play": g.j_G.scene = sahne
+		if var_mi("--mac"):
+			g.j_G.macGun = true
+			g.j_G.timeLeft = g.j_G.cfg.len * (1.0 - (g.j_MAC_BAS + g.j_MAC_BIT) / 2.0)
+			g.j_G.macDalga = true
+			for cc in g.j_G.customers: cc.mac = true
+		if var_mi("--kesinti"):
+			g.j_G.kesinti = {"faz": "kesik", "t": 3.0, "sure": 20.0, "uyari": 0.0}
+		if var_mi("--kizart"):
+			g.j_G.fryer.state = "fry"; g.j_G.fryer.dur = 20; g.j_G.fryer.t = 4; g.j_G.fryer.load = 6
+			g.j_G.cut.potato = true; g.j_G.cut.prog = 0.4; g.j_G.cut.cutting = true
 	await adim(int(arg("--kare", "20")))
 	if arg("--olc") != "":
 		var top := 0.0

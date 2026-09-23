@@ -179,7 +179,9 @@ func f_drawHUD(p_t: Variant = null) -> Variant:
 						game.f_px(J.add(J.add(v_sx4, 7.0), floor((cos(v_a4) * 6.0) + 0.5)), J.add(J.add(v_sy4, 5.0), floor((sin(v_a4) * 6.0) + 0.5)), "#ffb23c")
 						v_si4 = J.add(v_si4, 1.0)
 				game.text_draw.f_txt("SICAK", J.add(v_sx4, 28.0), J.add(v_sy4, 1.0), "#ffc86a")
-	if (J.eq(J.kind(J.ref(game.weather_system.f_macDalgada, 0)), "function") and J.truth(game.weather_system.f_macDalgada())):
+	# BIRLESIK: "MAC CIKISI" yazisi kaldirildi; mac dalgasi disaridaki insanlarin
+	# ve musterilerin takim atkilariyla anlasiliyor (remake_gorsel atki)
+	if false and (J.eq(J.kind(J.ref(game.weather_system.f_macDalgada, 0)), "function") and J.truth(game.weather_system.f_macDalgada())):
 		v_mgw = J.add(game.f_textW(game.localization.f_T("MAÇ ÇIKIŞI")), 12.0)
 		v_mgx = ((float(game.j_W) / float(2.0)) - (float(v_mgw) / float(2.0)))
 		v_mgy = (22.0 if J.truth(v_kompakt) else 32.0)

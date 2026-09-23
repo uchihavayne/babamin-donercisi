@@ -113,6 +113,15 @@ func f_drawKesinti(p_t: Variant = null) -> Variant:
 	if not J.eq(J.getv(v_K, "faz"), "kesik"):
 		return null
 	v_acilma = game.math_utils.f_clamp((float(J.getv(v_K, "t")) / float(2.2)), 0.0, 1.0)
+	# REMAKE kancasi: shader ile karanlik + ocaktan yumusak sicak hale
+	if game.f_hdKesinti(v_t, v_acilma):
+		v_kalan = max(0.0, ceil((J.getv(v_K, "sure") - J.getv(v_K, "t"))))
+		v_ms = J.add(game.localization.f_T("ELEKTRİK: "), v_kalan)
+		v_mw = J.add(game.f_textW(v_ms), 12.0)
+		game.f_rrect(((float(game.j_W) / float(2.0)) - (float(v_mw) / float(2.0))), 84.0, v_mw, 13.0, 3.0, "rgba(10,10,20,.85)")
+		game.f_rrectOut(((float(game.j_W) / float(2.0)) - (float(v_mw) / float(2.0))), 84.0, v_mw, 13.0, 3.0, "#ffb23c")
+		game.text_draw.f_txt(v_ms, (float(game.j_W) / float(2.0)), 87.0, "#ffd257", {"align": "c"})
+		return null
 	J.setv(game.j_ctx, "globalAlpha", (0.84 - (v_acilma * 0.14)))
 	game.f_fr(0.0, 0.0, game.j_W, J.getv(game.j_LAY, "floorY"), "#04060f")
 	J.setv(game.j_ctx, "globalAlpha", 1.0)

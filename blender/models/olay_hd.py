@@ -225,36 +225,63 @@ def hirsiz_canta():
 
 # ================================================================ rakip
 def rakip():
-    Mc = I.cel("RakipCeket", ["#1f2e36", "#2f4450", "#3d5a68", "#557684"], [0, .3, .6, .88])
-    T.torna("govde", [(13.2, 0), (13.4, 16), (12.8, 25), (9.5, 29.5), (4.5, 31.0)], 0.5, 1.0, 0.0, 0.55, Mc, K, seg=28)
-    # onluk (beyaz, isim kartli)
+    """Karsi dukkanin sahibi (birlesik surum, kullanici: "modellemesi yetersiz"):
+    yuvarlak omuzlu ceket + V yaka, gogus hizasinda kavusturulmus kollar,
+    kendi dukkaninin amblemli onlugu, kendinden emin yuz (kalkik kas, yan
+    gulumseme, kalin biyik, sakal golgesi), logolu kasket. Capa: ayak noktasi,
+    boy eskisiyle ayni (konusma balonu ayni yerde)."""
+    Mc = I.cel("RakipCeket", ["#17242b", "#2a3d48", "#3a5664", "#5a7c8a"], [0, .3, .6, .88])
+    Mk = I.cel("RakipKol", ["#1a2830", "#2f4450", "#3f5c6a", "#5f8290"], [0, .3, .6, .88])
+    TEN_R = "#b98b6a"
+    T.torna("govde", [(10.4, 0), (11.4, 8), (12.1, 17), (12.4, 23), (11.6, 26.6), (8.8, 29.6), (4.6, 31.2)],
+            0.5, 1.0, 0.0, 0.55, Mc, K, seg=32)
+    # V yaka: beyaz tisort + koyu yakalar
+    on_levha([(-3.6, -31.2), (4.6, -31.2), (0.5, -23.2)], -6.6, mat_duz("#e8ecef"))
+    on_levha([(-3.6, -31.2), (-1.8, -31.2), (0.5, -23.2), (-0.4, -23.8)], -6.8, mat_duz("#1b2830"))
+    on_levha([(2.8, -31.2), (4.6, -31.2), (1.4, -23.8), (0.5, -23.2)], -6.8, mat_duz("#1b2830"))
+    # onluk (gogsun altinda; cogu tezgahin arkasinda kalir): beyaz + kirmizi serit + doner amblemi
     Mo = I.cel("Onluk", ["#9aa3aa", "#c9d2d8", "#e4ebef", "#ffffff"], [0, .3, .62, .9])
-    kutu(-8.5, 9.5, -16.0, 1.0, -7.6, -7.0, Mo, bevel=0.5)
-    for sx in (-3.5, 4.5):
-        uzuv((sx, -16.0), (sx + (-2.5 if sx < 0 else 2.5), -22.5), 0.45, -7.4, c3("#c9d2d8"))
-    # kollar kavusturulmus
-    kutu(-14.0, 15.0, -18.5, -13.5, -8.5, -3.0, Mc, bevel=2.0)
-    for sx in (-4.0, 5.0):
-        elipsoid(sx, -16.0, 1.6, 1.3, 1.0, -8.8, c3("#b98b6a"), seg=10, ring=6)
+    kutu(-8.8, 9.8, -13.2, 1.0, -7.6, -7.0, Mo, bevel=0.6)
+    kutu(-8.8, 9.8, -13.2, -11.8, -7.75, -7.6, mat_duz("#c0281c"))
+    em = I.elipsoid("amblem", 0.5, -7.0, 1.6, 2.6, 0.4, -7.9, c3("#a0602a"), seg=10, ring=6)
+    em.location = (0.5, -7.9, ez(-7.0, -7.9, K))
+    # ust kollar (omuzdan dirsege) + kavusturulmus on kollar
+    uzuv((-11.4, -24.8), (-10.6, -16.8), 2.5, -4.0, Mk)
+    uzuv((12.4, -24.8), (11.6, -16.8), 2.5, -4.0, Mk)
+    uzuv((11.8, -17.0), (-5.5, -14.2), 2.3, -8.4, Mk)
+    uzuv((-10.8, -17.4), (6.6, -14.6), 2.3, -9.3, Mk)
+    for (hx, hy, y) in ((-6.8, -14.1, -8.8), (7.9, -14.5, -9.7)):
+        elipsoid(hx, hy, 1.7, 1.4, 1.1, y, c3(TEN_R), seg=10, ring=6)
     # boyun + bas
     T.torna("boyun", [(3.0, 0), (2.8, 6)], 0.5, -28.5, 0.0, 0.8, c3("#a87a54"), K, seg=14)
-    e = I.elipsoid("bas", 0.5, -39.5, 7.8, 7.8, 6.5, 0.0, c3("#b98b6a", f=(0.7, 0.88, 1.0, 1.1)), seg=20, ring=14)
+    e = I.elipsoid("bas", 0.5, -39.5, 7.4, 8.0, 6.5, 0.0, c3(TEN_R, f=(0.7, 0.88, 1.0, 1.1)), seg=22, ring=16)
     e.location = (0.5, 0.0, ez(-39.5, 0.0, K))
-    for sx in (-7.6, 8.6):
+    # sakal golgesi (cene)
+    sg = I.elipsoid("sakal", 0.5, -35.0, 5.6, 3.0, 2.0, -5.2, c3("#8e6a4c", f=(0.8, 0.95, 1.0, 1.05)), seg=16, ring=8)
+    sg.location = (0.5, -5.2, ez(-35.0, -5.2, K))
+    for sx in (-7.2, 8.2):
         elipsoid(sx, -39.0, 1.3, 1.9, 1.0, 0.5, c3("#a87a54"), seg=8, ring=6)
-    # bakisli kaslar, gozler, kalin biyik
-    for sx, yon in ((-3.0, 1), (4.0, -1)):
-        uzuv((sx - 2.0, -43.4 - yon * 0.6), (sx + 1.5, -42.6 + yon * 0.6), 0.55, -6.8, mat_duz("#2a2018"))
-        elipsoid(sx, -40.6, 0.8, 0.75, 0.3, -7.0, mat_duz("#1a1410"), seg=8, ring=5)
-    elipsoid(0.5, -38.0, 1.3, 1.6, 1.2, -7.2, c3("#a87a54"), seg=10, ring=6)
+    # kaslar: sol duz ve catik, sag kalkik (kendinden emin)
+    uzuv((-5.0, -43.0), (-1.2, -42.4), 0.6, -6.8, mat_duz("#2a2018"))
+    uzuv((2.2, -43.0), (6.0, -44.4), 0.6, -6.8, mat_duz("#2a2018"))
+    # gozler: yari kapali (ust kapak) + bebek
+    for sx, yuk in ((-3.0, 0.55), (4.0, 0.75)):
+        elipsoid(sx, -40.6, 1.1, yuk, 0.3, -6.9, mat_duz("#f4ece0"), seg=10, ring=6)
+        elipsoid(sx + 0.3, -40.5, 0.55, min(0.55, yuk), 0.3, -7.05, mat_duz("#1a1410"), seg=8, ring=5)
+        uzuv((sx - 1.2, -41.1), (sx + 1.2, -41.1), 0.35, -7.1, mat_duz("#8e6a4c"))
+    elipsoid(0.5, -38.0, 1.3, 1.7, 1.2, -7.2, c3("#a87a54"), seg=10, ring=6)
+    # kalin biyik + yan gulumseme (sag kose yukarida)
     for sx in (-2.0, 3.0):
-        e = I.elipsoid("biyik", sx, -35.8, 2.8, 1.1, 0.8, -7.4, c3("#2a2018", f=(0.7, 0.9, 1.0, 1.6)), seg=12, ring=6)
-        e.location = (sx, -7.4, ez(-35.8, -7.4, K))
-        e.rotation_euler = (0, math.radians(12 if sx < 0 else -12), 0)
-    # sac + mavi kasket
-    I.elipsoid("sac", 0.5, -45.0, 8.4, 3.5, 6.8, 0.2, c3("#2a2018", f=(0.7, 0.9, 1.0, 1.5)), seg=18, ring=10).location = (0.5, 0.2, ez(-45.5, 0.2, K))
-    T.torna("kasket", [(8.4, 0), (8.2, 2.4), (6.0, 3.6), (0.3, 4.0)], 0.5, -46.2, 0.4, 0.8, c3("#2f6a8a", f=(0.6, 0.85, 1.0, 1.25)), K, seg=24)
+        b = I.elipsoid("biyik", sx, -35.8, 2.9, 1.2, 0.8, -7.4, c3("#2a2018", f=(0.7, 0.9, 1.0, 1.6)), seg=12, ring=6)
+        b.location = (sx, -7.4, ez(-35.8, -7.4, K))
+        b.rotation_euler = (0, math.radians(12 if sx < 0 else -16), 0)
+    uzuv((-0.6, -33.9), (3.4, -34.6), 0.35, -7.2, mat_duz("#6a3a2a"))
+    # sac + logolu mavi kasket
+    I.elipsoid("sac", 0.5, -45.0, 8.0, 3.5, 6.8, 0.2, c3("#2a2018", f=(0.7, 0.9, 1.0, 1.5)), seg=18, ring=10).location = (0.5, 0.2, ez(-45.5, 0.2, K))
+    T.torna("kasket", [(8.2, 0), (8.0, 2.4), (6.0, 3.8), (0.3, 4.2)], 0.5, -46.2, 0.4, 0.8, c3("#2f6a8a", f=(0.6, 0.85, 1.0, 1.25)), K, seg=26)
     I.yatay_elips("siper", 3.0, -46.2, 7.5, 0.5, c3("#1f4a62", f=(0.6, 0.85, 1.0, 1.25)), K, ry_ekran=2.0, seg=24).location.y = -4.0
+    lg = I.elipsoid("logo", 0.5, -48.2, 1.8, 1.4, 0.3, -6.2, c3("#c0281c"), seg=12, ring=6)
+    lg.location = (0.5, -6.2, ez(-48.2, -6.2, K))
 
 
 # ================================================================ kedi

@@ -33,7 +33,9 @@ KOK = os.path.dirname(_HERE)
 OUT = os.path.join(_HERE, "out", "sokak_arka_hd")
 HD = 2
 K = 0.5
-GW, GH = 264, 92
+# BIRLESIK: cam olculeri yeni yerlesimden (yerlesim.py; remake 264x92)
+import yerlesim as YER
+GW, GH = YER.GL_W, YER.GL_H
 BASE = 50                    # stM: base = glass.y + 50
 ROAD_Y, ROAD_H, CURB2 = 58, 26, 84
 ez, onkutu, hexmul = T.ez, T.onkutu, T.hexmul

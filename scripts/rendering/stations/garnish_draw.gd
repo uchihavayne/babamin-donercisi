@@ -203,6 +203,25 @@ func f_drawGarnishTray(p_x: Variant = null, p_y: Variant = null, p_w: Variant = 
 	game.f_fr((v_midX - 1.0), J.add(v_y, 4.0), 2.0, (v_h - 10.0), "#8a929b")
 	game.f_vl((v_midX - 1.0), J.add(v_y, 4.0), (v_h - 10.0), "#c7ced5")
 	v_tl = game.math_utils.f_clamp((float(v_tn) / float(max(1.0, v_max))), 0.0, 1.0)
+	# REMAKE/BIRLESIK: HD'de stok TANE TANE gorunur (kullanici: "domates biber hic
+	# bitmiyor gibi"); eskiden 1-3 sira yalniz kaba seviye gosteriyordu.
+	if game.hd_gpu():
+		if J.gt(v_tn, 0.0):
+			var n_dom: int = int(ceil(v_tl * 9.0))
+			for k in range(n_dom - 1, -1, -1):
+				var sira: int = int(k / 3)
+				game.garnish_draw.f_drawTomatoSlice(J.add(v_x, 8.0 + (k % 3) * 6.0 + (sira % 2) * 2.0), ((J.add(v_y, v_h) - 10.0) - sira * 4.0) - v_bump, 6.0)
+			if J.truth(game.f_chance(0.04)):
+				game.effects.f_part({"x": J.add(J.add(v_x, 6.0), game.math_utils.f_rnd(0.0, 12.0)), "y": (J.add(v_y, v_h) - 11.0), "vx": 0.0, "vy": 10.0, "life": 0.3, "col": "#e2483a", "g": 60.0, "sz": 1.0, "floor": (J.add(v_y, v_h) - 8.0)})
+		var pl_hd: float = game.math_utils.f_clamp((float(v_pn) / float(max(1.0, v_max))), 0.0, 1.0)
+		if J.gt(v_pn, 0.0):
+			var n_bib: int = int(ceil(pl_hd * 4.0))
+			for k in range(n_bib - 1, -1, -1):
+				var kol: int = k % 2
+				game.garnish_draw.f_drawPepper(J.add(J.add(v_midX, 5.0), kol * 7.0), ((J.add(v_y, v_h) - 8.0) - int(k / 2) * 3.0) - v_bump, 12.0 + (k % 3), (1.0 if kol else -1.0))
+		game.f_trayInnerShade(v_x, v_y, v_w, v_h)
+		game.f_trayFlash(v_x, v_y, v_w, v_h, v_fx)
+		return null
 	if J.gt(v_tn, 0.0):
 		v_rows = max(1.0, floor(J.add(1.0, (v_tl * 2.2)) + 0.5))
 		v_rI = (v_rows - 1.0)

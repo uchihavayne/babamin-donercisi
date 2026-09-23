@@ -12,6 +12,8 @@ func order_icon(item: Dictionary, x: float, y: float, time: float) -> void:
 	game.icon_draw.f_icon(item.get("type", "cola") if item.kind == "drink" else ("iskender" if item.kind == "plate" else item.kind), x, y, time)
 	if item.get("sauce") != null:
 		var hot: bool = item.sauce == "hot"
+		# REMAKE kancasi: "!" / "G" yerine HD sos rozeti (aci biber / sarimsak)
+		if game.f_hdIkon("sos_hot" if hot else "sos_garlic", x+6, y-5): return
 		game.f_disc(x+6, y-5, 4, "#40291c")
 		game.f_disc(x+6, y-5, 3, "#ce382c" if hot else "#fff3d2")
 		game.text_draw.f_txt("!" if hot else "G", x+6, y-8, "#fff6df" if hot else "#675034", {"align":"c"})
@@ -77,8 +79,7 @@ func f_drawOrderBubble(customer: Variant = null, time: Variant = null) -> Varian
 	# Patience is integrated into the order; no extra panel or text obscures it.
 	game.f_fr(r.position.x+4, r.end.y-4, 50, 2, "#ceb58d")
 	game.f_fr(r.position.x+4, r.end.y-4, floor(50*clampf(customer.patience, 0, 1)), 2, "#b33028" if customer.patience < 0.3 else "#6c8e48")
-	game.f_rrect(r.position.x-2, r.position.y-3, 9, 9, 2, border)
-	game.text_draw.f_txt(str(int(customer.get("slot", 0))+1), r.position.x+2, r.position.y-2, "#fff1cf", {"align":"c"})
+	# (sira numarasi rozeti kaldirildi: balonun ustunde gereksiz kalabalik)
 	if customer.get("wrongT", 0) > 0: game.icon_draw.f_drawX(customer.x, customer.y-34, "#d64932")
 	game.j_ctx.restore()
 	return null
@@ -91,7 +92,8 @@ func draw_preparation_overlay(time: Variant = null) -> Variant:
 	var y: float = game.j_ST.board.y + game.j_ST.board.h - 4
 	var recipe: Dictionary = w.get("_order_recipe", {})
 	game.f_rrect(x-32, y-3, 64, 14, 2, "#493222")
-	if w.has("_order_mark"):
+	# musteri sira numarasi balonlardan kaldirildi; tahtada yalniz telefon ("P") isareti kalir
+	if w.has("_order_mark") and w._order_mark == "P":
 		game.f_rrect(x-40, y-3, 9, 10, 2, "#e8b453")
 		game.text_draw.f_txt(w._order_mark, x-36, y-2, "#493222", {"align":"c"})
 	if w.state == "open":

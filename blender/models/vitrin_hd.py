@@ -166,8 +166,10 @@ def u8(arr):
 
 
 # ================================================================ vitrin
-WIN_W, WIN_H = 272, 100
-GL_X, GL_Y, GL_W, GL_H = 4, 4, 264, 92      # cam, win'e gore
+# BIRLESIK: olculer yeni yerlesimden (yerlesim.py; remake 272x100, cam 264x92)
+import yerlesim as YER
+WIN_W, WIN_H = YER.WIN_W, YER.WIN_H
+GL_X, GL_Y, GL_W, GL_H = YER.GL_X, YER.GL_Y, YER.GL_W, YER.GL_H      # cam, win'e gore
 
 
 def pencere():
@@ -179,7 +181,7 @@ def pencere():
     Mc = cel("Cita", ["#15181c", "#23282e", "#333940", "#4c545d"], [0, .3, .55, .85])
     levha("cita", GL_X - 0.4, GL_Y - 0.4, GL_W + 0.8, GL_H + 0.8, 0.8, 0.9, 0.8, Mc, kalin=1.3)
     # iki kayit (art.js: mx = ix + round(iw/3), ix + round(2iw/3); mx-2 .. mx+3)
-    for mx in (GL_X + 88, GL_X + 176):
+    for mx in (GL_X + round(GL_W / 3), GL_X + round(2 * GL_W / 3)):
         levha("kayit", mx - 2.1, GL_Y - 0.5, 5.2, GL_H + 1.0, 1.0, -0.5, 2.0, Mal, bevel=0.6)
         # kayit uclarinda vida
         for gy in (GL_Y + 5, GL_Y + GL_H - 5):
@@ -188,7 +190,7 @@ def pencere():
     # tas esik: ust yuzu 2 px, on yuzu 98..105
     Mt = cel("Esik", ["#6f685c", "#8d8577", "#b3ab98", "#c9c2b0", "#e8e2d0"],
              [0, .2, .42, .6, .86], noise=0.07, noise_scale=22)
-    kutu_bevel("esik", -6, 278, 99.0, 105.0, -3.0, -0.2, Mt, bevel=0.5)
+    kutu_bevel("esik", -6, WIN_W + 6, WIN_H - 1.0, WIN_H + 5.0, -3.0, -0.2, Mt, bevel=0.5)
 
 
 def cam_isik():
@@ -212,14 +214,14 @@ def cam_isik():
 
 
 def esik_golge():
-    a = bos(284, 4)
-    yy = np.mgrid[0:4 * HD, 0:284 * HD][0].astype(np.float32) + 0.5
+    a = bos(WIN_W + 12, 4)
+    yy = np.mgrid[0:4 * HD, 0:(WIN_W + 12) * HD][0].astype(np.float32) + 0.5
     ustune(a, "#000000", np.clip(1.0 - yy / (3.2 * HD), 0, 1) ** 1.4 * 0.38)
     return u8(a)
 
 
 # ================================================================ kepenk
-SAC_H = 89
+SAC_H = GL_H - 3
 
 
 def kepenk_sac():
@@ -234,7 +236,7 @@ def kepenk_sac():
             sira.append((k * 3 + t, d))
     satirlar = []
     for gy, d in sira:
-        satirlar.append([bm.verts.new((x, d, ez(gy, d, K))) for x in (-2.0, 266.0)])
+        satirlar.append([bm.verts.new((x, d, ez(gy, d, K))) for x in (-2.0, GL_W + 2.0)])
     for a, b in zip(satirlar, satirlar[1:]):
         bm.faces.new((a[0], a[1], b[1], b[0]))
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
@@ -250,7 +252,7 @@ def kepenk_sac_son(yol):
     a = px.read_png(yol).astype(np.float32) / 255.0
     H, W = a.shape[:2]
     r = random.Random(7)
-    for vx in range(4, 264, 11):
+    for vx in range(4, GL_W, 11):
         c = vx * HD
         a[:, c, :3] *= 0.80
         if c + 1 < W:
@@ -274,20 +276,20 @@ def kepenk_sac_son(yol):
 
 def kepenk_alt():
     Mb = cel("KolAlt", ["#262b31", "#353b42", "#5b636c", "#7e8791", "#a8b1ba"], [0, .25, .48, .74, .92])
-    kutu_bevel("kol", -0.5, 264.5, 0.0, 4.0, -1.4, 0.6, Mb, bevel=0.6)
+    kutu_bevel("kol", -0.5, GL_W + 0.5, 0.0, 4.0, -1.4, 0.6, Mb, bevel=0.6)
     Mk = cel("Tutamak", ["#15181c", "#262b31", "#4a5159", "#6f777f"], [0, .3, .58, .86])
     # tutamak: iki ayak + yuvarlak cubuk
-    for dx in (125.5, 137.5):
+    for dx in (GL_W / 2 - 6.5, GL_W / 2 + 5.5):
         kutu_bevel("ayak", dx, dx + 1.4, 1.0, 3.6, -2.4, -1.2, Mk, bevel=0.25)
-    cu = L.silindir("cubuk", 0.75, 132.0, -2.9, 0.0, 13.0, Mk, seg=12, eksen="X")
-    cu.location = (132.0, -2.9, ez(2.3, -2.9, K))
+    cu = L.silindir("cubuk", 0.75, GL_W / 2, -2.9, 0.0, 13.0, Mk, seg=12, eksen="X")
+    cu.location = (GL_W / 2, -2.9, ez(2.3, -2.9, K))
     # kilit gobegi
-    L.silindir("kilit", 0.9, 132.0, -1.6, ez(2.0, -1.6, K), 0.6, cel("Kilit", ["#6b5a2a", "#b3923e", "#e8c46a"], [0, .5, .85]), seg=14, eksen="Y")
+    L.silindir("kilit", 0.9, GL_W / 2, -1.6, ez(2.0, -1.6, K), 0.6, cel("Kilit", ["#6b5a2a", "#b3923e", "#e8c46a"], [0, .5, .85]), seg=14, eksen="Y")
 
 
 def kepenk_golge():
-    a = bos(264, 3)
-    yy = np.mgrid[0:3 * HD, 0:264 * HD][0].astype(np.float32) + 0.5
+    a = bos(GL_W, 3)
+    yy = np.mgrid[0:3 * HD, 0:GL_W * HD][0].astype(np.float32) + 0.5
     ustune(a, "#000000", np.clip(1.0 - yy / (3.0 * HD), 0, 1) ** 1.2 * 0.36)
     return u8(a)
 
@@ -295,12 +297,12 @@ def kepenk_golge():
 def kepenk_rulo(rh):
     def fn():
         Mr = cel("Rulo%d" % rh, ["#2f353c", "#3f464e", "#4d555d", "#6d757e", "#9aa3ac"], [0, .22, .45, .7, .9])
-        kutu_bevel("kutu", -2, 266, 0.0, rh, -2.0, 1.0, Mr, bevel=min(0.7, rh * 0.18))
+        kutu_bevel("kutu", -2, GL_W + 2, 0.0, rh, -2.0, 1.0, Mr, bevel=min(0.7, rh * 0.18))
         Mo = px.flat("Oluk%d" % rh, "#4d555d")
         for rr in range(1, rh - 1, 2):
-            onkutu("oluk", -1.5, 265.5, rr + 0.25, rr + 0.75, -2.08, -2.0, Mo, K)
+            onkutu("oluk", -1.5, GL_W + 1.5, rr + 0.25, rr + 0.75, -2.08, -2.0, Mo, K)
         Mu = cel("RuloUc%d" % rh, ["#23282e", "#353b42", "#5b636c", "#8a939c"], [0, .3, .6, .88])
-        for x0 in (-3.0, 264.0):
+        for x0 in (-3.0, float(GL_W)):
             kutu_bevel("uc", x0, x0 + 3.0, -0.4, rh + 0.4, -2.4, 1.0, Mu, bevel=min(0.6, rh * 0.15))
     return fn
 
@@ -537,14 +539,14 @@ def afis_3():
 
 
 # ================================================================ kayit
-parca("pencere", (-6, -4, 284, 116), pencere, cizgi="#15181c", cizgi_alfa=120)
+parca("pencere", (-6, -4, WIN_W + 12, WIN_H + 16), pencere, cizgi="#15181c", cizgi_alfa=120)
 parca("cam_isik", (0, 0, GL_W, GL_H), cam_isik, tur="np")
-parca("esik_golge", (-6, 105, 284, 4), esik_golge, tur="np")
-parca("kepenk_sac", (0, 0, 264, SAC_H), kepenk_sac)
-parca("kepenk_alt", (-1, -2, 266, 7), kepenk_alt)
-parca("kepenk_golge", (0, 0, 264, 3), kepenk_golge, tur="np")
+parca("esik_golge", (-6, WIN_H + 5, WIN_W + 12, 4), esik_golge, tur="np")
+parca("kepenk_sac", (0, 0, GL_W, SAC_H), kepenk_sac)
+parca("kepenk_alt", (-1, -2, GL_W + 2, 7), kepenk_alt)
+parca("kepenk_golge", (0, 0, GL_W, 3), kepenk_golge, tur="np")
 for _rh in range(3, 10):
-    parca("kepenk_rulo_%d" % _rh, (-4, -2, 272, _rh + 4), kepenk_rulo(_rh), cizgi="#1d2126", cizgi_alfa=110)
+    parca("kepenk_rulo_%d" % _rh, (-4, -2, GL_W + 8, _rh + 4), kepenk_rulo(_rh), cizgi="#1d2126", cizgi_alfa=110)
 parca("tabela", (-4, -4, TAB_W + 8, 36), tabela, cizgi="#1e140c", cizgi_alfa=150)
 parca("ampul_acik", (-3, -3, 6, 6), ampul(True))
 parca("ampul_kapali", (-3, -3, 6, 6), ampul(False))

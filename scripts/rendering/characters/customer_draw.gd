@@ -170,6 +170,9 @@ func f_drawCustomer(p_c: Variant = null, p_t: Variant = null) -> Variant:
 	_cells["hh"][0] = 11.0
 	v_yzS = (3.0 if J.truth(v_cocuk) else J.getv(v_F, "sekil"))
 	_cells["KON"][0] = game.character_draw.f_kafaKontur(v_yzS, v_hw, _cells["hh"][0])
+	# BIRLESIK: mac cikisi musterisi takim atkisi takar (ekrandaki yazi yerine)
+	if J.truth(J.getv(v_c, "mac")):
+		game.f_hdAtki(v_x, v_by, v_bw, J.getv(v_L, "seed"))
 	# REMAKE kancasi
 	if not game.f_hdMusteriKafa(v_hx, v_hy, v_yzS, v_hw, J.getv(v_L, "skin")):
 		v_kr = 0.0

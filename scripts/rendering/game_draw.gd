@@ -325,7 +325,15 @@ func f_drawPlay(p_t: Variant = null) -> Variant:
 			J.setv(game.j_ctx, "globalAlpha", 1.0)
 		game.f_drawOrderBubble(_v["cc"], _cells["t"][0])
 		_v["j"] = J.add(_v["j"], 1.0)
+	# BIRLESIK: karsi dukkanin adami musteri sirasinda ama tezgahtan SONRA
+	# ciziliyor; yeni tezgahin rafi (ledgeY 140) daha yukarida oldugu icin govde
+	# tezgahin ustune biniyordu -> raf hizasinda kirpilir (tezgahin arkasinda)
+	J.method(game.j_ctx, "save", [])
+	J.method(game.j_ctx, "beginPath", [])
+	J.method(game.j_ctx, "rect", [0.0, 0.0, game.j_W, J.getv(game.j_LAY, "ledgeY")])
+	J.method(game.j_ctx, "clip", [])
 	game.incident_draw.f_drawRakip(_cells["t"][0])
+	J.method(game.j_ctx, "restore", [])
 	game.weather_draw.f_drawWeather(_cells["t"][0])
 	game.incident_draw.f_drawKesinti(_cells["t"][0])
 	game.game_draw.f_drawFlyCoins(_cells["t"][0])
