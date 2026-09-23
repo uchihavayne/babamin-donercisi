@@ -3,7 +3,7 @@
 #   godot --path . --resolution 960x540 --script tests/hd_sahne.gd -- --test --gpu-test
 #       [--cikti artifacts/hd.png] [--sahne play|title|shop|dayend] [--full]
 #       [--eski] (HD kapali) [--ikili] (ust: HD, alt: eski; ayni oyun ani)
-#       [--sehir N] [--gun N] [--kare N]
+#       [--sehir N] [--gun N] [--kare N] [--olc N] (N kare ortalama sure)
 extends SceneTree
 
 var shell: Control
@@ -63,6 +63,15 @@ func calis() -> void:
 		c.state = "wait"; c.x = c.tx
 		if sahne != "play": g.j_G.scene = sahne
 	await adim(int(arg("--kare", "20")))
+	if arg("--olc") != "":
+		var top := 0.0
+		var n := int(arg("--olc"))
+		var en := 0.0
+		for i in n:
+			await adim(1)
+			top += g.last_frame_ms
+			en = maxf(en, g.last_frame_ms)
+		print("OLCUM ort_ms=%.2f en_ms=%.2f" % [top / n, en])
 	var cikti := arg("--cikti", "res://artifacts/hd.png")
 	if var_mi("--ikili"):
 		var ust := await goruntu()

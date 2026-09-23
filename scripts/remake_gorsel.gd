@@ -2217,22 +2217,46 @@ func f_rrectOut(x: Variant = null, y: Variant = null, w: Variant = null, h: Vari
 	var R := minf(float(r) * 2.0, minf(W, H) / 2.0)
 	var t := 2.0
 	var ctx: GpuCanvas = draw_context
-	for i in int(H):
-		var dis := 0.0
-		if i < R: dis = roundf(R - sqrt(maxf(0.0, R * R - (R - i - 0.5) * (R - i - 0.5))))
-		elif i >= H - R: dis = roundf(R - sqrt(maxf(0.0, R * R - (i + 0.5 - (H - R)) * (i + 0.5 - (H - R)))))
-		if i < t or i >= H - t:
-			ctx.rect_hd(X + dis, Y + i, W - 2.0 * dis, 1.0, col)
-			continue
-		var Ri := maxf(0.0, R - t)
-		var k := i - t
-		var Hi := H - 2.0 * t
-		var ic := 0.0
-		if k < Ri: ic = roundf(Ri - sqrt(maxf(0.0, Ri * Ri - (Ri - k - 0.5) * (Ri - k - 0.5))))
-		elif k >= Hi - Ri: ic = roundf(Ri - sqrt(maxf(0.0, Ri * Ri - (k + 0.5 - (Hi - Ri)) * (k + 0.5 - (Hi - Ri)))))
-		var sol := t + ic - dis
-		ctx.rect_hd(X + dis, Y + i, maxf(t, sol), 1.0, col)
-		ctx.rect_hd(X + W - dis - maxf(t, sol), Y + i, maxf(t, sol), 1.0, col)
+	var Ri := maxf(0.0, R - t)
+	var Hi := H - 2.0 * t
+	# satir tanimi (girinti, yan serit genisligi; -1 = dolu satir); ayni tanimli
+	# ardisik satirlar TEK dikdortgen (baslik vinyeti 60 buyuk cerceve ciziyor)
+	var onceki := Vector2(-2, -2)
+	var bas := 0
+	# duz kenar araligi: girinti 0, serit t (koseler disinda hesap gerekmez)
+	var duz0 := int(ceilf(maxf(maxf(R, t + Ri), t)))
+	var duz1 := int(floorf(minf(minf(H - R, t + Hi - Ri), H - t)))
+	var i := 0
+	while i <= int(H):
+		var tanim := Vector2(-3, -3)
+		if i >= duz0 and i < duz1 - 1:
+			tanim = Vector2(0.0, t)
+			if tanim == onceki:
+				i = duz1 - 1
+				continue
+		elif i < int(H):
+			var dis := 0.0
+			if i < R: dis = roundf(R - sqrt(maxf(0.0, R * R - (R - i - 0.5) * (R - i - 0.5))))
+			elif i >= H - R: dis = roundf(R - sqrt(maxf(0.0, R * R - (i + 0.5 - (H - R)) * (i + 0.5 - (H - R)))))
+			if i < t or i >= H - t:
+				tanim = Vector2(dis, -1.0)
+			else:
+				var k := i - t
+				var ic := 0.0
+				if k < Ri: ic = roundf(Ri - sqrt(maxf(0.0, Ri * Ri - (Ri - k - 0.5) * (Ri - k - 0.5))))
+				elif k >= Hi - Ri: ic = roundf(Ri - sqrt(maxf(0.0, Ri * Ri - (k + 0.5 - (Hi - Ri)) * (k + 0.5 - (Hi - Ri)))))
+				tanim = Vector2(dis, maxf(t, t + ic - dis))
+		if tanim != onceki:
+			if onceki.x >= 0:
+				var n := float(i - bas)
+				if onceki.y < 0:
+					ctx.rect_hd(X + onceki.x, Y + bas, W - 2.0 * onceki.x, n, col)
+				else:
+					ctx.rect_hd(X + onceki.x, Y + bas, onceki.y, n, col)
+					ctx.rect_hd(X + W - onceki.x - onceki.y, Y + bas, onceki.y, n, col)
+			onceki = tanim
+			bas = i
+		i += 1
 	return null
 
 func f_disc(cx: Variant = null, cy: Variant = null, r: Variant = null, c: Variant = null) -> Variant:

@@ -67,7 +67,8 @@ func f_drawCustomer(customer: Variant = null, time: Variant = null) -> Variant:
 
 func f_drawYogurtTray(x: Variant = null, y: Variant = null, w: Variant = null, h: Variant = null, n: Variant = null, maximum: Variant = null, time: Variant = null, fx: Variant = null) -> Variant:
 	# Time is unused by this original drawing; retain the exact stock and bounce values.
-	if not sprites_enabled or hd_gpu() or float(j_ctx.globalAlpha)!=1.0 or float(n)<=0: return super.f_drawYogurtTray(x,y,w,h,n,maximum,time,fx)
+	if hd_gpu() and f_hdYogurtTepsi(x, y, w, h, n, maximum, time, fx): return null
+	if not sprites_enabled or float(j_ctx.globalAlpha)!=1.0 or float(n)<=0: return super.f_drawYogurtTray(x,y,w,h,n,maximum,time,fx)
 	var level := clampf(float(n)/float(maximum),0,1)
 	var bump := int(floorf(sin(J.n(fx)*PI)*2+.5))
 	var key := str([w,h,level,bump])
@@ -88,24 +89,28 @@ func f_drawYogurtTray(x: Variant = null, y: Variant = null, w: Variant = null, h
 	return null
 
 func sprite(key: String, x: float, y: float) -> bool:
-	# REMAKE: PNG sprite'lar prosedurel cizimin pisirilmis kopyasi; HD'de kancali
-	# prosedurel yol calissin (HD parca yoksa goruntu ayni)
-	return sprites_enabled and not hd_gpu() and float(j_ctx.globalAlpha) == 1.0 and sprite_library.draw(j_ctx, key, x, y)
+	# REMAKE: HD parcasi olan cagrilarda HD once denenir (asagidaki
+	# gecersiz kilmalar); HD karsiligi olmayan boyutlarda PNG onbellek kalir
+	return sprites_enabled and float(j_ctx.globalAlpha) == 1.0 and sprite_library.draw(j_ctx, key, x, y)
 
 func f_trayBase(x: Variant = null, y: Variant = null, w: Variant = null, h: Variant = null) -> Variant:
+	if hd_gpu() and f_hdKuvet(x, y, w, h): return null
 	if sprite("f_trayBase/%dx%d" % [w,h], x,y): return null
 	return super.f_trayBase(x,y,w,h)
 
 func f_trayInnerShade(x: Variant = null, y: Variant = null, w: Variant = null, h: Variant = null) -> Variant:
+	if hd_gpu() and f_hdKuvetGolge(x, y, w, h): return null
 	if sprite("f_trayInnerShade/%dx%d" % [w,h], x,y): return null
 	return super.f_trayInnerShade(x,y,w,h)
 
 func f_drawBreadStack(x: Variant = null, y: Variant = null, w: Variant = null, h: Variant = null, label: Variant = null) -> Variant:
+	if hd_gpu() and f_hdLavas(x, y, w, h, label): return null
 	if not sprite("bread/%d" % w,x,y): return super.f_drawBreadStack(x,y,w,h,label)
 	if label != "": text_draw.f_txt(label if J.truth(label) else "LAVAŞ",x+w/2.0,y+30,"rgba(255,255,255,.55)",{"align":"c","outline":"rgba(0,0,0,.4)"})
 	return null
 
 func f_drawPideStack(x: Variant = null, y: Variant = null, w: Variant = null) -> Variant:
+	if hd_gpu() and f_hdPide(x, y, w): return null
 	if sprite("pide/%d" % w,x,y): return null
 	return super.f_drawPideStack(x,y,w)
 
@@ -114,6 +119,7 @@ func f_potBinPaint(x: Variant = null, y: Variant = null, w: Variant = null, h: V
 	return super.f_potBinPaint(x,y,w,h)
 
 func f_drawKesimBicagi(x: Variant = null, y: Variant = null, direction: Variant = null, level: Variant = null) -> Variant:
+	if hd_gpu() and f_hdBicak(x, y, direction, level): return null
 	if sprite("knife/%d/%d" % [J.n(level),J.n(direction)],x,y): return null
 	return super.f_drawKesimBicagi(x,y,direction,level)
 
@@ -124,6 +130,8 @@ func f_drawSpitCutKnife(x: Variant = null, y: Variant = null, level: Variant = n
 	return f_drawKesimBicagi(x, y, -1.0, level)
 
 func f_drawFill(x: Variant = null, y: Variant = null, w: Variant = null, h: Variant = null, level: Variant = null, seed_value: Variant = null, item: Variant = null) -> Variant:
+	# HD: modul surumu (HD et/tursu/patates parcalari, kayitli onbellek)
+	if hd_gpu(): return super.f_drawFill(x, y, w, h, level, seed_value, item)
 	var q := int(floorf(clampf(float(level),0,1)*40+.5))
 	var key := "fill/%dx%d/%.1f/%d" % [w,h,seed_value,q]
 	# Guard the callback as well, so custom recipe code can still supply a different drawing.
