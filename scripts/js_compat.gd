@@ -186,7 +186,23 @@ static func method(o: Variant, key: String, a: Array = []) -> Variant:
 					return a[0].__regex.sub(o, s(arg(a, 1)), "g" in a[0].flags)
 				return o.replace(s(a[0]), s(arg(a, 1)))
 	if key == "toFixed": return ("%." + str(int(n(arg(a, 0)))) + "f") % n(o)
-	if key == "toString": return s(o)
+	if key == "toString":
+		# JS: Number.prototype.toString(taban) — taban yok sayilirsa renk
+		# donusumu (_rgb2hex: n.toString(16)) ondalik dizge uretip gecersiz
+		# hex veriyordu (boyali duvar siyah ciziliyordu).
+		var taban: int = int(n(arg(a, 0))) if a.size() > 0 and a[0] != null else 10
+		if taban != 10 and (o is float or o is int) and taban >= 2 and taban <= 36:
+			var sayi: int = int(n(o))
+			if sayi == 0: return "0"
+			var eksi := sayi < 0
+			sayi = absi(sayi)
+			var basamak := "0123456789abcdefghijklmnopqrstuvwxyz"
+			var cikti := ""
+			while sayi > 0:
+				cikti = basamak[sayi % taban] + cikti
+				sayi /= taban
+			return ("-" + cikti) if eksi else cikti
+		return s(o)
 	return null
 
 static func lt(a: Variant, b: Variant) -> bool:

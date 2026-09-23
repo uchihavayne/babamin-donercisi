@@ -82,14 +82,17 @@ func f_bsRozet(p_x: Variant = null, p_y: Variant = null, p_b: Variant = null, p_
 	var v_t: Variant = p_t
 	v_hlk = (J.getv(game.j_BS_KADEME, ((J.getv(v_b, "kademe") if J.truth(J.getv(v_b, "kademe")) else 1.0) - 1.0)) if J.truth(J.getv(game.j_BS_KADEME, ((J.getv(v_b, "kademe") if J.truth(J.getv(v_b, "kademe")) else 1.0) - 1.0))) else J.getv(game.j_BS_KADEME, 0.0))
 	if J.truth(v_acik):
-		game.f_rrect(v_x, v_y, 16.0, 16.0, 3.0, game.character_draw.f_shadeCol(v_hlk, 0.45))
-		game.f_rrect(J.add(v_x, 1.0), J.add(v_y, 1.0), 14.0, 14.0, 3.0, "#3a3026")
-		game.f_rrectOut(v_x, v_y, 16.0, 16.0, 3.0, v_hlk)
+		# REMAKE kancasi: HD rozet (pahli kademe halkasi + cukur yuva)
+		if not J.truth(game.f_hdRozet(v_x, v_y, v_hlk)):
+			game.f_rrect(v_x, v_y, 16.0, 16.0, 3.0, game.character_draw.f_shadeCol(v_hlk, 0.45))
+			game.f_rrect(J.add(v_x, 1.0), J.add(v_y, 1.0), 14.0, 14.0, 3.0, "#3a3026")
+			game.f_rrectOut(v_x, v_y, 16.0, 16.0, 3.0, v_hlk)
 		game.icon_draw.f_icon(J.getv(v_b, "ikon"), J.add(v_x, 8.0), J.add(v_y, 8.0), v_t)
 	else:
-		game.f_rrect(v_x, v_y, 16.0, 16.0, 3.0, "#171310")
-		game.f_rrect(J.add(v_x, 1.0), J.add(v_y, 1.0), 14.0, 14.0, 3.0, "#231d17")
-		game.f_rrectOut(v_x, v_y, 16.0, 16.0, 3.0, "#4a4038")
+		if not J.truth(game.f_hdRozet(v_x, v_y, "#4a4038")):
+			game.f_rrect(v_x, v_y, 16.0, 16.0, 3.0, "#171310")
+			game.f_rrect(J.add(v_x, 1.0), J.add(v_y, 1.0), 14.0, 14.0, 3.0, "#231d17")
+			game.f_rrectOut(v_x, v_y, 16.0, 16.0, 3.0, "#4a4038")
 		if J.truth(J.getv(v_b, "gizli")):
 			game.text_draw.f_txt("?", J.add(v_x, 8.0), J.add(v_y, 5.0), "#8a7a64", {"align": "c"})
 		else:
@@ -252,9 +255,11 @@ func f_drawBasarimToast(p_t: Variant = null, p_dt: Variant = null) -> Variant:
 	J.setv(game.j_ctx, "globalAlpha", (v_k * 0.4))
 	game.f_rrect(J.add(v_bx, 2.0), J.add(v_by, 3.0), v_w, v_h, 4.0, "#000")
 	J.setv(game.j_ctx, "globalAlpha", v_k)
-	game.f_rrect(v_bx, v_by, v_w, v_h, 4.0, "#4a3a1e")
-	game.f_rrect(J.add(v_bx, 1.0), J.add(v_by, 1.0), (v_w - 2.0), (v_h - 2.0), 4.0, "#2b2118")
-	game.f_rrectOut(v_bx, v_by, v_w, v_h, 4.0, J.getv(game.j_P, "au0"))
+	# REMAKE kancasi: HD bildirim plakasi (altin pahli 9 dilim)
+	if not J.truth(game.f_hdBildirimPlaka(v_bx, v_by, v_w, v_h)):
+		game.f_rrect(v_bx, v_by, v_w, v_h, 4.0, "#4a3a1e")
+		game.f_rrect(J.add(v_bx, 1.0), J.add(v_by, 1.0), (v_w - 2.0), (v_h - 2.0), 4.0, "#2b2118")
+		game.f_rrectOut(v_bx, v_by, v_w, v_h, 4.0, J.getv(game.j_P, "au0"))
 	game.achievement_draw.f_bsRozet(J.add(v_bx, 7.0), J.add(v_by, 7.0), J.getv(v_it, "b"), true, false, v_t)
 	game.text_draw.f_txt(game.localization.f_T("BAŞARIM AÇILDI"), J.add(v_bx, 29.0), J.add(v_by, 6.0), J.getv(game.j_P, "au2"))
 	game.text_draw.f_txt(game.achievement_system.f_bsAd(J.getv(v_it, "b")), J.add(v_bx, 29.0), J.add(v_by, 17.0), J.getv(game.j_P, "ui0"))

@@ -3,6 +3,8 @@ extends "res://scripts/core/game_module.gd"
 
 # art.js:2982
 func f_trayInnerShade(p_x: Variant = null, p_y: Variant = null, p_w: Variant = null, p_h: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdKuvetGolge(p_x, p_y, p_w, p_h): return null
 	var v_x: Variant = p_x
 	var v_y: Variant = p_y
 	var v_w: Variant = p_w
@@ -57,6 +59,8 @@ func f_trayFloor(p_x: Variant = null, p_y: Variant = null, p_w: Variant = null, 
 
 # art.js:3020
 func f_trayBase(p_x: Variant = null, p_y: Variant = null, p_w: Variant = null, p_h: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdKuvet(p_x, p_y, p_w, p_h): return null
 	var v_F: Variant = null
 	var v_d: Variant = null
 	var v_u: Variant = null
@@ -128,6 +132,9 @@ func f_trayBase(p_x: Variant = null, p_y: Variant = null, p_w: Variant = null, p
 
 # art.js:3092
 func f_drawFill(p_x: Variant = null, p_y: Variant = null, p_w: Variant = null, p_h: Variant = null, p_lvl: Variant = null, p_seed: Variant = null, p_item: Variant = null) -> Variant:
+	# REMAKE kancasi
+	# GPU'da onbelleksiz; parcalar HD kancalariyla ciziliyor
+	if game.hd("dolum"): return game.f_dolumHD(float(int(J.n(p_x))), float(int(J.n(p_y))), p_w, p_h, floor(J.n(game.math_utils.f_clamp(p_lvl, 0.0, 1.0)) * 40.0 + 0.5) / 40.0, p_seed, p_item)
 	var _v: Dictionary = {"q": null, "key": null, "e": null, "oc": null, "eskiCtx": null, "ty": null, "x": p_x, "y": p_y, "w": p_w, "h": p_h, "lvl": p_lvl, "seed": p_seed, "item": p_item}
 	_v["lvl"] = game.math_utils.f_clamp(_v["lvl"], 0.0, 1.0)
 	_v["q"] = floor((_v["lvl"] * 40.0) + 0.5)

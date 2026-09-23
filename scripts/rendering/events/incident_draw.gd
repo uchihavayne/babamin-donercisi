@@ -16,6 +16,8 @@ func f_drawKedi(p_t: Variant = null) -> Variant:
 	var v_ky2: Variant = null
 	var v_mw: Variant = null
 	var v_t: Variant = p_t
+	# REMAKE kancasi
+	if game.f_hdKedi(p_t): return null
 	v_K = J.getv(game.j_G, "kedi")
 	if ((not J.truth(v_K)) or J.eq(J.getv(v_K, "faz"), "yok")):
 		return null
@@ -124,17 +126,19 @@ func f_drawKesinti(p_t: Variant = null) -> Variant:
 	v_pcx = J.add(v_hx, (float(v_hw) / float(2.0)))
 	v_pcy = J.add(v_hy, (float(v_hh) / float(2.0)))
 	v_titre = J.add(0.5, ((0.5 * sin((v_t * 5.3))) * sin((v_t * 1.7))))
-	v_g = 0.0
-	while J.lt(v_g, 9.0):
-		v_yay = J.add(1.0, (v_g * 0.42))
-		J.setv(game.j_ctx, "globalAlpha", ((0.075 - (v_g * 0.0072)) * J.add(0.82, (v_titre * 0.18))))
-		v_gw2 = floor(((v_hw * v_yay) * 2.6) + 0.5)
-		v_gh2 = floor((v_hh * J.add(1.0, (v_g * 0.16))) + 0.5)
-		game.f_fr(floor((v_pcx - (float(v_gw2) / float(2.0))) + 0.5), floor((v_pcy - (float(v_gh2) / float(2.0))) + 0.5), v_gw2, v_gh2, "#ff7a1e")
-		v_g = J.add(v_g, 1.0)
-	J.setv(game.j_ctx, "globalAlpha", J.add(0.2, (v_titre * 0.07)))
-	game.f_fr((v_hx - 6.0), (v_hy - 4.0), J.add(v_hw, 12.0), J.add(v_hh, 8.0), "#ffa03c")
-	J.setv(game.j_ctx, "globalAlpha", 1.0)
+	# REMAKE kancasi
+	if not game.f_hdKesintiIsik(v_pcx, v_pcy, (v_hx - 6.0), (v_hy - 4.0), v_titre):
+		v_g = 0.0
+		while J.lt(v_g, 9.0):
+			v_yay = J.add(1.0, (v_g * 0.42))
+			J.setv(game.j_ctx, "globalAlpha", ((0.075 - (v_g * 0.0072)) * J.add(0.82, (v_titre * 0.18))))
+			v_gw2 = floor(((v_hw * v_yay) * 2.6) + 0.5)
+			v_gh2 = floor((v_hh * J.add(1.0, (v_g * 0.16))) + 0.5)
+			game.f_fr(floor((v_pcx - (float(v_gw2) / float(2.0))) + 0.5), floor((v_pcy - (float(v_gh2) / float(2.0))) + 0.5), v_gw2, v_gh2, "#ff7a1e")
+			v_g = J.add(v_g, 1.0)
+		J.setv(game.j_ctx, "globalAlpha", J.add(0.2, (v_titre * 0.07)))
+		game.f_fr((v_hx - 6.0), (v_hy - 4.0), J.add(v_hw, 12.0), J.add(v_hh, 8.0), "#ffa03c")
+		J.setv(game.j_ctx, "globalAlpha", 1.0)
 	v_i = 0.0
 	while J.lt(v_i, 6.0):
 		v_seg = floor((float((v_hh - 8.0)) / float(6.0)))
@@ -170,6 +174,8 @@ func f_drawRakip(p_t: Variant = null) -> Variant:
 	var v_bw: Variant = null
 	var v_bx: Variant = null
 	var v_t: Variant = p_t
+	# REMAKE kancasi
+	if game.f_hdRakip(p_t): return null
 	v_R = J.getv(game.j_G, "rakip")
 	if ((not J.truth(v_R)) or J.eq(J.getv(v_R, "faz"), "yok")):
 		return null

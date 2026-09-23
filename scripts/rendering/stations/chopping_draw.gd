@@ -86,6 +86,8 @@ func f_drawSlash(p_C: Variant = null) -> Variant:
 
 # art.js:3753
 func f_drawCutBoard(p_x: Variant = null, p_y: Variant = null, p_w: Variant = null, p_h: Variant = null, p_C: Variant = null, p_t: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdKesme(p_x, p_y, p_w, p_h, p_C, p_t): return null
 	var v_g: Variant = null
 	var v_s: Variant = null
 	var v_cx: Variant = null

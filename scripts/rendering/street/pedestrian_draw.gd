@@ -13,6 +13,8 @@ func f_pedKimlik(p_k: Variant = null) -> Variant:
 
 # art.js:1367
 func f_drawPed(p_x: Variant = null, p_y: Variant = null, p_k: Variant = null, p_dir: Variant = null, p_t: Variant = null, p_sc: Variant = null, p_umbrella: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdYaya(p_x, p_y, p_k, p_dir, p_t, p_sc, p_umbrella): return null
 	var v_P0: Variant = null
 	var v_shirt: Variant = null
 	var v_pant: Variant = null
@@ -149,6 +151,8 @@ func f_drawGozcu(p_x: Variant = null, p_y: Variant = null, p_t: Variant = null, 
 	var v_t: Variant = p_t
 	var v_bakiyor: Variant = p_bakiyor
 	var v_sorgu: Variant = p_sorgu
+	# REMAKE kancasi
+	if game.f_hdGozcu(p_x, p_y, p_t, p_bakiyor, p_sorgu): return null
 	v_x = floor(v_x + 0.5)
 	v_y = floor(v_y + 0.5)
 	v_PALTO = "#23262c"
@@ -244,6 +248,8 @@ func f_drawAsker(p_x: Variant = null, p_y: Variant = null, p_t: Variant = null, 
 	var v_t: Variant = p_t
 	var v_dir: Variant = p_dir
 	var v_faz: Variant = p_faz
+	# REMAKE kancasi
+	if game.f_hdAsker(p_x, p_y, p_t, p_dir, p_faz): return null
 	v_x = floor(v_x + 0.5)
 	v_y = floor(v_y + 0.5)
 	v_UNI = "#4a5148"

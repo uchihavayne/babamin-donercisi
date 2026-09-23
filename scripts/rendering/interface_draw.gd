@@ -9,6 +9,8 @@ func f_panel(p_x: Variant = null, p_y: Variant = null, p_w: Variant = null, p_h:
 	var v_w: Variant = p_w
 	var v_h: Variant = p_h
 	var v_title: Variant = p_title
+	# REMAKE kancasi: HD panel (9 dilim cerceve + kagit dolgu + baslik levhasi)
+	if J.truth(game.f_hdPanel(v_x, v_y, v_w, v_h, v_title)): return null
 	J.setv(game.j_ctx, "globalAlpha", 0.35)
 	game.f_rrect(J.add(v_x, 2.0), J.add(v_y, 3.0), v_w, v_h, 4.0, "#000")
 	J.setv(game.j_ctx, "globalAlpha", 1.0)
@@ -43,11 +45,13 @@ func f_button(p_x: Variant = null, p_y: Variant = null, p_w: Variant = null, p_h
 	v_c1 = game.character_draw.f_shadeCol(v_c0, (1.22 if J.truth(v_over) else 1.0))
 	v_c2 = game.character_draw.f_shadeCol(v_c0, 0.62)
 	v_off = (1.0 if (J.truth(v_over) and J.truth(J.getv(game.j_IN, "down"))) else 0.0)
-	J.setv(game.j_ctx, "globalAlpha", 0.3)
-	game.f_rrect(J.add(v_x, 1.0), J.add(v_y, 3.0), v_w, v_h, 3.0, "#000")
-	J.setv(game.j_ctx, "globalAlpha", 1.0)
-	game.f_rrect(v_x, J.add(v_y, v_off), v_w, v_h, 3.0, v_c2)
-	game.f_rrect(v_x, J.add(v_y, v_off), v_w, (v_h - 2.0), 3.0, v_c1)
+	# REMAKE kancasi: HD dugme (notr 9 dilim, c1/c2 ile modulate)
+	if not J.truth(game.f_hdDugme(v_x, v_y, v_w, v_h, v_c1, v_c2, v_off)):
+		J.setv(game.j_ctx, "globalAlpha", 0.3)
+		game.f_rrect(J.add(v_x, 1.0), J.add(v_y, 3.0), v_w, v_h, 3.0, "#000")
+		J.setv(game.j_ctx, "globalAlpha", 1.0)
+		game.f_rrect(v_x, J.add(v_y, v_off), v_w, v_h, 3.0, v_c2)
+		game.f_rrect(v_x, J.add(v_y, v_off), v_w, (v_h - 2.0), 3.0, v_c1)
 	game.f_hl(J.add(v_x, 3.0), J.add(J.add(v_y, 1.0), v_off), (v_w - 6.0), game.character_draw.f_shadeCol(v_c0, 1.5))
 	game.f_rrectOut(v_x, J.add(v_y, v_off), v_w, v_h, 3.0, J.getv(game.j_P, "ui5"))
 	game.text_draw.f_txt(v_label, J.add(v_x, (float(v_w) / float(2.0))), J.add(J.add(v_y, v_off), (float((v_h - 8.0)) / float(2.0))), J.getv(game.j_P, "ui0"), {"align": "c", "shadow": 1.0})
@@ -109,9 +113,11 @@ func f_drawShopStatic(p_t: Variant = null, p_mono: Variant = null) -> Variant:
 		J.method(game.j_ctx, "restore", [])
 	else:
 		game.f_drawBreadStack(J.getv(J.getv(game.j_ST, "bread"), "x"), J.getv(J.getv(game.j_ST, "bread"), "y"), J.getv(J.getv(game.j_ST, "bread"), "w"), J.getv(J.getv(game.j_ST, "bread"), "h"))
-	game.f_rrect(J.add(J.getv(J.getv(game.j_ST, "board"), "x"), 2.0), J.add(J.getv(J.getv(game.j_ST, "board"), "y"), 8.0), (J.getv(J.getv(game.j_ST, "board"), "w") - 4.0), 34.0, 3.0, "#7a5230")
-	game.f_rrect(J.add(J.getv(J.getv(game.j_ST, "board"), "x"), 2.0), J.add(J.getv(J.getv(game.j_ST, "board"), "y"), 7.0), (J.getv(J.getv(game.j_ST, "board"), "w") - 4.0), 34.0, 3.0, "#c49a68")
-	game.f_rrect(J.add(J.getv(J.getv(game.j_ST, "board"), "x"), 4.0), J.add(J.getv(J.getv(game.j_ST, "board"), "y"), 9.0), (J.getv(J.getv(game.j_ST, "board"), "w") - 8.0), 30.0, 2.0, "#dcb480")
+	# REMAKE kancasi
+	if not game.f_hdTahta(false):
+		game.f_rrect(J.add(J.getv(J.getv(game.j_ST, "board"), "x"), 2.0), J.add(J.getv(J.getv(game.j_ST, "board"), "y"), 8.0), (J.getv(J.getv(game.j_ST, "board"), "w") - 4.0), 34.0, 3.0, "#7a5230")
+		game.f_rrect(J.add(J.getv(J.getv(game.j_ST, "board"), "x"), 2.0), J.add(J.getv(J.getv(game.j_ST, "board"), "y"), 7.0), (J.getv(J.getv(game.j_ST, "board"), "w") - 4.0), 34.0, 3.0, "#c49a68")
+		game.f_rrect(J.add(J.getv(J.getv(game.j_ST, "board"), "x"), 4.0), J.add(J.getv(J.getv(game.j_ST, "board"), "y"), 9.0), (J.getv(J.getv(game.j_ST, "board"), "w") - 8.0), 30.0, 2.0, "#dcb480")
 	game.f_drawPaperStation(J.getv(J.getv(game.j_ST, "paper"), "x"), J.getv(J.getv(game.j_ST, "paper"), "y"), J.getv(J.getv(game.j_ST, "paper"), "w"), J.getv(J.getv(game.j_ST, "paper"), "h"), game.equipment_system.f_UV(game.j_G, "paper"), 0.0, v_t)
 	if J.truth(J.method(game.j_TUN, "grillOn", [game.j_G])):
 		game.f_drawGrill(J.getv(J.getv(game.j_ST, "grill"), "x"), J.getv(J.getv(game.j_ST, "grill"), "y"), J.getv(J.getv(game.j_ST, "grill"), "w"), J.getv(J.getv(game.j_ST, "grill"), "h"), {"slots": []}, v_t, J.method(game.j_TUN, "grillCap", [game.j_G]))

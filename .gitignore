@@ -26,3 +26,8 @@ artifacts/**
 *.p12
 *.pfx
 *.mobileprovision
+
+# Blender ara ciktilari (remake): renderlar yeniden uretilebilir, oyuna giren
+# atlaslar assets/remake altinda ayrica tutulur
+blender/out/*
+!blender/out/logo_font.json

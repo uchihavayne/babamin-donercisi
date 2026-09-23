@@ -1,5 +1,6 @@
 # Shared per-game state. Modules use the owning game; no global singletons.
-extends "res://scripts/native_platform.gd"
+# REMAKE: HD gorsel katmani (remake_gorsel.gd) platform ile oyun durumu arasinda
+extends "res://scripts/remake_gorsel.gd"
 
 var j_LANG: Variant = null
 var j_LANGKEY: Variant = null

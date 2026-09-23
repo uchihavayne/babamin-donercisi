@@ -3,6 +3,8 @@ extends "res://scripts/core/game_module.gd"
 
 # art.js:4147
 func f_drawDrinkMachine(p_x: Variant = null, p_y: Variant = null, p_w: Variant = null, p_h: Variant = null, p_D: Variant = null, p_t: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdIcecek(p_x, p_y, p_w, p_h, p_D, p_t): return null
 	var v_kd: Variant = null
 	var v_yari: Variant = null
 	var v_pH: Variant = null
@@ -192,6 +194,8 @@ func f_drawAyran(p_x: Variant = null, p_y: Variant = null, p_w: Variant = null, 
 
 # art.js:4353
 func f_drawAyranTank(p_x: Variant = null, p_y: Variant = null, p_w: Variant = null, p_h: Variant = null, p_n: Variant = null, p_max: Variant = null, p_A: Variant = null, p_t: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdAyran(p_x, p_y, p_w, p_h, p_n, p_max, p_A, p_t): return null
 	var v_lvl: Variant = null
 	var v_buyuk: Variant = null
 	var v_cx: Variant = null
@@ -281,6 +285,8 @@ func f_drawAyranTank(p_x: Variant = null, p_y: Variant = null, p_w: Variant = nu
 
 # art.js:4691
 func f_drawIcecekKasasi(p_x: Variant = null, p_y: Variant = null, p_w: Variant = null, p_h: Variant = null, p_bolme: Variant = null, p_t: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdIcecekKasa(p_x, p_y, p_w, p_h, p_bolme, p_t): return null
 	var v_i: Variant = null
 	var v_bx: Variant = null
 	var v_dy: Variant = null

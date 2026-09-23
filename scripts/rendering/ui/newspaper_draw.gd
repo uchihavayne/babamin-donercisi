@@ -91,21 +91,23 @@ func f_drawGazete(p_t: Variant = null, p_k: Variant = null) -> Variant:
 	v_ph = J.getv(v_kk, 1.0)
 	v_x = floor(((float(game.j_W) / float(2.0)) - (float(v_pw) / float(2.0))) + 0.5)
 	v_y = floor(game.math_utils.f_lerp((-J.n(v_ph)), J.getv(v_kk, 0.0), game.math_utils.f_easeOutBack(v_k)) + 0.5)
-	J.setv(game.j_ctx, "globalAlpha", 0.46)
-	game.f_fr(J.add(v_x, 5.0), J.add(v_y, 6.0), v_pw, v_ph, "#000")
-	J.setv(game.j_ctx, "globalAlpha", 1.0)
-	game.f_fr(v_x, v_y, v_pw, v_ph, "#b8ad8e")
-	game.f_fr(J.add(v_x, 1.0), J.add(v_y, 1.0), (v_pw - 2.0), (v_ph - 2.0), "#e6dcbe")
-	game.f_hl(J.add(v_x, 1.0), J.add(v_y, 1.0), (v_pw - 2.0), "#f4ecd4")
-	J.setv(game.j_ctx, "globalAlpha", 0.1)
-	v_d1 = 0.0
-	while J.lt(v_d1, 30.0):
-		game.f_px(J.add(J.add(v_x, 4.0), floor((game.f_hash1((v_d1 * 3.7)) * (v_pw - 8.0)))), J.add(J.add(v_y, 4.0), floor((game.f_hash1((v_d1 * 8.3)) * (v_ph - 8.0)))), "#6a5f45")
-		v_d1 = J.add(v_d1, 1.0)
-	J.setv(game.j_ctx, "globalAlpha", 1.0)
-	J.setv(game.j_ctx, "globalAlpha", 0.13)
-	game.f_fr(J.add(v_x, floor((float(v_pw) / float(2.0)) + 0.5)), J.add(v_y, 2.0), 1.0, (v_ph - 4.0), "#6a5f45")
-	J.setv(game.j_ctx, "globalAlpha", 1.0)
+	# REMAKE kancasi: HD gazete kagidi (lifli doku + golge + kat izi)
+	if not J.truth(game.f_hdGazeteKagit(v_x, v_y, v_pw, v_ph)):
+		J.setv(game.j_ctx, "globalAlpha", 0.46)
+		game.f_fr(J.add(v_x, 5.0), J.add(v_y, 6.0), v_pw, v_ph, "#000")
+		J.setv(game.j_ctx, "globalAlpha", 1.0)
+		game.f_fr(v_x, v_y, v_pw, v_ph, "#b8ad8e")
+		game.f_fr(J.add(v_x, 1.0), J.add(v_y, 1.0), (v_pw - 2.0), (v_ph - 2.0), "#e6dcbe")
+		game.f_hl(J.add(v_x, 1.0), J.add(v_y, 1.0), (v_pw - 2.0), "#f4ecd4")
+		J.setv(game.j_ctx, "globalAlpha", 0.1)
+		v_d1 = 0.0
+		while J.lt(v_d1, 30.0):
+			game.f_px(J.add(J.add(v_x, 4.0), floor((game.f_hash1((v_d1 * 3.7)) * (v_pw - 8.0)))), J.add(J.add(v_y, 4.0), floor((game.f_hash1((v_d1 * 8.3)) * (v_ph - 8.0)))), "#6a5f45")
+			v_d1 = J.add(v_d1, 1.0)
+		J.setv(game.j_ctx, "globalAlpha", 1.0)
+		J.setv(game.j_ctx, "globalAlpha", 0.13)
+		game.f_fr(J.add(v_x, floor((float(v_pw) / float(2.0)) + 0.5)), J.add(v_y, 2.0), 1.0, (v_ph - 4.0), "#6a5f45")
+		J.setv(game.j_ctx, "globalAlpha", 1.0)
 	v_my = J.add(v_y, 4.0)
 	game.newspaper_draw.f_gazeteArma(J.add(v_x, (float(v_pw) / float(2.0))), J.add(v_my, 1.0))
 	game.newspaper_draw.f_gazeteSusleme(J.add(v_x, 30.0), J.add(v_my, 8.0), 1.0)
@@ -199,6 +201,8 @@ func f_gazeteArma(p_cx: Variant = null, p_cy: Variant = null) -> Variant:
 	var v_cy: Variant = p_cy
 	v_cx = floor(v_cx + 0.5)
 	v_cy = floor(v_cy + 0.5)
+	# REMAKE kancasi: HD gazete armasi
+	if J.truth(game.f_hdGazeteArma(v_cx, v_cy)): return null
 	v_S = "#1e1a14"
 	v_K = "#e6dcbe"
 	v_i = 0.0
@@ -234,6 +238,8 @@ func f_gazeteSusleme(p_x: Variant = null, p_y: Variant = null, p_yon: Variant = 
 	var v_yon: Variant = p_yon
 	v_x = floor(v_x + 0.5)
 	v_y = floor(v_y + 0.5)
+	# REMAKE kancasi: HD baslik suslemesi
+	if J.truth(game.f_hdGazeteSusleme(v_x, v_y, v_yon)): return null
 	v_S = "#2a251c"
 	v_i = 0.0
 	while J.lt(v_i, 9.0):

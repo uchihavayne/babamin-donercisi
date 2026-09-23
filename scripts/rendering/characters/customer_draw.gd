@@ -105,8 +105,9 @@ func f_drawCustomer(p_c: Variant = null, p_t: Variant = null) -> Variant:
 	v_jitter = (floor(sin((v_t * 26.0)) + 0.5) if J.eq(J.getv(v_c, "mood"), "angry") else 0.0)
 	v_jump = (((-J.n(abs(sin((v_t * 8.0))))) * 2.0) if (J.eq(J.getv(v_c, "mood"), "happy") or J.eq(J.getv(v_c, "mood"), "served")) else 0.0)
 	v_sway = ((sin((v_t * 11.0)) * 1.2) if (J.eq(J.getv(v_c, "state"), "walkin") or J.eq(J.getv(v_c, "state"), "leave")) else 0.0)
-	v_x = floor(J.add(J.add(J.getv(v_c, "x"), v_jitter), v_sway) + 0.5)
-	v_y = floor(J.add(J.add(J.getv(v_c, "y"), v_bob), v_jump) + 0.5)
+	# REMAKE: HD'de salinim/nefes yarim piksel adimla (2x izgara); eskide tam piksel
+	v_x = game.f_hdYarimPx(J.add(J.add(J.getv(v_c, "x"), v_jitter), v_sway))
+	v_y = game.f_hdYarimPx(J.add(J.add(J.add(J.getv(v_c, "y"), v_bob), v_jump), game.f_hdAdim(v_c, v_t)))
 	v_tip = (J.getv(v_L, "tip") if J.truth(J.getv(v_L, "tip")) else ("adam" if J.lt(game.f_hash1(((J.getv(v_L, "seed") if J.truth(J.getv(v_L, "seed")) else 0.0) * 2.3)), 0.42) else ("kadin" if J.lt(game.f_hash1(((J.getv(v_L, "seed") if J.truth(J.getv(v_L, "seed")) else 0.0) * 2.3)), 0.8) else "cocuk")))
 	v_cocuk = J.eq(v_tip, "cocuk")
 	v_kadin = J.eq(v_tip, "kadin")
@@ -118,29 +119,35 @@ func f_drawCustomer(p_c: Variant = null, p_t: Variant = null) -> Variant:
 		return null
 	v_by = J.add((v_y - 30.0), (9.0 if J.truth(v_cocuk) else 0.0))
 	v_bw = J.add(26.0, (v_wide * 2.0))
-	game.f_ell(v_x, J.add(v_by, 5.0), (float(v_bw) / float(2.0)), 7.0, game.character_draw.f_shadeCol(v_sh, 0.72))
-	game.f_fr((v_x - (float(v_bw) / float(2.0))), J.add(v_by, 5.0), v_bw, 26.0, game.character_draw.f_shadeCol(v_sh, 0.72))
-	game.f_ell(v_x, J.add(v_by, 4.0), ((float(v_bw) / float(2.0)) - 1.0), 6.0, v_sh)
-	game.f_fr(J.add((v_x - (float(v_bw) / float(2.0))), 1.0), J.add(v_by, 4.0), (v_bw - 2.0), 26.0, v_sh)
-	game.f_fr(J.add((v_x - (float(v_bw) / float(2.0))), 1.0), J.add(v_by, 5.0), 7.0, 25.0, game.character_draw.f_shadeCol(v_sh, 1.14))
-	J.setv(game.j_ctx, "globalAlpha", 0.2)
-	game.f_fr(J.add(v_x, 3.0), J.add(v_by, 4.0), ((float(v_bw) / float(2.0)) - 3.0), 27.0, "#000")
-	J.setv(game.j_ctx, "globalAlpha", 1.0)
-	game.f_fr(((v_x - (float(v_bw) / float(2.0))) - 3.0), J.add(v_by, 8.0), 5.0, 22.0, game.character_draw.f_shadeCol(v_sh, 0.8))
-	game.f_fr(((v_x - (float(v_bw) / float(2.0))) - 3.0), J.add(v_by, 8.0), 4.0, 21.0, game.character_draw.f_shadeCol(v_sh, 0.92))
-	game.f_fr((J.add(v_x, (float(v_bw) / float(2.0))) - 2.0), J.add(v_by, 8.0), 5.0, 22.0, game.character_draw.f_shadeCol(v_sh, 0.66))
+	# REMAKE kancasi
+	if not game.f_hdMusteriGovde(v_x, v_by, v_bw, v_sh):
+		game.f_ell(v_x, J.add(v_by, 5.0), (float(v_bw) / float(2.0)), 7.0, game.character_draw.f_shadeCol(v_sh, 0.72))
+		game.f_fr((v_x - (float(v_bw) / float(2.0))), J.add(v_by, 5.0), v_bw, 26.0, game.character_draw.f_shadeCol(v_sh, 0.72))
+		game.f_ell(v_x, J.add(v_by, 4.0), ((float(v_bw) / float(2.0)) - 1.0), 6.0, v_sh)
+		game.f_fr(J.add((v_x - (float(v_bw) / float(2.0))), 1.0), J.add(v_by, 4.0), (v_bw - 2.0), 26.0, v_sh)
+		game.f_fr(J.add((v_x - (float(v_bw) / float(2.0))), 1.0), J.add(v_by, 5.0), 7.0, 25.0, game.character_draw.f_shadeCol(v_sh, 1.14))
+		J.setv(game.j_ctx, "globalAlpha", 0.2)
+		game.f_fr(J.add(v_x, 3.0), J.add(v_by, 4.0), ((float(v_bw) / float(2.0)) - 3.0), 27.0, "#000")
+		J.setv(game.j_ctx, "globalAlpha", 1.0)
+		game.f_fr(((v_x - (float(v_bw) / float(2.0))) - 3.0), J.add(v_by, 8.0), 5.0, 22.0, game.character_draw.f_shadeCol(v_sh, 0.8))
+		game.f_fr(((v_x - (float(v_bw) / float(2.0))) - 3.0), J.add(v_by, 8.0), 4.0, 21.0, game.character_draw.f_shadeCol(v_sh, 0.92))
+		game.f_fr((J.add(v_x, (float(v_bw) / float(2.0))) - 2.0), J.add(v_by, 8.0), 5.0, 22.0, game.character_draw.f_shadeCol(v_sh, 0.66))
 	if J.eq(J.getv(v_c, "state"), "wait"):
-		v_hy2 = J.add(v_by, 27.0)
-		game.f_ell(((v_x - (float(v_bw) / float(2.0))) - 1.0), J.add(v_hy2, 1.0), 3.0, 3.0, J.getv(v_s, 2.0))
-		game.f_ell(((v_x - (float(v_bw) / float(2.0))) - 1.0), v_hy2, 3.0, 3.0, J.getv(v_s, 1.0))
-		game.f_px(((v_x - (float(v_bw) / float(2.0))) - 2.0), (v_hy2 - 1.0), J.getv(v_s, 0.0))
-		game.f_ell(J.add(v_x, (float(v_bw) / float(2.0))), J.add(v_hy2, 1.0), 3.0, 3.0, J.getv(v_s, 2.0))
-		game.f_ell(J.add(v_x, (float(v_bw) / float(2.0))), v_hy2, 3.0, 3.0, J.getv(v_s, 1.0))
-		game.f_px(J.add(J.add(v_x, (float(v_bw) / float(2.0))), 1.0), (v_hy2 - 1.0), J.getv(v_s, 0.0))
-	game.f_fr((v_x - 6.0), J.add(v_by, 2.0), 12.0, 4.0, game.character_draw.f_shadeCol(v_sh, 0.62))
-	game.f_fr((v_x - 3.0), J.add(v_by, 1.0), 6.0, 5.0, J.getv(v_s, 1.0))
-	game.f_ln((v_x - 5.0), J.add(v_by, 3.0), v_x, J.add(v_by, 7.0), game.character_draw.f_shadeCol(v_sh, 0.55))
-	game.f_ln(J.add(v_x, 5.0), J.add(v_by, 3.0), v_x, J.add(v_by, 7.0), game.character_draw.f_shadeCol(v_sh, 0.55))
+		# REMAKE kancasi
+		if not game.f_hdMusteriEller(v_x, v_by, v_bw, J.getv(v_L, "skin")):
+			v_hy2 = J.add(v_by, 27.0)
+			game.f_ell(((v_x - (float(v_bw) / float(2.0))) - 1.0), J.add(v_hy2, 1.0), 3.0, 3.0, J.getv(v_s, 2.0))
+			game.f_ell(((v_x - (float(v_bw) / float(2.0))) - 1.0), v_hy2, 3.0, 3.0, J.getv(v_s, 1.0))
+			game.f_px(((v_x - (float(v_bw) / float(2.0))) - 2.0), (v_hy2 - 1.0), J.getv(v_s, 0.0))
+			game.f_ell(J.add(v_x, (float(v_bw) / float(2.0))), J.add(v_hy2, 1.0), 3.0, 3.0, J.getv(v_s, 2.0))
+			game.f_ell(J.add(v_x, (float(v_bw) / float(2.0))), v_hy2, 3.0, 3.0, J.getv(v_s, 1.0))
+			game.f_px(J.add(J.add(v_x, (float(v_bw) / float(2.0))), 1.0), (v_hy2 - 1.0), J.getv(v_s, 0.0))
+	# REMAKE kancasi
+	if not game.f_hdMusteriBoyunAlt(v_x, v_by, J.getv(v_L, "skin")):
+		game.f_fr((v_x - 6.0), J.add(v_by, 2.0), 12.0, 4.0, game.character_draw.f_shadeCol(v_sh, 0.62))
+		game.f_fr((v_x - 3.0), J.add(v_by, 1.0), 6.0, 5.0, J.getv(v_s, 1.0))
+		game.f_ln((v_x - 5.0), J.add(v_by, 3.0), v_x, J.add(v_by, 7.0), game.character_draw.f_shadeCol(v_sh, 0.55))
+		game.f_ln(J.add(v_x, 5.0), J.add(v_by, 3.0), v_x, J.add(v_by, 7.0), game.character_draw.f_shadeCol(v_sh, 0.55))
 	if J.eq(fmod(J.n(J.getv(v_L, "seed")), J.n(3.0)), 0.0):
 		v_i = 0.0
 		while J.lt(v_i, 8.0):
@@ -154,71 +161,77 @@ func f_drawCustomer(p_c: Variant = null, p_t: Variant = null) -> Variant:
 				v_j = J.add(v_j, 1.0)
 	v_KLP = game.appearance_system.f_kalipKimlik(v_L)
 	game.costume_draw.f_drawKalipGovde(v_KLP, v_x, v_by, v_bw, v_sh, v_s, v_L)
-	game.f_fr((v_hx - 4.0), J.add(v_hy, 10.0), 8.0, 6.0, J.getv(v_s, 2.0))
-	game.f_fr((v_hx - 3.0), J.add(v_hy, 10.0), 6.0, 5.0, J.getv(v_s, 1.0))
+	# REMAKE kancasi
+	if not game.f_hdMusteriBoyunUst(v_hx, v_hy, J.getv(v_L, "skin")):
+		game.f_fr((v_hx - 4.0), J.add(v_hy, 10.0), 8.0, 6.0, J.getv(v_s, 2.0))
+		game.f_fr((v_hx - 3.0), J.add(v_hy, 10.0), 6.0, 5.0, J.getv(v_s, 1.0))
 	v_F = game.appearance_system.f_yuzKimlik(v_L)
 	v_hw = (9.0 if J.truth(v_cocuk) else (12.0 if J.truth(J.getv(v_L, "big")) else 11.0))
 	_cells["hh"][0] = 11.0
 	v_yzS = (3.0 if J.truth(v_cocuk) else J.getv(v_F, "sekil"))
 	_cells["KON"][0] = game.character_draw.f_kafaKontur(v_yzS, v_hw, _cells["hh"][0])
-	v_kr = 0.0
-	while J.lt(v_kr, J.getv(_cells["KON"][0], "length")):
-		v_kw = J.getv(_cells["KON"][0], v_kr)
-		if J.le(v_kw, 0.0):
+	# REMAKE kancasi
+	if not game.f_hdMusteriKafa(v_hx, v_hy, v_yzS, v_hw, J.getv(v_L, "skin")):
+		v_kr = 0.0
+		while J.lt(v_kr, J.getv(_cells["KON"][0], "length")):
+			v_kw = J.getv(_cells["KON"][0], v_kr)
+			if J.le(v_kw, 0.0):
+				v_kr = J.add(v_kr, 1.0)
+				continue
+			v_ky = J.add((v_hy - _cells["hh"][0]), v_kr)
+			game.f_fr((v_hx - v_kw), v_ky, J.add((v_kw * 2.0), 1.0), 1.0, J.getv(v_s, 2.0))
+			if J.ge(v_kw, 2.0):
+				game.f_fr(J.add((v_hx - v_kw), 1.0), v_ky, ((v_kw * 2.0) - 1.0), 1.0, J.getv(v_s, 0.0))
 			v_kr = J.add(v_kr, 1.0)
-			continue
-		v_ky = J.add((v_hy - _cells["hh"][0]), v_kr)
-		game.f_fr((v_hx - v_kw), v_ky, J.add((v_kw * 2.0), 1.0), 1.0, J.getv(v_s, 2.0))
-		if J.ge(v_kw, 2.0):
-			game.f_fr(J.add((v_hx - v_kw), 1.0), v_ky, ((v_kw * 2.0) - 1.0), 1.0, J.getv(v_s, 0.0))
-		v_kr = J.add(v_kr, 1.0)
-	v_ycx = J.add(v_hx, floor((v_hw * 0.36) + 0.5))
-	v_ycR = max(3.0, floor((v_hw * 0.58) + 0.5))
-	v_kc = 0.0
-	while J.lt(v_kc, J.getv(_cells["KON"][0], "length")):
-		v_cw = J.getv(_cells["KON"][0], v_kc)
-		if J.lt(v_cw, 2.0):
+		v_ycx = J.add(v_hx, floor((v_hw * 0.36) + 0.5))
+		v_ycR = max(3.0, floor((v_hw * 0.58) + 0.5))
+		v_kc = 0.0
+		while J.lt(v_kc, J.getv(_cells["KON"][0], "length")):
+			v_cw = J.getv(_cells["KON"][0], v_kc)
+			if J.lt(v_cw, 2.0):
+				v_kc = J.add(v_kc, 1.0)
+				continue
+			v_cy = J.add((v_hy - _cells["hh"][0]), v_kc)
+			v_dyc = (v_cy - J.add(v_hy, 1.0))
+			if J.gt(abs(v_dyc), 8.0):
+				v_kc = J.add(v_kc, 1.0)
+				continue
+			v_yar = floor(J.add((v_ycR * sqrt((1.0 - (float((v_dyc * v_dyc)) / float(64.0))))), 0.5))
+			v_ca = max((v_ycx - v_yar), J.add((v_hx - v_cw), 1.0))
+			v_cb = min(J.add(v_ycx, v_yar), (J.add(v_hx, v_cw) - 1.0))
+			if J.ge(v_cb, v_ca):
+				game.f_fr(v_ca, v_cy, J.add((v_cb - v_ca), 1.0), 1.0, J.getv(v_s, 1.0))
 			v_kc = J.add(v_kc, 1.0)
-			continue
-		v_cy = J.add((v_hy - _cells["hh"][0]), v_kc)
-		v_dyc = (v_cy - J.add(v_hy, 1.0))
-		if J.gt(abs(v_dyc), 8.0):
-			v_kc = J.add(v_kc, 1.0)
-			continue
-		v_yar = floor(J.add((v_ycR * sqrt((1.0 - (float((v_dyc * v_dyc)) / float(64.0))))), 0.5))
-		v_ca = max((v_ycx - v_yar), J.add((v_hx - v_cw), 1.0))
-		v_cb = min(J.add(v_ycx, v_yar), (J.add(v_hx, v_cw) - 1.0))
-		if J.ge(v_cb, v_ca):
-			game.f_fr(v_ca, v_cy, J.add((v_cb - v_ca), 1.0), 1.0, J.getv(v_s, 1.0))
-		v_kc = J.add(v_kc, 1.0)
-	J.setv(game.j_ctx, "globalAlpha", 0.3)
-	v_kg = 4.0
-	while J.lt(v_kg, (J.getv(_cells["KON"][0], "length") - 2.0)):
-		if J.lt(J.getv(_cells["KON"][0], v_kg), 3.0):
+		J.setv(game.j_ctx, "globalAlpha", 0.3)
+		v_kg = 4.0
+		while J.lt(v_kg, (J.getv(_cells["KON"][0], "length") - 2.0)):
+			if J.lt(J.getv(_cells["KON"][0], v_kg), 3.0):
+				v_kg = J.add(v_kg, 1.0)
+				continue
+			game.f_fr((J.add(v_hx, J.getv(_cells["KON"][0], v_kg)) - 2.0), J.add((v_hy - _cells["hh"][0]), v_kg), 2.0, 1.0, J.getv(v_s, 2.0))
 			v_kg = J.add(v_kg, 1.0)
-			continue
-		game.f_fr((J.add(v_hx, J.getv(_cells["KON"][0], v_kg)) - 2.0), J.add((v_hy - _cells["hh"][0]), v_kg), 2.0, 1.0, J.getv(v_s, 2.0))
-		v_kg = J.add(v_kg, 1.0)
-	J.setv(game.j_ctx, "globalAlpha", 1.0)
+		J.setv(game.j_ctx, "globalAlpha", 1.0)
 	v_kuG = J.invoke(v_konG, [2.0])
-	if J.eq(J.getv(v_F, "kulak"), 1.0):
-		game.f_ell(((v_hx - v_kuG) - 1.0), J.add(v_hy, 2.0), 2.0, 4.0, J.getv(v_s, 1.0))
-		game.f_ell(J.add(J.add(v_hx, v_kuG), 1.0), J.add(v_hy, 2.0), 2.0, 4.0, J.getv(v_s, 1.0))
-		game.f_px(((v_hx - v_kuG) - 1.0), J.add(v_hy, 2.0), J.getv(v_s, 3.0))
-		game.f_px(J.add(J.add(v_hx, v_kuG), 1.0), J.add(v_hy, 2.0), J.getv(v_s, 3.0))
-		game.f_px(((v_hx - v_kuG) - 1.0), J.add(v_hy, 1.0), J.getv(v_s, 2.0))
-		game.f_px(J.add(J.add(v_hx, v_kuG), 1.0), J.add(v_hy, 1.0), J.getv(v_s, 2.0))
-	else:
-		if J.eq(J.getv(v_F, "kulak"), 2.0):
-			game.f_ell((v_hx - v_kuG), J.add(v_hy, 2.0), 1.0, 2.0, J.getv(v_s, 1.0))
-			game.f_ell(J.add(v_hx, v_kuG), J.add(v_hy, 2.0), 1.0, 2.0, J.getv(v_s, 1.0))
-			game.f_px((v_hx - v_kuG), J.add(v_hy, 2.0), J.getv(v_s, 2.0))
-			game.f_px(J.add(v_hx, v_kuG), J.add(v_hy, 2.0), J.getv(v_s, 2.0))
+	# REMAKE kancasi
+	if not game.f_hdMusteriKulak(v_hx, v_hy, J.getv(v_F, "kulak"), v_kuG, J.getv(v_L, "skin")):
+		if J.eq(J.getv(v_F, "kulak"), 1.0):
+			game.f_ell(((v_hx - v_kuG) - 1.0), J.add(v_hy, 2.0), 2.0, 4.0, J.getv(v_s, 1.0))
+			game.f_ell(J.add(J.add(v_hx, v_kuG), 1.0), J.add(v_hy, 2.0), 2.0, 4.0, J.getv(v_s, 1.0))
+			game.f_px(((v_hx - v_kuG) - 1.0), J.add(v_hy, 2.0), J.getv(v_s, 3.0))
+			game.f_px(J.add(J.add(v_hx, v_kuG), 1.0), J.add(v_hy, 2.0), J.getv(v_s, 3.0))
+			game.f_px(((v_hx - v_kuG) - 1.0), J.add(v_hy, 1.0), J.getv(v_s, 2.0))
+			game.f_px(J.add(J.add(v_hx, v_kuG), 1.0), J.add(v_hy, 1.0), J.getv(v_s, 2.0))
 		else:
-			game.f_ell((v_hx - v_kuG), J.add(v_hy, 2.0), 2.0, 3.0, J.getv(v_s, 1.0))
-			game.f_ell(J.add(v_hx, v_kuG), J.add(v_hy, 2.0), 2.0, 3.0, J.getv(v_s, 1.0))
-			game.f_px((v_hx - v_kuG), J.add(v_hy, 2.0), J.getv(v_s, 2.0))
-			game.f_px(J.add(v_hx, v_kuG), J.add(v_hy, 2.0), J.getv(v_s, 2.0))
+			if J.eq(J.getv(v_F, "kulak"), 2.0):
+				game.f_ell((v_hx - v_kuG), J.add(v_hy, 2.0), 1.0, 2.0, J.getv(v_s, 1.0))
+				game.f_ell(J.add(v_hx, v_kuG), J.add(v_hy, 2.0), 1.0, 2.0, J.getv(v_s, 1.0))
+				game.f_px((v_hx - v_kuG), J.add(v_hy, 2.0), J.getv(v_s, 2.0))
+				game.f_px(J.add(v_hx, v_kuG), J.add(v_hy, 2.0), J.getv(v_s, 2.0))
+			else:
+				game.f_ell((v_hx - v_kuG), J.add(v_hy, 2.0), 2.0, 3.0, J.getv(v_s, 1.0))
+				game.f_ell(J.add(v_hx, v_kuG), J.add(v_hy, 2.0), 2.0, 3.0, J.getv(v_s, 1.0))
+				game.f_px((v_hx - v_kuG), J.add(v_hy, 2.0), J.getv(v_s, 2.0))
+				game.f_px(J.add(v_hx, v_kuG), J.add(v_hy, 2.0), J.getv(v_s, 2.0))
 	v_sacG = max(6.0, J.invoke(v_konG, [(-J.n(5.0))]))
 	game.portrait_draw.f_drawHair(v_hx, v_hy, v_sacG, J.getv(v_L, "hair"), v_hc, v_s)
 	game.portrait_draw.f_drawAcc(v_hx, v_hy, v_sacG, v_L, v_sh, v_hc)
@@ -237,36 +250,38 @@ func f_drawCustomer(p_c: Variant = null, p_t: Variant = null) -> Variant:
 	v_kaC = (game.character_draw.f_shadeCol(v_hc, 1.5) if J.eq(J.getv(v_F, "yas"), 2.0) else v_hc)
 	v_kSol = J.add((v_hx - 9.0), v_icE)
 	v_kSag = (J.add(v_hx, 5.0) - v_icE)
-	if J.truth(v_ang):
-		game.f_fr(v_kSol, J.add(v_browY, v_kaD), v_kaW, v_kaH, v_kaC)
-		game.f_px(J.add(v_kSol, v_kaW), J.add(v_browY, 2.0), v_kaC)
-		game.f_px((v_kSol - 1.0), (v_browY - 1.0), v_kaC)
-		game.f_fr(v_kSag, J.add(v_browY, v_kaD), v_kaW, v_kaH, v_kaC)
-		game.f_px((v_kSag - 1.0), J.add(v_browY, 2.0), v_kaC)
-		game.f_px(J.add(v_kSag, v_kaW), (v_browY - 1.0), v_kaC)
-	else:
-		if J.truth(v_hap):
-			game.f_fr(v_kSol, (v_browY - 1.0), v_kaW, 1.0, v_kaC)
-			game.f_px((v_kSol - 1.0), v_browY, v_kaC)
-			game.f_fr(v_kSag, (v_browY - 1.0), v_kaW, 1.0, v_kaC)
-			game.f_px(J.add(v_kSag, v_kaW), v_browY, v_kaC)
+	# REMAKE kancasi
+	if not game.f_hdKaslar(v_kSol, v_kSag, v_browY, v_kaW, v_kaH, v_kaD, v_kaC, J.getv(v_F, "kas"), v_ang, v_hap):
+		if J.truth(v_ang):
+			game.f_fr(v_kSol, J.add(v_browY, v_kaD), v_kaW, v_kaH, v_kaC)
+			game.f_px(J.add(v_kSol, v_kaW), J.add(v_browY, 2.0), v_kaC)
+			game.f_px((v_kSol - 1.0), (v_browY - 1.0), v_kaC)
+			game.f_fr(v_kSag, J.add(v_browY, v_kaD), v_kaW, v_kaH, v_kaC)
+			game.f_px((v_kSag - 1.0), J.add(v_browY, 2.0), v_kaC)
+			game.f_px(J.add(v_kSag, v_kaW), (v_browY - 1.0), v_kaC)
 		else:
-			if J.eq(J.getv(v_F, "kas"), 3.0):
-				game.f_fr(v_kSol, v_browY, v_kaW, 2.0, v_kaC)
-				game.f_px(J.add(v_kSol, v_kaW), J.add(v_browY, 1.0), v_kaC)
-				game.f_px((v_kSol - 1.0), (v_browY - 1.0), v_kaC)
-				game.f_fr(v_kSag, v_browY, v_kaW, 2.0, v_kaC)
-				game.f_px((v_kSag - 1.0), J.add(v_browY, 1.0), v_kaC)
-				game.f_px(J.add(v_kSag, v_kaW), (v_browY - 1.0), v_kaC)
+			if J.truth(v_hap):
+				game.f_fr(v_kSol, (v_browY - 1.0), v_kaW, 1.0, v_kaC)
+				game.f_px((v_kSol - 1.0), v_browY, v_kaC)
+				game.f_fr(v_kSag, (v_browY - 1.0), v_kaW, 1.0, v_kaC)
+				game.f_px(J.add(v_kSag, v_kaW), v_browY, v_kaC)
 			else:
-				if J.eq(J.getv(v_F, "kas"), 4.0):
-					game.f_fr(v_kSol, J.add(v_browY, 1.0), v_kaW, 1.0, v_kaC)
-					game.f_hl(J.add(v_kSol, 1.0), v_browY, (v_kaW - 2.0), v_kaC)
-					game.f_fr(v_kSag, J.add(v_browY, 1.0), v_kaW, 1.0, v_kaC)
-					game.f_hl(J.add(v_kSag, 1.0), v_browY, (v_kaW - 2.0), v_kaC)
+				if J.eq(J.getv(v_F, "kas"), 3.0):
+					game.f_fr(v_kSol, v_browY, v_kaW, 2.0, v_kaC)
+					game.f_px(J.add(v_kSol, v_kaW), J.add(v_browY, 1.0), v_kaC)
+					game.f_px((v_kSol - 1.0), (v_browY - 1.0), v_kaC)
+					game.f_fr(v_kSag, v_browY, v_kaW, 2.0, v_kaC)
+					game.f_px((v_kSag - 1.0), J.add(v_browY, 1.0), v_kaC)
+					game.f_px(J.add(v_kSag, v_kaW), (v_browY - 1.0), v_kaC)
 				else:
-					game.f_fr(v_kSol, J.add(v_browY, v_kaD), v_kaW, v_kaH, v_kaC)
-					game.f_fr(v_kSag, J.add(v_browY, v_kaD), v_kaW, v_kaH, v_kaC)
+					if J.eq(J.getv(v_F, "kas"), 4.0):
+						game.f_fr(v_kSol, J.add(v_browY, 1.0), v_kaW, 1.0, v_kaC)
+						game.f_hl(J.add(v_kSol, 1.0), v_browY, (v_kaW - 2.0), v_kaC)
+						game.f_fr(v_kSag, J.add(v_browY, 1.0), v_kaW, 1.0, v_kaC)
+						game.f_hl(J.add(v_kSag, 1.0), v_browY, (v_kaW - 2.0), v_kaC)
+					else:
+						game.f_fr(v_kSol, J.add(v_browY, v_kaD), v_kaW, v_kaH, v_kaC)
+						game.f_fr(v_kSag, J.add(v_browY, v_kaD), v_kaW, v_kaH, v_kaC)
 	v_blink = J.gt(game.f_hash1(J.add(floor((v_t * 1.6)), J.getv(v_L, "seed"))), 0.92)
 	v_gzW = (6.0 if J.eq(J.getv(v_F, "goz"), 2.0) else 5.0)
 	v_gzH = (3.0 if J.eq(J.getv(v_F, "goz"), 1.0) else (6.0 if J.eq(J.getv(v_F, "goz"), 2.0) else (4.0 if J.eq(J.getv(v_F, "goz"), 5.0) else 5.0)))
@@ -277,72 +292,76 @@ func f_drawCustomer(p_c: Variant = null, p_t: Variant = null) -> Variant:
 	v_gzC = (J.getv(game.j_GOZ_RENK, (J.getv(v_F, "gozR") if J.truth(J.getv(v_F, "gozR")) else 0.0)) if J.truth(J.getv(game.j_GOZ_RENK, (J.getv(v_F, "gozR") if J.truth(J.getv(v_F, "gozR")) else 0.0))) else "#2b2018")
 	v_gSol = J.add(((v_hx - 9.0) - v_gzA), v_icE)
 	v_gSag = (J.add(J.add(v_hx, 5.0), v_gzA) - v_icE)
-	if J.truth(v_hap):
-		game.f_ln(v_gSol, J.add(J.add(v_fy, 1.0), v_gzD), J.add(v_gSol, 3.0), J.add((v_fy - 2.0), v_gzD), v_gzC)
-		game.f_ln(J.add(v_gSol, 3.0), J.add((v_fy - 2.0), v_gzD), J.add(v_gSol, 6.0), J.add(J.add(v_fy, 1.0), v_gzD), v_gzC)
-		game.f_ln((v_gSag - 2.0), J.add(J.add(v_fy, 1.0), v_gzD), J.add(v_gSag, 1.0), J.add((v_fy - 2.0), v_gzD), v_gzC)
-		game.f_ln(J.add(v_gSag, 1.0), J.add((v_fy - 2.0), v_gzD), J.add(v_gSag, 4.0), J.add(J.add(v_fy, 1.0), v_gzD), v_gzC)
-	else:
-		if (J.truth(v_blink) and (not J.truth(v_ang))):
-			game.f_fr(v_gSol, J.add(v_fy, v_gzD), v_gzW, 1.0, J.getv(v_s, 3.0))
-			game.f_fr(v_gSag, J.add(v_fy, v_gzD), v_gzW, 1.0, J.getv(v_s, 3.0))
+	# REMAKE kancasi
+	if not game.f_hdGozler(v_gSol, v_gSag, v_fy, v_gzW, v_gzH, v_gzD, v_bbW, v_bbH, v_gzC, v_hap, v_ang, v_imp, v_blink, v_kadin, v_F, v_L, v_s, v_t):
+		if J.truth(v_hap):
+			game.f_ln(v_gSol, J.add(J.add(v_fy, 1.0), v_gzD), J.add(v_gSol, 3.0), J.add((v_fy - 2.0), v_gzD), v_gzC)
+			game.f_ln(J.add(v_gSol, 3.0), J.add((v_fy - 2.0), v_gzD), J.add(v_gSol, 6.0), J.add(J.add(v_fy, 1.0), v_gzD), v_gzC)
+			game.f_ln((v_gSag - 2.0), J.add(J.add(v_fy, 1.0), v_gzD), J.add(v_gSag, 1.0), J.add((v_fy - 2.0), v_gzD), v_gzC)
+			game.f_ln(J.add(v_gSag, 1.0), J.add((v_fy - 2.0), v_gzD), J.add(v_gSag, 4.0), J.add(J.add(v_fy, 1.0), v_gzD), v_gzC)
 		else:
-			v_gB = (J.getv(v_F, "gozB") if J.truth(J.getv(v_F, "gozB")) else 0.0)
-			game.character_draw.f_gozAki(v_gSol, J.add((v_fy - 2.0), v_gzD), v_gzW, v_gzH, v_gB, (-J.n(1.0)), v_s)
-			game.character_draw.f_gozAki(v_gSag, J.add((v_fy - 2.0), v_gzD), v_gzW, v_gzH, v_gB, 1.0, v_s)
-			v_lx = (1.0 if J.truth(v_ang) else floor(sin(J.add((v_t * 0.8), J.getv(v_L, "seed"))) + 0.5))
-			v_ly = (1.0 if J.truth(v_imp) else 0.0)
-			v_pH = (2.0 if J.eq(v_gB, 4.0) else (min(v_bbH, (v_gzH - 2.0)) if J.eq(v_gB, 3.0) else v_bbH))
-			v_akUst = (2.0 if J.eq(v_gB, 3.0) else (max(1.0, (int(J.n((v_gzH - 2.0))) >> int(J.n(1.0)))) if J.eq(v_gB, 4.0) else 0.0))
-			v_akH = ((v_gzH - 2.0) if J.eq(v_gB, 3.0) else (2.0 if J.eq(v_gB, 4.0) else v_gzH))
-			v_pY = J.add(J.add(J.add(J.add((v_fy - 2.0), v_gzD), v_akUst), floor((float((v_akH - v_pH)) / float(2.0)))), v_ly)
-			game.f_fr(J.add(J.add(v_gSol, 1.0), v_lx), v_pY, v_bbW, max(1.0, v_pH), v_gzC)
-			game.f_fr(J.add(J.add(v_gSag, 1.0), v_lx), v_pY, v_bbW, max(1.0, v_pH), v_gzC)
-			game.f_px(J.add(J.add(v_gSol, 1.0), v_lx), v_pY, "#6a5a4a")
-			game.f_px(J.add(J.add(v_gSag, 1.0), v_lx), v_pY, "#6a5a4a")
-			if J.eq(J.getv(v_F, "goz"), 5.0):
-				game.f_hl(v_gSol, (v_fy - 2.0), v_gzW, J.getv(v_s, 3.0))
-				game.f_hl(v_gSag, (v_fy - 2.0), v_gzW, J.getv(v_s, 3.0))
-			if J.truth(v_kadin):
-				game.f_px((v_gSol - 1.0), J.add((v_fy - 3.0), v_gzD), "#2b2018")
-				game.f_px((v_gSol - 2.0), J.add((v_fy - 2.0), v_gzD), "#2b2018")
-				game.f_px(J.add(v_gSag, v_gzW), J.add((v_fy - 3.0), v_gzD), "#2b2018")
-				game.f_px(J.add(J.add(v_gSag, v_gzW), 1.0), J.add((v_fy - 2.0), v_gzD), "#2b2018")
-			if J.truth(v_ang):
-				game.f_px(v_gSol, (v_fy - 3.0), "#e04a3a")
-				game.f_px((J.add(v_gSag, v_gzW) - 1.0), (v_fy - 3.0), "#e04a3a")
-	if J.eq(J.getv(v_F, "burun"), 1.0):
-		game.f_ell(v_hx, J.add(v_fy, 4.0), 4.0, 3.0, J.getv(v_s, 2.0))
-		game.f_ell((v_hx - 1.0), J.add(v_fy, 3.0), 4.0, 2.0, J.getv(v_s, 1.0))
-		game.f_px((v_hx - 3.0), J.add(v_fy, 5.0), J.getv(v_s, 3.0))
-		game.f_px(J.add(v_hx, 3.0), J.add(v_fy, 5.0), J.getv(v_s, 3.0))
-	else:
-		if J.eq(J.getv(v_F, "burun"), 2.0):
-			game.f_fr((v_hx - 1.0), J.add(v_fy, 1.0), 2.0, 5.0, J.getv(v_s, 2.0))
-			game.f_fr((v_hx - 1.0), J.add(v_fy, 1.0), 1.0, 4.0, J.getv(v_s, 1.0))
-			game.f_ell(v_hx, J.add(v_fy, 5.0), 2.0, 2.0, J.getv(v_s, 2.0))
-			game.f_px(J.add(v_hx, 1.0), J.add(v_fy, 6.0), J.getv(v_s, 3.0))
-		else:
-			if J.eq(J.getv(v_F, "burun"), 3.0):
-				game.f_fr((v_hx - 1.0), v_fy, 2.0, 6.0, J.getv(v_s, 2.0))
-				game.f_fr((v_hx - 1.0), v_fy, 1.0, 5.0, J.getv(v_s, 1.0))
-				game.f_px(J.add(v_hx, 1.0), J.add(v_fy, 1.0), J.getv(v_s, 1.0))
-				game.f_px(J.add(v_hx, 2.0), J.add(v_fy, 3.0), J.getv(v_s, 2.0))
-				game.f_ell(J.add(v_hx, 1.0), J.add(v_fy, 6.0), 3.0, 2.0, J.getv(v_s, 2.0))
-				game.f_px(J.add(v_hx, 3.0), J.add(v_fy, 6.0), J.getv(v_s, 3.0))
-				game.f_px((v_hx - 2.0), J.add(v_fy, 6.0), J.getv(v_s, 3.0))
+			if (J.truth(v_blink) and (not J.truth(v_ang))):
+				game.f_fr(v_gSol, J.add(v_fy, v_gzD), v_gzW, 1.0, J.getv(v_s, 3.0))
+				game.f_fr(v_gSag, J.add(v_fy, v_gzD), v_gzW, 1.0, J.getv(v_s, 3.0))
 			else:
-				if J.eq(J.getv(v_F, "burun"), 4.0):
-					game.f_ell(v_hx, J.add(v_fy, 5.0), 3.0, 2.0, J.getv(v_s, 2.0))
-					game.f_ell((v_hx - 1.0), J.add(v_fy, 4.0), 2.0, 2.0, J.getv(v_s, 1.0))
+				v_gB = (J.getv(v_F, "gozB") if J.truth(J.getv(v_F, "gozB")) else 0.0)
+				game.character_draw.f_gozAki(v_gSol, J.add((v_fy - 2.0), v_gzD), v_gzW, v_gzH, v_gB, (-J.n(1.0)), v_s)
+				game.character_draw.f_gozAki(v_gSag, J.add((v_fy - 2.0), v_gzD), v_gzW, v_gzH, v_gB, 1.0, v_s)
+				v_lx = (1.0 if J.truth(v_ang) else floor(sin(J.add((v_t * 0.8), J.getv(v_L, "seed"))) + 0.5))
+				v_ly = (1.0 if J.truth(v_imp) else 0.0)
+				v_pH = (2.0 if J.eq(v_gB, 4.0) else (min(v_bbH, (v_gzH - 2.0)) if J.eq(v_gB, 3.0) else v_bbH))
+				v_akUst = (2.0 if J.eq(v_gB, 3.0) else (max(1.0, (int(J.n((v_gzH - 2.0))) >> int(J.n(1.0)))) if J.eq(v_gB, 4.0) else 0.0))
+				v_akH = ((v_gzH - 2.0) if J.eq(v_gB, 3.0) else (2.0 if J.eq(v_gB, 4.0) else v_gzH))
+				v_pY = J.add(J.add(J.add(J.add((v_fy - 2.0), v_gzD), v_akUst), floor((float((v_akH - v_pH)) / float(2.0)))), v_ly)
+				game.f_fr(J.add(J.add(v_gSol, 1.0), v_lx), v_pY, v_bbW, max(1.0, v_pH), v_gzC)
+				game.f_fr(J.add(J.add(v_gSag, 1.0), v_lx), v_pY, v_bbW, max(1.0, v_pH), v_gzC)
+				game.f_px(J.add(J.add(v_gSol, 1.0), v_lx), v_pY, "#6a5a4a")
+				game.f_px(J.add(J.add(v_gSag, 1.0), v_lx), v_pY, "#6a5a4a")
+				if J.eq(J.getv(v_F, "goz"), 5.0):
+					game.f_hl(v_gSol, (v_fy - 2.0), v_gzW, J.getv(v_s, 3.0))
+					game.f_hl(v_gSag, (v_fy - 2.0), v_gzW, J.getv(v_s, 3.0))
+				if J.truth(v_kadin):
+					game.f_px((v_gSol - 1.0), J.add((v_fy - 3.0), v_gzD), "#2b2018")
+					game.f_px((v_gSol - 2.0), J.add((v_fy - 2.0), v_gzD), "#2b2018")
+					game.f_px(J.add(v_gSag, v_gzW), J.add((v_fy - 3.0), v_gzD), "#2b2018")
+					game.f_px(J.add(J.add(v_gSag, v_gzW), 1.0), J.add((v_fy - 2.0), v_gzD), "#2b2018")
+				if J.truth(v_ang):
+					game.f_px(v_gSol, (v_fy - 3.0), "#e04a3a")
+					game.f_px((J.add(v_gSag, v_gzW) - 1.0), (v_fy - 3.0), "#e04a3a")
+	# REMAKE kancasi
+	if not game.f_hdMusteriBurun(v_hx, v_fy, J.getv(v_F, "burun"), J.getv(v_L, "skin")):
+		if J.eq(J.getv(v_F, "burun"), 1.0):
+			game.f_ell(v_hx, J.add(v_fy, 4.0), 4.0, 3.0, J.getv(v_s, 2.0))
+			game.f_ell((v_hx - 1.0), J.add(v_fy, 3.0), 4.0, 2.0, J.getv(v_s, 1.0))
+			game.f_px((v_hx - 3.0), J.add(v_fy, 5.0), J.getv(v_s, 3.0))
+			game.f_px(J.add(v_hx, 3.0), J.add(v_fy, 5.0), J.getv(v_s, 3.0))
+		else:
+			if J.eq(J.getv(v_F, "burun"), 2.0):
+				game.f_fr((v_hx - 1.0), J.add(v_fy, 1.0), 2.0, 5.0, J.getv(v_s, 2.0))
+				game.f_fr((v_hx - 1.0), J.add(v_fy, 1.0), 1.0, 4.0, J.getv(v_s, 1.0))
+				game.f_ell(v_hx, J.add(v_fy, 5.0), 2.0, 2.0, J.getv(v_s, 2.0))
+				game.f_px(J.add(v_hx, 1.0), J.add(v_fy, 6.0), J.getv(v_s, 3.0))
+			else:
+				if J.eq(J.getv(v_F, "burun"), 3.0):
+					game.f_fr((v_hx - 1.0), v_fy, 2.0, 6.0, J.getv(v_s, 2.0))
+					game.f_fr((v_hx - 1.0), v_fy, 1.0, 5.0, J.getv(v_s, 1.0))
+					game.f_px(J.add(v_hx, 1.0), J.add(v_fy, 1.0), J.getv(v_s, 1.0))
+					game.f_px(J.add(v_hx, 2.0), J.add(v_fy, 3.0), J.getv(v_s, 2.0))
+					game.f_ell(J.add(v_hx, 1.0), J.add(v_fy, 6.0), 3.0, 2.0, J.getv(v_s, 2.0))
+					game.f_px(J.add(v_hx, 3.0), J.add(v_fy, 6.0), J.getv(v_s, 3.0))
 					game.f_px((v_hx - 2.0), J.add(v_fy, 6.0), J.getv(v_s, 3.0))
-					game.f_px(J.add(v_hx, 2.0), J.add(v_fy, 6.0), J.getv(v_s, 3.0))
-					game.f_px(v_hx, J.add(v_fy, 3.0), J.getv(v_s, 1.0))
 				else:
-					game.f_ell(v_hx, J.add(v_fy, 4.0), 3.0, 3.0, J.getv(v_s, 2.0))
-					game.f_ell((v_hx - 1.0), J.add(v_fy, 3.0), 3.0, 3.0, J.getv(v_s, 1.0))
-					game.f_px((v_hx - 2.0), J.add(v_fy, 2.0), J.getv(v_s, 0.0))
-					game.f_px(J.add(v_hx, 2.0), J.add(v_fy, 5.0), J.getv(v_s, 3.0))
+					if J.eq(J.getv(v_F, "burun"), 4.0):
+						game.f_ell(v_hx, J.add(v_fy, 5.0), 3.0, 2.0, J.getv(v_s, 2.0))
+						game.f_ell((v_hx - 1.0), J.add(v_fy, 4.0), 2.0, 2.0, J.getv(v_s, 1.0))
+						game.f_px((v_hx - 2.0), J.add(v_fy, 6.0), J.getv(v_s, 3.0))
+						game.f_px(J.add(v_hx, 2.0), J.add(v_fy, 6.0), J.getv(v_s, 3.0))
+						game.f_px(v_hx, J.add(v_fy, 3.0), J.getv(v_s, 1.0))
+					else:
+						game.f_ell(v_hx, J.add(v_fy, 4.0), 3.0, 3.0, J.getv(v_s, 2.0))
+						game.f_ell((v_hx - 1.0), J.add(v_fy, 3.0), 3.0, 3.0, J.getv(v_s, 1.0))
+						game.f_px((v_hx - 2.0), J.add(v_fy, 2.0), J.getv(v_s, 0.0))
+						game.f_px(J.add(v_hx, 2.0), J.add(v_fy, 5.0), J.getv(v_s, 3.0))
 	v_ynG = max(4.0, (J.invoke(v_konG, [4.0]) - 3.0))
 	if J.truth(J.getv(v_F, "yanak")):
 		J.setv(game.j_ctx, "globalAlpha", 0.3)
@@ -397,94 +416,102 @@ func f_drawCustomer(p_c: Variant = null, p_t: Variant = null) -> Variant:
 			J.setv(game.j_ctx, "globalAlpha", 1.0)
 	if J.truth(J.getv(v_L, "mustache")):
 		v_byG = max(4.0, min(7.0, (J.invoke(v_konG, [6.0]) - 1.0)))
-		game.f_fr((v_hx - v_byG), J.add(J.add(v_fy, 6.0), v_agzU), (v_byG * 2.0), 2.0, v_hc)
-		game.f_px(((v_hx - v_byG) - 1.0), J.add(J.add(v_fy, 7.0), v_agzU), v_hc)
-		game.f_px(J.add(v_hx, v_byG), J.add(J.add(v_fy, 7.0), v_agzU), v_hc)
+		# REMAKE kancasi
+		if not game.f_hdMusteriBiyik(v_hx, v_fy, v_agzU, v_byG, v_hc):
+			game.f_fr((v_hx - v_byG), J.add(J.add(v_fy, 6.0), v_agzU), (v_byG * 2.0), 2.0, v_hc)
+			game.f_px(((v_hx - v_byG) - 1.0), J.add(J.add(v_fy, 7.0), v_agzU), v_hc)
+			game.f_px(J.add(v_hx, v_byG), J.add(J.add(v_fy, 7.0), v_agzU), v_hc)
 	if J.eq(J.getv(v_L, "acc"), "beard"):
 		v_skG = max(4.0, J.invoke(v_konG, [6.0]))
-		v_b = (-J.n(v_skG))
-		while J.le(v_b, v_skG):
-			v_bh = J.add(3.0, floor((sin((J.add(v_b, v_skG) * 0.7)) * 2.0) + 0.5))
-			game.f_fr(J.add(v_hx, v_b), J.add(v_hy, 6.0), 1.0, J.add(v_bh, 3.0), v_hc)
-			v_b = J.add(v_b, 1.0)
-		v_skA = max(3.0, J.add(J.invoke(v_konG, [9.0]), 1.0))
-		game.f_ell(v_hx, J.add(v_hy, 10.0), v_skA, 3.0, v_hc)
-		game.f_ell(v_hx, J.add(v_hy, 11.0), max(2.0, (v_skA - 2.0)), 2.0, game.character_draw.f_shadeCol(v_hc, 1.2))
+		# REMAKE kancasi
+		if not game.f_hdMusteriSakal(v_hx, v_hy, v_skG, max(3.0, J.add(J.invoke(v_konG, [9.0]), 1.0)), v_hc):
+			v_b = (-J.n(v_skG))
+			while J.le(v_b, v_skG):
+				v_bh = J.add(3.0, floor((sin((J.add(v_b, v_skG) * 0.7)) * 2.0) + 0.5))
+				game.f_fr(J.add(v_hx, v_b), J.add(v_hy, 6.0), 1.0, J.add(v_bh, 3.0), v_hc)
+				v_b = J.add(v_b, 1.0)
+			v_skA = max(3.0, J.add(J.invoke(v_konG, [9.0]), 1.0))
+			game.f_ell(v_hx, J.add(v_hy, 10.0), v_skA, 3.0, v_hc)
+			game.f_ell(v_hx, J.add(v_hy, 11.0), max(2.0, (v_skA - 2.0)), 2.0, game.character_draw.f_shadeCol(v_hc, 1.2))
 	v_my = J.add(J.add(v_fy, (9.0 if J.truth(J.getv(v_L, "mustache")) else 8.0)), v_agzU)
 	v_agD = (1.0 if J.eq(J.getv(v_F, "agiz"), 1.0) else ((-J.n(1.0)) if J.eq(J.getv(v_F, "agiz"), 2.0) else 0.0))
 	v_agD = min(v_agD, max((-J.n(1.0)), (J.invoke(v_konG, [8.0]) - 5.0)))
-	if J.truth(v_hap):
-		game.f_fr(((v_hx - 4.0) - v_agD), v_my, J.add(9.0, (v_agD * 2.0)), 3.0, "#6d2f28")
-		game.f_hl(((v_hx - 3.0) - v_agD), J.add(v_my, 3.0), J.add(7.0, (v_agD * 2.0)), "#c9584a")
-		game.f_hl(((v_hx - 3.0) - v_agD), v_my, J.add(7.0, (v_agD * 2.0)), "#ffffff")
-	else:
-		if J.truth(v_ang):
+	# REMAKE kancasi
+	if not game.f_hdAgiz(v_hx, v_my, v_agD, v_hap, v_ang, v_imp, v_kadin, J.getv(v_F, "agiz"), v_s):
+		if J.truth(v_hap):
 			game.f_fr(((v_hx - 4.0) - v_agD), v_my, J.add(9.0, (v_agD * 2.0)), 3.0, "#6d2f28")
-			game.f_hl(((v_hx - 4.0) - v_agD), v_my, J.add(9.0, (v_agD * 2.0)), "#ffffff")
-			game.f_px(((v_hx - 5.0) - v_agD), (v_my - 1.0), J.getv(v_s, 2.0))
-			game.f_px(J.add(J.add(v_hx, 5.0), v_agD), (v_my - 1.0), J.getv(v_s, 2.0))
+			game.f_hl(((v_hx - 3.0) - v_agD), J.add(v_my, 3.0), J.add(7.0, (v_agD * 2.0)), "#c9584a")
+			game.f_hl(((v_hx - 3.0) - v_agD), v_my, J.add(7.0, (v_agD * 2.0)), "#ffffff")
 		else:
-			if J.truth(v_imp):
-				game.f_hl(((v_hx - 4.0) - v_agD), J.add(v_my, 1.0), J.add(8.0, (v_agD * 2.0)), ("#c4405a" if J.truth(v_kadin) else "#8d3a30"))
-				game.f_px(J.add(J.add(v_hx, 4.0), v_agD), v_my, ("#c4405a" if J.truth(v_kadin) else "#8d3a30"))
+			if J.truth(v_ang):
+				game.f_fr(((v_hx - 4.0) - v_agD), v_my, J.add(9.0, (v_agD * 2.0)), 3.0, "#6d2f28")
+				game.f_hl(((v_hx - 4.0) - v_agD), v_my, J.add(9.0, (v_agD * 2.0)), "#ffffff")
+				game.f_px(((v_hx - 5.0) - v_agD), (v_my - 1.0), J.getv(v_s, 2.0))
+				game.f_px(J.add(J.add(v_hx, 5.0), v_agD), (v_my - 1.0), J.getv(v_s, 2.0))
 			else:
-				if J.truth(v_kadin):
-					game.f_fr(((v_hx - 3.0) - v_agD), v_my, J.add(7.0, (v_agD * 2.0)), 2.0, "#c4405a")
-					game.f_hl(((v_hx - 3.0) - v_agD), v_my, J.add(7.0, (v_agD * 2.0)), "#e2607a")
+				if J.truth(v_imp):
+					game.f_hl(((v_hx - 4.0) - v_agD), J.add(v_my, 1.0), J.add(8.0, (v_agD * 2.0)), ("#c4405a" if J.truth(v_kadin) else "#8d3a30"))
+					game.f_px(J.add(J.add(v_hx, 4.0), v_agD), v_my, ("#c4405a" if J.truth(v_kadin) else "#8d3a30"))
 				else:
-					if J.eq(J.getv(v_F, "agiz"), 3.0):
-						game.f_fr(((v_hx - 3.0) - v_agD), v_my, J.add(7.0, (v_agD * 2.0)), 2.0, "#8d3a30")
-						game.f_hl(((v_hx - 2.0) - v_agD), v_my, J.add(5.0, (v_agD * 2.0)), "#a8544a")
+					if J.truth(v_kadin):
+						game.f_fr(((v_hx - 3.0) - v_agD), v_my, J.add(7.0, (v_agD * 2.0)), 2.0, "#c4405a")
+						game.f_hl(((v_hx - 3.0) - v_agD), v_my, J.add(7.0, (v_agD * 2.0)), "#e2607a")
 					else:
-						if J.eq(J.getv(v_F, "agiz"), 4.0):
-							game.f_hl(((v_hx - 2.0) - v_agD), v_my, J.add(5.0, (v_agD * 2.0)), "#7d352c")
+						if J.eq(J.getv(v_F, "agiz"), 3.0):
+							game.f_fr(((v_hx - 3.0) - v_agD), v_my, J.add(7.0, (v_agD * 2.0)), 2.0, "#8d3a30")
+							game.f_hl(((v_hx - 2.0) - v_agD), v_my, J.add(5.0, (v_agD * 2.0)), "#a8544a")
 						else:
-							game.f_hl(((v_hx - 3.0) - v_agD), v_my, J.add(7.0, (v_agD * 2.0)), "#8d3a30")
+							if J.eq(J.getv(v_F, "agiz"), 4.0):
+								game.f_hl(((v_hx - 2.0) - v_agD), v_my, J.add(5.0, (v_agD * 2.0)), "#7d352c")
+							else:
+								game.f_hl(((v_hx - 3.0) - v_agD), v_my, J.add(7.0, (v_agD * 2.0)), "#8d3a30")
 	if J.eq(J.getv(v_L, "acc"), "glasses"):
 		v_glT = (J.getv(v_L, "glTip") if not J.eq(J.getv(v_L, "glTip"), null) else floor((game.f_hash1(((J.getv(v_L, "seed") if J.truth(J.getv(v_L, "seed")) else 0.0) * 31.7)) * 4.0)))
 		v_glS = J.add((v_hx - 10.0), v_icE)
 		v_glG = (J.add(v_hx, 4.0) - v_icE)
 		v_glC = ("#5a4a3a" if J.eq(v_glT, 2.0) else "#2b2018")
-		if J.eq(v_glT, 1.0):
-			game.f_ring(J.add(v_glS, 3.0), v_fy, 3.0, v_glC)
-			game.f_ring(J.add(v_glG, 3.0), v_fy, 3.0, v_glC)
-			game.f_hl(J.add(v_glS, 7.0), v_fy, ((v_glG - v_glS) - 6.0), v_glC)
-			J.setv(game.j_ctx, "globalAlpha", 0.2)
-			game.f_disc(J.add(v_glS, 3.0), v_fy, 2.0, "#ffffff")
-			game.f_disc(J.add(v_glG, 3.0), v_fy, 2.0, "#ffffff")
-			J.setv(game.j_ctx, "globalAlpha", 1.0)
-			game.f_px(J.add(v_glS, 2.0), (v_fy - 1.0), "rgba(255,255,255,.8)")
-			game.f_px(J.add(v_glG, 2.0), (v_fy - 1.0), "rgba(255,255,255,.8)")
-		else:
-			if J.eq(v_glT, 2.0):
-				game.f_rc(J.add(v_glS, 1.0), (v_fy - 2.0), 5.0, 5.0, v_glC)
-				game.f_rc(J.add(v_glG, 1.0), (v_fy - 2.0), 5.0, 5.0, v_glC)
-				game.f_hl(J.add(v_glS, 6.0), v_fy, ((v_glG - v_glS) - 5.0), v_glC)
-				game.f_px(v_glS, (v_fy - 1.0), v_glC)
-				game.f_px(J.add(v_glG, 6.0), (v_fy - 1.0), v_glC)
-				J.setv(game.j_ctx, "globalAlpha", 0.16)
-				game.f_fr(J.add(v_glS, 2.0), (v_fy - 1.0), 3.0, 3.0, "#ffffff")
-				game.f_fr(J.add(v_glG, 2.0), (v_fy - 1.0), 3.0, 3.0, "#ffffff")
+		# REMAKE kancasi
+		if not game.f_hdMusteriGozluk(v_hx, v_fy, v_glT, v_icE):
+			if J.eq(v_glT, 1.0):
+				game.f_ring(J.add(v_glS, 3.0), v_fy, 3.0, v_glC)
+				game.f_ring(J.add(v_glG, 3.0), v_fy, 3.0, v_glC)
+				game.f_hl(J.add(v_glS, 7.0), v_fy, ((v_glG - v_glS) - 6.0), v_glC)
+				J.setv(game.j_ctx, "globalAlpha", 0.2)
+				game.f_disc(J.add(v_glS, 3.0), v_fy, 2.0, "#ffffff")
+				game.f_disc(J.add(v_glG, 3.0), v_fy, 2.0, "#ffffff")
 				J.setv(game.j_ctx, "globalAlpha", 1.0)
+				game.f_px(J.add(v_glS, 2.0), (v_fy - 1.0), "rgba(255,255,255,.8)")
+				game.f_px(J.add(v_glG, 2.0), (v_fy - 1.0), "rgba(255,255,255,.8)")
 			else:
-				if J.eq(v_glT, 3.0):
-					game.f_fr(v_glS, (v_fy - 3.0), 7.0, 7.0, "#1c1610")
-					game.f_fr(v_glG, (v_fy - 3.0), 7.0, 7.0, "#1c1610")
-					game.f_fr(J.add(v_glS, 1.0), (v_fy - 2.0), 5.0, 5.0, "#33455e")
-					game.f_fr(J.add(v_glG, 1.0), (v_fy - 2.0), 5.0, 5.0, "#33455e")
-					game.f_hl(J.add(v_glS, 7.0), (v_fy - 1.0), ((v_glG - v_glS) - 6.0), "#1c1610")
-					game.f_px(J.add(v_glS, 1.0), (v_fy - 2.0), "rgba(255,255,255,.55)")
-					game.f_px(J.add(v_glG, 1.0), (v_fy - 2.0), "rgba(255,255,255,.55)")
-				else:
-					game.f_rc(v_glS, (v_fy - 3.0), 7.0, 7.0, v_glC)
-					game.f_rc(v_glG, (v_fy - 3.0), 7.0, 7.0, v_glC)
-					game.f_hl(J.add(v_glS, 7.0), v_fy, ((v_glG - v_glS) - 6.0), v_glC)
-					J.setv(game.j_ctx, "globalAlpha", 0.22)
-					game.f_fr(J.add(v_glS, 1.0), (v_fy - 2.0), 5.0, 5.0, "#ffffff")
-					game.f_fr(J.add(v_glG, 1.0), (v_fy - 2.0), 5.0, 5.0, "#ffffff")
+				if J.eq(v_glT, 2.0):
+					game.f_rc(J.add(v_glS, 1.0), (v_fy - 2.0), 5.0, 5.0, v_glC)
+					game.f_rc(J.add(v_glG, 1.0), (v_fy - 2.0), 5.0, 5.0, v_glC)
+					game.f_hl(J.add(v_glS, 6.0), v_fy, ((v_glG - v_glS) - 5.0), v_glC)
+					game.f_px(v_glS, (v_fy - 1.0), v_glC)
+					game.f_px(J.add(v_glG, 6.0), (v_fy - 1.0), v_glC)
+					J.setv(game.j_ctx, "globalAlpha", 0.16)
+					game.f_fr(J.add(v_glS, 2.0), (v_fy - 1.0), 3.0, 3.0, "#ffffff")
+					game.f_fr(J.add(v_glG, 2.0), (v_fy - 1.0), 3.0, 3.0, "#ffffff")
 					J.setv(game.j_ctx, "globalAlpha", 1.0)
-					game.f_px(J.add(v_glS, 2.0), (v_fy - 2.0), "rgba(255,255,255,.8)")
-					game.f_px(J.add(v_glG, 2.0), (v_fy - 2.0), "rgba(255,255,255,.8)")
+				else:
+					if J.eq(v_glT, 3.0):
+						game.f_fr(v_glS, (v_fy - 3.0), 7.0, 7.0, "#1c1610")
+						game.f_fr(v_glG, (v_fy - 3.0), 7.0, 7.0, "#1c1610")
+						game.f_fr(J.add(v_glS, 1.0), (v_fy - 2.0), 5.0, 5.0, "#33455e")
+						game.f_fr(J.add(v_glG, 1.0), (v_fy - 2.0), 5.0, 5.0, "#33455e")
+						game.f_hl(J.add(v_glS, 7.0), (v_fy - 1.0), ((v_glG - v_glS) - 6.0), "#1c1610")
+						game.f_px(J.add(v_glS, 1.0), (v_fy - 2.0), "rgba(255,255,255,.55)")
+						game.f_px(J.add(v_glG, 1.0), (v_fy - 2.0), "rgba(255,255,255,.55)")
+					else:
+						game.f_rc(v_glS, (v_fy - 3.0), 7.0, 7.0, v_glC)
+						game.f_rc(v_glG, (v_fy - 3.0), 7.0, 7.0, v_glC)
+						game.f_hl(J.add(v_glS, 7.0), v_fy, ((v_glG - v_glS) - 6.0), v_glC)
+						J.setv(game.j_ctx, "globalAlpha", 0.22)
+						game.f_fr(J.add(v_glS, 1.0), (v_fy - 2.0), 5.0, 5.0, "#ffffff")
+						game.f_fr(J.add(v_glG, 1.0), (v_fy - 2.0), 5.0, 5.0, "#ffffff")
+						J.setv(game.j_ctx, "globalAlpha", 1.0)
+						game.f_px(J.add(v_glS, 2.0), (v_fy - 2.0), "rgba(255,255,255,.8)")
+						game.f_px(J.add(v_glG, 2.0), (v_fy - 2.0), "rgba(255,255,255,.8)")
 	if (J.truth(v_ang) and J.truth(game.f_chance(0.05))):
 		game.effects.f_smoke(J.add(v_hx, game.math_utils.f_rnd((-J.n(11.0)), 11.0)), (v_hy - 13.0), 1.0, "rgba(230,90,60,.55)")
 	if J.truth(v_ang):

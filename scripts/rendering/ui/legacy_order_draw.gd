@@ -91,19 +91,21 @@ func f_drawOrderBubble(p_c: Variant = null, p_t: Variant = null) -> Variant:
 		J.method(game.j_ctx, "scale", [v_sc, v_sc])
 		J.method(game.j_ctx, "translate", [(-J.n(J.add(v_bx, (float(v_bw) / float(2.0))))), (-J.n(J.add(v_by, v_bh)))])
 	v_urgent = J.lt(J.getv(v_c, "patience"), 0.3)
-	J.setv(game.j_ctx, "globalAlpha", 0.32)
-	game.f_rrect(J.add(v_bx, 1.0), J.add(v_by, 3.0), v_bw, v_bh, 4.0, "#000")
-	J.setv(game.j_ctx, "globalAlpha", 1.0)
-	game.f_rrect(v_bx, v_by, v_bw, v_bh, 4.0, (J.getv(game.j_P, "bad") if J.truth(v_urgent) else J.getv(game.j_P, "ui4")))
-	game.f_rrect(J.add(v_bx, 1.0), J.add(v_by, 1.0), (v_bw - 2.0), (v_bh - 2.0), 3.0, ("#f7ded6" if J.truth(v_urgent) else J.getv(game.j_P, "ui0")))
-	game.f_hl(J.add(v_bx, 4.0), J.add(v_by, 2.0), (v_bw - 8.0), "#ffffff")
 	v_tailX = game.math_utils.f_clamp(J.getv(v_c, "x"), J.add(v_bx, 6.0), (J.add(v_bx, v_bw) - 8.0))
-	v_q = 0.0
-	while J.lt(v_q, 5.0):
-		game.f_fr(J.add((v_tailX - 3.0), v_q), J.add((J.add(v_by, v_bh) - 1.0), v_q), (6.0 - v_q), 1.0, ("#f7ded6" if J.truth(v_urgent) else J.getv(game.j_P, "ui0")))
-		game.f_px(J.add((v_tailX - 3.0), v_q), J.add((J.add(v_by, v_bh) - 1.0), v_q), (J.getv(game.j_P, "bad") if J.truth(v_urgent) else J.getv(game.j_P, "ui4")))
-		game.f_px(J.add(v_tailX, 2.0), J.add((J.add(v_by, v_bh) - 1.0), v_q), (J.getv(game.j_P, "bad") if J.truth(v_urgent) else J.getv(game.j_P, "ui4")))
-		v_q = J.add(v_q, 1.0)
+	# REMAKE kancasi: HD siparis balonu (9 dilim cerceve + kuyruk)
+	if not J.truth(game.f_hdBalon(v_bx, v_by, v_bw, v_bh, v_urgent, v_tailX)):
+		J.setv(game.j_ctx, "globalAlpha", 0.32)
+		game.f_rrect(J.add(v_bx, 1.0), J.add(v_by, 3.0), v_bw, v_bh, 4.0, "#000")
+		J.setv(game.j_ctx, "globalAlpha", 1.0)
+		game.f_rrect(v_bx, v_by, v_bw, v_bh, 4.0, (J.getv(game.j_P, "bad") if J.truth(v_urgent) else J.getv(game.j_P, "ui4")))
+		game.f_rrect(J.add(v_bx, 1.0), J.add(v_by, 1.0), (v_bw - 2.0), (v_bh - 2.0), 3.0, ("#f7ded6" if J.truth(v_urgent) else J.getv(game.j_P, "ui0")))
+		game.f_hl(J.add(v_bx, 4.0), J.add(v_by, 2.0), (v_bw - 8.0), "#ffffff")
+		v_q = 0.0
+		while J.lt(v_q, 5.0):
+			game.f_fr(J.add((v_tailX - 3.0), v_q), J.add((J.add(v_by, v_bh) - 1.0), v_q), (6.0 - v_q), 1.0, ("#f7ded6" if J.truth(v_urgent) else J.getv(game.j_P, "ui0")))
+			game.f_px(J.add((v_tailX - 3.0), v_q), J.add((J.add(v_by, v_bh) - 1.0), v_q), (J.getv(game.j_P, "bad") if J.truth(v_urgent) else J.getv(game.j_P, "ui4")))
+			game.f_px(J.add(v_tailX, 2.0), J.add((J.add(v_by, v_bh) - 1.0), v_q), (J.getv(game.j_P, "bad") if J.truth(v_urgent) else J.getv(game.j_P, "ui4")))
+			v_q = J.add(v_q, 1.0)
 	v_i2 = 0.0
 	while J.lt(v_i2, J.getv(v_items, "length")):
 		v_it = J.getv(v_items, v_i2)
@@ -177,10 +179,12 @@ func f_drawOrderBubble(p_c: Variant = null, p_t: Variant = null) -> Variant:
 	v_py0 = (J.getv(v_c, "y") - 52.0)
 	v_pv = game.math_utils.f_clamp(J.getv(v_c, "patience"), 0.0, 1.0)
 	v_pc = (J.getv(game.j_P, "ok") if J.gt(v_pv, 0.5) else (J.getv(game.j_P, "warn") if J.gt(v_pv, 0.25) else J.getv(game.j_P, "bad")))
-	game.f_rrect((v_px0 - 1.0), (v_py0 - 1.0), 7.0, 26.0, 2.0, "rgba(20,14,12,.65)")
-	v_ph = floor((23.0 * v_pv) + 0.5)
-	game.f_fr(J.add(v_px0, 1.0), (J.add(v_py0, 23.0) - v_ph), 4.0, v_ph, v_pc)
-	game.f_hl(J.add(v_px0, 1.0), (J.add(v_py0, 23.0) - v_ph), 4.0, "rgba(255,255,255,.55)")
+	# REMAKE kancasi: HD cam sabir tupu (sivi yarim piksel hassasiyetle azalir)
+	if not J.truth(game.f_hdSabir(v_px0, v_py0, v_pv, v_pc)):
+		game.f_rrect((v_px0 - 1.0), (v_py0 - 1.0), 7.0, 26.0, 2.0, "rgba(20,14,12,.65)")
+		v_ph = floor((23.0 * v_pv) + 0.5)
+		game.f_fr(J.add(v_px0, 1.0), (J.add(v_py0, 23.0) - v_ph), 4.0, v_ph, v_pc)
+		game.f_hl(J.add(v_px0, 1.0), (J.add(v_py0, 23.0) - v_ph), 4.0, "rgba(255,255,255,.55)")
 	game.icon_draw.f_drawHeart(J.add(v_px0, 2.0), J.add(v_py0, 28.0), 1.0, ("#e2483a" if J.gt(v_pv, 0.25) else ("#ff8a7a" if J.gt(sin((v_t * 12.0)), 0.0) else "#8a2018")))
 	if J.gt(J.getv(v_c, "lineT"), 0.0):
 		v_lw = J.add(game.f_textW(J.getv(v_c, "line")), 8.0)
@@ -316,6 +320,8 @@ func f_yokRozet(p_x: Variant = null, p_y: Variant = null, p_m: Variant = null) -
 	var v_x: Variant = p_x
 	var v_y: Variant = p_y
 	var v_m: Variant = p_m
+	# REMAKE kancasi: HD 'istemiyorum' cipi (Blender)
+	if J.truth(game.f_hdYok(v_x, v_y, v_m)): return null
 	game.f_disc(v_x, v_y, 6.0, "#c0281c")
 	game.f_disc(v_x, v_y, 4.0, "#f7efdc")
 	if J.eq(v_m, "pickle"):

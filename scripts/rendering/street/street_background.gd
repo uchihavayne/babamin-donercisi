@@ -79,6 +79,8 @@ func f_bakeStreet() -> Variant:
 	var v_dsh: Variant = null
 	var v_zb: Variant = null
 	var v_s2: Variant = null
+	# REMAKE kancasi
+	if game.f_hdSokakArka(): return null
 	v_M = game.street_background.f_stM()
 	v_gx = J.getv(v_M, "gx")
 	v_gy = J.getv(v_M, "gy")
@@ -238,6 +240,8 @@ func f_drawSokakAgaci(p_tx: Variant = null, p_ty: Variant = null, p_tip: Variant
 	var v_tx: Variant = p_tx
 	var v_ty: Variant = p_ty
 	var v_tip: Variant = p_tip
+	# REMAKE kancasi
+	if game.f_hdSokakAgaci(p_tx, p_ty, p_tip): return null
 	if J.eq(v_tip, "palmiye"):
 		game.f_fr((v_tx - 4.0), (v_ty - 2.0), 9.0, 3.0, "#5a4a32")
 		v_s = 0.0
@@ -313,6 +317,8 @@ func f_drawSehirIkonu(p_x: Variant = null, p_y: Variant = null, p_id: Variant = 
 	var v_y: Variant = p_y
 	var v_id: Variant = p_id
 	var v_t: Variant = p_t
+	# REMAKE kancasi
+	if game.f_hdSehirIkonu(p_x, p_y, p_id, p_t): return null
 	if J.eq(v_id, "simit"):
 		game.f_fr((v_x - 3.0), (v_y - 11.0), 16.0, 9.0, "#8a2318")
 		game.f_fr((v_x - 2.0), (v_y - 11.0), 14.0, 8.0, "#c0392b")

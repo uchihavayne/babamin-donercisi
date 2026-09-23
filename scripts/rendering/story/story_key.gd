@@ -92,6 +92,8 @@ func f_proKey(p_t: Variant = null, p_k: Variant = null) -> Variant:
 	var v_isl: Variant = null
 	var v_t: Variant = p_t
 	var v_k: Variant = p_k
+	# REMAKE kancasi
+	if game.f_hdProKey(p_t, p_k): return null
 	v_gx = 40.0
 	v_gy = 44.0
 	v_gw = 400.0

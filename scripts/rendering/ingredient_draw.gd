@@ -108,6 +108,8 @@ func f_drawFriesTray(p_x: Variant = null, p_y: Variant = null, p_w: Variant = nu
 
 # art.js:3584
 func f_drawYogurtTray(p_x: Variant = null, p_y: Variant = null, p_w: Variant = null, p_h: Variant = null, p_n: Variant = null, p_max: Variant = null, p_t: Variant = null, p_fx: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdYogurtTepsi(p_x, p_y, p_w, p_h, p_n, p_max, p_t, p_fx): return null
 	var v_lvl: Variant = null
 	var v_F: Variant = null
 	var v_zh: Variant = null

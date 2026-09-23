@@ -100,16 +100,18 @@ func f_drawWrapOpen(p_cx: Variant = null, p_cy: Variant = null, p_wrap: Variant 
 	J.setv(game.j_ctx, "globalAlpha", 0.22)
 	game.f_ell(v_cx, (J.add(v_cy, v_ry) - 1.0), v_rx, 3.0, "#000")
 	J.setv(game.j_ctx, "globalAlpha", 1.0)
-	game.f_ell(v_cx, v_cy, v_rx, v_ry, "#c9a06a")
-	game.f_ell(v_cx, (v_cy - 1.0), v_rx, v_ry, "#f0d5a8")
-	game.f_ell((v_cx - 2.0), (v_cy - 3.0), (v_rx - 6.0), (v_ry - 4.0), "#f8e6c4")
-	v_i = 0.0
-	while J.lt(v_i, 16.0):
-		v_a = (game.f_hash1((v_i * 3.1)) * game.j_TAU)
-		v_r0 = game.f_hash1((v_i * 7.3))
-		game.f_px(J.add(v_cx, (((cos(v_a) * v_rx) * v_r0) * 0.9)), J.add((v_cy - 1.0), (((sin(v_a) * v_ry) * v_r0) * 0.9)), ("#c39a63" if J.gt(game.f_hash1(v_i), 0.5) else "#e0bd85"))
-		v_i = J.add(v_i, 1.0)
-	game.f_ell(v_cx, (J.add(v_cy, v_ry) - 3.0), (v_rx - 1.0), 2.0, "#dcbb8b")
+	# REMAKE kancasi
+	if not game.f_hdLavasAcik(v_cx, v_cy):
+		game.f_ell(v_cx, v_cy, v_rx, v_ry, "#c9a06a")
+		game.f_ell(v_cx, (v_cy - 1.0), v_rx, v_ry, "#f0d5a8")
+		game.f_ell((v_cx - 2.0), (v_cy - 3.0), (v_rx - 6.0), (v_ry - 4.0), "#f8e6c4")
+		v_i = 0.0
+		while J.lt(v_i, 16.0):
+			v_a = (game.f_hash1((v_i * 3.1)) * game.j_TAU)
+			v_r0 = game.f_hash1((v_i * 7.3))
+			game.f_px(J.add(v_cx, (((cos(v_a) * v_rx) * v_r0) * 0.9)), J.add((v_cy - 1.0), (((sin(v_a) * v_ry) * v_r0) * 0.9)), ("#c39a63" if J.gt(game.f_hash1(v_i), 0.5) else "#e0bd85"))
+			v_i = J.add(v_i, 1.0)
+		game.f_ell(v_cx, (J.add(v_cy, v_ry) - 3.0), (v_rx - 1.0), 2.0, "#dcbb8b")
 	v_mn = (J.getv(v_wrap, "meat") if J.truth(J.getv(v_wrap, "meat")) else 0.0)
 	v_fn = (J.getv(v_wrap, "friesN") if J.truth(J.getv(v_wrap, "friesN")) else 0.0)
 	v_by = (v_cy - 3.0)
@@ -392,46 +394,50 @@ func f_drawWrapRolled(p_cx: Variant = null, p_cy: Variant = null, p_wrap: Varian
 	game.f_ell(v_cx, J.add(v_cy, 8.0), (float(v_w) / float(2.0)), 3.0, "#000")
 	J.setv(game.j_ctx, "globalAlpha", 1.0)
 	if J.truth(J.getv(v_wrap, "paper")):
-		J.setv(game.j_ctx, "globalAlpha", (1.0 - (v_pt * 0.3)))
-		game.f_rrect((v_pl - 1.0), J.add(((v_cy - (float(v_h) / float(2.0))) - 1.0), v_po), J.add(v_pw, 3.0), J.add(v_h, 2.0), 5.0, "#cfc9b8")
-		game.f_rrect((v_pl - 1.0), J.add(((v_cy - (float(v_h) / float(2.0))) - 1.0), v_po), J.add(v_pw, 3.0), J.add(v_h, 1.0), 5.0, "#e8e4d6")
-		J.setv(game.j_ctx, "globalAlpha", 1.0)
-	game.f_rrect((v_cx - (float(v_w) / float(2.0))), (v_cy - (float(v_h) / float(2.0))), v_w, v_h, 5.0, v_shade)
-	game.f_rrect((v_cx - (float(v_w) / float(2.0))), (v_cy - (float(v_h) / float(2.0))), v_w, (v_h - 2.0), 5.0, v_base)
-	game.f_rrect(J.add((v_cx - (float(v_w) / float(2.0))), 3.0), J.add((v_cy - (float(v_h) / float(2.0))), 1.0), (v_w - 8.0), 4.0, 2.0, v_lite)
-	game.f_ell(J.add((v_cx - (float(v_w) / float(2.0))), 2.0), v_cy, 3.0, ((float(v_h) / float(2.0)) - 1.0), v_shade)
-	game.f_ell((J.add(v_cx, (float(v_w) / float(2.0))) - 2.0), v_cy, 3.0, ((float(v_h) / float(2.0)) - 1.0), v_shade)
-	game.f_px(J.add((v_cx - (float(v_w) / float(2.0))), 2.0), v_cy, v_base)
-	game.f_px((J.add(v_cx, (float(v_w) / float(2.0))) - 2.0), v_cy, v_base)
-	v_si = 0.0
-	while J.lt(v_si, 4.0):
-		J.setv(game.j_ctx, "globalAlpha", 0.22)
-		game.f_ln(J.add(J.add((v_cx - (float(v_w) / float(2.0))), 8.0), (v_si * 8.0)), (v_cy - 5.0), J.add(J.add((v_cx - (float(v_w) / float(2.0))), 10.0), (v_si * 8.0)), J.add(v_cy, 5.0), v_shade)
-		J.setv(game.j_ctx, "globalAlpha", 1.0)
-		v_si = J.add(v_si, 1.0)
-	if J.gt(v_kiz, 0.18):
-		v_izGuc = game.math_utils.f_clamp((float((v_kiz - 0.18)) / float(0.82)), 0.0, 1.0)
-		v_gi = 0.0
-		while J.lt(v_gi, 5.0):
-			v_izK = game.math_utils.f_clamp((float((v_izGuc - (v_gi * 0.11))) / float(0.45)), 0.0, 1.0)
-			if J.le(v_izK, 0.0):
+		# REMAKE kancasi
+		if not game.f_hdKagitArka(v_cx, v_cy, v_po, v_pt):
+			J.setv(game.j_ctx, "globalAlpha", (1.0 - (v_pt * 0.3)))
+			game.f_rrect((v_pl - 1.0), J.add(((v_cy - (float(v_h) / float(2.0))) - 1.0), v_po), J.add(v_pw, 3.0), J.add(v_h, 2.0), 5.0, "#cfc9b8")
+			game.f_rrect((v_pl - 1.0), J.add(((v_cy - (float(v_h) / float(2.0))) - 1.0), v_po), J.add(v_pw, 3.0), J.add(v_h, 1.0), 5.0, "#e8e4d6")
+			J.setv(game.j_ctx, "globalAlpha", 1.0)
+	# REMAKE kancasi
+	if not game.f_hdDurumGovde(v_cx, v_cy, v_kiz, J.getv(v_wrap, "burnt")):
+		game.f_rrect((v_cx - (float(v_w) / float(2.0))), (v_cy - (float(v_h) / float(2.0))), v_w, v_h, 5.0, v_shade)
+		game.f_rrect((v_cx - (float(v_w) / float(2.0))), (v_cy - (float(v_h) / float(2.0))), v_w, (v_h - 2.0), 5.0, v_base)
+		game.f_rrect(J.add((v_cx - (float(v_w) / float(2.0))), 3.0), J.add((v_cy - (float(v_h) / float(2.0))), 1.0), (v_w - 8.0), 4.0, 2.0, v_lite)
+		game.f_ell(J.add((v_cx - (float(v_w) / float(2.0))), 2.0), v_cy, 3.0, ((float(v_h) / float(2.0)) - 1.0), v_shade)
+		game.f_ell((J.add(v_cx, (float(v_w) / float(2.0))) - 2.0), v_cy, 3.0, ((float(v_h) / float(2.0)) - 1.0), v_shade)
+		game.f_px(J.add((v_cx - (float(v_w) / float(2.0))), 2.0), v_cy, v_base)
+		game.f_px((J.add(v_cx, (float(v_w) / float(2.0))) - 2.0), v_cy, v_base)
+		v_si = 0.0
+		while J.lt(v_si, 4.0):
+			J.setv(game.j_ctx, "globalAlpha", 0.22)
+			game.f_ln(J.add(J.add((v_cx - (float(v_w) / float(2.0))), 8.0), (v_si * 8.0)), (v_cy - 5.0), J.add(J.add((v_cx - (float(v_w) / float(2.0))), 10.0), (v_si * 8.0)), J.add(v_cy, 5.0), v_shade)
+			J.setv(game.j_ctx, "globalAlpha", 1.0)
+			v_si = J.add(v_si, 1.0)
+		if J.gt(v_kiz, 0.18):
+			v_izGuc = game.math_utils.f_clamp((float((v_kiz - 0.18)) / float(0.82)), 0.0, 1.0)
+			v_gi = 0.0
+			while J.lt(v_gi, 5.0):
+				v_izK = game.math_utils.f_clamp((float((v_izGuc - (v_gi * 0.11))) / float(0.45)), 0.0, 1.0)
+				if J.le(v_izK, 0.0):
+					v_gi = J.add(v_gi, 1.0)
+					continue
+				J.setv(game.j_ctx, "globalAlpha", (0.55 * v_izK))
+				game.f_ln(J.add((v_cx - 14.0), (v_gi * 7.0)), (v_cy - 4.0), J.add((v_cx - 11.0), (v_gi * 7.0)), J.add(v_cy, 4.0), "#8a5a2a")
+				J.setv(game.j_ctx, "globalAlpha", 1.0)
 				v_gi = J.add(v_gi, 1.0)
-				continue
-			J.setv(game.j_ctx, "globalAlpha", (0.55 * v_izK))
-			game.f_ln(J.add((v_cx - 14.0), (v_gi * 7.0)), (v_cy - 4.0), J.add((v_cx - 11.0), (v_gi * 7.0)), J.add(v_cy, 4.0), "#8a5a2a")
-			J.setv(game.j_ctx, "globalAlpha", 1.0)
-			v_gi = J.add(v_gi, 1.0)
-		if J.gt(v_kiz, 0.62):
-			J.setv(game.j_ctx, "globalAlpha", (0.4 * game.math_utils.f_clamp((float((v_kiz - 0.62)) / float(0.38)), 0.0, 1.0)))
-			v_kb = 0.0
-			while J.lt(v_kb, 6.0):
-				game.f_px(floor(J.add((v_cx - 15.0), (game.f_hash1((v_kb * 3.7)) * 30.0)) + 0.5), floor(J.add((v_cy - 4.0), (game.f_hash1((v_kb * 8.3)) * 8.0)) + 0.5), "#6b3f18")
-				v_kb = J.add(v_kb, 1.0)
-			J.setv(game.j_ctx, "globalAlpha", 1.0)
-	if J.truth(v_grilled):
-		pass
-	game.f_px((J.add(v_cx, (float(v_w) / float(2.0))) - 4.0), (v_cy - 2.0), "#c98436")
-	game.f_px((J.add(v_cx, (float(v_w) / float(2.0))) - 5.0), J.add(v_cy, 1.0), "#8a4f1e")
+			if J.gt(v_kiz, 0.62):
+				J.setv(game.j_ctx, "globalAlpha", (0.4 * game.math_utils.f_clamp((float((v_kiz - 0.62)) / float(0.38)), 0.0, 1.0)))
+				v_kb = 0.0
+				while J.lt(v_kb, 6.0):
+					game.f_px(floor(J.add((v_cx - 15.0), (game.f_hash1((v_kb * 3.7)) * 30.0)) + 0.5), floor(J.add((v_cy - 4.0), (game.f_hash1((v_kb * 8.3)) * 8.0)) + 0.5), "#6b3f18")
+					v_kb = J.add(v_kb, 1.0)
+				J.setv(game.j_ctx, "globalAlpha", 1.0)
+		if J.truth(v_grilled):
+			pass
+		game.f_px((J.add(v_cx, (float(v_w) / float(2.0))) - 4.0), (v_cy - 2.0), "#c98436")
+		game.f_px((J.add(v_cx, (float(v_w) / float(2.0))) - 5.0), J.add(v_cy, 1.0), "#8a4f1e")
 	if J.truth(J.getv(v_wrap, "pickle")):
 		game.f_px((J.add(v_cx, (float(v_w) / float(2.0))) - 6.0), (v_cy - 3.0), J.getv(game.j_P, "g1"))
 	if J.truth(J.getv(v_wrap, "yogurt")):
@@ -439,60 +445,62 @@ func f_drawWrapRolled(p_cx: Variant = null, p_cy: Variant = null, p_wrap: Varian
 	if J.gt(J.getv(v_wrap, "friesN"), 0.0):
 		game.f_px((J.add(v_cx, (float(v_w) / float(2.0))) - 7.0), J.add(v_cy, 2.0), J.getv(game.j_P, "p1"))
 	if J.truth(J.getv(v_wrap, "paper")):
-		v_ph = v_h
-		v_pty = floor(J.add((v_cy - (float(v_ph) / float(2.0))), v_po) + 0.5)
-		v_alpha = (1.0 - (v_pt * 0.15))
-		J.setv(game.j_ctx, "globalAlpha", v_alpha)
-		v_yy = 0.0
-		while J.lt(v_yy, v_ph):
-			v_tt = (float(v_yy) / float((v_ph - 1.0)))
-			v_inset = (3.0 if (J.eq(v_yy, 0.0) or J.eq(v_yy, (v_ph - 1.0))) else (1.0 if (J.eq(v_yy, 1.0) or J.eq(v_yy, (v_ph - 2.0))) else 0.0))
-			v_rowX = J.add(v_pl, v_inset)
-			v_rowR = J.add((J.add(v_pl, v_pw) - 5.0), floor((v_tt * 6.0) + 0.5))
-			v_rowW = (v_rowR - v_rowX)
-			if J.lt(v_rowW, 2.0):
-				v_yy = J.add(v_yy, 1.0)
-				continue
-			if J.eq(v_yy, 0.0):
-				v_col = "#fdfaf0"
-			else:
-				if J.lt(v_yy, 3.0):
-					v_col = "#f8f5ea"
+		# REMAKE kancasi
+		if not game.f_hdKagitOn(v_cx, v_cy, v_po, v_pt):
+			v_ph = v_h
+			v_pty = floor(J.add((v_cy - (float(v_ph) / float(2.0))), v_po) + 0.5)
+			v_alpha = (1.0 - (v_pt * 0.15))
+			J.setv(game.j_ctx, "globalAlpha", v_alpha)
+			v_yy = 0.0
+			while J.lt(v_yy, v_ph):
+				v_tt = (float(v_yy) / float((v_ph - 1.0)))
+				v_inset = (3.0 if (J.eq(v_yy, 0.0) or J.eq(v_yy, (v_ph - 1.0))) else (1.0 if (J.eq(v_yy, 1.0) or J.eq(v_yy, (v_ph - 2.0))) else 0.0))
+				v_rowX = J.add(v_pl, v_inset)
+				v_rowR = J.add((J.add(v_pl, v_pw) - 5.0), floor((v_tt * 6.0) + 0.5))
+				v_rowW = (v_rowR - v_rowX)
+				if J.lt(v_rowW, 2.0):
+					v_yy = J.add(v_yy, 1.0)
+					continue
+				if J.eq(v_yy, 0.0):
+					v_col = "#fdfaf0"
 				else:
-					if J.lt(v_yy, (v_ph - 4.0)):
-						v_col = "#f2eee0"
+					if J.lt(v_yy, 3.0):
+						v_col = "#f8f5ea"
 					else:
-						if J.lt(v_yy, (v_ph - 2.0)):
-							v_col = "#e2ddcc"
+						if J.lt(v_yy, (v_ph - 4.0)):
+							v_col = "#f2eee0"
 						else:
-							v_col = "#cfc8b4"
-			game.f_fr(v_rowX, J.add(v_pty, v_yy), v_rowW, 1.0, v_col)
-			game.f_px((v_rowR - 1.0), J.add(v_pty, v_yy), ("#ffffff" if J.lt(v_yy, 3.0) else "#e8e2d0"))
-			game.f_px(v_rowR, J.add(v_pty, v_yy), "rgba(120,112,94,.45)")
-			v_yy = J.add(v_yy, 1.0)
-		v_fi = 0.0
-		while J.lt(v_fi, 3.0):
-			J.setv(game.j_ctx, "globalAlpha", (v_alpha * J.add(0.28, (v_fi * 0.07))))
-			game.f_ln(J.add(J.add(v_pl, 2.0), (v_fi * 2.0)), J.add(v_pty, 2.0), J.add(J.add(v_pl, 4.0), (v_fi * 2.0)), (J.add(v_pty, v_ph) - 3.0), "#d2ccb8")
-			v_fi = J.add(v_fi, 1.0)
-		J.setv(game.j_ctx, "globalAlpha", v_alpha)
-		v_b1y = floor(J.add(v_pty, (v_ph * 0.32)) + 0.5)
-		v_b2y = floor(J.add(v_pty, (v_ph * 0.62)) + 0.5)
-		game.f_fr(J.add(v_pl, 4.0), v_b1y, (v_pw - 10.0), 2.0, "#d8352c")
-		game.f_px(J.add(v_pl, 3.0), J.add(v_b1y, 1.0), "#b02a22")
-		game.f_fr(J.add(v_pl, 4.0), v_b2y, (v_pw - 9.0), 2.0, "#2f5f9e")
-		game.f_px(J.add(v_pl, 3.0), J.add(v_b2y, 1.0), "#26477a")
-		v_di = 0.0
-		while J.lt(v_di, 4.0):
-			game.f_px(J.add(J.add(v_pl, 5.0), (v_di * 4.0)), J.add(v_pty, 2.0), ("#2f5f9e" if J.truth(fmod(J.n(v_di), J.n(2.0))) else "#d8352c"))
-			v_di = J.add(v_di, 1.0)
-		J.setv(game.j_ctx, "globalAlpha", (v_alpha * 0.35))
-		v_sy2 = 2.0
-		while J.lt(v_sy2, (v_ph - 2.0)):
-			v_sr = J.add((J.add(v_pl, v_pw) - 5.0), floor(((float(v_sy2) / float((v_ph - 1.0))) * 6.0) + 0.5))
-			game.f_px((v_sr - 2.0), J.add(v_pty, v_sy2), "#8a8474")
-			v_sy2 = J.add(v_sy2, 1.0)
-		J.setv(game.j_ctx, "globalAlpha", 1.0)
+							if J.lt(v_yy, (v_ph - 2.0)):
+								v_col = "#e2ddcc"
+							else:
+								v_col = "#cfc8b4"
+				game.f_fr(v_rowX, J.add(v_pty, v_yy), v_rowW, 1.0, v_col)
+				game.f_px((v_rowR - 1.0), J.add(v_pty, v_yy), ("#ffffff" if J.lt(v_yy, 3.0) else "#e8e2d0"))
+				game.f_px(v_rowR, J.add(v_pty, v_yy), "rgba(120,112,94,.45)")
+				v_yy = J.add(v_yy, 1.0)
+			v_fi = 0.0
+			while J.lt(v_fi, 3.0):
+				J.setv(game.j_ctx, "globalAlpha", (v_alpha * J.add(0.28, (v_fi * 0.07))))
+				game.f_ln(J.add(J.add(v_pl, 2.0), (v_fi * 2.0)), J.add(v_pty, 2.0), J.add(J.add(v_pl, 4.0), (v_fi * 2.0)), (J.add(v_pty, v_ph) - 3.0), "#d2ccb8")
+				v_fi = J.add(v_fi, 1.0)
+			J.setv(game.j_ctx, "globalAlpha", v_alpha)
+			v_b1y = floor(J.add(v_pty, (v_ph * 0.32)) + 0.5)
+			v_b2y = floor(J.add(v_pty, (v_ph * 0.62)) + 0.5)
+			game.f_fr(J.add(v_pl, 4.0), v_b1y, (v_pw - 10.0), 2.0, "#d8352c")
+			game.f_px(J.add(v_pl, 3.0), J.add(v_b1y, 1.0), "#b02a22")
+			game.f_fr(J.add(v_pl, 4.0), v_b2y, (v_pw - 9.0), 2.0, "#2f5f9e")
+			game.f_px(J.add(v_pl, 3.0), J.add(v_b2y, 1.0), "#26477a")
+			v_di = 0.0
+			while J.lt(v_di, 4.0):
+				game.f_px(J.add(J.add(v_pl, 5.0), (v_di * 4.0)), J.add(v_pty, 2.0), ("#2f5f9e" if J.truth(fmod(J.n(v_di), J.n(2.0))) else "#d8352c"))
+				v_di = J.add(v_di, 1.0)
+			J.setv(game.j_ctx, "globalAlpha", (v_alpha * 0.35))
+			v_sy2 = 2.0
+			while J.lt(v_sy2, (v_ph - 2.0)):
+				v_sr = J.add((J.add(v_pl, v_pw) - 5.0), floor(((float(v_sy2) / float((v_ph - 1.0))) * 6.0) + 0.5))
+				game.f_px((v_sr - 2.0), J.add(v_pty, v_sy2), "#8a8474")
+				v_sy2 = J.add(v_sy2, 1.0)
+			J.setv(game.j_ctx, "globalAlpha", 1.0)
 	if (J.truth(J.getv(v_wrap, "hot")) and J.truth(game.f_chance(0.04))):
 		game.effects.f_smoke(J.add(v_cx, game.math_utils.f_rnd((-J.n(10.0)), 10.0)), (v_cy - 7.0), 1.0, "rgba(255,250,240,.4)")
 	if not J.eq(v_sc, 1.0):

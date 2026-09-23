@@ -116,53 +116,55 @@ func f_drawPideBoard(p_cx: Variant = null, p_cy: Variant = null, p_it: Variant =
 	J.setv(game.j_ctx, "globalAlpha", 0.32)
 	game.f_ell(v_cx, J.add(v_taban, 1.0), 25.0, 3.0, "#3a2a18")
 	J.setv(game.j_ctx, "globalAlpha", 1.0)
-	v_q = 0.0
-	while J.lt(v_q, v_seg):
-		v_S = game.plate_draw.f_pideSerit(v_cx, v_q)
-		v_w = (J.getv(v_S, "R") - J.getv(v_S, "L"))
-		if J.lt(v_q, v_n):
-			v_b = 1.0
-			while J.ge(v_b, 0.0):
-				v_a = 0.0
-				while J.lt(v_a, 3.0):
-					v_hs = game.f_hash1(J.add(J.add((v_q * 13.7), (v_a * 3.1)), (v_b * 7.7)))
-					v_kx = J.add(J.add(J.add(J.getv(v_S, "L"), 1.0), (v_a * 3.0)), (1.0 if J.truth(v_b) else 0.0))
-					if J.gt(J.add(v_kx, 3.0), J.getv(v_S, "R")):
+	# REMAKE kancasi
+	if not game.f_hdPideDilimler(v_cx, v_cy, v_n):
+		v_q = 0.0
+		while J.lt(v_q, v_seg):
+			v_S = game.plate_draw.f_pideSerit(v_cx, v_q)
+			v_w = (J.getv(v_S, "R") - J.getv(v_S, "L"))
+			if J.lt(v_q, v_n):
+				v_b = 1.0
+				while J.ge(v_b, 0.0):
+					v_a = 0.0
+					while J.lt(v_a, 3.0):
+						v_hs = game.f_hash1(J.add(J.add((v_q * 13.7), (v_a * 3.1)), (v_b * 7.7)))
+						v_kx = J.add(J.add(J.add(J.getv(v_S, "L"), 1.0), (v_a * 3.0)), (1.0 if J.truth(v_b) else 0.0))
+						if J.gt(J.add(v_kx, 3.0), J.getv(v_S, "R")):
+							v_a = J.add(v_a, 1.0)
+							continue
+						game.plate_draw.f_pideKup(v_kx, ((v_taban - (v_b * 4.0)) - floor((v_hs * 1.4) + 0.5)), 3.0, 3.0, 2.0)
 						v_a = J.add(v_a, 1.0)
-						continue
-					game.plate_draw.f_pideKup(v_kx, ((v_taban - (v_b * 4.0)) - floor((v_hs * 1.4) + 0.5)), 3.0, 3.0, 2.0)
-					v_a = J.add(v_a, 1.0)
-				v_b = (v_b - 1.0)
+					v_b = (v_b - 1.0)
+				v_q = J.add(v_q, 1.0)
+				continue
+			v_ust = (v_taban - J.getv(v_S, "geri"))
+			v_on = (v_taban - J.getv(v_S, "h"))
+			v_sol = J.add(J.getv(v_S, "L"), (1.0 if J.eq(v_q, 0.0) else 0.0))
+			v_sag = (J.getv(v_S, "R") - (1.0 if J.eq(v_q, (v_seg - 1.0)) else 0.0))
+			v_gw = (v_sag - v_sol)
+			game.f_fr(v_sol, v_on, v_gw, J.getv(v_S, "h"), "#a8762e")
+			game.f_fr(v_sol, (v_taban - 2.0), v_gw, 2.0, "#7a4f22")
+			game.f_hl(v_sol, (v_taban - 1.0), v_gw, "#5e3a12")
+			if J.eq(v_q, 0.0):
+				game.f_vl(J.getv(v_S, "L"), J.add(v_on, 1.0), (J.getv(v_S, "h") - 2.0), "#8a5f2a")
+			if J.eq(v_q, (v_seg - 1.0)):
+				game.f_vl((J.getv(v_S, "R") - 1.0), J.add(v_on, 1.0), (J.getv(v_S, "h") - 2.0), "#8a5f2a")
+			v_uc = (1.0 if (J.eq(v_q, 0.0) or J.eq(v_q, (v_seg - 1.0))) else 0.0)
+			game.f_fr(J.add(v_sol, (v_uc if J.eq(v_q, 0.0) else 0.0)), v_ust, (v_gw - v_uc), (v_on - v_ust), "#dcae55")
+			game.f_hl(J.add(v_sol, (v_uc if J.eq(v_q, 0.0) else 0.0)), v_ust, (v_gw - v_uc), "#f0cd94")
+			game.f_hl(v_sol, (v_on - 1.0), v_gw, "#c98f3c")
+			v_cy0 = J.add(v_ust, 2.0)
+			v_e = 0.0
+			while J.lt(v_e, 3.0):
+				if J.lt(J.add(v_cy0, v_e), (v_on - 1.0)):
+					game.f_px(J.add(J.add(J.getv(v_S, "L"), 3.0), v_e), J.add(v_cy0, v_e), "#a8762e")
+				v_e = J.add(v_e, 1.0)
+			v_bs = game.f_hash1((v_q * 5.3))
+			game.f_fr(J.add(J.add(J.getv(v_S, "L"), 2.0), floor((v_bs * (v_w - 6.0)) + 0.5)), J.add(v_ust, 1.0), 2.0, 1.0, "#b8842c")
+			game.f_px(J.add(J.add(J.getv(v_S, "L"), 1.0), floor((game.f_hash1((v_q * 9.1)) * (v_w - 3.0)) + 0.5)), (v_on - 3.0), "#fce7bd")
+			if (J.eq(v_q, v_n) and J.gt(v_n, 0.0)):
+				game.f_vl(J.getv(v_S, "L"), J.add(v_on, 1.0), (J.getv(v_S, "h") - 2.0), "#f4e6c2")
 			v_q = J.add(v_q, 1.0)
-			continue
-		v_ust = (v_taban - J.getv(v_S, "geri"))
-		v_on = (v_taban - J.getv(v_S, "h"))
-		v_sol = J.add(J.getv(v_S, "L"), (1.0 if J.eq(v_q, 0.0) else 0.0))
-		v_sag = (J.getv(v_S, "R") - (1.0 if J.eq(v_q, (v_seg - 1.0)) else 0.0))
-		v_gw = (v_sag - v_sol)
-		game.f_fr(v_sol, v_on, v_gw, J.getv(v_S, "h"), "#a8762e")
-		game.f_fr(v_sol, (v_taban - 2.0), v_gw, 2.0, "#7a4f22")
-		game.f_hl(v_sol, (v_taban - 1.0), v_gw, "#5e3a12")
-		if J.eq(v_q, 0.0):
-			game.f_vl(J.getv(v_S, "L"), J.add(v_on, 1.0), (J.getv(v_S, "h") - 2.0), "#8a5f2a")
-		if J.eq(v_q, (v_seg - 1.0)):
-			game.f_vl((J.getv(v_S, "R") - 1.0), J.add(v_on, 1.0), (J.getv(v_S, "h") - 2.0), "#8a5f2a")
-		v_uc = (1.0 if (J.eq(v_q, 0.0) or J.eq(v_q, (v_seg - 1.0))) else 0.0)
-		game.f_fr(J.add(v_sol, (v_uc if J.eq(v_q, 0.0) else 0.0)), v_ust, (v_gw - v_uc), (v_on - v_ust), "#dcae55")
-		game.f_hl(J.add(v_sol, (v_uc if J.eq(v_q, 0.0) else 0.0)), v_ust, (v_gw - v_uc), "#f0cd94")
-		game.f_hl(v_sol, (v_on - 1.0), v_gw, "#c98f3c")
-		v_cy0 = J.add(v_ust, 2.0)
-		v_e = 0.0
-		while J.lt(v_e, 3.0):
-			if J.lt(J.add(v_cy0, v_e), (v_on - 1.0)):
-				game.f_px(J.add(J.add(J.getv(v_S, "L"), 3.0), v_e), J.add(v_cy0, v_e), "#a8762e")
-			v_e = J.add(v_e, 1.0)
-		v_bs = game.f_hash1((v_q * 5.3))
-		game.f_fr(J.add(J.add(J.getv(v_S, "L"), 2.0), floor((v_bs * (v_w - 6.0)) + 0.5)), J.add(v_ust, 1.0), 2.0, 1.0, "#b8842c")
-		game.f_px(J.add(J.add(J.getv(v_S, "L"), 1.0), floor((game.f_hash1((v_q * 9.1)) * (v_w - 3.0)) + 0.5)), (v_on - 3.0), "#fce7bd")
-		if (J.eq(v_q, v_n) and J.gt(v_n, 0.0)):
-			game.f_vl(J.getv(v_S, "L"), J.add(v_on, 1.0), (J.getv(v_S, "h") - 2.0), "#f4e6c2")
-		v_q = J.add(v_q, 1.0)
 	if J.lt(v_n, game.j_PIDE_NEED):
 		v_S = game.plate_draw.f_pideSerit(v_cx, v_n)
 		v_S2 = game.plate_draw.f_pideSerit(v_cx, min(J.add(v_n, 1.0), (v_seg - 1.0)))
@@ -172,7 +174,7 @@ func f_drawPideBoard(p_cx: Variant = null, p_cy: Variant = null, p_it: Variant =
 		J.setv(game.j_ctx, "globalAlpha", J.add(0.1, (0.16 * v_ch)))
 		game.f_fr((v_kxp - 4.0), J.add(v_taban, 1.0), (8.0 - floor((v_lift * 0.25) + 0.5)), 2.0, "#000")
 		J.setv(game.j_ctx, "globalAlpha", 1.0)
-		game.plate_draw.f_pideBicak(v_kxp, v_agiz)
+		if not game.f_hdPideBicak(v_kxp, v_agiz): game.plate_draw.f_pideBicak(v_kxp, v_agiz)
 		if J.gt(v_ch, 0.55):
 			J.setv(game.j_ctx, "globalAlpha", ((v_ch - 0.55) * 1.4))
 			game.f_hl((v_kxp - 8.0), (v_agiz - 1.0), 4.0, "#ffffff")
@@ -228,15 +230,17 @@ func f_drawPlate(p_cx: Variant = null, p_cy: Variant = null, p_pl: Variant = nul
 	J.setv(game.j_ctx, "globalAlpha", 0.25)
 	game.f_ell(v_cx, J.add(J.add(v_cy, v_ry), 1.0), v_rx, 3.0, "#000")
 	J.setv(game.j_ctx, "globalAlpha", 1.0)
-	game.f_ell(v_cx, J.add(v_cy, 2.0), v_rx, v_ry, "#aeb6bd")
-	game.f_ell(v_cx, J.add(v_cy, 1.0), v_rx, v_ry, "#e9eef2")
-	game.f_ell(v_cx, v_cy, (v_rx - 1.0), (v_ry - 1.0), "#fbfdfe")
-	game.f_ell(v_cx, J.add(v_cy, 1.0), (v_rx - 4.0), (v_ry - 2.0), "#d6dee4")
-	game.f_ell(v_cx, v_cy, (v_rx - 4.0), (v_ry - 2.0), "#f2f6f9")
-	J.setv(game.j_ctx, "globalAlpha", 0.5)
-	game.f_ell(v_cx, (v_cy - 1.0), (v_rx - 2.0), (v_ry - 1.0), "#8fb4d8")
-	game.f_ell(v_cx, (v_cy - 1.0), (v_rx - 3.0), (v_ry - 2.0), "#f2f6f9")
-	J.setv(game.j_ctx, "globalAlpha", 1.0)
+	# REMAKE kancasi
+	if not game.f_hdTabak(v_cx, v_cy):
+		game.f_ell(v_cx, J.add(v_cy, 2.0), v_rx, v_ry, "#aeb6bd")
+		game.f_ell(v_cx, J.add(v_cy, 1.0), v_rx, v_ry, "#e9eef2")
+		game.f_ell(v_cx, v_cy, (v_rx - 1.0), (v_ry - 1.0), "#fbfdfe")
+		game.f_ell(v_cx, J.add(v_cy, 1.0), (v_rx - 4.0), (v_ry - 2.0), "#d6dee4")
+		game.f_ell(v_cx, v_cy, (v_rx - 4.0), (v_ry - 2.0), "#f2f6f9")
+		J.setv(game.j_ctx, "globalAlpha", 0.5)
+		game.f_ell(v_cx, (v_cy - 1.0), (v_rx - 2.0), (v_ry - 1.0), "#8fb4d8")
+		game.f_ell(v_cx, (v_cy - 1.0), (v_rx - 3.0), (v_ry - 2.0), "#f2f6f9")
+		J.setv(game.j_ctx, "globalAlpha", 1.0)
 	if J.truth(J.getv(v_pl, "pide")):
 		v_kat = 0.0
 		while J.lt(v_kat, 3.0):

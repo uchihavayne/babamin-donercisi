@@ -17,6 +17,8 @@ func f_drawKesimBicagi(p_ux: Variant = null, p_uy: Variant = null, p_yon: Varian
 	var v_px0: Variant = null
 	var v_yon: Variant = p_yon
 	var v_kademe: Variant = p_kademe
+	# REMAKE kancasi
+	if game.f_hdBicak(p_ux, p_uy, p_yon, p_kademe): return null
 	v_agizCiz = game.spit_draw._closure_75.bind({"257:K": _cells["K"], "257:ux": _cells["ux"], "257:d": _cells["d"], "257:uy": _cells["uy"]})
 	_cells["d"][0] = (v_yon if J.truth(v_yon) else (-J.n(1.0)))
 	_cells["K"][0] = J.getv(game.j_BICAK_KADEME, game.math_utils.f_clamp(floor((v_kademe if J.truth(v_kademe) else 0.0) + 0.5), 0.0, 3.0))
@@ -73,6 +75,8 @@ func f_drawEtDilimi(p_x: Variant = null, p_y: Variant = null, p_kv: Variant = nu
 	var v_kv: Variant = p_kv
 	var v_k: Variant = p_k
 	var v_sc: Variant = p_sc
+	# REMAKE kancasi
+	if game.f_hdEtDilimi(p_x, p_y, p_kv, p_k, p_sc): return null
 	v_sc = (v_sc if J.truth(v_sc) else 1.0)
 	v_boy = floor((J.add(5.0, (game.f_hash1((v_k * 3.1)) * 3.0)) * v_sc) + 0.5)
 	v_don = ((game.f_hash1((v_k * 7.7)) * 0.9) - 0.45)
@@ -162,30 +166,36 @@ func f_drawSpit(p_sp: Variant = null, p_t: Variant = null) -> Variant:
 	v_hy = (v_top + 2.0)
 	v_hw = 17.0
 	v_hh = (v_H0 - 14.0)
-	game.f_fr((v_hx - 1.0), (v_hy - 1.0), (v_hw + 2.0), (v_hh + 2.0), game.j_P["mt4"])
-	game.f_fr(v_hx, v_hy, v_hw, v_hh, game.j_P["mt2"])
-	game.f_fr((v_hx + 2.0), (v_hy + 2.0), (v_hw - 4.0), (v_hh - 4.0), "#241610")
-	game.f_hl(v_hx, v_hy, v_hw, game.j_P["mt0"])
-	game.f_vl(v_hx, v_hy, v_hh, game.j_P["mt1"])
-	game.f_hl(v_hx, ((v_hy + v_hh) - 1.0), v_hw, game.j_P["mt5"])
+	# REMAKE kancasi: HD isitici kasasi (Blender); kor elemanlar asagida
+	var hd_isi := J.truth(game.f_hdIsiticiGovde(v_hx, v_hy))
+	if not hd_isi:
+		game.f_fr((v_hx - 1.0), (v_hy - 1.0), (v_hw + 2.0), (v_hh + 2.0), game.j_P["mt4"])
+		game.f_fr(v_hx, v_hy, v_hw, v_hh, game.j_P["mt2"])
+		game.f_fr((v_hx + 2.0), (v_hy + 2.0), (v_hw - 4.0), (v_hh - 4.0), "#241610")
+		game.f_hl(v_hx, v_hy, v_hw, game.j_P["mt0"])
+		game.f_vl(v_hx, v_hy, v_hh, game.j_P["mt1"])
+		game.f_hl(v_hx, ((v_hy + v_hh) - 1.0), v_hw, game.j_P["mt5"])
 	v_i = 0.0
 	while (v_i < 6.0):
 		v_seg = floor((float((v_hh - 8.0)) / float(6.0)))
 		v_ey = ((v_hy + 4.0) + (v_i * v_seg))
 		v_fl = (0.55 + (0.45 * sin(((v_t * 6.0) + (v_i * 1.9)))))
-		game.f_fr((v_hx + 3.0), v_ey, (v_hw - 6.0), (v_seg - 3.0), "#6d1a08")
-		game.f_fr((v_hx + 3.0), v_ey, (v_hw - 6.0), (v_seg - 4.0), ("#c8380f" if J.truth(fmod(J.n(v_i), J.n(2.0))) else "#e0500f"))
-		J.setv(game.j_ctx, "globalAlpha", (0.3 + (0.4 * v_fl)))
-		game.f_fr((v_hx + 4.0), (v_ey + 1.0), (v_hw - 8.0), max(1.0, (v_seg - 5.0)), "#ff9c2e")
-		J.setv(game.j_ctx, "globalAlpha", (0.25 + (0.3 * v_fl)))
-		game.f_fr((v_hx + 5.0), (v_ey + 1.0), (v_hw - 10.0), max(1.0, (v_seg - 6.0)), "#ffe08a")
-		J.setv(game.j_ctx, "globalAlpha", 1.0)
+		if not (hd_isi and J.truth(game.f_hdIsiticiEleman((v_hx + 3.0), v_ey, v_fl))):
+			game.f_fr((v_hx + 3.0), v_ey, (v_hw - 6.0), (v_seg - 3.0), "#6d1a08")
+			game.f_fr((v_hx + 3.0), v_ey, (v_hw - 6.0), (v_seg - 4.0), ("#c8380f" if J.truth(fmod(J.n(v_i), J.n(2.0))) else "#e0500f"))
+			J.setv(game.j_ctx, "globalAlpha", (0.3 + (0.4 * v_fl)))
+			game.f_fr((v_hx + 4.0), (v_ey + 1.0), (v_hw - 8.0), max(1.0, (v_seg - 5.0)), "#ff9c2e")
+			J.setv(game.j_ctx, "globalAlpha", (0.25 + (0.3 * v_fl)))
+			game.f_fr((v_hx + 5.0), (v_ey + 1.0), (v_hw - 10.0), max(1.0, (v_seg - 6.0)), "#ffe08a")
+			J.setv(game.j_ctx, "globalAlpha", 1.0)
 		if J.truth(game.f_chance(0.014)):
 			game.effects.f_part({"x": (v_hx + game.math_utils.f_rnd(3.0, (v_hw - 3.0))), "y": v_ey, "vx": game.math_utils.f_rnd((-J.n(4.0)), 2.0), "vy": game.math_utils.f_rnd((-J.n(30.0)), (-J.n(14.0))), "life": game.math_utils.f_rnd(0.3, 0.8), "col": game.math_utils.f_pick([game.j_P["f1"], game.j_P["f2"], game.j_P["f0"]]), "g": (-J.n(16.0)), "sz": 1.0})
 		v_i = (v_i + 1.0)
-	J.setv(game.j_ctx, "globalAlpha", (0.1 + (0.045 * sin((v_t * 5.0)))))
-	game.f_fr((v_cx - 4.0), v_top, 26.0, v_H0, "#ff8a2a")
-	J.setv(game.j_ctx, "globalAlpha", 1.0)
+	# REMAKE kancasi: duz turuncu kutu yerine isiticiya dogru artan sicak isik
+	if not (hd_isi and J.truth(game.f_hdSicakIsik((v_cx - 4.0), v_top, (0.1 + (0.045 * sin((v_t * 5.0))))))):
+		J.setv(game.j_ctx, "globalAlpha", (0.1 + (0.045 * sin((v_t * 5.0)))))
+		game.f_fr((v_cx - 4.0), v_top, 26.0, v_H0, "#ff8a2a")
+		J.setv(game.j_ctx, "globalAlpha", 1.0)
 	game.counter_draw.f_heatShimmer((v_cx + 8.0), (v_top + 6.0), 18.0, (v_H0 - 12.0), v_t)
 	game.f_vl((v_cx - 1.0), (v_top - 12.0), (v_H0 + 16.0), game.j_P["mt4"])
 	game.f_vl(v_cx, (v_top - 12.0), (v_H0 + 16.0), game.j_P["mt1"])
@@ -204,7 +214,9 @@ func f_drawSpit(p_sp: Variant = null, p_t: Variant = null) -> Variant:
 	J.setv(game.j_ctx, "globalAlpha", 0.3)
 	game.f_ell((v_cx + 2.0), (v_bot + 3.0), 15.0, 4.0, "#000")
 	J.setv(game.j_ctx, "globalAlpha", 1.0)
-	v_y = 0.0
+	# REMAKE kancasi: HD koni shader'i cizerse prosedurel dongu ve kesim yuzu atlanir
+	var v_hd: bool = game.f_sisHD(v_sp, v_cx, v_coneTop, v_coneH)
+	v_y = (v_coneH if v_hd else 0.0)
 	while (v_y < v_coneH):
 		v_ty = (float(v_y) / float(v_coneH))
 		v_rjit = ((1.0 if (sin(((v_y * 0.21) + (v_sp["rot"] * 1.3))) > 0.25) else 0.0) - (1.0 if (sin((((v_y * 0.29) + 2.1) + v_sp["rot"])) > 0.55) else 0.0))
@@ -289,7 +301,7 @@ func f_drawSpit(p_sp: Variant = null, p_t: Variant = null) -> Variant:
 			game.f_px((v_cx + v_bx2), v_yy, "#33231a")
 			game.f_px(((v_cx + v_bx2) + 1.0), v_yy, "#4a3226")
 		v_y = (v_y + 1.0)
-	if (v_sp["cutDepth"] > 0.0):
+	if (not v_hd) and (v_sp["cutDepth"] > 0.0):
 		v_yc = 10.0
 		while (v_yc < (v_coneH * 0.8)):
 			v_rr = max(1.0, floor(((v_maxR * v_scaleR) * game.f_coneProfile((float(v_yc) / float(v_coneH)))) + 0.5))
@@ -314,41 +326,46 @@ func f_drawSpit(p_sp: Variant = null, p_t: Variant = null) -> Variant:
 		game.effects.f_part({"x": (v_cx + game.math_utils.f_rnd((-J.n(4.0)), 4.0)), "y": (v_bot - 4.0), "vx": 0.0, "vy": 20.0, "life": 0.5, "col": "#c08a2a", "g": 90.0, "sz": 1.0, "floor": (v_bot + 1.0)})
 	if (((J.kind(game.j_TUN) != "undefined") and J.truth(game.j_G["up"])) and J.truth(J.method(game.j_TUN, "autoShave", [game.j_G]))):
 		v_rx0 = ((v_cx - floor((v_maxR * v_scaleR) + 0.5)) - 12.0)
-		game.f_fr(v_rx0, (v_top - 6.0), 4.0, (v_H0 + 14.0), "#3a4048")
-		game.f_fr((v_rx0 + 1.0), (v_top - 6.0), 2.0, (v_H0 + 14.0), "#6b737d")
-		v_rv = 0.0
-		while (v_rv < (v_H0 + 10.0)):
-			game.f_px((v_rx0 + 1.0), ((v_top - 4.0) + v_rv), "#98a0a9")
-			v_rv = (v_rv + 8.0)
-		game.f_fr((v_rx0 - 7.0), (v_top - 16.0), 16.0, 12.0, "#2f3740")
-		game.f_fr((v_rx0 - 6.0), (v_top - 16.0), 14.0, 11.0, "#59636d")
-		game.f_hl((v_rx0 - 6.0), (v_top - 16.0), 14.0, "#8b959e")
-		v_wa = (v_t * 9.0)
-		game.f_disc((v_rx0 + 1.0), (v_top - 10.0), 4.0, "#3a4048")
-		game.f_disc((v_rx0 + 1.0), (v_top - 10.0), 3.0, "#98a0a9")
-		game.f_ln((v_rx0 + 1.0), (v_top - 10.0), ((v_rx0 + 1.0) + (cos(v_wa) * 3.0)), ((v_top - 10.0) + (sin(v_wa) * 3.0)), "#2f3740")
-		game.f_px((v_rx0 - 4.0), (v_top - 13.0), ("#7dff7a" if J.truth(game.f_chance(0.5)) else "#2a6a28"))
+		# REMAKE kancasi
+		if game.f_hdOtoTiras(v_rx0, v_top, v_t):
+			game.f_hdOtoLed(v_rx0, v_top, J.truth(game.f_chance(0.5)))
+		else:
+			game.f_fr(v_rx0, (v_top - 6.0), 4.0, (v_H0 + 14.0), "#3a4048")
+			game.f_fr((v_rx0 + 1.0), (v_top - 6.0), 2.0, (v_H0 + 14.0), "#6b737d")
+			v_rv = 0.0
+			while (v_rv < (v_H0 + 10.0)):
+				game.f_px((v_rx0 + 1.0), ((v_top - 4.0) + v_rv), "#98a0a9")
+				v_rv = (v_rv + 8.0)
+			game.f_fr((v_rx0 - 7.0), (v_top - 16.0), 16.0, 12.0, "#2f3740")
+			game.f_fr((v_rx0 - 6.0), (v_top - 16.0), 14.0, 11.0, "#59636d")
+			game.f_hl((v_rx0 - 6.0), (v_top - 16.0), 14.0, "#8b959e")
+			v_wa = (v_t * 9.0)
+			game.f_disc((v_rx0 + 1.0), (v_top - 10.0), 4.0, "#3a4048")
+			game.f_disc((v_rx0 + 1.0), (v_top - 10.0), 3.0, "#98a0a9")
+			game.f_ln((v_rx0 + 1.0), (v_top - 10.0), ((v_rx0 + 1.0) + (cos(v_wa) * 3.0)), ((v_top - 10.0) + (sin(v_wa) * 3.0)), "#2f3740")
+			game.f_px((v_rx0 - 4.0), (v_top - 13.0), ("#7dff7a" if J.truth(game.f_chance(0.5)) else "#2a6a28"))
 		v_ph = ((float((game.j_G["shave"]["auto"] if J.truth(game.j_G["shave"]["auto"]) else 0.0)) / float(0.55)) if J.truth(game.j_G["shave"]) else 0.0)
 		v_tri = ((v_ph * 2.0) if (v_ph < 0.5) else ((1.0 - v_ph) * 2.0))
 		v_cy2 = floor(game.math_utils.f_lerp((v_top + 10.0), (v_bot - 18.0), game.math_utils.f_clamp(v_tri, 0.0, 1.0)) + 0.5)
-		game.f_fr((v_rx0 - 4.0), (v_cy2 - 5.0), 12.0, 11.0, "#59636d")
-		game.f_fr((v_rx0 - 3.0), (v_cy2 - 5.0), 10.0, 10.0, "#8b959e")
-		game.f_hl((v_rx0 - 3.0), (v_cy2 - 5.0), 10.0, "#c6ccd2")
-		game.f_fr((v_rx0 - 5.0), (v_cy2 - 1.0), 3.0, 3.0, "#2f3740")
-		game.f_fr((v_rx0 + 7.0), (v_cy2 - 1.0), 14.0, 3.0, "#c9d2da")
-		game.f_fr((v_rx0 + 7.0), (v_cy2 - 1.0), 14.0, 2.0, "#eef4f8")
-		game.f_hl((v_rx0 + 7.0), (v_cy2 - 1.0), 14.0, "#ffffff")
-		game.f_px((v_rx0 + 21.0), v_cy2, "#ffffff")
+		# REMAKE kancasi
+		if not game.f_hdOtoAraba(v_rx0, v_cy2):
+			game.f_fr((v_rx0 - 4.0), (v_cy2 - 5.0), 12.0, 11.0, "#59636d")
+			game.f_fr((v_rx0 - 3.0), (v_cy2 - 5.0), 10.0, 10.0, "#8b959e")
+			game.f_hl((v_rx0 - 3.0), (v_cy2 - 5.0), 10.0, "#c6ccd2")
+			game.f_fr((v_rx0 - 5.0), (v_cy2 - 1.0), 3.0, 3.0, "#2f3740")
+			game.f_fr((v_rx0 + 7.0), (v_cy2 - 1.0), 14.0, 3.0, "#c9d2da")
+			game.f_fr((v_rx0 + 7.0), (v_cy2 - 1.0), 14.0, 2.0, "#eef4f8")
+			game.f_hl((v_rx0 + 7.0), (v_cy2 - 1.0), 14.0, "#ffffff")
+			game.f_px((v_rx0 + 21.0), v_cy2, "#ffffff")
 		if J.truth(game.f_chance(0.25)):
 			game.effects.f_part({"x": (v_rx0 + 20.0), "y": (v_cy2 + game.math_utils.f_rnd((-J.n(2.0)), 2.0)), "vx": game.math_utils.f_rnd((-J.n(26.0)), (-J.n(6.0))), "vy": game.math_utils.f_rnd((-J.n(18.0)), 4.0), "life": 0.35, "col": game.math_utils.f_pick(["#c98436", "#eeb464"]), "g": 240.0, "sz": 1.0, "floor": (game.j_ST["meat"]["y"] + game.math_utils.f_rnd(4.0, 12.0))})
 	if (v_sp["sliceT"] > 0.0):
 		v_kt = (1.0 - v_sp["sliceT"])
 		v_ky = ((v_coneTop + 10.0) + (v_kt * (v_coneH - 26.0)))
 		v_kx = ((v_cx - floor((v_maxR * v_scaleR) + 0.5)) - 3.0)
-		J.setv(game.j_ctx, "globalAlpha", 0.3)
-		game.f_fr((v_kx + 2.0), (v_ky - 8.0), 3.0, 16.0, "#dfe6ec")
-		J.setv(game.j_ctx, "globalAlpha", 1.0)
-		game.f_drawKesimBicagi((v_kx + 4.0), (v_ky + 1.0), (-J.n(1.0)), (game.equipment_system.f_UV(game.j_G, "knife") if (J.kind(J.ref(game.equipment_system.f_UV, 2)) == "function") else 0.0))
+		# BIRLESIK: parilti + bicak game.f_drawSpitCutKnife'ta (platform katmani
+		# elde tutulan bicak gorunurken gizler); game_sprites surumuyle ayni
+		game.f_drawSpitCutKnife((v_kx + 4.0), (v_ky + 1.0), (game.equipment_system.f_UV(game.j_G, "knife") if (J.kind(J.ref(game.equipment_system.f_UV, 2)) == "function") else 0.0))
 		if J.truth(game.f_chance(0.5)):
 			game.effects.f_part({"x": (v_kx + 4.0), "y": (v_ky + game.math_utils.f_rnd((-J.n(2.0)), 2.0)), "vx": game.math_utils.f_rnd((-J.n(40.0)), (-J.n(10.0))), "vy": game.math_utils.f_rnd((-J.n(20.0)), 10.0), "life": 0.3, "col": "#ffffff", "g": 60.0, "sz": 1.0})
 	return null

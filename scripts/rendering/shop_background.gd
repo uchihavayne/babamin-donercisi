@@ -30,6 +30,8 @@ func f_archR(p_y: Variant = null) -> Variant:
 
 # art.js:2301
 func f_bakeStoneFG() -> Variant:
+	# REMAKE kancasi: arka plan GPU'da pisirildiyse tas on plan dogrudan dokudan cizilir
+	if game.f_hdTasOnPlanPisir(): return null
 	var v_c: Variant = null
 	var v_g: Variant = null
 	var v_y: Variant = null
@@ -55,6 +57,8 @@ func f_bakeStoneFG() -> Variant:
 
 # art.js:2313
 func f_drawStoneFG() -> Variant:
+	# REMAKE kancasi
+	if game.f_hdTasOnPlan(): return null
 	if (not J.truth(game.j_STONEFG)):
 		game.shop_background.f_bakeStoneFG()
 	if J.truth(game.j_STONEFG):
@@ -111,7 +115,8 @@ func f_bakeBG(p_decor: Variant = null) -> Variant:
 	game.j_BGDAYI = game.shop_background.f_dayiVar()
 	game.j_BGCITY = J.getv(game.j_G, "city")
 	game.j_BGRAKIP = game.rival_building.f_rakipCepheDurum()
-	v_c = Canvas.new()
+	# REMAKE: HD'de GPU pisirme tuvali
+	v_c = game.f_hdBakeTuval()
 	J.setv(v_c, "width", game.j_W)
 	J.setv(v_c, "height", game.j_H)
 	v_g = J.method(v_c, "getContext", ["2d"])
@@ -121,27 +126,29 @@ func f_bakeBG(p_decor: Variant = null) -> Variant:
 	v_wallCols = game.city_system.f_duvarPaleti(v_TEMA, v_decor)
 	_cells["TASP"][0] = game.city_system.f_tasPaleti(v_TEMA, v_decor)
 	game.f_fr(0.0, 0.0, game.j_W, J.add(J.getv(game.j_LAY, "floorY"), 12.0), J.getv(v_wallCols, 3.0))
-	v_TS = 18.0
-	v_ty = (-J.n(8.0))
-	while J.lt(v_ty, J.add(J.getv(game.j_LAY, "floorY"), 4.0)):
-		v_tx = 0.0
-		while J.lt(v_tx, game.j_W):
-			v_hsh = game.f_hash1(J.add((v_tx * 0.37), (v_ty * 1.13)))
-			v_base = (J.getv(v_wallCols, 0.0) if J.lt(v_hsh, 0.18) else (J.getv(v_wallCols, 1.0) if J.lt(v_hsh, 0.62) else J.getv(v_wallCols, 2.0)))
-			game.f_fr(J.add(v_tx, 1.0), J.add(v_ty, 1.0), (v_TS - 1.0), (v_TS - 1.0), v_base)
-			game.f_hl(J.add(v_tx, 1.0), J.add(v_ty, 1.0), (v_TS - 1.0), ("#8dc4dc" if J.lt(v_hsh, 0.18) else J.getv(v_wallCols, 0.0)))
-			game.f_vl(J.add(v_tx, 1.0), J.add(v_ty, 1.0), (v_TS - 1.0), (J.getv(v_wallCols, 0.0) if J.lt(v_hsh, 0.5) else v_base))
-			game.f_hl(J.add(v_tx, 1.0), (J.add(v_ty, v_TS) - 1.0), (v_TS - 1.0), J.getv(v_wallCols, 3.0))
-			if J.gt(game.f_hash1(J.add((v_tx * 2.7), (v_ty * 0.91))), 0.955):
-				v_bw = J.add(5.0, floor((game.f_hash1(J.add(v_tx, v_ty)) * 6.0)))
-				v_bh = J.add(4.0, floor((game.f_hash1(J.add((v_tx * 2.0), v_ty)) * 5.0)))
-				v_bx = J.add(J.add(v_tx, 3.0), floor((game.f_hash1(J.add((v_tx * 0.5), v_ty)) * 6.0)))
-				v_by = J.add(J.add(v_ty, 3.0), floor((game.f_hash1(J.add((v_ty * 0.5), v_tx)) * 6.0)))
-				game.f_fr(v_bx, v_by, v_bw, v_bh, "#3c2a24")
-				game.f_fr(J.add(v_bx, 1.0), J.add(v_by, 1.0), (v_bw - 2.0), (v_bh - 2.0), "#2a1c18")
-				game.f_hl(v_bx, J.add(v_by, v_bh), v_bw, J.getv(v_wallCols, 0.0))
-			v_tx = J.add(v_tx, v_TS)
-		v_ty = J.add(v_ty, v_TS)
+	# REMAKE kancasi
+	if not game.f_hdDuvar(v_wallCols):
+		v_TS = 18.0
+		v_ty = (-J.n(8.0))
+		while J.lt(v_ty, J.add(J.getv(game.j_LAY, "floorY"), 4.0)):
+			v_tx = 0.0
+			while J.lt(v_tx, game.j_W):
+				v_hsh = game.f_hash1(J.add((v_tx * 0.37), (v_ty * 1.13)))
+				v_base = (J.getv(v_wallCols, 0.0) if J.lt(v_hsh, 0.18) else (J.getv(v_wallCols, 1.0) if J.lt(v_hsh, 0.62) else J.getv(v_wallCols, 2.0)))
+				game.f_fr(J.add(v_tx, 1.0), J.add(v_ty, 1.0), (v_TS - 1.0), (v_TS - 1.0), v_base)
+				game.f_hl(J.add(v_tx, 1.0), J.add(v_ty, 1.0), (v_TS - 1.0), ("#8dc4dc" if J.lt(v_hsh, 0.18) else J.getv(v_wallCols, 0.0)))
+				game.f_vl(J.add(v_tx, 1.0), J.add(v_ty, 1.0), (v_TS - 1.0), (J.getv(v_wallCols, 0.0) if J.lt(v_hsh, 0.5) else v_base))
+				game.f_hl(J.add(v_tx, 1.0), (J.add(v_ty, v_TS) - 1.0), (v_TS - 1.0), J.getv(v_wallCols, 3.0))
+				if J.gt(game.f_hash1(J.add((v_tx * 2.7), (v_ty * 0.91))), 0.955):
+					v_bw = J.add(5.0, floor((game.f_hash1(J.add(v_tx, v_ty)) * 6.0)))
+					v_bh = J.add(4.0, floor((game.f_hash1(J.add((v_tx * 2.0), v_ty)) * 5.0)))
+					v_bx = J.add(J.add(v_tx, 3.0), floor((game.f_hash1(J.add((v_tx * 0.5), v_ty)) * 6.0)))
+					v_by = J.add(J.add(v_ty, 3.0), floor((game.f_hash1(J.add((v_ty * 0.5), v_tx)) * 6.0)))
+					game.f_fr(v_bx, v_by, v_bw, v_bh, "#3c2a24")
+					game.f_fr(J.add(v_bx, 1.0), J.add(v_by, 1.0), (v_bw - 2.0), (v_bh - 2.0), "#2a1c18")
+					game.f_hl(v_bx, J.add(v_by, v_bh), v_bw, J.getv(v_wallCols, 0.0))
+				v_tx = J.add(v_tx, v_TS)
+			v_ty = J.add(v_ty, v_TS)
 	v_y = 0.0
 	while J.lt(v_y, J.getv(game.j_LAY, "floorY")):
 		v_a = max(0.0, (0.2 - (v_y * 0.0016)))
@@ -158,73 +165,78 @@ func f_bakeBG(p_decor: Variant = null) -> Variant:
 		v_y2 = J.add(v_y2, 1.0)
 	J.setv(game.j_ctx, "globalAlpha", 1.0)
 	game.street_background.f_bakeStreet()
-	J.invoke(v_stoneBand, [(-J.n(1.0))])
-	J.invoke(v_stoneBand, [1.0])
+	# REMAKE kancasi
+	if not game.f_hdTasBant(-1.0, _cells["TASP"][0]):
+		J.invoke(v_stoneBand, [(-J.n(1.0))])
+	if not game.f_hdTasBant(1.0, _cells["TASP"][0]):
+		J.invoke(v_stoneBand, [1.0])
 	v_Z = J.getv(v_TEMA, "zemin")
 	v_zy = J.getv(game.j_LAY, "floorY")
 	v_zh = (game.j_H - J.getv(game.j_LAY, "floorY"))
-	game.f_fr(0.0, v_zy, game.j_W, v_zh, J.getv(v_Z, 2.0))
-	if J.eq(J.getv(v_TEMA, "zeminTip"), "dama"):
-		v_dx = (-J.n(8.0))
-		while J.lt(v_dx, game.j_W):
-			v_dy = v_zy
-			while J.lt(v_dy, game.j_H):
-				v_kare = fmod(J.n(J.add((int(J.n((float(v_dx) / float(16.0)))) | int(J.n(0.0))), (int(J.n((float(v_dy) / float(8.0)))) | int(J.n(0.0))))), J.n(2.0))
-				game.f_fr(v_dx, v_dy, 16.0, 8.0, (J.getv(v_Z, 0.0) if J.truth(v_kare) else J.getv(v_Z, 2.0)))
-				v_dy = J.add(v_dy, 8.0)
-			v_dx = J.add(v_dx, 16.0)
-		J.setv(game.j_ctx, "globalAlpha", 0.18)
-		v_dl = v_zy
-		while J.lt(v_dl, game.j_H):
-			game.f_hl(0.0, v_dl, game.j_W, J.getv(v_Z, 3.0))
-			v_dl = J.add(v_dl, 8.0)
-		J.setv(game.j_ctx, "globalAlpha", 1.0)
-	else:
-		if J.eq(J.getv(v_TEMA, "zeminTip"), "mermer"):
-			game.f_fr(0.0, v_zy, game.j_W, v_zh, J.getv(v_Z, 0.0))
-			v_mx2 = (-J.n(10.0))
-			while J.lt(v_mx2, game.j_W):
-				game.f_vl(v_mx2, v_zy, v_zh, J.getv(v_Z, 2.0))
-				J.setv(game.j_ctx, "globalAlpha", 0.3)
-				v_md = 0.0
-				while J.lt(v_md, 3.0):
-					v_vx = J.add(J.add(v_mx2, 6.0), (v_md * 11.0))
-					game.f_ln(v_vx, J.add(v_zy, 1.0), (J.add(v_vx, 5.0) - (v_md * 3.0)), (game.j_H - 1.0), J.getv(v_Z, 3.0))
-					v_md = J.add(v_md, 1.0)
-				J.setv(game.j_ctx, "globalAlpha", 1.0)
-				v_mx2 = J.add(v_mx2, 38.0)
-			game.f_hl(0.0, v_zy, game.j_W, J.getv(v_Z, 1.0))
+	# REMAKE kancasi
+	if not game.f_hdZemin(v_TEMA):
+		game.f_fr(0.0, v_zy, game.j_W, v_zh, J.getv(v_Z, 2.0))
+		if J.eq(J.getv(v_TEMA, "zeminTip"), "dama"):
+			v_dx = (-J.n(8.0))
+			while J.lt(v_dx, game.j_W):
+				v_dy = v_zy
+				while J.lt(v_dy, game.j_H):
+					v_kare = fmod(J.n(J.add((int(J.n((float(v_dx) / float(16.0)))) | int(J.n(0.0))), (int(J.n((float(v_dy) / float(8.0)))) | int(J.n(0.0))))), J.n(2.0))
+					game.f_fr(v_dx, v_dy, 16.0, 8.0, (J.getv(v_Z, 0.0) if J.truth(v_kare) else J.getv(v_Z, 2.0)))
+					v_dy = J.add(v_dy, 8.0)
+				v_dx = J.add(v_dx, 16.0)
+			J.setv(game.j_ctx, "globalAlpha", 0.18)
+			v_dl = v_zy
+			while J.lt(v_dl, game.j_H):
+				game.f_hl(0.0, v_dl, game.j_W, J.getv(v_Z, 3.0))
+				v_dl = J.add(v_dl, 8.0)
+			J.setv(game.j_ctx, "globalAlpha", 1.0)
 		else:
-			if J.eq(J.getv(v_TEMA, "zeminTip"), "beton"):
-				game.f_fr(0.0, v_zy, game.j_W, v_zh, J.getv(v_Z, 1.0))
-				v_bx2 = (-J.n(4.0))
-				while J.lt(v_bx2, game.j_W):
-					game.f_vl(v_bx2, v_zy, v_zh, J.getv(v_Z, 2.0))
-					v_bx2 = J.add(v_bx2, 29.0)
-				v_by2 = J.add(v_zy, 5.0)
-				while J.lt(v_by2, game.j_H):
-					J.setv(game.j_ctx, "globalAlpha", 0.22)
-					game.f_hl(0.0, v_by2, game.j_W, J.getv(v_Z, 3.0))
+			if J.eq(J.getv(v_TEMA, "zeminTip"), "mermer"):
+				game.f_fr(0.0, v_zy, game.j_W, v_zh, J.getv(v_Z, 0.0))
+				v_mx2 = (-J.n(10.0))
+				while J.lt(v_mx2, game.j_W):
+					game.f_vl(v_mx2, v_zy, v_zh, J.getv(v_Z, 2.0))
+					J.setv(game.j_ctx, "globalAlpha", 0.3)
+					v_md = 0.0
+					while J.lt(v_md, 3.0):
+						v_vx = J.add(J.add(v_mx2, 6.0), (v_md * 11.0))
+						game.f_ln(v_vx, J.add(v_zy, 1.0), (J.add(v_vx, 5.0) - (v_md * 3.0)), (game.j_H - 1.0), J.getv(v_Z, 3.0))
+						v_md = J.add(v_md, 1.0)
 					J.setv(game.j_ctx, "globalAlpha", 1.0)
-					v_by2 = J.add(v_by2, 7.0)
-				v_bs = 0.0
-				while J.lt(v_bs, 260.0):
-					v_sx2 = floor((game.f_hash1((v_bs * 3.7)) * game.j_W))
-					v_sy2 = J.add(v_zy, floor((game.f_hash1((v_bs * 8.1)) * v_zh)))
-					game.f_px(v_sx2, v_sy2, (J.getv(v_Z, 0.0) if J.gt(game.f_hash1(v_bs), 0.5) else J.getv(v_Z, 3.0)))
-					v_bs = J.add(v_bs, 1.0)
-			else:
-				v_fx = (-J.n(6.0))
-				while J.lt(v_fx, game.j_W):
-					v_sxx = J.add(v_fx, floor((game.f_hash1(v_fx) * 4.0)))
-					game.f_vl(v_sxx, v_zy, v_zh, J.getv(v_Z, 3.0))
-					v_fy = v_zy
-					while J.lt(v_fy, game.j_H):
-						if J.gt(game.f_hash1(J.add((v_sxx * 1.3), (v_fy * 2.1))), 0.8):
-							game.f_px(J.add(J.add(v_sxx, 1.0), floor((game.f_hash1(v_fy) * 12.0))), v_fy, J.getv(v_Z, 1.0))
-						v_fy = J.add(v_fy, 1.0)
-					v_fx = J.add(v_fx, 17.0)
+					v_mx2 = J.add(v_mx2, 38.0)
 				game.f_hl(0.0, v_zy, game.j_W, J.getv(v_Z, 1.0))
+			else:
+				if J.eq(J.getv(v_TEMA, "zeminTip"), "beton"):
+					game.f_fr(0.0, v_zy, game.j_W, v_zh, J.getv(v_Z, 1.0))
+					v_bx2 = (-J.n(4.0))
+					while J.lt(v_bx2, game.j_W):
+						game.f_vl(v_bx2, v_zy, v_zh, J.getv(v_Z, 2.0))
+						v_bx2 = J.add(v_bx2, 29.0)
+					v_by2 = J.add(v_zy, 5.0)
+					while J.lt(v_by2, game.j_H):
+						J.setv(game.j_ctx, "globalAlpha", 0.22)
+						game.f_hl(0.0, v_by2, game.j_W, J.getv(v_Z, 3.0))
+						J.setv(game.j_ctx, "globalAlpha", 1.0)
+						v_by2 = J.add(v_by2, 7.0)
+					v_bs = 0.0
+					while J.lt(v_bs, 260.0):
+						v_sx2 = floor((game.f_hash1((v_bs * 3.7)) * game.j_W))
+						v_sy2 = J.add(v_zy, floor((game.f_hash1((v_bs * 8.1)) * v_zh)))
+						game.f_px(v_sx2, v_sy2, (J.getv(v_Z, 0.0) if J.gt(game.f_hash1(v_bs), 0.5) else J.getv(v_Z, 3.0)))
+						v_bs = J.add(v_bs, 1.0)
+				else:
+					v_fx = (-J.n(6.0))
+					while J.lt(v_fx, game.j_W):
+						v_sxx = J.add(v_fx, floor((game.f_hash1(v_fx) * 4.0)))
+						game.f_vl(v_sxx, v_zy, v_zh, J.getv(v_Z, 3.0))
+						v_fy = v_zy
+						while J.lt(v_fy, game.j_H):
+							if J.gt(game.f_hash1(J.add((v_sxx * 1.3), (v_fy * 2.1))), 0.8):
+								game.f_px(J.add(J.add(v_sxx, 1.0), floor((game.f_hash1(v_fy) * 12.0))), v_fy, J.getv(v_Z, 1.0))
+							v_fy = J.add(v_fy, 1.0)
+						v_fx = J.add(v_fx, 17.0)
+					game.f_hl(0.0, v_zy, game.j_W, J.getv(v_Z, 1.0))
 	J.setv(game.j_ctx, "globalAlpha", 0.3)
 	game.f_fr(0.0, J.getv(game.j_LAY, "floorY"), game.j_W, 3.0, "#000")
 	J.setv(game.j_ctx, "globalAlpha", 1.0)

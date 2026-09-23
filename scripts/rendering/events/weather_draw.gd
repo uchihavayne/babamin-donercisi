@@ -35,6 +35,8 @@ func f_drawKar(p_t: Variant = null) -> Variant:
 	if ((not J.truth(game.weather_system.f_isKar())) or (not J.truth(J.getv(game.j_G, "kar")))):
 		return null
 	v_K = J.getv(game.j_G, "kar")
+	# REMAKE kancasi: HD kar taneleri + kiragi
+	if J.truth(game.f_hdKar(v_K, J.getv(game.j_LAY, "glass"))): return null
 	v_i = 0.0
 	while J.lt(v_i, J.getv(v_K, "length")):
 		v_k = J.getv(v_K, v_i)
@@ -74,6 +76,8 @@ func f_drawCamDamla(p_t: Variant = null) -> Variant:
 	if ((not J.truth(game.weather_system.f_isRain())) or (not J.truth(J.getv(game.j_G, "camDamla")))):
 		return null
 	v_D = J.getv(game.j_G, "camDamla")
+	# REMAKE kancasi: HD cam damlalari
+	if J.truth(game.f_hdCamDamla(v_D)): return null
 	v_i = 0.0
 	while J.lt(v_i, J.getv(v_D, "length")):
 		v_d = J.getv(v_D, v_i)

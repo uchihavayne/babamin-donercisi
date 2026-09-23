@@ -14,9 +14,11 @@ func f_drawMotoBadge(p_t: Variant = null) -> Variant:
 	game.f_rrect(v_bx, v_by, 44.0, 22.0, 3.0, "rgba(20,14,12,.85)")
 	game.f_rrectOut(v_bx, v_by, 44.0, 22.0, 3.0, J.getv(game.j_P, "bad"))
 	J.setv(game.j_ctx, "globalAlpha", 1.0)
-	game.f_ln(J.add(v_bx, 6.0), J.add(v_by, 15.0), J.add(v_bx, 13.0), J.add(v_by, 8.0), "#c7ced5")
-	game.f_fr(J.add(v_bx, 4.0), J.add(v_by, 13.0), 4.0, 4.0, "#9aa3ab")
-	game.f_px(J.add(v_bx, 5.0), J.add(v_by, 14.0), "#5a636b")
+	# REMAKE kancasi: HD motosiklet ikonu
+	if not J.truth(game.f_hdMotoIkon(J.add(v_bx, 10.0), J.add(v_by, 6.0))):
+		game.f_ln(J.add(v_bx, 6.0), J.add(v_by, 15.0), J.add(v_bx, 13.0), J.add(v_by, 8.0), "#c7ced5")
+		game.f_fr(J.add(v_bx, 4.0), J.add(v_by, 13.0), 4.0, 4.0, "#9aa3ab")
+		game.f_px(J.add(v_bx, 5.0), J.add(v_by, 14.0), "#5a636b")
 	game.text_draw.f_txt("BOZUK", J.add(v_bx, 24.0), J.add(v_by, 3.0), J.getv(game.j_P, "bad"), {"align": "c"})
 	game.text_draw.f_txt(J.add("$", game.math_utils.f_fmtShort(J.getv(J.getv(game.j_G, "moto"), "cost"))), J.add(v_bx, 24.0), J.add(v_by, 12.0), J.getv(game.j_P, "au0"), {"align": "c"})
 	return null
@@ -56,29 +58,31 @@ func f_drawPhone(p_t: Variant = null) -> Variant:
 	v_sh = (floor((sin((v_t * 40.0)) * 1.5) + 0.5) if J.eq(J.getv(v_p, "state"), "ring") else 0.0)
 	v_x = J.add(J.getv(v_s, "x"), v_sh)
 	v_y = J.getv(v_s, "y")
-	game.f_fr(J.add(v_x, 2.0), J.add(v_y, 6.0), 20.0, 22.0, "#2b2f36")
-	game.f_fr(J.add(v_x, 3.0), J.add(v_y, 6.0), 18.0, 21.0, "#3f454e")
-	game.f_hl(J.add(v_x, 3.0), J.add(v_y, 6.0), 18.0, "#5c646e")
-	v_r = 0.0
-	while J.lt(v_r, 3.0):
-		v_c = 0.0
-		while J.lt(v_c, 3.0):
-			game.f_fr(J.add(J.add(v_x, 6.0), (v_c * 4.0)), J.add(J.add(v_y, 12.0), (v_r * 4.0)), 3.0, 3.0, "#8a929b")
-			game.f_px(J.add(J.add(v_x, 6.0), (v_c * 4.0)), J.add(J.add(v_y, 12.0), (v_r * 4.0)), "#c6ccd2")
-			v_c = J.add(v_c, 1.0)
-		v_r = J.add(v_r, 1.0)
-	v_hy = J.add(J.add(v_y, (1.0 if J.eq(J.getv(v_p, "state"), "ring") else 2.0)), v_sh)
-	game.f_fr(v_x, v_hy, 24.0, 5.0, "#1f2329")
-	game.f_fr(J.add(v_x, 1.0), v_hy, 22.0, 4.0, "#c0281c")
-	game.f_hl(J.add(v_x, 2.0), v_hy, 20.0, "#e2483a")
-	game.f_fr(v_x, v_hy, 4.0, 6.0, "#c0281c")
-	game.f_fr(J.add(v_x, 20.0), v_hy, 4.0, 6.0, "#c0281c")
-	game.f_hl(v_x, v_hy, 4.0, "#e2483a")
-	game.f_hl(J.add(v_x, 20.0), v_hy, 4.0, "#e2483a")
-	v_k = 0.0
-	while J.lt(v_k, 6.0):
-		game.f_px(J.add(J.add(v_x, 12.0), floor((sin((v_k * 1.2)) * 2.0) + 0.5)), J.add(J.add(v_hy, 6.0), v_k), "#1f2329")
-		v_k = J.add(v_k, 1.0)
+	# REMAKE kancasi
+	if not game.f_hdTelefon(v_x, v_y, J.eq(J.getv(v_p, "state"), "ring"), v_sh):
+		game.f_fr(J.add(v_x, 2.0), J.add(v_y, 6.0), 20.0, 22.0, "#2b2f36")
+		game.f_fr(J.add(v_x, 3.0), J.add(v_y, 6.0), 18.0, 21.0, "#3f454e")
+		game.f_hl(J.add(v_x, 3.0), J.add(v_y, 6.0), 18.0, "#5c646e")
+		v_r = 0.0
+		while J.lt(v_r, 3.0):
+			v_c = 0.0
+			while J.lt(v_c, 3.0):
+				game.f_fr(J.add(J.add(v_x, 6.0), (v_c * 4.0)), J.add(J.add(v_y, 12.0), (v_r * 4.0)), 3.0, 3.0, "#8a929b")
+				game.f_px(J.add(J.add(v_x, 6.0), (v_c * 4.0)), J.add(J.add(v_y, 12.0), (v_r * 4.0)), "#c6ccd2")
+				v_c = J.add(v_c, 1.0)
+			v_r = J.add(v_r, 1.0)
+		v_hy = J.add(J.add(v_y, (1.0 if J.eq(J.getv(v_p, "state"), "ring") else 2.0)), v_sh)
+		game.f_fr(v_x, v_hy, 24.0, 5.0, "#1f2329")
+		game.f_fr(J.add(v_x, 1.0), v_hy, 22.0, 4.0, "#c0281c")
+		game.f_hl(J.add(v_x, 2.0), v_hy, 20.0, "#e2483a")
+		game.f_fr(v_x, v_hy, 4.0, 6.0, "#c0281c")
+		game.f_fr(J.add(v_x, 20.0), v_hy, 4.0, 6.0, "#c0281c")
+		game.f_hl(v_x, v_hy, 4.0, "#e2483a")
+		game.f_hl(J.add(v_x, 20.0), v_hy, 4.0, "#e2483a")
+		v_k = 0.0
+		while J.lt(v_k, 6.0):
+			game.f_px(J.add(J.add(v_x, 12.0), floor((sin((v_k * 1.2)) * 2.0) + 0.5)), J.add(J.add(v_hy, 6.0), v_k), "#1f2329")
+			v_k = J.add(v_k, 1.0)
 	if J.eq(J.getv(v_p, "state"), "ring"):
 		J.setv(game.j_ctx, "globalAlpha", J.add(0.5, (0.4 * sin((v_t * 14.0)))))
 		v_w2 = 0.0
@@ -175,6 +179,8 @@ func f_drawScooter(p_x: Variant = null, p_y: Variant = null, p_t: Variant = null
 	var v_y: Variant = p_y
 	var v_t: Variant = p_t
 	var v_sc: Variant = p_sc
+	# REMAKE kancasi
+	if game.f_hdScooter(p_x, p_y, p_t, p_sc): return null
 	v_wob = floor((sin((v_t * 22.0)) * 0.6) + 0.5)
 	J.method(game.j_ctx, "save", [])
 	if not J.eq(v_sc, 1.0):

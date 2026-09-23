@@ -137,6 +137,8 @@ func f_proSis(p_cx: Variant = null, p_z0: Variant = null, p_z1: Variant = null, 
 	var v_r0: Variant = p_r0
 	var v_r1: Variant = p_r1
 	var v_t: Variant = p_t
+	# REMAKE kancasi
+	if game.f_hdProSis(p_cx, p_z0, p_z1, p_r0, p_r1, p_t): return null
 	v_n = (v_z1 - v_z0)
 	v_sx = game.story_canvas.f_pbx(v_cx)
 	v_sy = game.story_canvas.f_pby(v_z1)

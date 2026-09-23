@@ -3,6 +3,8 @@ extends "res://scripts/core/game_module.gd"
 
 # art.js:3200
 func f_pickleSlice(p_x: Variant = null, p_y: Variant = null, p_sh: Variant = null, p_k: Variant = null, p_sz: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdTursu(p_x, p_y, p_sh, p_k, p_sz): return null
 	var v_rw: Variant = null
 	var v_rh: Variant = null
 	var v_don: Variant = null
@@ -208,6 +210,8 @@ func f__etParca(p_x0: Variant = null, p_y: Variant = null, p_len: Variant = null
 
 # art.js:3356
 func f_meatStrip(p_x: Variant = null, p_y: Variant = null, p_sh: Variant = null, p_k: Variant = null, p_sz: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdEt(p_x, p_y, p_sh, p_k, p_sz): return null
 	var v_bicim: Variant = null
 	var v_len: Variant = null
 	var v_x0: Variant = null
@@ -297,6 +301,8 @@ func f_fryBar(p_x0: Variant = null, p_y0: Variant = null, p_L: Variant = null, p
 
 # art.js:3439
 func f_fryStick(p_x: Variant = null, p_y: Variant = null, p_sh: Variant = null, p_k: Variant = null, p_sz: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdPatates(p_x, p_y, p_sh, p_k, p_sz): return null
 	var v_L: Variant = null
 	var v_ton: Variant = null
 	var v_G: Variant = null

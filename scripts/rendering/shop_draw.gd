@@ -93,9 +93,11 @@ func f_drawShop(p_t: Variant = null) -> Variant:
 	var v_hy2: Variant = null
 	var v_hpz: Variant = null
 	var v_t: Variant = p_t
-	if (not J.truth(J.getv(game.j_SHOP, "bake"))):
-		game.shop_draw.f_bakeShop()
-	J.method(game.j_ctx, "drawImage", [J.getv(game.j_SHOP, "bake"), 0.0, 0.0])
+	# REMAKE kancasi
+	if not game.f_hdDukkanArka():
+		if (not J.truth(J.getv(game.j_SHOP, "bake"))):
+			game.shop_draw.f_bakeShop()
+		J.method(game.j_ctx, "drawImage", [J.getv(game.j_SHOP, "bake"), 0.0, 0.0])
 	if (((((((((not J.truth(J.getv(game.j_G, "dersGorulmus"))) and (not J.truth(J.getv(game.j_G, "ders")))) and J.le(J.getv(game.j_G, "day"), 2.0)) and (not J.truth(J.getv(game.j_CUSTOM, "open")))) and (not J.truth(J.getv(game.j_STATS, "open")))) and (not J.truth(J.getv(game.j_BSP, "open")))) and (not J.truth(J.getv(game.j_SESP, "open")))) and (not J.truth(J.getv(game.j_BRP, "open")))) and (not J.truth(J.getv(game.j_PAYP, "open")))):
 		J.setv(game.j_G, "ders", {"adim": 0.0, "t": 0.0, "verildi": false})
 	if J.truth(J.getv(game.j_CUSTOM, "open")):
@@ -171,9 +173,11 @@ func f_drawShop(p_t: Variant = null) -> Variant:
 		J.setv(game.j_ctx, "globalAlpha", 0.42)
 		game.f_rrect(J.add(v_kx, 2.0), J.add(v_ky, 3.0), v_kw, v_kh, 4.0, "#000")
 		J.setv(game.j_ctx, "globalAlpha", 1.0)
-		game.f_rrect(v_kx, v_ky, v_kw, v_kh, 4.0, "#1d1611")
-		game.f_rrect(v_kx, v_ky, v_kw, (v_kh - 2.0), 4.0, "#2b2119")
-		game.f_hl(J.add(v_kx, 4.0), J.add(v_ky, 1.0), (v_kw - 8.0), "#4a3a2c")
+		# REMAKE kancasi: HD koyu kart (pahli 9 dilim)
+		if not J.truth(game.f_hdKoyuKart(v_kx, v_ky, v_kw, v_kh)):
+			game.f_rrect(v_kx, v_ky, v_kw, v_kh, 4.0, "#1d1611")
+			game.f_rrect(v_kx, v_ky, v_kw, (v_kh - 2.0), 4.0, "#2b2119")
+			game.f_hl(J.add(v_kx, 4.0), J.add(v_ky, 1.0), (v_kw - 8.0), "#4a3a2c")
 		game.f_rrectOut(v_kx, v_ky, v_kw, v_kh, 4.0, (J.getv(game.j_P, "au2") if J.truth(v_kAlinir) else "#4a3f36"))
 		game.f_fr(v_kx, J.add(v_ky, 4.0), 3.0, (v_kh - 8.0), ("#3f8a4a" if J.truth(v_kTam) else ("#6a5a4a" if J.truth(v_kKilit) else (J.getv(game.j_P, "au0") if J.truth(v_kAlinir) else "#7a4a4a"))))
 		game.text_draw.f_txt(game.localization.f_T(J.getv(v_kartU, "name")), J.add(v_kx, 10.0), J.add(v_ky, 7.0), J.getv(game.j_P, "au0"))

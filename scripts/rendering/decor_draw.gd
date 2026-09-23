@@ -26,6 +26,8 @@ func f_drawTabela(p_sx: Variant = null, p_sy: Variant = null, p_t: Variant = nul
 	var v_sx: Variant = p_sx
 	var v_sy: Variant = p_sy
 	var v_t: Variant = p_t
+	# REMAKE kancasi
+	if game.f_hdTabela(p_sx, p_sy, p_t): return null
 	v_name = game.decor_draw.f_tabelaAd()
 	v_sub = game.decor_draw.f_tabelaAlt()
 	v_sw = game.decor_draw.f_tabelaGen()
@@ -72,6 +74,8 @@ func f_drawPoster(p_kind: Variant = null, p_t: Variant = null, p_x: Variant = nu
 	var v_t: Variant = p_t
 	var v_x: Variant = p_x
 	var v_y: Variant = p_y
+	# REMAKE kancasi
+	if game.f_hdAfis(p_kind, p_x, p_y): return null
 	v_x = (106.0 if J.eq(v_x, null) else v_x)
 	v_y = (50.0 if J.eq(v_y, null) else v_y)
 	if J.eq(v_kind, 1.0):
@@ -195,16 +199,18 @@ func f_drawWallDecor(p_t: Variant = null) -> Variant:
 		v_sx = floor((J.add(J.getv(J.getv(game.j_LAY, "win"), "x"), (float(J.getv(J.getv(game.j_LAY, "win"), "w")) / float(2.0))) - (float(v_sw0) / float(2.0))) + 0.5)
 		game.decor_draw.f_drawTabela(v_sx, v_sy, v_t)
 	if J.gt(game.equipment_system.f_UV(game.j_G, "paint"), 0.0):
-		game.f_vl(120.0, 0.0, 14.0, "#3a2a1e")
-		game.f_rrect(112.0, 14.0, 17.0, 7.0, 2.0, "#c9a04a")
-		game.f_rrect(113.0, 14.0, 15.0, 5.0, 2.0, "#e8c46a")
-		J.setv(game.j_ctx, "globalAlpha", 0.13)
-		v_r = 0.0
-		while J.lt(v_r, 26.0):
-			game.f_fr(((120.0 - 3.0) - v_r), J.add(21.0, v_r), J.add(7.0, (v_r * 2.0)), 1.0, "#ffe9a0")
-			v_r = J.add(v_r, 1.0)
-		J.setv(game.j_ctx, "globalAlpha", 1.0)
-		game.f_disc(120.0, 21.0, 2.0, "#fff6c0")
+		# REMAKE kancasi
+		if not game.f_hdLamba():
+			game.f_vl(120.0, 0.0, 14.0, "#3a2a1e")
+			game.f_rrect(112.0, 14.0, 17.0, 7.0, 2.0, "#c9a04a")
+			game.f_rrect(113.0, 14.0, 15.0, 5.0, 2.0, "#e8c46a")
+			J.setv(game.j_ctx, "globalAlpha", 0.13)
+			v_r = 0.0
+			while J.lt(v_r, 26.0):
+				game.f_fr(((120.0 - 3.0) - v_r), J.add(21.0, v_r), J.add(7.0, (v_r * 2.0)), 1.0, "#ffe9a0")
+				v_r = J.add(v_r, 1.0)
+			J.setv(game.j_ctx, "globalAlpha", 1.0)
+			game.f_disc(120.0, 21.0, 2.0, "#fff6c0")
 	game.f_drawPoster(((J.getv(J.getv(game.j_G, "custom"), "poster") if J.truth(J.getv(game.j_G, "custom")) else J.getv(game.j_G, "custom")) if (J.truth(J.getv(game.j_G, "custom")) and J.truth(J.getv(J.getv(game.j_G, "custom"), "poster"))) else 0.0), v_t)
 	return null
 

@@ -320,6 +320,8 @@ func f_proFather(p_t: Variant = null, p_k: Variant = null) -> Variant:
 	var v_r: Variant = null
 	var v_t: Variant = p_t
 	var v_k: Variant = p_k
+	# REMAKE kancasi
+	if game.f_hdProFather(p_t, p_k): return null
 	game.story_canvas.f_proCiz("s2a", J.ref(game.story_father.f_pro2Arka, 0))
 	game.story_father.f_pro2Doner(v_t)
 	J.setv(game.j_ctx, "globalAlpha", J.add(0.88, (0.26 * sin((v_t * 1.7)))))

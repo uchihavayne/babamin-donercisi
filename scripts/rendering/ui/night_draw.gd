@@ -21,6 +21,8 @@ func f_drawThief(p_x: Variant = null, p_y: Variant = null, p_t: Variant = null, 
 	var v_t: Variant = p_t
 	var v_phase: Variant = p_phase
 	var v_running: Variant = p_running
+	# REMAKE kancasi
+	if game.f_hdHirsiz(p_x, p_y, p_t, p_phase, p_running): return null
 	v_sway = ((sin((v_t * 11.0)) * 1.2) if (J.eq(v_phase, 0.0) or J.truth(v_running)) else 0.0)
 	v_bob = (sin((v_t * 2.2)) * 0.8)
 	v_x = floor(J.add(v_x, v_sway) + 0.5)
@@ -165,9 +167,11 @@ func f_drawNight(p_t: Variant = null) -> Variant:
 		v_al = J.gt(sin((v_t * 14.0)), 0.0)
 		v_ax = 108.0
 		v_ay = 38.0
-		game.f_fr(v_ax, v_ay, 12.0, 7.0, "#2f3740")
-		game.f_fr(J.add(v_ax, 1.0), J.add(v_ay, 1.0), 10.0, 5.0, "#454b52")
-		game.f_ell(J.add(v_ax, 6.0), v_ay, 6.0, 4.0, ("#ff3a2a" if J.truth(v_al) else "#6a2018"))
+		# REMAKE kancasi
+		if not game.f_hdAlarm(v_ax, v_ay, v_al):
+			game.f_fr(v_ax, v_ay, 12.0, 7.0, "#2f3740")
+			game.f_fr(J.add(v_ax, 1.0), J.add(v_ay, 1.0), 10.0, 5.0, "#454b52")
+			game.f_ell(J.add(v_ax, 6.0), v_ay, 6.0, 4.0, ("#ff3a2a" if J.truth(v_al) else "#6a2018"))
 		if J.truth(v_al):
 			J.setv(game.j_ctx, "globalAlpha", 0.18)
 			game.f_disc(J.add(v_ax, 6.0), v_ay, 20.0, "#ff3a2a")
@@ -178,10 +182,12 @@ func f_drawNight(p_t: Variant = null) -> Variant:
 	if J.ge(v_sec, 1.0):
 		v_lx = (float(game.j_W) / float(2.0))
 		v_ly = 112.0
-		game.f_fr((v_lx - 4.0), v_ly, 9.0, 7.0, "#8a929b")
-		game.f_fr((v_lx - 3.0), J.add(v_ly, 1.0), 7.0, 5.0, "#c7ced5")
-		game.f_rc((v_lx - 3.0), (v_ly - 4.0), 7.0, 5.0, "#8a929b")
-		game.f_px(v_lx, J.add(v_ly, 3.0), "#5a636b")
+		# REMAKE kancasi
+		if not game.f_hdKilit(v_lx, v_ly):
+			game.f_fr((v_lx - 4.0), v_ly, 9.0, 7.0, "#8a929b")
+			game.f_fr((v_lx - 3.0), J.add(v_ly, 1.0), 7.0, 5.0, "#c7ced5")
+			game.f_rc((v_lx - 3.0), (v_ly - 4.0), 7.0, 5.0, "#8a929b")
+			game.f_px(v_lx, J.add(v_ly, 3.0), "#5a636b")
 	v_ph = J.getv(v_N, "phase")
 	if (J.eq(v_ph, 0.0) and J.gt(J.getv(v_N, "t"), 1.7)):
 		J.setv(v_N, "phase", 1.0)
@@ -212,13 +218,15 @@ func f_drawNight(p_t: Variant = null) -> Variant:
 			v_k2 = game.math_utils.f_clamp((float((J.getv(v_N, "t") - 3.4)) / float(1.5)), 0.0, 1.0)
 			v_tx = (game.math_utils.f_lerp(236.0, J.add(game.j_W, 46.0), v_k2) if J.truth(J.getv(v_N, "stole")) else game.math_utils.f_lerp(236.0, (-J.n(46.0)), v_k2))
 	if J.lt(J.getv(v_N, "phase"), 2.0):
-		J.setv(game.j_ctx, "globalAlpha", J.add(0.1, (0.04 * sin((v_t * 9.0)))))
-		v_fb = 0.0
-		while J.lt(v_fb, 30.0):
-			game.f_fr(J.add(J.add(v_tx, 8.0), v_fb), J.add((v_TY - 22.0), floor((v_fb * 0.5) + 0.5)), J.add(3.0, v_fb), 1.0, "#ffe9a0")
-			v_fb = J.add(v_fb, 1.0)
-		J.setv(game.j_ctx, "globalAlpha", 1.0)
-		game.f_px(J.add(v_tx, 8.0), (v_TY - 20.0), "#fff6c8")
+		# REMAKE kancasi
+		if not game.f_hdFener(v_tx, v_TY, v_t):
+			J.setv(game.j_ctx, "globalAlpha", J.add(0.1, (0.04 * sin((v_t * 9.0)))))
+			v_fb = 0.0
+			while J.lt(v_fb, 30.0):
+				game.f_fr(J.add(J.add(v_tx, 8.0), v_fb), J.add((v_TY - 22.0), floor((v_fb * 0.5) + 0.5)), J.add(3.0, v_fb), 1.0, "#ffe9a0")
+				v_fb = J.add(v_fb, 1.0)
+			J.setv(game.j_ctx, "globalAlpha", 1.0)
+			game.f_px(J.add(v_tx, 8.0), (v_TY - 20.0), "#fff6c8")
 	game.night_draw.f_drawThief(v_tx, v_TY, v_t, J.getv(v_N, "phase"), J.eq(J.getv(v_N, "phase"), 2.0))
 	if ((J.eq(J.getv(v_N, "phase"), 2.0) and J.truth(J.getv(v_N, "stole"))) and J.truth(game.f_chance(0.35))):
 		game.effects.f_part({"x": v_tx, "y": (v_TY - 20.0), "vx": game.math_utils.f_rnd((-J.n(24.0)), 24.0), "vy": game.math_utils.f_rnd((-J.n(44.0)), (-J.n(14.0))), "life": 0.9, "col": J.getv(game.j_P, "au0"), "g": 90.0, "sz": 2.0})

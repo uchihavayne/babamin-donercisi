@@ -124,9 +124,11 @@ func f_lockedStation(p_s: Variant = null, p_label: Variant = null, p_t: Variant 
 	J.setv(game.j_ctx, "globalAlpha", 1.0)
 	v_cx = J.add(J.getv(v_s, "x"), (float(J.getv(v_s, "w")) / float(2.0)))
 	v_cy = J.add(J.getv(v_s, "y"), (float(J.getv(v_s, "h")) / float(2.0)))
-	game.f_fr((v_cx - 4.0), (v_cy - 1.0), 9.0, 7.0, "#8a929b")
-	game.f_fr((v_cx - 3.0), v_cy, 7.0, 5.0, "#b6bec6")
-	game.f_rc((v_cx - 3.0), (v_cy - 5.0), 7.0, 5.0, "#8a929b")
+	# REMAKE kancasi
+	if not game.f_hdKilitIkon(v_cx, v_cy):
+		game.f_fr((v_cx - 4.0), (v_cy - 1.0), 9.0, 7.0, "#8a929b")
+		game.f_fr((v_cx - 3.0), v_cy, 7.0, 5.0, "#b6bec6")
+		game.f_rc((v_cx - 3.0), (v_cy - 5.0), 7.0, 5.0, "#8a929b")
 	game.text_draw.f_txt(v_label, v_cx, J.add(v_cy, 9.0), "rgba(255,255,255,.5)", {"align": "c"})
 	return null
 

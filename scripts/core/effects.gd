@@ -155,6 +155,8 @@ func f_psDraw() -> Variant:
 	var v_p: Variant = null
 	var v_k: Variant = null
 	var v_r: Variant = null
+	# REMAKE kancasi: HD parcaciklar (yumusak duman, keskin parilti, yarim piksel)
+	if J.truth(game.f_hdPsDraw(game.j_PS)): return null
 	v_i = 0.0
 	while J.lt(v_i, J.getv(game.j_PS, "length")):
 		v_p = J.getv(game.j_PS, v_i)

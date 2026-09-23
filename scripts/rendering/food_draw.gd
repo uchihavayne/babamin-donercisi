@@ -3,6 +3,8 @@ extends "res://scripts/core/game_module.gd"
 
 # food.js:632
 func f_drawFriesCup(p_cx: Variant = null, p_cy: Variant = null, p_q: Variant = null, p_t: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdPatatesKutusu(p_cx, p_cy, p_q, p_t): return null
 	var v_bos: Variant = null
 	var v_koyuUc: Variant = null
 	var v_govdeler: Variant = null
@@ -121,6 +123,8 @@ func f_drawFriesCup(p_cx: Variant = null, p_cy: Variant = null, p_q: Variant = n
 
 # food.js:717
 func f_drawSweetPlate(p_cx: Variant = null, p_cy: Variant = null, p_t: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdTatliTabagi(p_cx, p_cy, p_t): return null
 	var v_i: Variant = null
 	var v_rx: Variant = null
 	var v_ry: Variant = null
@@ -144,6 +148,8 @@ func f_drawSweetPlate(p_cx: Variant = null, p_cy: Variant = null, p_t: Variant =
 
 # food.js:730
 func f_drawCup(p_cx: Variant = null, p_cy: Variant = null, p_kind: Variant = null, p_fill: Variant = null, p_t: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdKupa(p_cx, p_cy, p_kind, p_fill, p_t): return null
 	var v_col0: Variant = null
 	var v_col1: Variant = null
 	var v_y: Variant = null
@@ -259,6 +265,8 @@ func f_drawCursor(p_x: Variant = null, p_y: Variant = null, p_mode: Variant = nu
 		J.setv(game.j_ctx, "globalAlpha", 1.0)
 		if ((J.eq(J.getv(v_held, "kind"), "wrap") and not J.eq(J.getv(v_held, "state"), "open")) and J.eq(J.kind(J.ref(game.legacy_order_draw.f_wrapEtiket, 4)), "function")):
 			game.legacy_order_draw.f_wrapEtiket(J.add(v_x, 2.0), J.add(v_y, 28.0), v_held, false)
+	# REMAKE kancasi
+	if game.f_hdImlec(v_x, v_y, v_mode): return null
 	if J.eq(v_mode, "knife"):
 		game.f_fr((v_x - 1.0), (v_y - 2.0), 3.0, 14.0, "#2b2018")
 		game.f_fr(v_x, (v_y - 1.0), 2.0, 12.0, "#e8eef4")

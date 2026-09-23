@@ -3,6 +3,10 @@ extends "res://scripts/core/game_module.gd"
 
 # food.js:785
 func f_icon(p_id: Variant = null, p_x: Variant = null, p_y: Variant = null, p_t: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdIkon(p_id, p_x, p_y): return null
+	# REMAKE kancasi (onbellek)
+	if game.f_ikonOnbellek(p_id, p_x, p_y, p_t): return null
 	var v_pi: Variant = null
 	var v_pj: Variant = null
 	var v_ay: Variant = null
@@ -252,6 +256,8 @@ func f_drawStar(p_cx: Variant = null, p_cy: Variant = null, p_r: Variant = null,
 
 # food.js:980
 func f_drawHeart(p_cx: Variant = null, p_cy: Variant = null, p_sc: Variant = null, p_col: Variant = null) -> Variant:
+	# REMAKE kancasi (hiz)
+	if game.f_kalpHizli(p_cx, p_cy, p_sc, p_col): return null
 	var v_pat: Variant = null
 	var v_y: Variant = null
 	var v_x: Variant = null
@@ -277,6 +283,8 @@ func f_drawX(p_cx: Variant = null, p_cy: Variant = null, p_col: Variant = null) 
 	var v_cx: Variant = p_cx
 	var v_cy: Variant = p_cy
 	var v_col: Variant = p_col
+	# REMAKE kancasi: HD carpi ikonu
+	if J.truth(game.f_hdCarpi(v_cx, v_cy, v_col)): return null
 	v_i = (-J.n(2.0))
 	while J.le(v_i, 2.0):
 		game.f_px(J.add(v_cx, v_i), J.add(v_cy, v_i), v_col)
@@ -293,6 +301,8 @@ func f_drawCheck(p_cx: Variant = null, p_cy: Variant = null, p_col: Variant = nu
 	var v_cx: Variant = p_cx
 	var v_cy: Variant = p_cy
 	var v_col: Variant = p_col
+	# REMAKE kancasi: HD tik ikonu
+	if J.truth(game.f_hdOnay(v_cx, v_cy, v_col)): return null
 	game.f_px((v_cx - 3.0), v_cy, v_col)
 	game.f_px((v_cx - 2.0), J.add(v_cy, 1.0), v_col)
 	game.f_px((v_cx - 1.0), J.add(v_cy, 2.0), v_col)
@@ -315,6 +325,8 @@ func f_drawCoin(p_x: Variant = null, p_y: Variant = null, p_v: Variant = null, p
 	var v_v: Variant = p_v
 	var v_t: Variant = p_t
 	var v_ph: Variant = p_ph
+	# REMAKE kancasi: HD para (donen 3B parca)
+	if J.truth(game.f_hdPara(v_x, v_y, v_v, v_t, v_ph)): return null
 	v_sp = abs(sin(J.add((v_t * 3.0), (v_ph if J.truth(v_ph) else 0.0))))
 	v_rx = max(1.0, floor((5.0 * v_sp) + 0.5))
 	v_big = J.ge(v_v, 25.0)

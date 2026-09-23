@@ -4,6 +4,11 @@ const J = preload("res://scripts/js_compat.gd")
 const Canvas = preload("res://scripts/pixel_canvas.gd")
 const GPUCanvas = preload("res://scripts/gpu_canvas.gd")
 const Store = preload("res://scripts/save_store.gd")
+# REMAKE 2x HD piksel: oyun mantigi ve yerlesim 480x270, ekran 960x540.
+# Kodla cizilen her sey 2x2 pikselle cizilir; Blender'dan gelen 2x
+# gorseller kendi piksel yogunluklarinda (yarim mantik pikseli) oturur.
+# CPU tuvali (testler) 480x270 goruntuyu 2x buyuterek basar.
+const OLCEK := 2
 var screen_canvas = Canvas.new()
 var storage = Store.new()
 var clock_ms: float = 0.0
@@ -60,6 +65,7 @@ func advance(delta: float) -> void:
 			else: native_timers.erase(id)
 			J.invoke(timer.callback)
 	game.game_loop.f_frame(clock_ms)
+	if gpu_enabled: screen_canvas.end_frame()
 	update_audio_levels()
 	frame_count += 1
 	if not gpu_enabled:
@@ -68,7 +74,7 @@ func advance(delta: float) -> void:
 	last_frame_ms = (Time.get_ticks_usec() - began) / 1000.0
 
 func _draw() -> void:
-	if frame_texture: draw_texture_rect(frame_texture, Rect2(0, 0, 480, 270), false)
+	if frame_texture: draw_texture_rect(frame_texture, Rect2(0, 0, 480 * OLCEK, 270 * OLCEK), false)
 
 func _input(event: InputEvent) -> void:
 	if game == null: return

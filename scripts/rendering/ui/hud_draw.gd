@@ -64,20 +64,23 @@ func f_drawHUD(p_t: Variant = null) -> Variant:
 	v_cx = 6.0
 	v_cy = 3.0
 	if J.truth(v_kompakt):
-		J.setv(game.j_ctx, "globalAlpha", 0.3)
-		game.f_rrect(J.add(v_cx, 1.0), J.add(v_cy, 3.0), 30.0, 16.0, 3.0, "#000")
-		J.setv(game.j_ctx, "globalAlpha", 1.0)
-		game.f_rrect(v_cx, J.add(v_cy, 1.0), 30.0, 16.0, 3.0, "#f2ece0")
-		game.f_rrect(v_cx, J.add(v_cy, 1.0), 30.0, 6.0, 3.0, "#c0281c")
+		# REMAKE kancasi: HD takvim kutusu
+		if not J.truth(game.f_hdHudGun(v_cx, J.add(v_cy, 1.0), true)):
+			J.setv(game.j_ctx, "globalAlpha", 0.3)
+			game.f_rrect(J.add(v_cx, 1.0), J.add(v_cy, 3.0), 30.0, 16.0, 3.0, "#000")
+			J.setv(game.j_ctx, "globalAlpha", 1.0)
+			game.f_rrect(v_cx, J.add(v_cy, 1.0), 30.0, 16.0, 3.0, "#f2ece0")
+			game.f_rrect(v_cx, J.add(v_cy, 1.0), 30.0, 6.0, 3.0, "#c0281c")
 		game.text_draw.f_txt(J.add("", J.getv(game.j_G, "day")), J.add(v_cx, 15.0), J.add(v_cy, 8.0), J.getv(game.j_P, "ink"), {"align": "c"})
 		game.f_rrectOut(v_cx, J.add(v_cy, 1.0), 30.0, 16.0, 3.0, "#8a7a60")
 	else:
-		J.setv(game.j_ctx, "globalAlpha", 0.3)
-		game.f_rrect(J.add(v_cx, 1.0), J.add(v_cy, 2.0), 30.0, 26.0, 3.0, "#000")
-		J.setv(game.j_ctx, "globalAlpha", 1.0)
-		game.f_rrect(v_cx, v_cy, 30.0, 26.0, 3.0, "#f2ece0")
-		game.f_rrect(v_cx, v_cy, 30.0, 8.0, 3.0, "#c0281c")
-		game.f_rrect(J.add(v_cx, 1.0), J.add(v_cy, 1.0), 28.0, 6.0, 2.0, "#e2483a")
+		if not J.truth(game.f_hdHudGun(v_cx, v_cy, false)):
+			J.setv(game.j_ctx, "globalAlpha", 0.3)
+			game.f_rrect(J.add(v_cx, 1.0), J.add(v_cy, 2.0), 30.0, 26.0, 3.0, "#000")
+			J.setv(game.j_ctx, "globalAlpha", 1.0)
+			game.f_rrect(v_cx, v_cy, 30.0, 26.0, 3.0, "#f2ece0")
+			game.f_rrect(v_cx, v_cy, 30.0, 8.0, 3.0, "#c0281c")
+			game.f_rrect(J.add(v_cx, 1.0), J.add(v_cy, 1.0), 28.0, 6.0, 2.0, "#e2483a")
 		game.text_draw.f_txt("GÜN", J.add(v_cx, 15.0), J.add(v_cy, 1.0), J.getv(game.j_P, "white"), {"align": "c"})
 		game.text_draw.f_txt(J.add("", J.getv(game.j_G, "day")), J.add(v_cx, 15.0), J.add(v_cy, 12.0), J.getv(game.j_P, "ink"), {"align": "c"})
 		game.f_vl(J.add(v_cx, 6.0), (v_cy - 3.0), 4.0, "#8a8a90")
@@ -86,12 +89,14 @@ func f_drawHUD(p_t: Variant = null) -> Variant:
 	v_tx = 40.0
 	v_th = (16.0 if J.truth(v_kompakt) else 20.0)
 	v_ty0 = (J.add(v_cy, 1.0) if J.truth(v_kompakt) else v_cy)
-	J.setv(game.j_ctx, "globalAlpha", 0.3)
-	game.f_rrect(J.add(v_tx, 1.0), J.add(v_ty0, 2.0), 42.0, v_th, 3.0, "#000")
-	J.setv(game.j_ctx, "globalAlpha", 1.0)
-	game.f_rrect(v_tx, v_ty0, 42.0, v_th, 3.0, "#7a5230")
-	game.f_rrect(J.add(v_tx, 1.0), J.add(v_ty0, 1.0), 40.0, (v_th - 2.0), 3.0, "#9c6b3f")
-	game.f_rrect(J.add(v_tx, 3.0), J.add(v_ty0, 3.0), 36.0, (v_th - 6.0), 2.0, "#241a14")
+	# REMAKE kancasi: HD sure kasasi
+	if not J.truth(game.f_hdHudSure(v_tx, v_ty0, v_kompakt)):
+		J.setv(game.j_ctx, "globalAlpha", 0.3)
+		game.f_rrect(J.add(v_tx, 1.0), J.add(v_ty0, 2.0), 42.0, v_th, 3.0, "#000")
+		J.setv(game.j_ctx, "globalAlpha", 1.0)
+		game.f_rrect(v_tx, v_ty0, 42.0, v_th, 3.0, "#7a5230")
+		game.f_rrect(J.add(v_tx, 1.0), J.add(v_ty0, 1.0), 40.0, (v_th - 2.0), 3.0, "#9c6b3f")
+		game.f_rrect(J.add(v_tx, 3.0), J.add(v_ty0, 3.0), 36.0, (v_th - 6.0), 2.0, "#241a14")
 	v_tl = (J.getv(game.j_G, "timeLeft") if J.eq(J.getv(game.j_G, "scene"), "play") else 0.0)
 	v_low = (J.gt(v_tl, 0.0) if J.lt(v_tl, 20.0) else J.lt(v_tl, 20.0))
 	v_tcol = (("#ff5a3a" if J.gt(sin((v_t * 10.0)), 0.0) else "#a03020") if J.truth(v_low) else "#ff9a4a")
@@ -100,9 +105,11 @@ func f_drawHUD(p_t: Variant = null) -> Variant:
 		game.f_vl(J.add(v_tx, 8.0), (v_cy - 3.0), 4.0, "#8a8a90")
 		game.f_vl(J.add(v_tx, 33.0), (v_cy - 3.0), 4.0, "#8a8a90")
 	v_Wr = game.hud_draw.f_hudSagKenar()
-	game.f_rrect((v_Wr - 22.0), 4.0, 18.0, 16.0, 3.0, "rgba(30,20,16,.75)")
-	game.f_fr((v_Wr - 17.0), 8.0, 3.0, 8.0, J.getv(game.j_P, "ui0"))
-	game.f_fr((v_Wr - 12.0), 8.0, 3.0, 8.0, J.getv(game.j_P, "ui0"))
+	# REMAKE kancasi: HD mola dugmesi
+	if not J.truth(game.f_hdHudMola((v_Wr - 22.0), 4.0)):
+		game.f_rrect((v_Wr - 22.0), 4.0, 18.0, 16.0, 3.0, "rgba(30,20,16,.75)")
+		game.f_fr((v_Wr - 17.0), 8.0, 3.0, 8.0, J.getv(game.j_P, "ui0"))
+		game.f_fr((v_Wr - 12.0), 8.0, 3.0, 8.0, J.getv(game.j_P, "ui0"))
 	v_fk = (game.household_system.f_fkasaAcik() if J.eq(J.kind(J.ref(game.household_system.f_fkasaAcik, 0)), "function") else J.eq(J.kind(J.ref(game.household_system.f_fkasaAcik, 0)), "function"))
 	v_mval = ((J.getv(game.j_G, "fpara") if J.truth(J.getv(game.j_G, "fpara")) else 0.0) if J.truth(v_fk) else J.getv(game.j_G, "money"))
 	v_ms = J.add(("-" if J.lt(v_mval, 0.0) else ""), game.math_utils.f_fmtShort(abs(v_mval)))
@@ -113,8 +120,12 @@ func f_drawHUD(p_t: Variant = null) -> Variant:
 		J.setv(game.j_ctx, "globalAlpha", (v_mpop * 0.5))
 		game.f_rrect((v_mx - 2.0), 2.0, J.add(v_mw, 4.0), 20.0, 5.0, J.getv(game.j_P, "au0"))
 		J.setv(game.j_ctx, "globalAlpha", 1.0)
-	game.f_rrect(v_mx, 4.0, v_mw, 16.0, 4.0, "rgba(30,20,16,.78)")
-	game.f_rrectOut(v_mx, 4.0, v_mw, 16.0, 4.0, (J.getv(game.j_P, "au0") if J.gt(v_mpop, 0.0) else "rgba(255,220,140,.35)"))
+	# REMAKE kancasi: HD para plakasi
+	if not J.truth(game.f_hdHudPara(v_mx, 4.0, v_mw, 16.0)):
+		game.f_rrect(v_mx, 4.0, v_mw, 16.0, 4.0, "rgba(30,20,16,.78)")
+		game.f_rrectOut(v_mx, 4.0, v_mw, 16.0, 4.0, (J.getv(game.j_P, "au0") if J.gt(v_mpop, 0.0) else "rgba(255,220,140,.35)"))
+	elif J.gt(v_mpop, 0.0):
+		game.f_rrectOut(v_mx, 4.0, v_mw, 16.0, 4.0, J.getv(game.j_P, "au0"))
 	game.icon_draw.f_icon("coin", J.add(v_mx, 9.0), (12.0 - floor((v_mpop * 2.0) + 0.5)), v_t)
 	game.text_draw.f_txt(v_ms, (J.add(v_mx, v_mw) - 5.0), (8.0 - floor((v_mpop * 2.0) + 0.5)), ("#ff6a56" if J.lt(v_mval, 0.0) else J.getv(game.j_P, "au0")), {"align": "r", "mono": true})
 	if J.eq(J.getv(game.j_G, "weather"), "rain"):
@@ -123,14 +134,16 @@ func f_drawHUD(p_t: Variant = null) -> Variant:
 		J.setv(game.j_ctx, "globalAlpha", 0.85)
 		game.f_rrect((v_wx - 2.0), (v_wy - 2.0), 28.0, 14.0, 3.0, "rgba(30,40,60,.8)")
 		J.setv(game.j_ctx, "globalAlpha", 1.0)
-		game.f_ell(J.add(v_wx, 6.0), J.add(v_wy, 4.0), 5.0, 3.0, "#c6d4e2")
-		game.f_ell(J.add(v_wx, 10.0), J.add(v_wy, 3.0), 4.0, 3.0, "#e2ecf6")
-		v_ri = 0.0
-		while J.lt(v_ri, 3.0):
-			v_ry2 = J.add(J.add(v_wy, 6.0), fmod(J.n(J.add((v_t * 22.0), (v_ri * 4.0))), J.n(6.0)))
-			game.f_px(J.add(J.add(v_wx, 3.0), (v_ri * 4.0)), v_ry2, "#6b9ad8")
-			game.f_px(J.add(J.add(v_wx, 3.0), (v_ri * 4.0)), J.add(v_ry2, 1.0), "#8fb8e0")
-			v_ri = J.add(v_ri, 1.0)
+		# REMAKE kancasi: HD hava ikonu (Blender bulut/gunes, yarim piksel damla)
+		if not J.truth(game.f_hdHava("rain", v_wx, v_wy, v_t)):
+			game.f_ell(J.add(v_wx, 6.0), J.add(v_wy, 4.0), 5.0, 3.0, "#c6d4e2")
+			game.f_ell(J.add(v_wx, 10.0), J.add(v_wy, 3.0), 4.0, 3.0, "#e2ecf6")
+			v_ri = 0.0
+			while J.lt(v_ri, 3.0):
+				v_ry2 = J.add(J.add(v_wy, 6.0), fmod(J.n(J.add((v_t * 22.0), (v_ri * 4.0))), J.n(6.0)))
+				game.f_px(J.add(J.add(v_wx, 3.0), (v_ri * 4.0)), v_ry2, "#6b9ad8")
+				game.f_px(J.add(J.add(v_wx, 3.0), (v_ri * 4.0)), J.add(v_ry2, 1.0), "#8fb8e0")
+				v_ri = J.add(v_ri, 1.0)
 		game.text_draw.f_txt("YAĞMUR", J.add(v_wx, 28.0), J.add(v_wy, 1.0), "#8fb8e0")
 	else:
 		if J.eq(J.getv(game.j_G, "weather"), "kar"):
@@ -139,14 +152,16 @@ func f_drawHUD(p_t: Variant = null) -> Variant:
 			J.setv(game.j_ctx, "globalAlpha", 0.85)
 			game.f_rrect((v_kx - 2.0), (v_ky - 2.0), 28.0, 14.0, 3.0, "rgba(40,58,80,.8)")
 			J.setv(game.j_ctx, "globalAlpha", 1.0)
-			game.f_ell(J.add(v_kx, 6.0), J.add(v_ky, 4.0), 5.0, 3.0, "#dbe7f2")
-			game.f_ell(J.add(v_kx, 10.0), J.add(v_ky, 3.0), 4.0, 3.0, "#f4f9ff")
-			v_ki = 0.0
-			while J.lt(v_ki, 3.0):
-				v_ky2 = J.add(J.add(v_ky, 6.0), fmod(J.n(J.add((v_t * 12.0), (v_ki * 4.0))), J.n(6.0)))
-				game.f_px(J.add(J.add(v_kx, 3.0), (v_ki * 4.0)), v_ky2, "#ffffff")
-				game.f_px(J.add(J.add(v_kx, 4.0), (v_ki * 4.0)), J.add(v_ky2, 1.0), "#cfe2f4")
-				v_ki = J.add(v_ki, 1.0)
+			# REMAKE kancasi: HD hava ikonu (Blender bulut/gunes, yarim piksel damla)
+			if not J.truth(game.f_hdHava("kar", v_kx, v_ky, v_t)):
+				game.f_ell(J.add(v_kx, 6.0), J.add(v_ky, 4.0), 5.0, 3.0, "#dbe7f2")
+				game.f_ell(J.add(v_kx, 10.0), J.add(v_ky, 3.0), 4.0, 3.0, "#f4f9ff")
+				v_ki = 0.0
+				while J.lt(v_ki, 3.0):
+					v_ky2 = J.add(J.add(v_ky, 6.0), fmod(J.n(J.add((v_t * 12.0), (v_ki * 4.0))), J.n(6.0)))
+					game.f_px(J.add(J.add(v_kx, 3.0), (v_ki * 4.0)), v_ky2, "#ffffff")
+					game.f_px(J.add(J.add(v_kx, 4.0), (v_ki * 4.0)), J.add(v_ky2, 1.0), "#cfe2f4")
+					v_ki = J.add(v_ki, 1.0)
 			game.text_draw.f_txt("KAR", J.add(v_kx, 28.0), J.add(v_ky, 1.0), "#dbe7f2")
 		else:
 			if J.eq(J.getv(game.j_G, "weather"), "sicak"):
@@ -155,12 +170,14 @@ func f_drawHUD(p_t: Variant = null) -> Variant:
 				J.setv(game.j_ctx, "globalAlpha", 0.85)
 				game.f_rrect((v_sx4 - 2.0), (v_sy4 - 2.0), 28.0, 14.0, 3.0, "rgba(70,40,10,.8)")
 				J.setv(game.j_ctx, "globalAlpha", 1.0)
-				game.f_disc(J.add(v_sx4, 7.0), J.add(v_sy4, 5.0), 4.0, "#ffd257")
-				v_si4 = 0.0
-				while J.lt(v_si4, 8.0):
-					v_a4 = J.add((v_si4 * 0.785), (sin((v_t * 1.6)) * 0.12))
-					game.f_px(J.add(J.add(v_sx4, 7.0), floor((cos(v_a4) * 6.0) + 0.5)), J.add(J.add(v_sy4, 5.0), floor((sin(v_a4) * 6.0) + 0.5)), "#ffb23c")
-					v_si4 = J.add(v_si4, 1.0)
+				# REMAKE kancasi: HD hava ikonu (Blender bulut/gunes, yarim piksel damla)
+				if not J.truth(game.f_hdHava("sicak", v_sx4, v_sy4, v_t)):
+					game.f_disc(J.add(v_sx4, 7.0), J.add(v_sy4, 5.0), 4.0, "#ffd257")
+					v_si4 = 0.0
+					while J.lt(v_si4, 8.0):
+						v_a4 = J.add((v_si4 * 0.785), (sin((v_t * 1.6)) * 0.12))
+						game.f_px(J.add(J.add(v_sx4, 7.0), floor((cos(v_a4) * 6.0) + 0.5)), J.add(J.add(v_sy4, 5.0), floor((sin(v_a4) * 6.0) + 0.5)), "#ffb23c")
+						v_si4 = J.add(v_si4, 1.0)
 				game.text_draw.f_txt("SICAK", J.add(v_sx4, 28.0), J.add(v_sy4, 1.0), "#ffc86a")
 	if (J.eq(J.kind(J.ref(game.weather_system.f_macDalgada, 0)), "function") and J.truth(game.weather_system.f_macDalgada())):
 		v_mgw = J.add(game.f_textW(game.localization.f_T("MAÇ ÇIKIŞI")), 12.0)

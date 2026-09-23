@@ -316,6 +316,7 @@ func _ready() -> void:
 	if external_input: set_process_input(false)
 
 func _input(event: InputEvent) -> void:
+	if hd_tus(event): return
 	if controls != null and not suspended: controls.handle(event)
 
 func advance(delta: float) -> void:

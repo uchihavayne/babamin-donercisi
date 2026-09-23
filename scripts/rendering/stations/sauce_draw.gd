@@ -53,6 +53,8 @@ func f_drawSauceBottle(p_cx: Variant = null, p_taban: Variant = null, p_S: Varia
 
 # art.js:4967
 func f_drawSauceStation(p_x: Variant = null, p_y: Variant = null, p_w: Variant = null, p_h: Variant = null, p_on: Variant = null, p_isk: Variant = null, p_fx: Variant = null, p_t: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdSos(p_x, p_y, p_w, p_h, p_on, p_isk, p_fx, p_t): return null
 	var v_v: Variant = null
 	var v_i: Variant = null
 	var v_d: Variant = null

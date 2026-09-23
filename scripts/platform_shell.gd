@@ -2,6 +2,11 @@ extends Control
 
 const Game = preload("res://scripts/platform_game.gd")
 const GAME_SIZE := Vector2(480, 270)
+# REMAKE: oyun 2x HD cizilir (960x540 alt gorunum); pencereye keskin-bilinear
+# shader ile basilir, kesirli olceklerde de pikseller esit kalir. Girdi
+# koordinatlari yine 480x270 mantik biriminde.
+const HD_OLCEK := 2
+const KESKIN := preload("res://shaders/keskin_olcek.gdshader")
 var game: Node
 var game_viewport: SubViewport
 var surface: TextureRect
@@ -35,7 +40,7 @@ func _ready() -> void:
 	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	game_viewport = SubViewport.new()
 	game_viewport.name = "GameViewport"
-	game_viewport.size = Vector2i(GAME_SIZE)
+	game_viewport.size = Vector2i(GAME_SIZE) * HD_OLCEK
 	game_viewport.disable_3d = true
 	game_viewport.gui_disable_input = true
 	game_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
@@ -52,7 +57,11 @@ func _ready() -> void:
 	surface = TextureRect.new()
 	surface.name = "PixelSurface"
 	surface.texture = game_viewport.get_texture()
-	surface.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	surface.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	var keskin := ShaderMaterial.new()
+	keskin.shader = KESKIN
+	keskin.set_shader_parameter("kaynak", GAME_SIZE * HD_OLCEK)
+	surface.material = keskin
 	surface.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	surface.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(surface)

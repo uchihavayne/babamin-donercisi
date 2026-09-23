@@ -3,6 +3,8 @@ extends "res://scripts/core/game_module.gd"
 
 # art.js:3804
 func f_drawFryer(p_x: Variant = null, p_y: Variant = null, p_w: Variant = null, p_h: Variant = null, p_F: Variant = null, p_t: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdFritoz(p_x, p_y, p_w, p_h, p_F, p_t): return null
 	var v_bodyY: Variant = null
 	var v_panH: Variant = null
 	var v_vatX: Variant = null

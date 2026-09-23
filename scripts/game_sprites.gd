@@ -18,7 +18,8 @@ func f_chance(probability: Variant = null) -> Variant:
 	return super.f_chance(probability)
 
 func f_drawCustomer(customer: Variant = null, time: Variant = null) -> Variant:
-	if not sprites_enabled or J.truth(j_OZEL_ACIK) or float(j_ctx.globalAlpha) != 1.0:
+	# REMAKE: HD'de onbellek sprite yerine canli (HD kancali) cizim
+	if not sprites_enabled or hd_gpu() or J.truth(j_OZEL_ACIK) or float(j_ctx.globalAlpha) != 1.0:
 		return super.f_drawCustomer(customer,time)
 	var look: Dictionary = customer.look
 	appearance_system.f_yuzKimlik(look)
@@ -66,7 +67,7 @@ func f_drawCustomer(customer: Variant = null, time: Variant = null) -> Variant:
 
 func f_drawYogurtTray(x: Variant = null, y: Variant = null, w: Variant = null, h: Variant = null, n: Variant = null, maximum: Variant = null, time: Variant = null, fx: Variant = null) -> Variant:
 	# Time is unused by this original drawing; retain the exact stock and bounce values.
-	if not sprites_enabled or float(j_ctx.globalAlpha)!=1.0 or float(n)<=0: return super.f_drawYogurtTray(x,y,w,h,n,maximum,time,fx)
+	if not sprites_enabled or hd_gpu() or float(j_ctx.globalAlpha)!=1.0 or float(n)<=0: return super.f_drawYogurtTray(x,y,w,h,n,maximum,time,fx)
 	var level := clampf(float(n)/float(maximum),0,1)
 	var bump := int(floorf(sin(J.n(fx)*PI)*2+.5))
 	var key := str([w,h,level,bump])
@@ -87,7 +88,9 @@ func f_drawYogurtTray(x: Variant = null, y: Variant = null, w: Variant = null, h
 	return null
 
 func sprite(key: String, x: float, y: float) -> bool:
-	return sprites_enabled and float(j_ctx.globalAlpha) == 1.0 and sprite_library.draw(j_ctx, key, x, y)
+	# REMAKE: PNG sprite'lar prosedurel cizimin pisirilmis kopyasi; HD'de kancali
+	# prosedurel yol calissin (HD parca yoksa goruntu ayni)
+	return sprites_enabled and not hd_gpu() and float(j_ctx.globalAlpha) == 1.0 and sprite_library.draw(j_ctx, key, x, y)
 
 func f_trayBase(x: Variant = null, y: Variant = null, w: Variant = null, h: Variant = null) -> Variant:
 	if sprite("f_trayBase/%dx%d" % [w,h], x,y): return null
@@ -130,7 +133,7 @@ func f_drawFill(x: Variant = null, y: Variant = null, w: Variant = null, h: Vari
 	return super.f_drawFill(x,y,w,h,level,seed_value,item)
 
 func f_proKat(name: Variant = null, draw_callback: Variant = null) -> Variant:
-	if sprites_enabled:
+	if sprites_enabled and not hd_gpu():
 		var layer: Variant = sprite_library.get_sprite("story/"+str(name))
 		if layer != null: return layer
 	return super.f_proKat(name,draw_callback)
@@ -139,6 +142,8 @@ const SpitPixels = preload("res://scripts/spit_pixels.gd")
 var spit_pixels := SpitPixels.new()
 
 func f_drawSpit(p_sp: Variant = null, p_t: Variant = null) -> Variant:
+	# REMAKE: HD'de kancali modul surumu (koni shader'i satir dongusunu atlar)
+	if hd_gpu(): return spit_draw.f_drawSpit(p_sp, p_t)
 	var v_cx: float = 0.0
 	var v_top: float = 0.0
 	var v_bot: float = 0.0

@@ -3,6 +3,8 @@ extends "res://scripts/core/game_module.gd"
 
 # chars.js:894
 func f_drawAcc(p_hx: Variant = null, p_hy: Variant = null, p_hw: Variant = null, p_L: Variant = null, p_sh: Variant = null, p_hc: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdMusteriAks(p_hx, p_hy, p_hw, p_L, p_sh): return null
 	var v_cc: Variant = null
 	var v_k: Variant = null
 	var v_hx: Variant = p_hx
@@ -44,6 +46,8 @@ func f_drawAcc(p_hx: Variant = null, p_hy: Variant = null, p_hw: Variant = null,
 
 # chars.js:923
 func f_drawHair(p_hx: Variant = null, p_hy: Variant = null, p_hw: Variant = null, p_style: Variant = null, p_hc: Variant = null, p_s: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdMusteriSac(p_hx, p_hy, p_hw, p_style, p_hc): return null
 	var v_d: Variant = null
 	var v_l: Variant = null
 	var v_i: Variant = null
@@ -146,6 +150,8 @@ func f_drawHair(p_hx: Variant = null, p_hy: Variant = null, p_hw: Variant = null
 
 # chars.js:1473
 func f_drawKalipBas(p_id: Variant = null, p_hx: Variant = null, p_hy: Variant = null, p_hw: Variant = null, p_s: Variant = null, p_L: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdKalipBas(p_id, p_hx, p_hy, p_hw, p_s, p_L): return null
 	var v_R: Variant = null
 	var v_ana: Variant = null
 	var v_ac: Variant = null

@@ -84,6 +84,8 @@ func f_bakeCounter() -> Variant:
 
 # art.js:2507
 func f_drawCounter() -> Variant:
+	# REMAKE kancasi
+	if game.f_hdTezgahGovde(): return null
 	if (not J.truth(game.j_CLAYER)):
 		game.counter_draw.f_bakeCounter()
 	J.method(game.j_ctx, "drawImage", [game.j_CLAYER, 0.0, 0.0])
@@ -291,6 +293,8 @@ func f_copIcerik(p_x: Variant = null, p_y: Variant = null, p_w: Variant = null, 
 
 # art.js:5046
 func f_drawTrash(p_x: Variant = null, p_y: Variant = null, p_w: Variant = null, p_h: Variant = null, p_t: Variant = null, p_bosalt: Variant = null, p_dolu: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdCop(p_x, p_y, p_w, p_h, p_t, p_bosalt, p_dolu): return null
 	var v_d: Variant = null
 	var v_i: Variant = null
 	var v_sal: Variant = null

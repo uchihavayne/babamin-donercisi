@@ -373,6 +373,8 @@ func f_proShopDay(p_t: Variant = null, p_k: Variant = null) -> Variant:
 	var v_gh: Variant = null
 	var v_t: Variant = p_t
 	var v_k: Variant = p_k
+	# REMAKE kancasi
+	if game.f_hdProShopDay(p_t, p_k): return null
 	v_gx = 40.0
 	v_gy = 44.0
 	v_gw = 400.0

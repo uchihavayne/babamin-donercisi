@@ -117,6 +117,8 @@ func f_proDebt(p_t: Variant = null, p_k: Variant = null) -> Variant:
 	var v_f1: Variant = null
 	var v_t: Variant = p_t
 	var v_k: Variant = p_k
+	# REMAKE kancasi
+	if game.f_hdProDebt(p_t, p_k): return null
 	game.story_canvas.f_proCiz("s4a", J.ref(game.story_debt.f_pro4Arka, 0))
 	v_sal = (sin((v_t * 1.1)) * 2.0)
 	game.story_canvas.f_pb(J.add((-J.n(2.0)), (v_sal * 0.3)), 84.0, J.add(2.0, (v_sal * 0.3)), 96.0, "#1a1208")

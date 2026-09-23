@@ -77,6 +77,9 @@ func f_drawChef(p_x: Variant = null, p_y: Variant = null, p_st: Variant = null, 
 	v_bacakSerit = game.chef_draw._closure_80.bind({"350:KEN": _cells["KEN"], "350:GOV": _cells["GOV"], "350:ISK": _cells["ISK"], "350:GLG": _cells["GLG"]})
 	if J.truth(game.j_NOCHEF):
 		return null
+	# REMAKE kancasi: HD Dayi (Blender katmanlari) cizerse eski cizim atlanir
+	if game.f_dayiHD(v_x, v_y, v_st, v_t):
+		return null
 	v_bob = (sin((v_t * 1.7)) * 1.0)
 	v_breathe = (sin((v_t * 2.4)) * 0.7)
 	v_s = J.getv(game.j_SKINS, 0.0)

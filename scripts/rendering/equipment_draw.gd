@@ -47,6 +47,8 @@ func f_drawPotato(p_cx: Variant = null, p_cy: Variant = null, p_r: Variant = nul
 
 # art.js:4068
 func f_drawPotatoBin(p_x: Variant = null, p_y: Variant = null, p_w: Variant = null, p_h: Variant = null, p_t: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdPatatesDolap(p_x, p_y, p_w, p_h, p_t): return null
 	var v_oc: Variant = null
 	var v_eskiCtx: Variant = null
 	var v_x: Variant = p_x
@@ -155,6 +157,8 @@ func f_potBinPaint(p_x: Variant = null, p_y: Variant = null, p_w: Variant = null
 
 # art.js:4428
 func f_drawGrill(p_x: Variant = null, p_y: Variant = null, p_w: Variant = null, p_h: Variant = null, p_Gr: Variant = null, p_t: Variant = null, p_cap: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdIzgara(p_x, p_y, p_w, p_h, p_Gr, p_t, p_cap): return null
 	var v_gy0: Variant = null
 	var v_gy1: Variant = null
 	var v_ly: Variant = null
@@ -254,6 +258,8 @@ func f_drawGrill(p_x: Variant = null, p_y: Variant = null, p_w: Variant = null, 
 
 # art.js:4500
 func f_drawBreadStack(p_x: Variant = null, p_y: Variant = null, p_w: Variant = null, p_h: Variant = null, p_label: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdLavas(p_x, p_y, p_w, p_h, p_label): return null
 	var v_i: Variant = null
 	var v_yy: Variant = null
 	var v_s: Variant = null
@@ -282,6 +288,8 @@ func f_drawBreadStack(p_x: Variant = null, p_y: Variant = null, p_w: Variant = n
 
 # art.js:4514
 func f_drawPideStack(p_x: Variant = null, p_y: Variant = null, p_w: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdPide(p_x, p_y, p_w): return null
 	var v_cx: Variant = null
 	var v_i: Variant = null
 	var v_yy: Variant = null
@@ -308,6 +316,8 @@ func f_drawPideStack(p_x: Variant = null, p_y: Variant = null, p_w: Variant = nu
 
 # art.js:4851
 func f_drawCrate(p_x: Variant = null, p_y: Variant = null, p_w: Variant = null, p_h: Variant = null, p_open: Variant = null, p_t: Variant = null, p_acik: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdStok(p_x, p_y, p_w, p_h, p_open, p_t, p_acik): return null
 	var v_k: Variant = null
 	var v_kay: Variant = null
 	var v_i: Variant = null

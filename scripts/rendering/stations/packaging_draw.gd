@@ -3,6 +3,8 @@ extends "res://scripts/core/game_module.gd"
 
 # art.js:4532
 func f_drawPaperStation(p_x: Variant = null, p_y: Variant = null, p_w: Variant = null, p_h: Variant = null, p_level: Variant = null, p_busy: Variant = null, p_t: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdKagit(p_x, p_y, p_w, p_h, p_level, p_busy, p_t): return null
 	var v_rcx0: Variant = null
 	var v_ry0: Variant = null
 	var v_rw: Variant = null
@@ -152,6 +154,8 @@ func f_drawPaperStation(p_x: Variant = null, p_y: Variant = null, p_w: Variant =
 
 # art.js:4649
 func f_drawFboxStation(p_x: Variant = null, p_y: Variant = null, p_w: Variant = null, p_h: Variant = null, p_ready: Variant = null, p_t: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdKutu(p_x, p_y, p_w, p_h, p_ready, p_t): return null
 	var v_cx: Variant = null
 	var v_ry: Variant = null
 	var v_i: Variant = null
@@ -213,6 +217,8 @@ func f_drawFboxStation(p_x: Variant = null, p_y: Variant = null, p_w: Variant = 
 
 # art.js:4711
 func f_drawTepsiKasasi(p_x: Variant = null, p_y: Variant = null, p_w: Variant = null, p_h: Variant = null, p_bolmeler: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdKasa(p_x, p_y, p_w, p_h): return null
 	var v_i: Variant = null
 	var v_bx: Variant = null
 	var v_x: Variant = p_x
@@ -239,6 +245,8 @@ func f_drawTepsiKasasi(p_x: Variant = null, p_y: Variant = null, p_w: Variant = 
 
 # art.js:4726
 func f_drawTepsiCami(p_x: Variant = null, p_y: Variant = null, p_w: Variant = null, p_h: Variant = null, p_t: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdCam(p_x, p_y, p_w, p_h): return null
 	var v_g: Variant = null
 	var v_x: Variant = p_x
 	var v_y: Variant = p_y

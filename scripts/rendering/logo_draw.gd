@@ -82,12 +82,14 @@ func f_logoCiz(p_t: Variant = null, p_cx: Variant = null, p_y: Variant = null) -
 	J.setv(game.j_ctx, "imageSmoothingEnabled", false)
 	v_A = J.getv(v_V, "arka")
 	v_k = game.logo_draw.f_logoIsiticiKare(v_t)
-	J.method(game.j_ctx, "drawImage", [J.getv(J.getv(game.j_LOGO, "im"), "arka"), (v_k * J.getv(v_A, "kw")), 0.0, J.getv(v_A, "kw"), J.getv(v_A, "kh"), J.add(v_x, J.getv(v_A, "x")), J.add(v_y, J.getv(v_A, "y")), J.getv(v_A, "kw"), J.getv(v_A, "kh")])
+	# REMAKE kancasi: HD logo katmanlari (ciziliyorsa eski drawImage/parilti atlanir)
+	var _hd_logo: bool = game.f_hdLogo(v_t, p_cx, v_y, v_dil, v_u)
+	if not _hd_logo: J.method(game.j_ctx, "drawImage", [J.getv(J.getv(game.j_LOGO, "im"), "arka"), (v_k * J.getv(v_A, "kw")), 0.0, J.getv(v_A, "kw"), J.getv(v_A, "kh"), J.add(v_x, J.getv(v_A, "x")), J.add(v_y, J.getv(v_A, "y")), J.getv(v_A, "kw"), J.getv(v_A, "kh")])
 	v_S = J.getv(v_V, "sis")
 	v_f = fmod(J.n(floor((float((v_t * J.getv(v_S, "n"))) / float(J.getv(v_S, "turSn"))))), J.n(J.getv(v_S, "n")))
-	J.method(game.j_ctx, "drawImage", [J.getv(J.getv(game.j_LOGO, "im"), "sis"), (fmod(J.n(v_f), J.n(J.getv(v_S, "sut"))) * J.getv(v_S, "kw")), (floor((float(v_f) / float(J.getv(v_S, "sut")))) * J.getv(v_S, "kh")), J.getv(v_S, "kw"), J.getv(v_S, "kh"), J.add(v_x, J.getv(v_S, "x")), J.add(v_y, J.getv(v_S, "y")), J.getv(v_S, "kw"), J.getv(v_S, "kh")])
+	if not _hd_logo: J.method(game.j_ctx, "drawImage", [J.getv(J.getv(game.j_LOGO, "im"), "sis"), (fmod(J.n(v_f), J.n(J.getv(v_S, "sut"))) * J.getv(v_S, "kw")), (floor((float(v_f) / float(J.getv(v_S, "sut")))) * J.getv(v_S, "kh")), J.getv(v_S, "kw"), J.getv(v_S, "kh"), J.add(v_x, J.getv(v_S, "x")), J.add(v_y, J.getv(v_S, "y")), J.getv(v_S, "kw"), J.getv(v_S, "kh")])
 	v_O = J.getv(J.getv(v_V, "on"), v_dil)
-	J.method(game.j_ctx, "drawImage", [J.getv(J.getv(game.j_LOGO, "im"), J.add("on_", v_dil)), J.add(v_x, J.getv(v_O, "x")), J.add(v_y, J.getv(v_O, "y"))])
+	if not _hd_logo: J.method(game.j_ctx, "drawImage", [J.getv(J.getv(game.j_LOGO, "im"), J.add("on_", v_dil)), J.add(v_x, J.getv(v_O, "x")), J.add(v_y, J.getv(v_O, "y"))])
 	v_p = (-J.n(1.0))
 	if J.lt((v_t - J.getv(game.j_LOGO, "dilT")), game.j_LOGO_PARILTI):
 		v_p = (float((v_t - J.getv(game.j_LOGO, "dilT"))) / float(game.j_LOGO_PARILTI))
@@ -96,7 +98,7 @@ func f_logoCiz(p_t: Variant = null, p_cx: Variant = null, p_y: Variant = null) -
 			v_faz = fmod(J.n((v_u - 1.4)), J.n(game.j_LOGO_PARILTI_ARA))
 			if J.lt(v_faz, game.j_LOGO_PARILTI):
 				v_p = (float(v_faz) / float(game.j_LOGO_PARILTI))
-	if J.ge(v_p, 0.0):
+	if J.ge(v_p, 0.0) and not _hd_logo:
 		game.logo_draw.f_logoParilti(v_O, J.getv(J.getv(game.j_LOGO, "im"), J.add("maske_", v_dil)), J.add(v_x, J.getv(v_O, "x")), J.add(v_y, J.getv(v_O, "y")), v_p)
 	if (J.truth(game.logo_draw.f_logoYandi(v_t)) and J.eq(v_dy, 0.0)):
 		if J.truth(game.f_chance(0.07)):

@@ -23,6 +23,8 @@ func f_drawStreetProps(p_t: Variant = null, p_lampOn: Variant = null) -> Variant
 	var v_pwx: Variant = null
 	var v_t: Variant = p_t
 	var v_lampOn: Variant = p_lampOn
+	# REMAKE kancasi
+	if game.f_hdSokakEsya(p_t, p_lampOn): return null
 	v_M = game.street_background.f_stM()
 	v_gx = J.getv(v_M, "gx")
 	game.street_background.f_drawSokakAgaci(J.add(v_gx, 118.0), J.add(J.getv(v_M, "base"), 7.0), J.getv((game.city_system.f_sehirTema() if J.truth(game.city_system.f_sehirTema()) else {}), "agac"))
@@ -95,6 +97,8 @@ func f_drawNearProps(p_t: Variant = null) -> Variant:
 	var v_kx: Variant = null
 	var v_kk: Variant = null
 	var v_t: Variant = p_t
+	# REMAKE kancasi
+	if game.f_hdYakinEsya(): return null
 	v_M = game.street_background.f_stM()
 	v_gx = J.getv(v_M, "gx")
 	v_pby = (J.add(J.getv(J.getv(game.j_LAY, "glass"), "y"), J.getv(J.getv(game.j_LAY, "glass"), "h")) - 1.0)

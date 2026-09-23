@@ -18,53 +18,55 @@ func f_drawLider(p_t: Variant = null) -> Variant:
 		return null
 	v_x = floor(J.getv(v_L, "x") + 0.5)
 	v_y = J.getv(v_L, "y")
-	v_m = 0.0
-	while J.lt(v_m, 2.0):
-		v_mx = J.add(v_x, (26.0 if J.truth(v_m) else (-J.n(26.0))))
-		J.setv(game.j_ctx, "globalAlpha", 0.22)
-		game.f_ell(v_mx, v_y, 5.0, 2.0, "#000")
+	# REMAKE kancasi: HD lider ve korumalari
+	if not J.truth(game.f_hdLider(v_x, v_y)):
+		v_m = 0.0
+		while J.lt(v_m, 2.0):
+			v_mx = J.add(v_x, (26.0 if J.truth(v_m) else (-J.n(26.0))))
+			J.setv(game.j_ctx, "globalAlpha", 0.22)
+			game.f_ell(v_mx, v_y, 5.0, 2.0, "#000")
+			J.setv(game.j_ctx, "globalAlpha", 1.0)
+			game.f_fr((v_mx - 4.0), (v_y - 20.0), 8.0, 20.0, "#3a413a")
+			game.f_fr((v_mx - 4.0), (v_y - 20.0), 8.0, 1.0, "#4c544c")
+			game.f_fr((v_mx - 4.0), (v_y - 8.0), 8.0, 1.0, "#20241f")
+			game.f_fr((v_mx - 3.0), (v_y - 28.0), 6.0, 8.0, "#c99a66")
+			game.f_fr((v_mx - 2.0), (v_y - 25.0), 1.0, 1.0, "#14161a")
+			game.f_fr(J.add(v_mx, 1.0), (v_y - 25.0), 1.0, 1.0, "#14161a")
+			game.f_fr((v_mx - 4.0), (v_y - 31.0), 8.0, 3.0, "#39403a")
+			game.f_fr((v_mx - 3.0), (v_y - 32.0), 6.0, 1.0, "#39403a")
+			game.f_fr((v_mx - 4.0), (v_y - 28.0), 8.0, 1.0, "#20241f")
+			v_i = 0.0
+			while J.lt(v_i, 11.0):
+				game.f_px(J.add(v_mx, (5.0 if J.truth(v_m) else (-J.n(5.0)))), J.add((v_y - 26.0), v_i), "#2a2620")
+				v_i = J.add(v_i, 1.0)
+			v_m = J.add(v_m, 1.0)
+		J.setv(game.j_ctx, "globalAlpha", 0.28)
+		game.f_ell(v_x, v_y, 6.0, 2.0, "#000")
 		J.setv(game.j_ctx, "globalAlpha", 1.0)
-		game.f_fr((v_mx - 4.0), (v_y - 20.0), 8.0, 20.0, "#3a413a")
-		game.f_fr((v_mx - 4.0), (v_y - 20.0), 8.0, 1.0, "#4c544c")
-		game.f_fr((v_mx - 4.0), (v_y - 8.0), 8.0, 1.0, "#20241f")
-		game.f_fr((v_mx - 3.0), (v_y - 28.0), 6.0, 8.0, "#c99a66")
-		game.f_fr((v_mx - 2.0), (v_y - 25.0), 1.0, 1.0, "#14161a")
-		game.f_fr(J.add(v_mx, 1.0), (v_y - 25.0), 1.0, 1.0, "#14161a")
-		game.f_fr((v_mx - 4.0), (v_y - 31.0), 8.0, 3.0, "#39403a")
-		game.f_fr((v_mx - 3.0), (v_y - 32.0), 6.0, 1.0, "#39403a")
-		game.f_fr((v_mx - 4.0), (v_y - 28.0), 8.0, 1.0, "#20241f")
-		v_i = 0.0
-		while J.lt(v_i, 11.0):
-			game.f_px(J.add(v_mx, (5.0 if J.truth(v_m) else (-J.n(5.0)))), J.add((v_y - 26.0), v_i), "#2a2620")
-			v_i = J.add(v_i, 1.0)
-		v_m = J.add(v_m, 1.0)
-	J.setv(game.j_ctx, "globalAlpha", 0.28)
-	game.f_ell(v_x, v_y, 6.0, 2.0, "#000")
-	J.setv(game.j_ctx, "globalAlpha", 1.0)
-	game.f_fr((v_x - 6.0), (v_y - 24.0), 12.0, 24.0, "#22252b")
-	game.f_fr((v_x - 6.0), (v_y - 24.0), 12.0, 1.0, "#333740")
-	game.f_fr((v_x - 1.0), (v_y - 23.0), 1.0, 22.0, "#171a1f")
-	game.f_fr((v_x - 6.0), (v_y - 12.0), 12.0, 2.0, "#0e1013")
-	game.f_fr(J.add(v_x, 1.0), (v_y - 12.0), 3.0, 2.0, "#c9a23a")
-	game.f_fr((v_x - 6.0), (v_y - 24.0), 4.0, 2.0, "#c9a23a")
-	game.f_fr(J.add(v_x, 2.0), (v_y - 24.0), 4.0, 2.0, "#c9a23a")
-	game.f_fr((v_x - 4.0), (v_y - 20.0), 2.0, 2.0, "#c9a23a")
-	game.f_fr((v_x - 4.0), (v_y - 17.0), 2.0, 2.0, "#b83228")
-	game.f_fr((v_x - 1.0), (v_y - 20.0), 2.0, 2.0, "#c9a23a")
-	game.f_fr((v_x - 8.0), (v_y - 22.0), 2.0, 10.0, "#171a1f")
-	game.f_fr(J.add(v_x, 6.0), (v_y - 22.0), 2.0, 10.0, "#171a1f")
-	game.f_fr((v_x - 4.0), (v_y - 33.0), 8.0, 9.0, "#d6ab7c")
-	game.f_fr((v_x - 4.0), (v_y - 26.0), 8.0, 2.0, "#c39a6e")
-	game.f_fr((v_x - 2.0), (v_y - 30.0), 1.0, 1.0, "#14161a")
-	game.f_fr(J.add(v_x, 2.0), (v_y - 30.0), 1.0, 1.0, "#14161a")
-	game.f_fr((v_x - 1.0), (v_y - 27.0), 3.0, 1.0, "#8a5a4a")
-	game.f_fr((v_x - 2.0), (v_y - 28.0), 5.0, 1.0, "#3a2e24")
-	game.f_fr((v_x - 6.0), (v_y - 37.0), 12.0, 4.0, "#171a1f")
-	game.f_fr((v_x - 6.0), (v_y - 38.0), 12.0, 1.0, "#2a2e35")
-	game.f_fr((v_x - 6.0), (v_y - 33.0), 12.0, 1.0, "#8e1c14")
-	game.f_fr((v_x - 7.0), (v_y - 32.0), 14.0, 1.0, "#0b0d10")
-	game.f_px(v_x, (v_y - 36.0), "#e8dcb0")
-	game.f_fr((v_x - 1.0), (v_y - 35.0), 3.0, 1.0, "#c9a23a")
+		game.f_fr((v_x - 6.0), (v_y - 24.0), 12.0, 24.0, "#22252b")
+		game.f_fr((v_x - 6.0), (v_y - 24.0), 12.0, 1.0, "#333740")
+		game.f_fr((v_x - 1.0), (v_y - 23.0), 1.0, 22.0, "#171a1f")
+		game.f_fr((v_x - 6.0), (v_y - 12.0), 12.0, 2.0, "#0e1013")
+		game.f_fr(J.add(v_x, 1.0), (v_y - 12.0), 3.0, 2.0, "#c9a23a")
+		game.f_fr((v_x - 6.0), (v_y - 24.0), 4.0, 2.0, "#c9a23a")
+		game.f_fr(J.add(v_x, 2.0), (v_y - 24.0), 4.0, 2.0, "#c9a23a")
+		game.f_fr((v_x - 4.0), (v_y - 20.0), 2.0, 2.0, "#c9a23a")
+		game.f_fr((v_x - 4.0), (v_y - 17.0), 2.0, 2.0, "#b83228")
+		game.f_fr((v_x - 1.0), (v_y - 20.0), 2.0, 2.0, "#c9a23a")
+		game.f_fr((v_x - 8.0), (v_y - 22.0), 2.0, 10.0, "#171a1f")
+		game.f_fr(J.add(v_x, 6.0), (v_y - 22.0), 2.0, 10.0, "#171a1f")
+		game.f_fr((v_x - 4.0), (v_y - 33.0), 8.0, 9.0, "#d6ab7c")
+		game.f_fr((v_x - 4.0), (v_y - 26.0), 8.0, 2.0, "#c39a6e")
+		game.f_fr((v_x - 2.0), (v_y - 30.0), 1.0, 1.0, "#14161a")
+		game.f_fr(J.add(v_x, 2.0), (v_y - 30.0), 1.0, 1.0, "#14161a")
+		game.f_fr((v_x - 1.0), (v_y - 27.0), 3.0, 1.0, "#8a5a4a")
+		game.f_fr((v_x - 2.0), (v_y - 28.0), 5.0, 1.0, "#3a2e24")
+		game.f_fr((v_x - 6.0), (v_y - 37.0), 12.0, 4.0, "#171a1f")
+		game.f_fr((v_x - 6.0), (v_y - 38.0), 12.0, 1.0, "#2a2e35")
+		game.f_fr((v_x - 6.0), (v_y - 33.0), 12.0, 1.0, "#8e1c14")
+		game.f_fr((v_x - 7.0), (v_y - 32.0), 14.0, 1.0, "#0b0d10")
+		game.f_px(v_x, (v_y - 36.0), "#e8dcb0")
+		game.f_fr((v_x - 1.0), (v_y - 35.0), 3.0, 1.0, "#c9a23a")
 	if (J.eq(J.getv(v_L, "state"), "bekliyor") and J.truth(J.getv(v_L, "istek"))):
 		v_bx = (v_x - 18.0)
 		v_by = (v_y - 62.0)
@@ -90,6 +92,8 @@ func f_drawPhoneMuhurlu(p_t: Variant = null) -> Variant:
 	var v_hy: Variant = null
 	var v_k: Variant = null
 	var v_t: Variant = p_t
+	# REMAKE kancasi
+	if game.f_hdTelefonMuhur(): return null
 	v_s = J.getv(game.j_ST, "phone")
 	v_x = J.getv(v_s, "x")
 	v_y = J.getv(v_s, "y")
@@ -139,6 +143,8 @@ func f_drawDenetimLambasi(p_t: Variant = null) -> Variant:
 	var v_mr: Variant = null
 	var v_ic: Variant = null
 	var v_t: Variant = p_t
+	# REMAKE kancasi
+	if game.f_hdDenetimLambasi(p_t): return null
 	if (not J.truth(J.getv(game.j_G, "ferman"))):
 		return null
 	v_k = game.regulation_system.f_denetimLambaKutu()
@@ -328,13 +334,15 @@ func f_drawInspector(p_t: Variant = null) -> Variant:
 	game.f_drawCustomer(v_fake, v_t)
 	v_bx = J.add(floor(J.getv(v_I, "x") + 0.5), 14.0)
 	v_by = (J.getv(v_I, "y") - 30.0)
-	game.f_fr(v_bx, v_by, 12.0, 15.0, "#8a6a3a")
-	game.f_fr(J.add(v_bx, 1.0), J.add(v_by, 1.0), 10.0, 13.0, "#e8e2d0")
-	game.f_fr(J.add(v_bx, 3.0), (v_by - 2.0), 6.0, 3.0, "#9aa3ab")
-	v_i = 0.0
-	while J.lt(v_i, 4.0):
-		game.f_hl(J.add(v_bx, 2.0), J.add(J.add(v_by, 4.0), (v_i * 3.0)), 8.0, "#b9b2a0")
-		v_i = J.add(v_i, 1.0)
+	# REMAKE kancasi
+	if not game.f_hdPano(v_bx, v_by):
+		game.f_fr(v_bx, v_by, 12.0, 15.0, "#8a6a3a")
+		game.f_fr(J.add(v_bx, 1.0), J.add(v_by, 1.0), 10.0, 13.0, "#e8e2d0")
+		game.f_fr(J.add(v_bx, 3.0), (v_by - 2.0), 6.0, 3.0, "#9aa3ab")
+		v_i = 0.0
+		while J.lt(v_i, 4.0):
+			game.f_hl(J.add(v_bx, 2.0), J.add(J.add(v_by, 4.0), (v_i * 3.0)), 8.0, "#b9b2a0")
+			v_i = J.add(v_i, 1.0)
 	if J.eq(J.getv(v_I, "state"), "check"):
 		v_pen = (sin((v_t * 12.0)) * 2.0)
 		game.f_ln(J.add(J.add(v_bx, 8.0), v_pen), J.add(v_by, 4.0), J.add(J.add(v_bx, 11.0), v_pen), J.add(v_by, 9.0), "#2f3740")

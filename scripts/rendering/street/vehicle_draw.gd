@@ -39,6 +39,8 @@ func f_wheel(p_x: Variant = null, p_y: Variant = null, p_r: Variant = null, p_t:
 
 # art.js:1209
 func f_drawVehicle(p_x: Variant = null, p_y: Variant = null, p_sc: Variant = null, p_type: Variant = null, p_ci: Variant = null, p_dir: Variant = null, p_t: Variant = null, p_duruyor: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdArac(p_x, p_y, p_sc, p_type, p_ci, p_dir, p_t, p_duruyor): return null
 	var v_L: Variant = null
 	var v_C: Variant = null
 	var v_wr: Variant = null

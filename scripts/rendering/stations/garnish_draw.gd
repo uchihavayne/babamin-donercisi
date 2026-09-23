@@ -32,6 +32,8 @@ func f_drawBaklava(p_cx: Variant = null, p_cy: Variant = null) -> Variant:
 
 # art.js:4322
 func f_drawSweetTray(p_x: Variant = null, p_y: Variant = null, p_w: Variant = null, p_h: Variant = null, p_n: Variant = null, p_max: Variant = null, p_t: Variant = null, p_fx: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdTatli(p_x, p_y, p_w, p_h, p_n, p_max, p_t, p_fx): return null
 	var v_bump: Variant = null
 	var v_cnt: Variant = null
 	var v_i: Variant = null
@@ -72,6 +74,8 @@ func f_drawSweetTray(p_x: Variant = null, p_y: Variant = null, p_w: Variant = nu
 
 # art.js:4741
 func f_drawPepper(p_x: Variant = null, p_y: Variant = null, p_h: Variant = null, p_flip: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdBiber(p_x, p_y, p_h, p_flip): return null
 	var v_wMax: Variant = null
 	var v_q: Variant = null
 	var v_u: Variant = null
@@ -126,6 +130,8 @@ func f_drawPepper(p_x: Variant = null, p_y: Variant = null, p_h: Variant = null,
 
 # art.js:4778
 func f_drawTomatoSlice(p_x: Variant = null, p_y: Variant = null, p_r: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdDomates(p_x, p_y, p_r): return null
 	var v_ry2: Variant = null
 	var v_i: Variant = null
 	var v_a: Variant = null

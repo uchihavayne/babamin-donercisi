@@ -3,6 +3,8 @@ extends "res://scripts/core/game_module.gd"
 
 # chars.js:1217
 func f_drawKalipGovde(p_id: Variant = null, p_x: Variant = null, p_by: Variant = null, p_bw: Variant = null, p_sh: Variant = null, p_s: Variant = null, p_L: Variant = null) -> Variant:
+	# REMAKE kancasi
+	if game.f_hdKalipGovde(p_id, p_x, p_by, p_bw, p_sh, p_s, p_L): return null
 	var v_R: Variant = null
 	var v_ana: Variant = null
 	var v_koy: Variant = null
