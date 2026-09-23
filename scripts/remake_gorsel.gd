@@ -541,9 +541,15 @@ func f_hdTahta(golge: bool) -> bool:
 	var A := _tz()
 	if A.is_empty(): return false
 	var st: Dictionary = get("j_ST").board
-	if int(J.n(st.w)) != 94: return false
 	var X: float = J.n(st.x)
 	var Y: float = J.n(st.y)
+	# BIRLESIK: yeni tezgahin 150x48 tahtasi (kendi golgesiyle, tezgah2 atlasi)
+	if int(J.n(st.w)) == 150:
+		var B := atlas("tezgah2")
+		if B.is_empty() or not B.parca.has("tahta"): return false
+		hd_ciz(B, "tahta", X, Y)
+		return true
+	if int(J.n(st.w)) != 94: return false
 	if golge:
 		draw_context.globalAlpha = .3
 		f_rrect(X + 3, Y + 10, 90.0, 34.0, 3.0, "#000")

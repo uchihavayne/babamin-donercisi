@@ -5,7 +5,9 @@ func initialize_game() -> void:
 	# REMAKE: HTML surumu __DEV_BUILD'i test derlemesinde aciyordu (T ile test
 	# paneli, ekranda DEV dugmesi). Godot karsiligi: editorden / debug export'ta acik,
 	# release export'ta kapali.
-	game.j_window = {"__DEV_BUILD": OS.is_debug_build(), "__ERRS": []}
+	# Otomatik testlerde (--test) kapali: taban projenin piksel anlik
+	# goruntuleri DEV dugmesiz kaydedildi.
+	game.j_window = {"__DEV_BUILD": OS.is_debug_build() and not "--test" in OS.get_cmdline_user_args(), "__ERRS": []}
 	game.j_navigator = {"maxTouchPoints": 0}
 	game.j_localStorage = game.storage
 	# i18n.js
