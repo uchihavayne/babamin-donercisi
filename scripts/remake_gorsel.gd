@@ -18,6 +18,7 @@ var hd_acik := true:
 	set(v):
 		if hd_acik == v: return
 		hd_acik = v
+		if get("screen_canvas") is GpuCanvas: get("screen_canvas").olcek_hd = v
 		for ad in ["j_BG", "j_WINOVER", "j_STONEFG", "j_CLAYER"]:
 			set(ad, null)
 		var shop: Variant = get("j_SHOP")
@@ -1026,7 +1027,8 @@ func f_hdTezgahGovde() -> bool:
 # izgara .8/.62/.58): Blender parcasi her olcekte ayri render edildi, donusumun
 # olcegine en yakin varyant seciliyor (texture_hd konumu olcekliyor, boyutu
 # parcanin kendi piksel olcusu). Dolgu, tup animasyonu, isaretler kodda.
-const DURUM_OLCEK := [100, 80, 74, 62, 58]
+# 180/122/90: birlesik surumun yeni tahtasi (1/2/3 urun)
+const DURUM_OLCEK := [100, 80, 74, 62, 58, 180, 122, 90]
 func _durum_olcek(izinli: Array) -> int:
 	var sc := absf(float(draw_context.transform.x.x))
 	var en := -1
@@ -1040,11 +1042,38 @@ func _durum_olcek(izinli: Array) -> int:
 
 func f_hdLavasAcik(cx: Variant, cy: Variant) -> bool:
 	if not hd_olcekli("durum"): return false
-	var o := _durum_olcek([100, 74, 58])
+	var o := _durum_olcek([100, 74, 58, 180, 122, 90])
 	if o < 0: return false
 	var A := atlas("durum")
 	if A.is_empty(): return false
 	hd_ciz(A, "durum_acik_%d" % o, J.n(cx), J.n(cy))
+	return true
+
+# BIRLESIK: acik durumun malzeme katmanlari (sargi atlasi). Yerlesim yalniz
+# oran = sayi / 4'e bagli; 1..4 disi (kesirli / fazlasi) oran 1'de doyar.
+const SARGI_OLCEK := [180, 122, 90, 100]
+
+func f_hdSargiUst(tur: String, n: Variant, cx: Variant, cy: Variant) -> bool:
+	if not hd_olcekli("sargi"): return false
+	var o := _durum_olcek(SARGI_OLCEK)
+	if o < 0: return false
+	var oran := clampf(J.n(n) / 4.0, 0.0, 1.0)
+	var k := roundi(oran * 4.0)
+	if k < 1 or absf(oran * 4.0 - k) > .001: return false
+	var A := atlas("sargi")
+	var ad := "ust_%s_%d_%d" % [tur, k, o]
+	if A.is_empty() or not A.parca.has(ad): return false
+	hd_ciz(A, ad, J.n(cx), J.n(cy))
+	return true
+
+func f_hdSargiSos(tur: Variant, cx: Variant, cy: Variant) -> bool:
+	if not hd_olcekli("sargi"): return false
+	var o := _durum_olcek(SARGI_OLCEK)
+	if o < 0: return false
+	var A := atlas("sargi")
+	var ad := "ust_sos_%s_%d" % ["hot" if J.eq(tur, "hot") else "garlic", o]
+	if A.is_empty() or not A.parca.has(ad): return false
+	hd_ciz(A, ad, J.n(cx), J.n(cy))
 	return true
 
 func f_hdDurumGovde(cx: Variant, cy: Variant, kiz: Variant, yanik: Variant) -> bool:
@@ -1082,7 +1111,7 @@ func f_hdKagitOn(cx: Variant, cy: Variant, po: Variant, pt: Variant) -> bool:
 # Blender: blender/models/yiyecek_hd.py
 func f_hdTabak(cx: Variant, cy: Variant) -> bool:
 	if not hd_olcekli("tabak"): return false
-	var o := _durum_olcek([100, 85, 74, 58])
+	var o := _durum_olcek([100, 85, 74, 58, 180, 122, 90])
 	if o < 0: return false
 	var A := atlas("yiyecek")
 	if A.is_empty(): return false
@@ -3118,7 +3147,7 @@ func f_hdLogo(t: Variant, cx: Variant, y: Variant, dil: Variant, u: Variant) -> 
 # ---------------------------------------------------------------- iskender pide tahtasi
 # food.js drawPideBoard: dilimler (kesilmemis / kup) ve dograma bicagi
 # Blender parcasi (blender/models/pide_hd.py), 4 olcek (tahta ctx.scale icinde).
-const PIDE_OLCEK := [100, 85, 74, 58]
+const PIDE_OLCEK := [100, 85, 74, 58, 180, 122, 90]
 
 func f_hdPideDilimler(cx: Variant, cy: Variant, n: Variant) -> bool:
 	if not hd_olcekli("pide"): return false

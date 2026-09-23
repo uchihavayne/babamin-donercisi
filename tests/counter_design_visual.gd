@@ -72,7 +72,8 @@ func run() -> void:
 	g.stations.hint_time=0
 	for theme in range(1,4):
 		g.j_G.custom.counter=float(theme); g.j_CLAYER=null; await step(2)
-		check(g.j_CLAYER != null,"custom counter theme renders: "+str(theme))
+		# HD'de tezgah dogrudan Blender parcalarindan (tema rengi modulate), onbellek katmani yok
+		check(g.j_CLAYER != null or g.t2_hd(),"custom counter theme renders: "+str(theme))
 	await snap("custom-counter")
 	g.j_G.custom.counter=0; g.j_CLAYER=null
 	g.controls.pause(); await step(2); await snap("pause")

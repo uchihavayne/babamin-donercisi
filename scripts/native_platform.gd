@@ -33,6 +33,7 @@ func _ready() -> void:
 	if gpu_enabled:
 		screen_canvas = GPUCanvas.new()
 		screen_canvas.attach(get_canvas_item())
+		screen_canvas.olcek_hd = true   # remake: olcekli cizim HD izgarada
 	screen_canvas.width = 480
 	screen_canvas.height = 270
 	screen_canvas.ensure()

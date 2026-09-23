@@ -1,5 +1,9 @@
 {
 	"checks": 62,
-	"failures": [],
-	"renderer": "Apple M4"
+	"failures": [
+		"custom counter theme renders: 1",
+		"custom counter theme renders: 2",
+		"custom counter theme renders: 3"
+	],
+	"renderer": "NVIDIA GeForce RTX 5060"
 }

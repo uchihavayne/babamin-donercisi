@@ -115,7 +115,8 @@ func f_drawWrapOpen(p_cx: Variant = null, p_cy: Variant = null, p_wrap: Variant 
 	v_mn = (J.getv(v_wrap, "meat") if J.truth(J.getv(v_wrap, "meat")) else 0.0)
 	v_fn = (J.getv(v_wrap, "friesN") if J.truth(J.getv(v_wrap, "friesN")) else 0.0)
 	v_by = (v_cy - 3.0)
-	if J.gt(v_mn, 0.0):
+	# REMAKE kancalari: malzeme katmanlari HD (blender/models/sargi_hd.py, ayni hash yerlesimi)
+	if J.gt(v_mn, 0.0) and not game.f_hdSargiUst("et", v_mn, v_cx, v_cy):
 		v_mOran = game.math_utils.f_clamp((float(v_mn) / float(game.j_MEAT_NEED)), 0.0, 1.0)
 		v_chunks = max(5.0, floor(J.add(5.0, (v_mOran * 9.0)) + 0.5))
 		v_mGen = J.add(16.0, (v_mOran * 18.0))
@@ -137,7 +138,7 @@ func f_drawWrapOpen(p_cx: Variant = null, p_cy: Variant = null, p_wrap: Variant 
 				game.f_px((J.add(v_mx, v_mw) - 2.0), (v_my - 1.0), "#ffd291")
 			game.f_px(v_mx, v_my, "#9c5718")
 			v_m = J.add(v_m, 1.0)
-	if J.gt(v_fn, 0.0):
+	if J.gt(v_fn, 0.0) and not game.f_hdSargiUst("patates", v_fn, v_cx, v_cy):
 		v_fOran = game.math_utils.f_clamp((float(v_fn) / float(game.j_FRIES_NEED)), 0.0, 1.0)
 		v_fc = max(4.0, floor(J.add(4.0, (v_fOran * 7.0)) + 0.5))
 		v_fGen = J.add(16.0, (v_fOran * 18.0))
@@ -177,7 +178,7 @@ func f_drawWrapOpen(p_cx: Variant = null, p_cy: Variant = null, p_wrap: Variant 
 					v_q1 = J.add(v_q1, 1.0)
 			v_f = J.add(v_f, 1.0)
 	v_pkN = (J.getv(v_wrap, "pickleN") if J.truth(J.getv(v_wrap, "pickleN")) else 0.0)
-	if J.gt(v_pkN, 0.0):
+	if J.gt(v_pkN, 0.0) and not game.f_hdSargiUst("tursu", v_pkN, v_cx, v_cy):
 		v_pOran = game.math_utils.f_clamp((float(v_pkN) / float(game.j_PICKLE_NEED)), 0.0, 1.0)
 		v_pc = max(3.0, floor(J.add(3.0, (v_pOran * 5.0)) + 0.5))
 		v_pGen = J.add(14.0, (v_pOran * 16.0))
@@ -195,7 +196,7 @@ func f_drawWrapOpen(p_cx: Variant = null, p_cy: Variant = null, p_wrap: Variant 
 			game.f_px(J.add(v_kx, 1.0), v_ky, "#c4dc74")
 			v_k = J.add(v_k, 1.0)
 	v_ygN = (J.getv(v_wrap, "yogurtN") if J.truth(J.getv(v_wrap, "yogurtN")) else 0.0)
-	if J.gt(v_ygN, 0.0):
+	if J.gt(v_ygN, 0.0) and not game.f_hdSargiUst("yogurt", v_ygN, v_cx, v_cy):
 		v_yOran = game.math_utils.f_clamp((float(v_ygN) / float(game.j_YOGURT_NEED)), 0.0, 1.0)
 		v_yGen = floor(J.add(14.0, (v_yOran * 20.0)) + 0.5)
 		v_yKal = J.add(1.0, floor((v_yOran * 1.6) + 0.5))
@@ -216,7 +217,7 @@ func f_drawWrapOpen(p_cx: Variant = null, p_cy: Variant = null, p_wrap: Variant 
 			if J.eq(fmod(J.n(v_z1), J.n(5.0)), 2.0):
 				game.f_px(v_zx1, (v_zy1 - 1.0), "#ffffff")
 			v_z1 = J.add(v_z1, 1.0)
-	if J.truth(J.getv(v_wrap, "sauce")):
+	if J.truth(J.getv(v_wrap, "sauce")) and not game.f_hdSargiSos(J.getv(v_wrap, "sauce"), v_cx, v_cy):
 		v_sc0 = ("#b3241a" if J.eq(J.getv(v_wrap, "sauce"), "hot") else "#e6dfc8")
 		v_sc1 = ("#f04a34" if J.eq(J.getv(v_wrap, "sauce"), "hot") else "#fdfaf0")
 		v_z = 0.0

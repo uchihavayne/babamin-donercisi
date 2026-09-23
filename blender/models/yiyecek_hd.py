@@ -191,7 +191,7 @@ def tatli_tabagi():
     torna("serbet", [(8.8, 0.95), (0.3, 1.1)], 0, 5.0, 0, der * 0.72, cel("Serbet", ["#8a5a1a", "#a8701f", "#c98a2a", "#e0a848"], [0, .25, .5, .8]), K, seg=40, kapak=False)
 
 
-parca("tabak", (-22, -10, 44, 22), tabak, 0.5, [1.0, 0.85, 0.74, 0.58], cizgi="#7d858c", cizgi_alfa=110)
+parca("tabak", (-22, -10, 44, 22), tabak, 0.5, [1.0, 0.85, 0.74, 0.58, 1.8, 1.22, 0.9], cizgi="#7d858c", cizgi_alfa=110)
 parca("patates_kutusu_ok", (-12, -14, 24, 26), patates_kutusu(True), 0.3, cizgi="#4a0e0a", cizgi_alfa=130)
 parca("patates_kutusu_bos", (-12, -14, 24, 26), patates_kutusu(False), 0.3, cizgi="#4a0e0a", cizgi_alfa=130)
 parca("kupa_arka", (-8, -8, 16, 20), kupa_arka, 0.3)

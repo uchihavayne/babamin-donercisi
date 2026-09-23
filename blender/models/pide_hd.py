@@ -28,7 +28,7 @@ K = S.K
 ez = T.ez
 kutu = S.kutu
 PIDE_NEED, PIDE_KAL, PIDE_DER = 4, 5.2, 3.4
-OLCEK = (1.0, 0.85, 0.74, 0.58)
+OLCEK = (1.0, 0.85, 0.74, 0.58, 1.8, 1.22, 0.9)
 PARCALAR, KOKEN, OLCEKLER = {}, {}, {}
 
 

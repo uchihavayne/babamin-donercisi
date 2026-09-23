@@ -263,6 +263,54 @@ func bounds(r: Rect2) -> Rect2i:
 	bottom = mini(bottom, mini(int(height), clip_rect.end.y))
 	return Rect2i(left, top, maxi(0, right - left), maxi(0, bottom - top))
 
+# OLCEKLI HD (birlesik surum): ctx.scale icindeki prosedurel cizim (tahtadaki
+# durum 1.8/1.22/0.9, izgara, fis ikonlari) mantik pikseline yuvarlaninca
+# 1-2 piksel arasi duzensiz bloklar olusuyordu. Acikken olcekli dikdortgenin
+# her kenari AYRI ayri HD izgaraya (yarim piksel) yuvarlanir: bitisik
+# dikdortgenler arasinda bosluk/ust uste binme olmaz. Yalniz ekran tuvali
+# (remake_gorsel HD acikken); pisirme tuvalleri eski kurali korur.
+var olcek_hd := false
+
+func _olcekli_hd(x: float, y: float, w: float, h: float) -> bool:
+	var sx := transform.x.x
+	var sy := transform.y.y
+	var X0 := roundf((x * sx + transform.origin.x) * 2.0)
+	var X1 := roundf(((x + w) * sx + transform.origin.x) * 2.0)
+	var Y0 := roundf((y * sy + transform.origin.y) * 2.0)
+	var Y1 := roundf(((y + h) * sy + transform.origin.y) * 2.0)
+	if X1 < X0:
+		var t := X0
+		X0 = X1
+		X1 = t
+	if Y1 < Y0:
+		var t2 := Y0
+		Y0 = Y1
+		Y1 = t2
+	X0 = maxf(X0, maxf(0.0, clip_rect.position.x * 2.0))
+	Y0 = maxf(Y0, maxf(0.0, clip_rect.position.y * 2.0))
+	X1 = minf(X1, minf(float(width) * 2.0, clip_rect.end.x * 2.0))
+	Y1 = minf(Y1, minf(float(height) * 2.0, clip_rect.end.y * 2.0))
+	if X1 <= X0 or Y1 <= Y0: return true
+	var c := color
+	c.a *= clampf(float(globalAlpha), 0, 1)
+	if c.a <= 0: return true
+	var istenen: RID = sat_material if globalCompositeOperation == "saturation" else _varsayilan()
+	if istenen != item_mat: _segment(istenen)
+	var n := bp.size()
+	if n >= TOPLU_TAVAN:
+		_flush()
+		n = 0
+	var l := X0 * 0.5
+	var tt := Y0 * 0.5
+	var r := X1 * 0.5
+	var b := Y1 * 0.5
+	bp.append(Vector2(l, tt)); bp.append(Vector2(r, tt)); bp.append(Vector2(r, b)); bp.append(Vector2(l, b))
+	bc.append(c); bc.append(c); bc.append(c); bc.append(c)
+	bi.append(n); bi.append(n + 1); bi.append(n + 2); bi.append(n); bi.append(n + 2); bi.append(n + 3)
+	stat_rects += 1
+	if _kayitta: _kayit.append([0, l, tt, r, b, c, item_mat])
+	return true
+
 # ---------------------------------------------------------------- cizim
 func fillRect(x: Variant, y: Variant, w: Variant, h: Variant) -> Variant:
 	if absf(transform.x.y) > 0.001 or absf(transform.y.x) > 0.001:
@@ -270,6 +318,9 @@ func fillRect(x: Variant, y: Variant, w: Variant, h: Variant) -> Variant:
 		path = PackedVector2Array([transform * Vector2(x, y), transform * Vector2(x + w, y), transform * Vector2(x + w, y + h), transform * Vector2(x, y + h)])
 		fill()
 		path = old_path
+		return null
+	if olcek_hd and (absf(absf(transform.x.x) - 1.0) > 0.001 or absf(transform.y.y - 1.0) > 0.001):
+		_olcekli_hd(float(x), float(y), float(w), float(h))
 		return null
 	var r := bounds(Rect2(float(x), float(y), float(w), float(h)))
 	if r.size.x <= 0 or r.size.y <= 0: return null
