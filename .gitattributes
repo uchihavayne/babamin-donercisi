@@ -4,3 +4,4 @@
 *.mp3 binary
 *.m4a binary
 *.wav binary
+*.cmd text eol=crlf
