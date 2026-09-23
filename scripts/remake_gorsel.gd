@@ -128,7 +128,13 @@ static func en_yakin(dizi: Array, v: float) -> int:
 # biyik, agiz. Oyunda kullanilan modlar: idle, slice, happy.
 func f_dayiHD(x: Variant, y: Variant, st: Variant, t: Variant) -> bool:
 	if not hd_acik or not (draw_context is GpuCanvas): return false
-	var A := atlas("dayi")
+	# BIRLESIK: yeni tezgahta Dayi servis bolmesinde 0.82 olcekli ciziliyor;
+	# o olcekte ayrica render edilmis atlas (dayi_hd.py DAYI_OLCEK=0.82)
+	var sx: float = draw_context.transform.x.x
+	var A: Dictionary
+	if absf(sx - 1.0) < .001: A = atlas("dayi")
+	elif absf(sx - 0.82) < .001: A = atlas("dayi82")
+	else: return false
 	if A.is_empty(): return false
 	var tt: float = J.n(t)
 	var mod := str(J.getv(st, "mode"))
@@ -244,18 +250,28 @@ func _sis_damla(cx: float, top: float, h: float, kutle: float) -> void:
 # tonu (_etTon) renk carpani olarak veriliyor.
 const KUVETLER := [46, 34, 42]
 
-func f_hdKuvet(x: Variant, y: Variant, w: Variant, h: Variant) -> bool:
-	if not hd("kuvet") or int(J.n(w)) not in KUVETLER or int(J.n(h)) != 28: return false
+# tepsi parca adi: eski tezgah WxH28 -> "<on>_W"; yeni tezgah (counter_design)
+# 44x32 / 44x27 / 34x27 -> "<on>_WxH"; atlasta yoksa bos
+func _kuvet_ad(on: String, w: Variant, h: Variant) -> String:
+	var W := int(J.n(w))
+	var H := int(J.n(h))
+	if H == 28 and W in KUVETLER: return "%s_%d" % [on, W]
+	var ad := "%s_%dx%d" % [on, W, H]
 	var A := atlas("tepsi")
-	if A.is_empty(): return false
-	hd_ciz(A, "kuvet_%d" % int(J.n(w)), J.n(x), J.n(y))
+	return ad if not A.is_empty() and A.parca.has(ad) else ""
+
+func f_hdKuvet(x: Variant, y: Variant, w: Variant, h: Variant) -> bool:
+	if not hd("kuvet"): return false
+	var ad := _kuvet_ad("kuvet", w, h)
+	if ad == "": return false
+	hd_ciz(atlas("tepsi"), ad, J.n(x), J.n(y))
 	return true
 
 func f_hdKuvetGolge(x: Variant, y: Variant, w: Variant, h: Variant) -> bool:
-	if not hd("golge") or int(J.n(w)) not in KUVETLER or int(J.n(h)) != 28: return false
-	var A := atlas("tepsi")
-	if A.is_empty(): return false
-	hd_ciz(A, "golge_%d" % int(J.n(w)), J.n(x), J.n(y), 0.16)
+	if not hd("golge"): return false
+	var ad := _kuvet_ad("golge", w, h)
+	if ad == "": return false
+	hd_ciz(atlas("tepsi"), ad, J.n(x), J.n(y), 0.16)
 	return true
 
 func f_hdKasa(x: Variant, y: Variant, w: Variant, h: Variant) -> bool:
@@ -354,18 +370,22 @@ func f_hdBiber(x: Variant, y: Variant, h: Variant, flip: Variant) -> bool:
 	return true
 
 func f_hdYogurtTepsi(x: Variant, y: Variant, w: Variant, h: Variant, n: Variant, mx: Variant, t: Variant, fx: Variant) -> bool:
-	if not hd("yogurt") or int(J.n(w)) != 34: return false
+	if not hd("yogurt"): return false
+	# eski tezgah 34x28, yeni tezgah (counter_design) 44x32
+	var yeni := int(J.n(w)) == 44 and int(J.n(h)) == 32
+	if int(J.n(w)) != 34 and not yeni: return false
 	var A := atlas("tepsi")
 	if A.is_empty(): return false
 	var X: float = J.n(x)
 	var Y: float = J.n(y)
 	var f: float = J.n(fx)
-	hd_ciz(A, "kuvet_34", X, Y)
+	var ek := "_44x32" if yeni else "_34"
+	hd_ciz(A, "kuvet" + ek, X, Y)
 	if J.n(n) > 0:
 		var lvl := clampf(J.n(n) / maxf(1.0, J.n(mx)), 0.0, 1.0)
 		var bump := roundf(sin(f * PI) * 2.0)
-		hd_ciz(A, "yogurt_%d" % clampi(roundi(lvl * 8.0), 1, 8), X, Y - bump)
-	hd_ciz(A, "golge_34", X, Y, 0.16)
+		hd_ciz(A, ("yogurt_44x32_%d" if yeni else "yogurt_%d") % clampi(roundi(lvl * 8.0), 1, 8), X, Y - bump)
+	hd_ciz(A, "golge" + ek, X, Y, 0.16)
 	_c("f_trayFlash", x, y, w, h, f)           # game.gd alt sinifta; fx bos gelebilir (fx || 0)
 	return true
 
@@ -381,20 +401,22 @@ func _P() -> Dictionary:
 	return get("j_P")
 
 func f_hdLavas(x: Variant, y: Variant, w: Variant, h: Variant, label: Variant) -> bool:
-	if not hd("lavas") or int(J.n(w)) != 42: return false
+	# eski tezgah 42; yeni tezgah (counter_design) 44 -> ortalanir
+	if not hd("lavas") or int(J.n(w)) not in [42, 44]: return false
 	var A := atlas("istasyon")
 	if A.is_empty(): return false
-	hd_ciz(A, "lavas_yigin", J.n(x), J.n(y))
+	hd_ciz(A, "lavas_yigin", J.n(x) + (J.n(w) - 42.0) / 2.0, J.n(y))
 	if not (label is String and label == ""):
 		_c("f_txt", label if J.truth(label) else "LAVAŞ", J.n(x) + J.n(w) / 2.0, J.n(y) + 30.0,
 			"rgba(255,255,255,.55)", {"align": "c", "outline": "rgba(0,0,0,.4)"})
 	return true
 
 func f_hdPide(x: Variant, y: Variant, w: Variant) -> bool:
-	if not hd("pide") or int(J.n(w)) != 42: return false
+	# eski tezgah 42; yeni tezgah 48 -> ortalanir
+	if not hd("pide") or int(J.n(w)) not in [42, 48]: return false
 	var A := atlas("istasyon")
 	if A.is_empty(): return false
-	hd_ciz(A, "pide_yigin", J.n(x), J.n(y))
+	hd_ciz(A, "pide_yigin", J.n(x) + (J.n(w) - 42.0) / 2.0, J.n(y))
 	return true
 
 func f_hdPatatesDolap(x: Variant, y: Variant, w: Variant, h: Variant, t: Variant) -> bool:
@@ -718,7 +740,8 @@ func f_hdSos(x: Variant, y: Variant, w: Variant, h: Variant, on: Variant, isk: V
 	return true
 
 func f_hdKutu(x: Variant, y: Variant, w: Variant, h: Variant, ready: Variant, t: Variant) -> bool:
-	if not hd("kutu") or int(J.n(w)) != 38 or int(J.n(h)) != 46: return false
+	var yeni := int(J.n(w)) == 46 and int(J.n(h)) == 36
+	if not hd("kutu") or (not yeni and (int(J.n(w)) != 38 or int(J.n(h)) != 46)): return false
 	var A := _tz()
 	if A.is_empty(): return false
 	var X: float = J.n(x)
@@ -730,7 +753,12 @@ func f_hdKutu(x: Variant, y: Variant, w: Variant, h: Variant, ready: Variant, t:
 	draw_context.globalAlpha = .3
 	f_fr(X + 2, ry + 11, W - 4, 2.0, "#000")
 	draw_context.globalAlpha = 1.0
-	hd_ciz(A, "kutu_raf", X, Y)
+	if yeni:
+		var B := atlas("tezgah2")
+		if B.is_empty(): return false
+		hd_ciz(B, "kutu_raf_46", X, Y)
+	else:
+		hd_ciz(A, "kutu_raf", X, Y)
 	hd_ciz(A, "kutu_bos", X, Y, .74)
 	var n := mini(2, int(J.n(ready)))
 	for r in n:
@@ -1789,8 +1817,12 @@ func _lamba_tozu(lx: float, ly: float) -> void:
 
 func f_hdAfis(kind: Variant, x: Variant, y: Variant) -> bool:
 	var tur := int(J.n(kind))
-	if tur < 1 or tur > 3 or not hd("afis"): return false
-	var A := atlas("vitrin")
+	if tur < 1 or tur > 3: return false
+	# BIRLESIK: yeni tezgahta afis ctx.scale(0.64) icinde (atlas "afis64")
+	var A: Dictionary
+	if hd("afis"): A = atlas("vitrin")
+	elif hd_olcekli("afis") and absf(draw_context.transform.x.x - 0.64) < .001: A = atlas("afis64")
+	else: return false
 	if A.is_empty() or not A.parca.has("afis_%d" % tur): return false
 	var X := 106.0 if x == null else J.n(x)
 	var Y := 50.0 if y == null else J.n(y)
@@ -3396,6 +3428,35 @@ func f_hdBalon(bx: Variant, by: Variant, bw: Variant, bh: Variant, acil: Variant
 	ctx.globalAlpha = 1.0
 	hd_dilim9(A, "balon_acil" if ac else "balon", X, Y, W, H, 8.0)
 	hd_ciz(A, "kuyruk_acil" if ac else "kuyruk", floorf(J.n(tailX) + 0.5) - 5.0, Y + H - 2.0)
+	return true
+
+# BIRLESIK SURUM: yeni siparis balonu (rendering/order_draw.gd). Govde ayni 9
+# dilim HD balon; secili sipariste altin cerceve, acil (sabir < .3) kirmizi.
+func f_hdSiparisBalon(x: float, y: float, w: float, h: float, acil: bool, secili: bool, kuyruk_x: float) -> bool:
+	if not hd("balon"): return false
+	var A := atlas("arayuz")
+	if A.is_empty() or not A.parca.has("balon"): return false
+	var ctx: GpuCanvas = draw_context
+	var a0: float = float(ctx.globalAlpha)
+	ctx.globalAlpha = a0 * 0.32
+	f_rrect(x + 1.0, y + 2.0, w, h, 3.0, "#35271d")
+	ctx.globalAlpha = a0
+	hd_dilim9(A, "balon_acil" if acil else "balon", x, y, w, h, 8.0)
+	hd_ciz(A, "kuyruk_acil" if acil else "kuyruk", floorf(kuyruk_x + 0.5) - 5.0, y + h - 2.0)
+	if secili and not acil:
+		f_rrectOut(x, y, w, h, 3.0, "#e8b453")
+		ctx.globalAlpha = a0 * 0.35
+		f_rrectOut(x - 1.0, y - 1.0, w + 2.0, h + 2.0, 4.0, "#ffe7a0")
+		ctx.globalAlpha = a0
+	return true
+
+# yeni balonun malzeme cipi (ikon_hd.py cip): istenen krem, istemiyor pembe + capraz
+func f_hdCip(m: String, x: float, y: float, yasak: bool) -> bool:
+	if not hd("cip"): return false
+	var A := atlas("ikon")
+	var ad := "ikon_cip_%s%s" % [m, "_yok" if yasak else ""]
+	if A.is_empty() or not A.parca.has(ad): return false
+	hd_ciz(A, ad, x, y)
 	return true
 
 func f_hdHudGun(x: Variant, y: Variant, kompakt: Variant) -> bool:

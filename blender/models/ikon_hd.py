@@ -315,6 +315,54 @@ def yok(m):
     return fn
 
 
+def cip(m, yasak):
+    """BIRLESIK SURUM: yeni siparis balonunun (order_draw.order_badge) malzeme
+    cipi. Krem (istenen) / pembe (istemiyor) yuvarlak levha + malzeme; istemiyor
+    ise kirmizi capraz cizgi (sol alt -> sag ust). Capa: cipin merkezi (x, y);
+    levha ekranda x-7..x+7, y-6..y+7."""
+    def fn():
+        st = [0, .3, .6, .9]
+        zemin = ["#b09d78", "#d2c29e", "#e7dec3", "#f8f1de"] if not yasak else ["#c08e74", "#e0b397", "#f4d3bc", "#fde9dc"]
+        ob = L._egri("cip", [L.yuvarlak_dikdortgen(14, 13, 2.4)], 0.0, -0.5, 0.6, 1.2, 0.35)
+        L.meshle(ob, cel("Cip" + ("Y" if yasak else "N"), zemin, st))
+        if m == "pickle":
+            Mt = cel("TursuC", ["#2f5a14", "#4a7a22", "#6aa032", "#9ac85a"], st)
+            e = I.elipsoid("tursu", 0.0, 0.0, 4.2, 2.6, 1.2, 0.0, Mt, seg=16, ring=8)
+            e.location = (0.0, -0.5, 0.2)
+            for k in range(5):
+                a = k * 1.256
+                d = I.elipsoid("cekirdek", 0, 0, 0.4, 0.4, 0.2, 0, px.flat("TursuCC", "#e9dd8a"), seg=6, ring=4)
+                d.location = (math.cos(a) * 1.8, -1.7, 0.2 + math.sin(a) * 1.1)
+        elif m == "yogurt":
+            Mk = cel("YogKase", ["#46707f", "#5a8798", "#6f9aab", "#a8c8d4"], st)
+            e = I.elipsoid("kase", 0.0, 0.0, 4.4, 2.2, 1.3, 0.0, Mk, seg=18, ring=8)
+            e.location = (0.0, -0.4, -1.4)
+            My = cel("YogC", ["#c9c1ad", "#ece2c8", "#fff5de", "#ffffff"], st)
+            e = I.elipsoid("yog", 0.0, 0.0, 3.8, 1.5, 1.2, 0.0, My, seg=16, ring=8)
+            e.location = (0.0, -1.0, 0.3)
+            e = I.elipsoid("yog2", 0.0, 0.0, 1.8, 1.2, 0.9, 0.0, My, seg=12, ring=6)
+            e.location = (1.3, -1.5, 1.4)
+        elif m == "fries":
+            Mp = cel("PatC", ["#8a5518", "#c9852c", "#e8b44a", "#f4ce69"], [0, .3, .62, .9])
+            for k, (x, h, a) in enumerate(((-3.2, 7.6, -8), (0.0, 8.2, 0), (3.2, 7.4, 8))):
+                L.kutu("pat%d" % k, x - 0.8, x + 0.8, -4.2, -4.2 + h, -1.6, -0.2, Mp).rotation_euler = (0, math.radians(a), 0)
+        else:
+            Me = cel("EtC", ["#5a2f10", "#9c5427", "#c47a3c", "#e4a45b"], st)
+            for k in range(3):
+                ob = L.kutu("et%d" % k, -3.6, 3.6, -0.9, 0.9, -1.6, -0.3, Me)
+                ob.location = (-1.0 + k * 1.6, 0.0, 2.2 - k * 2.0)
+                ob.rotation_euler = (0, math.radians(-14), 0)
+        if yasak:
+            ob = L.kutu("cizgi", -6.2, 6.2, -0.75, 0.75, -2.8, -2.1, cel("CipCizgi", ["#7a1a14", "#b33028", "#d8483a", "#ff7a6a"], st))
+            ob.rotation_euler = (0, math.radians(-45), 0)
+    return fn
+
+
+for _m in ("pickle", "yogurt", "fries", "meat"):
+    parca("cip_%s" % _m, (-8, -7, 16, 15), cip(_m, False), cizgi="#6b5236", cizgi_alfa=110)
+    parca("cip_%s_yok" % _m, (-8, -7, 16, 15), cip(_m, True), cizgi="#6b3a26", cizgi_alfa=110)
+
+
 for _m in ("pickle", "yogurt", "fries"):
     parca("yok_%s" % _m, (-7, -7, 14, 14), yok(_m), cizgi="#4a0e0a", cizgi_alfa=120)
 

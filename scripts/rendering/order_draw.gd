@@ -34,6 +34,8 @@ func order_ingredient(ingredient: String, x: float, y: float) -> void:
 				game.f_hl(x-5+i*2, y-3+i*2, 6, "#e4a45b")
 
 func order_badge(ingredient: String, x: float, y: float, omitted: bool) -> void:
+	# REMAKE kancasi: HD malzeme cipi
+	if game.f_hdCip(ingredient, x, y, omitted): return
 	game.f_rrect(x-7, y-6, 14, 13, 2, "#f4d3bc" if omitted else "#e7dec3")
 	order_ingredient(ingredient, x, y)
 	if omitted:
@@ -47,11 +49,13 @@ func f_drawOrderBubble(customer: Variant = null, time: Variant = null) -> Varian
 	var border := "#b33028" if customer.patience < 0.3 else ("#e8b453" if selected else "#876c48")
 	game.j_ctx.save()
 	game.j_ctx.globalAlpha = minf(1, float(customer.bubble)*2)
-	game.f_rrect(r.position.x+1, r.position.y+2, r.size.x, r.size.y, 3, "#35271d")
-	game.f_rrect(r.position.x, r.position.y, r.size.x, r.size.y, 3, border)
-	game.f_rrect(r.position.x+1, r.position.y+1, r.size.x-2, r.size.y-2, 2, "#fff1cf")
-	game.f_fr(customer.x-2, r.end.y, 5, 2, border)
-	game.f_fr(customer.x-1, r.end.y+2, 3, 2, border)
+	# REMAKE kancasi: HD balon (9 dilim + kuyruk)
+	if not game.f_hdSiparisBalon(r.position.x, r.position.y, r.size.x, r.size.y, customer.patience < 0.3, selected, customer.x):
+		game.f_rrect(r.position.x+1, r.position.y+2, r.size.x, r.size.y, 3, "#35271d")
+		game.f_rrect(r.position.x, r.position.y, r.size.x, r.size.y, 3, border)
+		game.f_rrect(r.position.x+1, r.position.y+1, r.size.x-2, r.size.y-2, 2, "#fff1cf")
+		game.f_fr(customer.x-2, r.end.y, 5, 2, border)
+		game.f_fr(customer.x-1, r.end.y+2, 3, 2, border)
 	var step_x: float = 50.0 / max(1, customer.items.size())
 	for i in customer.items.size():
 		var x: float = r.position.x + 4 + step_x*(i+0.5)

@@ -347,7 +347,9 @@ def yogurt(w, h, seviye):
     ax0, ax1 = 4.0, w - 4.0
     zh = (h - 2 - 1) - (2 + 4)                   # F.on - F.zemin
     kaplama = 0.10 + 0.90 * lvl
-    on_y = 1.0 / K                                # on kenar dunya y
+    # on kenar: kuvet tabaninin on kenari (iy0 = 2/K + 1) biraz gerisi; eskiden
+    # 1/K idi ve dusuk seviyede yogurt tepsinin altindan tasiyordu
+    on_y = 2.0 / K + 1.5
     arka_y = on_y + (zh * kaplama) / K
     tepe = 0.6 + lvl * 3.2
     bm = bmesh.new()
@@ -377,6 +379,19 @@ def yogurt(w, h, seviye):
     for p in ob.data.polygons:
         if p.normal.z < 0:
             p.flip()
+    # BIRLESIK: kuvetin kendisi HOLDOUT olarak sahnede -> on duvarin ve flansin
+    # arkasinda kalan yogurt gorunmez (eskiden dusuk seviyede on kenardan tasiyordu)
+    kv = kuvet(w, h)
+    Mh = bpy.data.materials.new("KuvetHoldout")
+    Mh.use_nodes = True
+    nt = Mh.node_tree
+    for n in list(nt.nodes):
+        nt.nodes.remove(n)
+    hn = nt.nodes.new("ShaderNodeHoldout")
+    out = nt.nodes.new("ShaderNodeOutputMaterial")
+    nt.links.new(hn.outputs[0], out.inputs["Surface"])
+    kv.data.materials.clear()
+    kv.data.materials.append(Mh)
 
 
 # ---------------------------------------------------------------- uretim
@@ -392,6 +407,11 @@ def parca(ad, tuval, fn, cizgi=None):
 for W in (46, 34, 42):
     parca("kuvet_%d" % W, (-5, -6, W + 10, 28 + 13), lambda W=W: kuvet(W, 28))
     parca("golge_%d" % W, (-5, -6, W + 10, 28 + 13), lambda W=W: ic_golge(W, 28))
+# BIRLESIK SURUM: yeni tezgahin soguk rayindaki tepsiler (counter_design.gd)
+# 44x32 (et/tursu/yogurt/patates), 44x27 (garnitur), 34x27 (tatli)
+for W, H in ((44, 32), (44, 27), (34, 27)):
+    parca("kuvet_%dx%d" % (W, H), (-5, -6, W + 10, H + 13), lambda W=W, H=H: kuvet(W, H))
+    parca("golge_%dx%d" % (W, H), (-5, -6, W + 10, H + 13), lambda W=W, H=H: ic_golge(W, H))
 parca("kasa_102", (-6, -8, 114, 28 + 18), lambda: kasa(102, 28))
 parca("cam_102", (-4, -4, 110, 28 + 8), lambda: cam(102, 28))
 parca("garnitur_bolme", (-2, -2, 46, 32), lambda: garnitur_bolme(42, 28))
@@ -413,6 +433,7 @@ for b in (12, 13, 14):
     parca("biber_%d" % b, (-7, -b - 6, 14, b + 9), lambda b=b: biber(b), cizgi="#1c2f08")
 for s in range(1, 9):
     parca("yogurt_%d" % s, (-5, -6, 34 + 10, 28 + 13), lambda s=s: yogurt(34, 28, s))
+    parca("yogurt_44x32_%d" % s, (-5, -6, 44 + 10, 32 + 13), lambda s=s: yogurt(44, 32, s))
 
 
 def uret(ad):

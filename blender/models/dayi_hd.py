@@ -30,10 +30,19 @@ import pxcore as px
 import palette as pal
 import logo as L
 
-OUT = os.path.join(_HERE, "out", "dayi_hd")
 P = pal.P
 HD = 2
 TUVAL = (-12, -8, 74, 168)          # gx0, gy0, w, h (mantik pikseli)
+# BIRLESIK SURUM: yeni tezgahta Dayi servis bolmesinde ctx.scale(0.82) icinde
+# ciziliyor. DAYI_OLCEK=0.82 ile ayni katmanlar o olcekte render edilir
+# (atlas "dayi82"); tuval genisligi/yuksekligi olcekle tam sayi piksel olsun
+# diye 75x175 (x1.64 = 123x287).
+OLCEK = float(os.environ.get("DAYI_OLCEK", "1"))
+if abs(OLCEK - 1.0) > 1e-6:
+    OUT = os.path.join(_HERE, "out", "dayi%d_hd" % int(round(OLCEK * 100)))
+    TUVAL = (-12, -8, 75, 175)
+else:
+    OUT = os.path.join(_HERE, "out", "dayi_hd")
 
 # ---------------------------------------------------------------- renkler
 # chars.js'teki renkler koyudan acige; cel rampasi 4 kademe
@@ -60,7 +69,7 @@ def sahne():
     L._FONTLAR.clear()
     px.reset()
     gx0, gy0, w, h = TUVAL
-    px.setup(w * HD, h * HD)
+    px.setup(int(round(w * HD * OLCEK)), int(round(h * HD * OLCEK)))
     px.ortho_cam(gx0 + w / 2.0, -(gy0 + h / 2.0), w, h)
     px.world("#000000", 0.0)
     # isik: onden, ustten, soldan (oyunun cizimlerinde acik taraf sol-ust)
@@ -442,8 +451,11 @@ def main():
         uret(ad)
     gx0, gy0, w, h = TUVAL
     with open(os.path.join(OUT, "tuval.json"), "w", encoding="utf-8") as fp:
-        json.dump({"gx0": gx0, "gy0": gy0, "w": w, "h": h, "hd": HD,
-                   "katmanlar": list(KATMANLAR)}, fp, indent=1)
+        veri = {"gx0": gx0, "gy0": gy0, "w": w, "h": h, "hd": HD,
+                "katmanlar": list(KATMANLAR)}
+        if abs(OLCEK - 1.0) > 1e-6:
+            veri["olcekler"] = {k: OLCEK for k in KATMANLAR}
+        json.dump(veri, fp, indent=1)
     print("DAYI_HD_DONE %d katman" % len(adlar))
 
 

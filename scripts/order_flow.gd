@@ -1,5 +1,6 @@
 # Order extension points. Behavior: systems/order_system.gd; visuals: rendering/order_draw.gd.
-extends "res://scripts/counter_design.gd"
+# REMAKE: yeni tezgahin HD katmani (counter_design_hd.gd) arada
+extends "res://scripts/counter_design_hd.gd"
 
 const ORDER_FIELDS := {"meat":"meat", "pickle":"pickleN", "yogurt":"yogurtN", "fries":"friesN"}
 var chosen_order: Dictionary = {}
