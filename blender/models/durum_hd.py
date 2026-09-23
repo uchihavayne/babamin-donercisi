@@ -196,42 +196,123 @@ R_DURUM = 6.3
 X_UC = 18.6        # acik sag ucun x'i
 
 
+def _talas(ad, x, y, z, boy, en, kal, rot, kivrim, tohum, M, Mk):
+    """Doner et talasi (dolgu_hd.talas ile ayni): ince, kivrik, kenari duzensiz
+    yaprak; yan yuzleri (kizarmis kenar) koyu."""
+    bm = bmesh.new()
+    nu, nv = 6, 4
+    g = []
+    for i_ in range(nu):
+        u = i_ / (nu - 1.0) * 2 - 1
+        sira = []
+        for j_ in range(nv):
+            v = j_ / (nv - 1.0) * 2 - 1
+            kenar = i_ in (0, nu - 1) or j_ in (0, nv - 1)
+            sk = 1.0 - (0.14 * hash1(tohum * 3.1 + i_ * 7.7 + j_ * 1.3) if kenar else 0.0)
+            gx = u * boy / 2.0 * sk
+            gy = v * en / 2.0 * sk * (1.0 - 0.2 * u * u)
+            gz = kivrim * u * u + 0.2 * math.sin(u * 3.0 + tohum) * math.cos(v * 1.7 + tohum)
+            sira.append(bm.verts.new((gx, gy, gz)))
+        g.append(sira)
+    for i_ in range(nu - 1):
+        for j_ in range(nv - 1):
+            bm.faces.new((g[i_][j_], g[i_ + 1][j_], g[i_ + 1][j_ + 1], g[i_][j_ + 1]))
+    bmesh.ops.solidify(bm, geom=bm.faces[:], thickness=kal)
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
+    ob = I.mesh_ob(ad, bm, M, smooth=True)
+    ob.data.materials.append(Mk)
+    for pol in ob.data.polygons:
+        if abs(pol.normal.z) < 0.45:
+            pol.material_index = 1
+    ob.rotation_euler = rot
+    ob.location = (x, y, z)
+    return ob
+
+
+def _uc_nokta(t, r, x):
+    """Tupun kesitinde t acisi (0: on, pi/2: ust), r yaricapi, x konumu."""
+    return (x, -r * math.cos(t), r * math.sin(t))
+
+
 def _dolgu_ucu(k):
-    """Acik uctan gorunen / tasan dolgu: et lopcalari, iki patates, tursu, sos.
-    Tupun ekseni (y=0, z=0) boyunca, ic yaricap ~4.4 icinde."""
-    Me = cel("UcEt", ["#5a2c0c", "#8c4c1c", "#b86c2c", "#e0a050"], [0, .28, .52, .82], noise=0.2, noise_scale=6)
-    Me2 = cel("UcEt2", ["#4a240a", "#7a4014", "#a45c20", "#cf8a3a"], [0, .28, .52, .82], noise=0.2, noise_scale=7)
-    for q in range(14):
-        a = hash1(q * 3.3) * math.tau
-        rr = 3.9 * math.sqrt(hash1(q * 7.7))
-        y, z = math.cos(a) * rr, math.sin(a) * rr
-        x = X_UC - 1.2 + hash1(q * 5.1) * 2.6
-        e = I.elipsoid("et%d" % q, x, 0, 1.5 + 0.7 * hash1(q), 1.0 + 0.4 * hash1(q * 2), 1.3, 0, Me if q % 3 else Me2,
-                       seg=10, ring=7)
-        e.location = (x, y, z)
-        e.rotation_euler = (hash1(q * 1.1) * 3.0, hash1(q * 2.3) * 3.0, hash1(q * 3.7) * 3.0)
-    Mp = cel("UcPat", ["#8a6218", "#b88a28", "#ecce6c", "#fbeab0"], [0, .3, .5, .8])
-    for q, (y, z, uz, aci) in enumerate(((-1.6, 1.2, 6.0, 0.18), (1.4, -1.6, 5.2, -0.22))):
+    """Acik uctan tasan dolgu (4. tur, kullanici: "acik uc gorseli iyi olmamis").
+    Et topaklari yerine gercek doner talaslari uctan disari kabarik bir yigin
+    olarak tasar; uc patates cubugu farkli acilarla disari uzanir; yuzu gorunen
+    bir tursu dilimi; ustte beyaz sos, dudaktan disari suzulen bir damla."""
+    Me = cel("UcEt", ["#5a2c0c", "#8c4c1c", "#b86c2c", "#e2a452"], [0, .26, .5, .8], noise=0.18, noise_scale=5)
+    Me2 = cel("UcEt2", ["#4a240a", "#7a4014", "#a45c20", "#cf8a3a"], [0, .26, .5, .8], noise=0.2, noise_scale=7)
+    Mk = cel("UcEtKenar", ["#2e1606", "#4a240a", "#6a3410", "#8a4a18"], [0, .3, .5, .8])
+    # et: acikligi dolduran, ortada daha cok tasan talaslar (yuzleri disa/kameraya)
+    for q in range(15):
+        a = hash1(q * 3.3 + 0.5) * math.tau
+        rr = 4.4 * math.sqrt(0.08 + 0.92 * hash1(q * 7.7 + 0.2))
+        y, z = -rr * math.cos(a), rr * math.sin(a)
+        tasma = 1.9 * (1.0 - rr / 4.8) + 0.5 * hash1(q * 5.1)
+        x = X_UC - 0.6 + tasma
+        rot = (math.radians((hash1(q * 1.1) - 0.5) * 70),
+               math.radians(90 + (hash1(q * 2.3) - 0.5) * 60),
+               math.radians(-25 + (hash1(q * 3.7) - 0.5) * 60))
+        _talas("et%d" % q, x, y, z, 3.2 + 1.2 * hash1(q * 4.4), 2.2 + 0.8 * hash1(q * 6.1), 0.4, rot,
+               0.4 + 0.6 * hash1(q * 8.8), q * 1.3, Me if hash1(q * 2.9) > 0.35 else Me2, Mk)
+    # patates: uc cubuk, disari uzanan
+    Mp = cel("UcPat", ["#8a6218", "#b88a28", "#ecce6c", "#fbeab0"], [0, .3, .52, .8])
+    Mpu = cel("UcPatUc", ["#6a4810", "#9a7020", "#c89a3a", "#e0bc5a"], [0, .3, .52, .8])
+    for q, (t, rr, uz, yaw, pitch) in enumerate(((1.9, 2.4, 6.6, -14, -12), (-0.9, 2.2, 6.0, 12, 16),
+                                                 (0.5, 3.3, 5.4, -20, 4))):
+        _, y, z = _uc_nokta(t, rr, 0)
         bm = bmesh.new()
         bmesh.ops.create_cube(bm, size=1.0)
         for v in bm.verts:
             v.co.x *= uz
-            v.co.y *= 1.1
-            v.co.z *= 1.1
-        bmesh.ops.bevel(bm, geom=bm.edges[:], offset=0.22, segments=2, profile=0.5, affect="EDGES")
+            v.co.y *= 1.05
+            v.co.z *= 1.05
+        bmesh.ops.bevel(bm, geom=bm.edges[:], offset=0.2, segments=2, profile=0.5, affect="EDGES")
         ob = I.mesh_ob("pat%d" % q, bm, Mp)
-        ob.location = (X_UC - uz / 2 + 2.3, y, z)
-        ob.rotation_euler = (0.0, aci, aci * 0.6)
-    Mt = cel("UcTursu", ["#2e4212", "#44601c", "#6e9128", "#a8c656"], [0, .3, .5, .8])
-    t = I.elipsoid("tursu", X_UC + 0.4, 0, 0.35, 1.3, 1.25, 0, Mt, seg=14, ring=8)
-    t.location = (X_UC + 0.5, 0.6, 2.2)
-    t.rotation_euler = (0.3, 0.2, 0.0)
-    # beyaz sos: uctan hafif tasan birikinti + damla
-    Ms = cel("UcSos", ["#c4bca6", "#e2dccb", "#f3efe4", "#ffffff"], [0, .3, .5, .8])
-    b = I.elipsoid("sos", 0, 0, 1.0, 0.9, 1.6, 0, Ms, seg=12, ring=8)
-    b.location = (X_UC + 0.7, -0.4, -2.9)
-    d = I.elipsoid("damla", 0, 0, 0.6, 0.9, 0.6, 0, Ms, seg=10, ring=6)
-    d.location = (X_UC + 1.0, -1.2, -4.0)
+        ob.data.materials.append(Mpu)
+        for pol in ob.data.polygons:
+            if abs(pol.normal.x) > 0.8:
+                pol.material_index = 1
+        ob.location = (X_UC + uz / 2.0 - 2.4 + 0.5 * q, y, z)
+        ob.rotation_euler = (0.0, math.radians(pitch), math.radians(yaw))
+    # tursu dilimi: yuzu disa ve kameraya donuk
+    Mtk = cel("UcTursuKabuk", ["#1a2808", "#2e4212", "#44601c", "#5a7a28"], [0, .3, .5, .8])
+    Mti = cel("UcTursuIc", ["#6e7c28", "#8e9c3c", "#aab458", "#c4cc78"], [0, .3, .5, .8])
+    for q, (t, rr, tas) in enumerate(((0.35, 2.9, 2.1), (-1.6, 1.8, 2.0))):
+        _, y, z = _uc_nokta(t, rr, 0)
+        L.silindir("tursu%d" % q, 1.35, X_UC + tas, y, z, 0.32, Mtk, seg=18, eksen="X")
+        ob = L.silindir("tursu_ic%d" % q, 1.05, X_UC + tas + 0.18, y, z, 0.05, Mti, seg=18, eksen="X")
+        par = bpy.data.objects["tursu%d" % q]
+        for o_ in (par, ob):
+            o_.rotation_euler = (0.0, math.radians(70), math.radians(-35))
+    # beyaz sos: yiginin ustunde bir kasik + dudaktan disari suzulen damla
+    Ms = cel("UcSos", ["#b8b09a", "#ddd6c4", "#f1ece0", "#ffffff"], [0, .3, .5, .82])
+    b = I.elipsoid("sos", 0, 0, 1.6, 0.9, 1.3, 0, Ms, seg=16, ring=10)
+    b.location = (X_UC + 1.6, -1.0, 1.4)
+    b.rotation_euler = (0.2, 0.3, 0.0)
+    r_uc = R_DURUM * 1.08
+    nok = []
+    for q in range(5):
+        u = q / 4.0
+        t = -0.5 - u * 0.22
+        nok.append(_uc_nokta(t, r_uc + 0.3, X_UC + 0.35 - u * 0.5))
+    cu = bpy.data.curves.new("damla", "CURVE")
+    cu.dimensions = "3D"
+    cu.bevel_depth = 1.0
+    cu.bevel_resolution = 3
+    cu.use_fill_caps = True
+    sp = cu.splines.new("BEZIER")
+    sp.bezier_points.add(len(nok) - 1)
+    for q, co in enumerate(nok):
+        bp = sp.bezier_points[q]
+        bp.co = co
+        bp.handle_left_type = bp.handle_right_type = "AUTO"
+        bp.radius = (0.55, 0.48, 0.45, 0.5, 0.6)[q]
+    ob = bpy.data.objects.new("damla", cu)
+    bpy.context.collection.objects.link(ob)
+    L.meshle(ob, Ms)
+    x_, y_, z_ = nok[-1]
+    e = I.elipsoid("damla_uc", 0, 0, 0.65, 0.75, 0.65, 0, Ms, seg=12, ring=8)
+    e.location = (x_, y_ - 0.1, z_ - 0.2)
 
 
 def durum_govde(kiz):
@@ -252,6 +333,8 @@ def durum_govde(kiz):
         Mg = cel("Durum", [hexmul(shade, .85), shade, base, lite], [0, .3, .5, .82], noise=0.08, noise_scale=10)
         ic_renk = mix("#f0d5a8", "#e2b882", k * 0.5) if kiz is not None else "#5a4a3c"
         Mi = cel("DurumIc", [hexmul(ic_renk, .8), hexmul(ic_renk, .9), ic_renk, hexmul(ic_renk, 1.04)], [0, .3, .5, .82])
+        # tupun ici: golgede (acikligin derinligi okunsun)
+        Mig = cel("DurumIcGolge", [hexmul(ic_renk, .42), hexmul(ic_renk, .5), hexmul(ic_renk, .6), hexmul(ic_renk, .7)], [0, .3, .5, .82])
         R = R_DURUM
         T_ = 0.7
         bm = bmesh.new()
@@ -263,15 +346,21 @@ def durum_govde(kiz):
         for x in xs:
             u = max(0.0, -x - 15.0) / 5.0
             r = R * math.sqrt(max(0.0, 1 - u * u))
-            # uca yakin hafif genisleme (lavas agzi acilir)
-            r *= 1.0 + 0.05 * max(0.0, (x - (X_UC - 3.0)) / 3.0)
+            # uca yakin genisleme (lavas agzi acilir)
+            r *= 1.0 + 0.08 * max(0.0, (x - (X_UC - 3.5)) / 3.5) ** 1.5
             dis.append([bm.verts.new((x, -r * math.cos(2 * math.pi * j / seg), r * math.sin(2 * math.pi * j / seg))) for j in range(seg)])
         for a_, b_ in zip(dis, dis[1:]):
             for j in range(seg):
                 bm.faces.new((a_[j], a_[(j + 1) % seg], b_[(j + 1) % seg], b_[j]))
-        # agiz kenari (kalinlik) + ic yuzey (kisa)
-        r_uc = R * 1.05
-        ic_on = [bm.verts.new((X_UC, -(r_uc - T_) * math.cos(2 * math.pi * j / seg), (r_uc - T_) * math.sin(2 * math.pi * j / seg))) for j in range(seg)]
+        # agiz kenari (ince, dalgali) + ic yuzey (golgeli, kisa)
+        r_uc = R * 1.08
+        T_ = 0.45
+        son_ = dis[-1]
+        for j in range(seg):
+            t = 2 * math.pi * j / seg
+            son_[j].co.x = X_UC + 0.35 * math.sin(5 * t + 1.0) + 0.2 * math.sin(3 * t)
+        ic_on = [bm.verts.new((X_UC + 0.35 * math.sin(5 * (2 * math.pi * j / seg) + 1.0) + 0.2 * math.sin(3 * (2 * math.pi * j / seg)) - 0.05,
+                               -(r_uc - T_) * math.cos(2 * math.pi * j / seg), (r_uc - T_) * math.sin(2 * math.pi * j / seg))) for j in range(seg)]
         ic_arka = [bm.verts.new((X_UC - 5.0, -(R - T_) * math.cos(2 * math.pi * j / seg), (R - T_) * math.sin(2 * math.pi * j / seg))) for j in range(seg)]
         son = dis[-1]
         kenar_yuz, ic_yuz = [], []
@@ -279,24 +368,27 @@ def durum_govde(kiz):
             kenar_yuz.append(bm.faces.new((son[j], son[(j + 1) % seg], ic_on[(j + 1) % seg], ic_on[j])))
             ic_yuz.append(bm.faces.new((ic_on[j], ic_on[(j + 1) % seg], ic_arka[(j + 1) % seg], ic_arka[j])))
         ic_yuz.append(bm.faces.new(list(reversed(ic_arka))))
-        for f in ic_yuz + kenar_yuz:
+        for f in kenar_yuz:
             f.material_index = 1
+        for f in ic_yuz:
+            f.material_index = 2
         bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
         ob = I.mesh_ob("govde", bm, Mg)
         ob.data.materials.append(Mi)
+        ob.data.materials.append(Mig)
         # sarmal ic kat: uctan gorunen spiral (dis kattan ice dogru bir tur)
         bm2 = bmesh.new()
         n = 40
         on_, arka_ = [], []
         for q in range(n + 1):
-            a = 0.6 + q / float(n) * math.tau * 1.05
-            rr = r_uc - T_ - 0.25 - (q / float(n)) * 1.5
+            a = 0.9 + q / float(n) * math.tau * 0.8
+            rr = r_uc - T_ - 0.2 - (q / float(n)) * 0.9
             yy, zz = -rr * math.cos(a), rr * math.sin(a)
-            on_.append(bm2.verts.new((X_UC - 0.25, yy, zz)))
+            on_.append(bm2.verts.new((X_UC - 0.45, yy, zz)))
             arka_.append(bm2.verts.new((X_UC - 4.0, yy, zz)))
         for q in range(n):
             bm2.faces.new((on_[q], on_[q + 1], arka_[q + 1], arka_[q]))
-        bmesh.ops.solidify(bm2, geom=bm2.faces[:], thickness=0.45)
+        bmesh.ops.solidify(bm2, geom=bm2.faces[:], thickness=0.32)
         bmesh.ops.recalc_face_normals(bm2, faces=bm2.faces[:])
         I.mesh_ob("sarmal", bm2, Mi)
         _dolgu_ucu(k)
