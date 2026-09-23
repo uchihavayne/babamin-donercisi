@@ -63,6 +63,11 @@ func calis() -> void:
 			var d := arg("--dolgu").split(",")
 			w.meat = float(d[0]); w.friesN = float(d[1]); w.pickleN = float(d[2]); w.yogurtN = float(d[3])
 		if arg("--sos") != "": w.sauce = arg("--sos")
+		# --sarili K : tahtadaki durum sarili (K: kizarma 0..1); --kagit: kagitli (hazir)
+		if arg("--sarili") != "":
+			w.state = "rolled"; w.roll = 1.0; w.kizarma = float(arg("--sarili"))
+		if "--kagit" in OS.get_cmdline_user_args():
+			w.state = "ready"; w.paper = true; w.roll = 1.0
 		g.customer_system.f_spawnCustomer()
 		var c: Dictionary = g.j_G.customers[0]
 		c.state = "wait"; c.x = c.tx

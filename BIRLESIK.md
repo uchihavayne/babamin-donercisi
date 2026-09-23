@@ -86,6 +86,8 @@ Kullanıcı geri bildirimiyle gelen düzenlemeler (2026-09-23):
 | Döner keserken Dayı anlamsız hareket ediyor | Döneri oyuncu keser; Dayı kesimde bekleme pozunda durur, şişe bakar |
 | Dolgu katman katman, karışmıyor | `dolgu_hd.py`: 125 birleşim tek 3B sahnede; yoğurt/sos yığının üstüne dökülür |
 | Lavaş tahtada durmuyor, havada gibi | Tek üründe (1.8) lavaş tahtanın ön kenarına taşıyordu ve eski gölge elipsi aşağı düşüp kenardan sarkıyordu: çizim 3.5 px yukarı (hedef noktası aynı), HD'de lavaşa yapışık temas gölgesi, lavaş alttan inceltildi (2.1 → 1.35 px) |
+| Sarılı dürümün ucu kapalı | Kamera hafif sağdan (x += y·0.42, `durum_hd.x_egim`): sağ uç açık, dış kat + sarmal iç kat + uçtan taşan et/patates/turşu/sos; sol uç kıvrık kapalı; kağıt aynı açıyla; uçtaki piksel işaretleri HD'de yok; gölge gövdeye yapışık |
+| Lavaş pizza hamuruna benziyor | Kabarık kenar halkası ve kusursuz elips kaldırıldı: düzensiz kenarlı ince yufka, yumuşak dalgalı yüzey, soluk kızarma benekleri + un tozu (dolgu yeniden render) |
 
 Önizleme: `python blender/tezgah2_onizleme.py` (parçaları oyundaki yerlerine dizer).
 

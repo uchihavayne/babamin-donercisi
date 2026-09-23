@@ -406,8 +406,13 @@ func f_drawWrapRolled(p_cx: Variant = null, p_cy: Variant = null, p_wrap: Varian
 	v_po = floor(((v_pt * v_pt) * 10.0) + 0.5)
 	v_pl = ((v_cx - (float(v_w) / float(2.0))) - 1.0)
 	v_pw = 21.0
-	J.setv(game.j_ctx, "globalAlpha", 0.25)
-	game.f_ell(v_cx, J.add(v_cy, 8.0), (float(v_w) / float(2.0)), 3.0, "#000")
+	# BIRLESIK: HD'de golge durumun altina yapisik (eskisi 2 px asagida, ayrik)
+	if game.hd_gpu():
+		J.setv(game.j_ctx, "globalAlpha", 0.25)
+		game.f_ell(J.add(v_cx, 0.5), J.add(v_cy, 5.4), 21.5, 2.2, "#3a2410")
+	else:
+		J.setv(game.j_ctx, "globalAlpha", 0.25)
+		game.f_ell(v_cx, J.add(v_cy, 8.0), (float(v_w) / float(2.0)), 3.0, "#000")
 	J.setv(game.j_ctx, "globalAlpha", 1.0)
 	if J.truth(J.getv(v_wrap, "paper")):
 		# REMAKE kancasi
@@ -416,8 +421,10 @@ func f_drawWrapRolled(p_cx: Variant = null, p_cy: Variant = null, p_wrap: Varian
 			game.f_rrect((v_pl - 1.0), J.add(((v_cy - (float(v_h) / float(2.0))) - 1.0), v_po), J.add(v_pw, 3.0), J.add(v_h, 2.0), 5.0, "#cfc9b8")
 			game.f_rrect((v_pl - 1.0), J.add(((v_cy - (float(v_h) / float(2.0))) - 1.0), v_po), J.add(v_pw, 3.0), J.add(v_h, 1.0), 5.0, "#e8e4d6")
 			J.setv(game.j_ctx, "globalAlpha", 1.0)
-	# REMAKE kancasi
-	if not game.f_hdDurumGovde(v_cx, v_cy, v_kiz, J.getv(v_wrap, "burnt")):
+	# REMAKE kancasi (HD govdenin acik ucunda dolgu zaten gorunur: uctaki
+	# piksel isaretleri o zaman cizilmez)
+	var v_hdGovde: bool = game.f_hdDurumGovde(v_cx, v_cy, v_kiz, J.getv(v_wrap, "burnt"))
+	if not v_hdGovde:
 		game.f_rrect((v_cx - (float(v_w) / float(2.0))), (v_cy - (float(v_h) / float(2.0))), v_w, v_h, 5.0, v_shade)
 		game.f_rrect((v_cx - (float(v_w) / float(2.0))), (v_cy - (float(v_h) / float(2.0))), v_w, (v_h - 2.0), 5.0, v_base)
 		game.f_rrect(J.add((v_cx - (float(v_w) / float(2.0))), 3.0), J.add((v_cy - (float(v_h) / float(2.0))), 1.0), (v_w - 8.0), 4.0, 2.0, v_lite)
@@ -454,11 +461,11 @@ func f_drawWrapRolled(p_cx: Variant = null, p_cy: Variant = null, p_wrap: Varian
 			pass
 		game.f_px((J.add(v_cx, (float(v_w) / float(2.0))) - 4.0), (v_cy - 2.0), "#c98436")
 		game.f_px((J.add(v_cx, (float(v_w) / float(2.0))) - 5.0), J.add(v_cy, 1.0), "#8a4f1e")
-	if J.truth(J.getv(v_wrap, "pickle")):
+	if J.truth(J.getv(v_wrap, "pickle")) and not v_hdGovde:
 		game.f_px((J.add(v_cx, (float(v_w) / float(2.0))) - 6.0), (v_cy - 3.0), J.getv(game.j_P, "g1"))
-	if J.truth(J.getv(v_wrap, "yogurt")):
+	if J.truth(J.getv(v_wrap, "yogurt")) and not v_hdGovde:
 		game.f_px((J.add(v_cx, (float(v_w) / float(2.0))) - 3.0), J.add(v_cy, 2.0), J.getv(game.j_P, "s0"))
-	if J.gt(J.getv(v_wrap, "friesN"), 0.0):
+	if J.gt(J.getv(v_wrap, "friesN"), 0.0) and not v_hdGovde:
 		game.f_px((J.add(v_cx, (float(v_w) / float(2.0))) - 7.0), J.add(v_cy, 2.0), J.getv(game.j_P, "p1"))
 	if J.truth(J.getv(v_wrap, "paper")):
 		# REMAKE kancasi
