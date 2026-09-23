@@ -67,6 +67,11 @@ func calis() -> void:
 			g.j_G.timeLeft = g.j_G.cfg.len * (1.0 - (g.j_MAC_BAS + g.j_MAC_BIT) / 2.0)
 			g.j_G.macDalga = true
 			for cc in g.j_G.customers: cc.mac = true
+		if var_mi("--siparis"):
+			c.items = [{"kind": "wrap", "sauce": "hot", "yok": ["pickle"]}, {"kind": "drink", "type": "cola"}]
+			c.done = [false, false]
+			c.bubble = 1.0
+			g.j_G.stock.tomato = 3; g.j_G.stockAnim.tomato = 3; g.j_G.stock.pepper = 1; g.j_G.stockAnim.pepper = 1
 		if var_mi("--kesinti"):
 			g.j_G.kesinti = {"faz": "kesik", "t": 3.0, "sure": 20.0, "uyari": 0.0}
 		if var_mi("--kizart"):

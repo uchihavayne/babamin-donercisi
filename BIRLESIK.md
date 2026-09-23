@@ -40,6 +40,30 @@ F2: HD aç/kapat (karşılaştırma).
 | `blender/models/sargi_hd.py` | `sargi` | açık dürümün et/patates/turşu/yoğurt/sos katmanları (oyundaki `f_hash1` yerleşimi, 4 seviye × 4 ölçek) |
 | `durum_hd.py`, `yiyecek_hd.py`, `pide_hd.py` | `durum`, `yiyecek`, `pide` | + yeni tahtanın 1.8 / 1.22 / 0.9 ölçekleri |
 
+Birleşik yerleşimin ölçüleri (pencere 300×103, cam 292×95, döner şişi) `blender/models/yerlesim.py` içinde; `vitrin_hd.py`, `sokak_arka_hd.py` ve `arac_hd.py` (otomatik kesim rayı) buradan okur.
+
+Kullanıcı geri bildirimiyle gelen düzenlemeler (2026-09-23):
+
+| Konu | Çözüm |
+| --- | --- |
+| Arabalar/insanlar duvarın üstünden geçiyordu | Pencere çerçevesi, kepenk ve sokak arka planı yeni cam boyunda |
+| Kedi geri geri yürüyordu | Kedi hep sola yürür; yürüyüş kareleri aynalı |
+| Rakibin adamı tezgâhın üstüne çıkıyordu | Raf hizasında kırpılır; model yenilendi |
+| Dayı sağa sola kayıp titriyordu | Ayaklar sabit, nefes/ağırlık yalnız üst gövdede, yarım piksel |
+| Oto kesim rayı Dayı'nın üstündeydi, alt ucu yarımdı | Dayı şişten sonra çizilir; ray uzadı, cıvatalı ayak |
+| Fritöz, patates sepeti | Remake (önceki) tasarımları yeni yuva ölçüsünde |
+| Patates doğrama düzdü | Patates kısalır, dilimler birikir, satır iner-kalkar, kırıntı, bıçak izi |
+| Soslar yarım/kesik | Dolu gövdeli sıkma şişe, ortada etiket |
+| Ekmekler altlığa oturmuyordu | Tabaksız yığınlar altlığın üstünde |
+| Açık dürümde turşu fazla/büyük, yoğurt şerit | 2–4 küçük turşu, kaşık yoğurt damlaları, ince sos |
+| Balonda sıra numaraları, "!" işareti | Numaralar kaldırıldı; sos rozeti (acı biber / sarımsak) |
+| Balondaki içecek ≠ makinedeki bardak | İkon makinedeki cam bardak modelinden |
+| Domates/biber bitmiyor gibi | Tepside tane tane azalır |
+| Depo çekmecesinde yalnız 2 kavanoz | Açık tüm stok türlerinin ikonu |
+| Tatlı tepsisi | Bakır baklava tepsisi + 0–6 dilim |
+| Elektrik kesintisi ışığı kare kare | `shaders/kesinti.gdshader`: karanlık + ocaktan yumuşak sıcak hale |
+| "MAÇ ÇIKIŞI" yazısı | Kaldırıldı; müşteriler ve yayalar takım atkılı |
+
 Önizleme: `python blender/tezgah2_onizleme.py` (parçaları oyundaki yerlerine dizer).
 
 **Atlas yeniden paketlenince Godot içe aktarması şart**:
@@ -64,4 +88,4 @@ godot --headless --path . --script tests/module_snapshot.gd --quit-after 3000 --
 
 Tabanın bütün testleri geçiyor (sipariş akışı, kesim, istasyonlar, girişler, ekonomi, anlık görüntü 6/6). Anlık görüntü referansında tek değişiklik `upgraded-shop`: taban projede boyalı duvar siyah çiziliyordu (`js_compat` `toString(16)` tabanı yok sayıyordu), birleşik sürümde doğru renk.
 
-Kare süresi (tam yükseltmeli oyun ekranı çizimi, Ryzen 5 3600X + RTX 5060): 16 ms.
+Kare süresi (tam yükseltmeli oyun ekranı çizimi, Ryzen 5 3600X + RTX 5060): 12 ms; başlık 18 ms.
