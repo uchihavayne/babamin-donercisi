@@ -1,0 +1,6 @@
+{
+	"checks": 29,
+	"failures": [],
+	"host": "macOS; simulated screen sizes and native touch events",
+	"renderer": "Apple M4"
+}

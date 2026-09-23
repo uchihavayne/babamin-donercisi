@@ -1,0 +1,15 @@
+{
+	"checks": 61,
+	"failures": [],
+	"full_tray_seconds": {
+		"120": 2.50833333333333,
+		"30": 2.7,
+		"60": 2.6
+	},
+	"input": "synthetic controller/touch/keyboard on macOS",
+	"two_second_base_knife_counts": [
+		12.0,
+		12.0,
+		12.0
+	]
+}

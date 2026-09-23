@@ -1,0 +1,34 @@
+{
+  "engine": "Godot 4.7.1",
+  "platform": "macOS / Apple M4",
+  "regression": {
+    "checks": 34,
+    "cities": 10,
+    "failures": [],
+    "upgrades": 24
+  },
+  "embedded_assets_sha256_verified": true,
+  "visual_comparison": {
+    "title": {
+      "mean_absolute_channel_error_0_to_255": 0.3042,
+      "width": 480,
+      "height": 270
+    },
+    "story": {
+      "mean_absolute_channel_error_0_to_255": 0.1249,
+      "width": 480,
+      "height": 270
+    },
+    "play": {
+      "mean_absolute_channel_error_0_to_255": 0.4443,
+      "width": 480,
+      "height": 270
+    }
+  },
+  "observed_headless_frame_ms": {
+    "TITLE": 30.69,
+    "STORY": 4.482,
+    "PLAY": 26.386
+  },
+  "runtime": "GDScript only"
+}

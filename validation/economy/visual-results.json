@@ -1,0 +1,6 @@
+{
+	"checks": 8,
+	"coverage": "real mouse/touch and synthetic controller purchase, level effects, desktop/mobile GPU cards",
+	"failures": [],
+	"renderer": "Apple M4"
+}

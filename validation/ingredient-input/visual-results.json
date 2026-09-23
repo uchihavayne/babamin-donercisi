@@ -1,0 +1,6 @@
+{
+	"checks": 16,
+	"coverage": "mouse and touch events through platform shell; desktop/mobile layout, rapid clicks, hold, stock and transient feedback",
+	"failures": [],
+	"renderer": "Apple M4"
+}

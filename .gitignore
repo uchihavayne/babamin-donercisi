@@ -1,0 +1,28 @@
+# Godot imports and generated builds
+.godot/
+exports/
+*.zip
+*.log
+
+# Local dependencies and editor/system caches
+node_modules/
+__pycache__/
+*.py[cod]
+.DS_Store
+.idea/
+
+# Keep the empty output folders needed by the authoring and test tools.
+artifacts/**
+!artifacts/**/
+!artifacts/**/.gitkeep
+!artifacts/.gdignore
+
+# Local credentials and platform signing material
+.env
+.env.*
+!.env.example
+*.keystore
+*.jks
+*.p12
+*.pfx
+*.mobileprovision

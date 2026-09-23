@@ -1,0 +1,26 @@
+{
+	"advanced_rain": {
+		"draw_commands": 9273,
+		"frames": 120,
+		"median_ms": 24.438,
+		"p95_ms": 25.614,
+		"scene": "play",
+		"texture_uploads_last_frame": 0
+	},
+	"play": {
+		"draw_commands": 4850,
+		"frames": 120,
+		"median_ms": 11.676,
+		"p95_ms": 12.152,
+		"scene": "play",
+		"texture_uploads_last_frame": 0
+	},
+	"title": {
+		"draw_commands": 7568,
+		"frames": 120,
+		"median_ms": 22.533,
+		"p95_ms": 24.467,
+		"scene": "title",
+		"texture_uploads_last_frame": 1
+	}
+}

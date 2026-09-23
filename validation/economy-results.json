@@ -1,0 +1,675 @@
+{
+	"assumptions": "12 fixed-workload days; 6/8/10 accurate wrap orders, 70% patience, sunny weather, drink on every third order once owned. Actual delivery, payments, debt, purchases and saves. No human input timing, phone/branch income, penalties or night events. Both curves use exact coin allocation.",
+	"checks": 39,
+	"failures": [],
+	"scenarios": {
+		"10": {
+			"after": [
+				{
+					"cash_after_shop": 79.0,
+					"cash_before_shop": 189,
+					"day": 1,
+					"debt_paid": 41.0,
+					"gross": 230.0,
+					"purchases": [
+						"tongs"
+					]
+				},
+				{
+					"cash_after_shop": 168.0,
+					"cash_before_shop": 268,
+					"day": 2,
+					"debt_paid": 41.0,
+					"gross": 230.0,
+					"purchases": [
+						"knife"
+					]
+				},
+				{
+					"cash_after_shop": 137.0,
+					"cash_before_shop": 357,
+					"day": 3,
+					"debt_paid": 41.0,
+					"gross": 230.0,
+					"purchases": [
+						"drink"
+					]
+				},
+				{
+					"cash_after_shop": 45.0,
+					"cash_before_shop": 375,
+					"day": 4,
+					"debt_paid": 52.0,
+					"gross": 290.0,
+					"purchases": [
+						"fryer",
+						"paper"
+					]
+				},
+				{
+					"cash_after_shop": 183.0,
+					"cash_before_shop": 283,
+					"day": 5,
+					"debt_paid": 52.0,
+					"gross": 290.0,
+					"purchases": [
+						"store"
+					]
+				},
+				{
+					"cash_after_shop": 421.0,
+					"cash_before_shop": 421,
+					"day": 6,
+					"debt_paid": 52.0,
+					"gross": 290.0,
+					"purchases": []
+				},
+				{
+					"cash_after_shop": 209.0,
+					"cash_before_shop": 659,
+					"day": 7,
+					"debt_paid": 52.0,
+					"gross": 290.0,
+					"purchases": [
+						"secim"
+					]
+				},
+				{
+					"cash_after_shop": 228.0,
+					"cash_before_shop": 488,
+					"day": 8,
+					"debt_paid": 61.0,
+					"gross": 340.0,
+					"purchases": [
+						"grill"
+					]
+				},
+				{
+					"cash_after_shop": 201.0,
+					"cash_before_shop": 581,
+					"day": 9,
+					"debt_paid": 77.0,
+					"gross": 430.0,
+					"purchases": [
+						"helper"
+					]
+				},
+				{
+					"cash_after_shop": 74.0,
+					"cash_before_shop": 554,
+					"day": 10,
+					"debt_paid": 77.0,
+					"gross": 430.0,
+					"purchases": [
+						"tongs"
+					]
+				},
+				{
+					"cash_after_shop": 427.0,
+					"cash_before_shop": 427,
+					"day": 11,
+					"debt_paid": 77.0,
+					"gross": 430.0,
+					"purchases": []
+				},
+				{
+					"cash_after_shop": 230.0,
+					"cash_before_shop": 780,
+					"day": 12,
+					"debt_paid": 77.0,
+					"gross": 430.0,
+					"purchases": [
+						"phone"
+					]
+				}
+			],
+			"before": [
+				{
+					"cash_after_shop": 139.0,
+					"cash_before_shop": 139,
+					"day": 1,
+					"debt_paid": 31.0,
+					"gross": 170.0,
+					"purchases": []
+				},
+				{
+					"cash_after_shop": 278.0,
+					"cash_before_shop": 278,
+					"day": 2,
+					"debt_paid": 31.0,
+					"gross": 170.0,
+					"purchases": []
+				},
+				{
+					"cash_after_shop": 117.0,
+					"cash_before_shop": 417,
+					"day": 3,
+					"debt_paid": 31.0,
+					"gross": 170.0,
+					"purchases": [
+						"tongs"
+					]
+				},
+				{
+					"cash_after_shop": 6.0,
+					"cash_before_shop": 256,
+					"day": 4,
+					"debt_paid": 31.0,
+					"gross": 170.0,
+					"purchases": [
+						"knife"
+					]
+				},
+				{
+					"cash_after_shop": 145.0,
+					"cash_before_shop": 145,
+					"day": 5,
+					"debt_paid": 31.0,
+					"gross": 170.0,
+					"purchases": []
+				},
+				{
+					"cash_after_shop": 284.0,
+					"cash_before_shop": 284,
+					"day": 6,
+					"debt_paid": 31.0,
+					"gross": 170.0,
+					"purchases": []
+				},
+				{
+					"cash_after_shop": 423.0,
+					"cash_before_shop": 423,
+					"day": 7,
+					"debt_paid": 31.0,
+					"gross": 170.0,
+					"purchases": []
+				},
+				{
+					"cash_after_shop": 562.0,
+					"cash_before_shop": 562,
+					"day": 8,
+					"debt_paid": 31.0,
+					"gross": 170.0,
+					"purchases": []
+				},
+				{
+					"cash_after_shop": 101.0,
+					"cash_before_shop": 701,
+					"day": 9,
+					"debt_paid": 31.0,
+					"gross": 170.0,
+					"purchases": [
+						"drink"
+					]
+				},
+				{
+					"cash_after_shop": 280.0,
+					"cash_before_shop": 280,
+					"day": 10,
+					"debt_paid": 39.0,
+					"gross": 218.0,
+					"purchases": []
+				},
+				{
+					"cash_after_shop": 139.0,
+					"cash_before_shop": 459,
+					"day": 11,
+					"debt_paid": 39.0,
+					"gross": 218.0,
+					"purchases": [
+						"fryer"
+					]
+				},
+				{
+					"cash_after_shop": 318.0,
+					"cash_before_shop": 318,
+					"day": 12,
+					"debt_paid": 39.0,
+					"gross": 218.0,
+					"purchases": []
+				}
+			]
+		},
+		"6": {
+			"after": [
+				{
+					"cash_after_shop": 3.0,
+					"cash_before_shop": 113,
+					"day": 1,
+					"debt_paid": 25.0,
+					"gross": 138.0,
+					"purchases": [
+						"tongs"
+					]
+				},
+				{
+					"cash_after_shop": 16.0,
+					"cash_before_shop": 116,
+					"day": 2,
+					"debt_paid": 25.0,
+					"gross": 138.0,
+					"purchases": [
+						"knife"
+					]
+				},
+				{
+					"cash_after_shop": 129.0,
+					"cash_before_shop": 129,
+					"day": 3,
+					"debt_paid": 25.0,
+					"gross": 138.0,
+					"purchases": []
+				},
+				{
+					"cash_after_shop": 22.0,
+					"cash_before_shop": 242,
+					"day": 4,
+					"debt_paid": 25.0,
+					"gross": 138.0,
+					"purchases": [
+						"drink"
+					]
+				},
+				{
+					"cash_after_shop": 10.0,
+					"cash_before_shop": 160,
+					"day": 5,
+					"debt_paid": 30.0,
+					"gross": 168.0,
+					"purchases": [
+						"fryer"
+					]
+				},
+				{
+					"cash_after_shop": 148.0,
+					"cash_before_shop": 148,
+					"day": 6,
+					"debt_paid": 30.0,
+					"gross": 168.0,
+					"purchases": []
+				},
+				{
+					"cash_after_shop": 6.0,
+					"cash_before_shop": 286,
+					"day": 7,
+					"debt_paid": 30.0,
+					"gross": 168.0,
+					"purchases": [
+						"paper",
+						"store"
+					]
+				},
+				{
+					"cash_after_shop": 144.0,
+					"cash_before_shop": 144,
+					"day": 8,
+					"debt_paid": 30.0,
+					"gross": 168.0,
+					"purchases": []
+				},
+				{
+					"cash_after_shop": 282.0,
+					"cash_before_shop": 282,
+					"day": 9,
+					"debt_paid": 30.0,
+					"gross": 168.0,
+					"purchases": []
+				},
+				{
+					"cash_after_shop": 420.0,
+					"cash_before_shop": 420,
+					"day": 10,
+					"debt_paid": 30.0,
+					"gross": 168.0,
+					"purchases": []
+				},
+				{
+					"cash_after_shop": 108.0,
+					"cash_before_shop": 558,
+					"day": 11,
+					"debt_paid": 30.0,
+					"gross": 168.0,
+					"purchases": [
+						"secim"
+					]
+				},
+				{
+					"cash_after_shop": 10.0,
+					"cash_before_shop": 270,
+					"day": 12,
+					"debt_paid": 36.0,
+					"gross": 198.0,
+					"purchases": [
+						"grill"
+					]
+				}
+			],
+			"before": [
+				{
+					"cash_after_shop": 84.0,
+					"cash_before_shop": 84,
+					"day": 1,
+					"debt_paid": 18.0,
+					"gross": 102.0,
+					"purchases": []
+				},
+				{
+					"cash_after_shop": 168.0,
+					"cash_before_shop": 168,
+					"day": 2,
+					"debt_paid": 18.0,
+					"gross": 102.0,
+					"purchases": []
+				},
+				{
+					"cash_after_shop": 252.0,
+					"cash_before_shop": 252,
+					"day": 3,
+					"debt_paid": 18.0,
+					"gross": 102.0,
+					"purchases": []
+				},
+				{
+					"cash_after_shop": 36.0,
+					"cash_before_shop": 336,
+					"day": 4,
+					"debt_paid": 18.0,
+					"gross": 102.0,
+					"purchases": [
+						"tongs"
+					]
+				},
+				{
+					"cash_after_shop": 120.0,
+					"cash_before_shop": 120,
+					"day": 5,
+					"debt_paid": 18.0,
+					"gross": 102.0,
+					"purchases": []
+				},
+				{
+					"cash_after_shop": 204.0,
+					"cash_before_shop": 204,
+					"day": 6,
+					"debt_paid": 18.0,
+					"gross": 102.0,
+					"purchases": []
+				},
+				{
+					"cash_after_shop": 38.0,
+					"cash_before_shop": 288,
+					"day": 7,
+					"debt_paid": 18.0,
+					"gross": 102.0,
+					"purchases": [
+						"knife"
+					]
+				},
+				{
+					"cash_after_shop": 122.0,
+					"cash_before_shop": 122,
+					"day": 8,
+					"debt_paid": 18.0,
+					"gross": 102.0,
+					"purchases": []
+				},
+				{
+					"cash_after_shop": 206.0,
+					"cash_before_shop": 206,
+					"day": 9,
+					"debt_paid": 18.0,
+					"gross": 102.0,
+					"purchases": []
+				},
+				{
+					"cash_after_shop": 290.0,
+					"cash_before_shop": 290,
+					"day": 10,
+					"debt_paid": 18.0,
+					"gross": 102.0,
+					"purchases": []
+				},
+				{
+					"cash_after_shop": 374.0,
+					"cash_before_shop": 374,
+					"day": 11,
+					"debt_paid": 18.0,
+					"gross": 102.0,
+					"purchases": []
+				},
+				{
+					"cash_after_shop": 458.0,
+					"cash_before_shop": 458,
+					"day": 12,
+					"debt_paid": 18.0,
+					"gross": 102.0,
+					"purchases": []
+				}
+			]
+		},
+		"8": {
+			"after": [
+				{
+					"cash_after_shop": 41.0,
+					"cash_before_shop": 151,
+					"day": 1,
+					"debt_paid": 33.0,
+					"gross": 184.0,
+					"purchases": [
+						"tongs"
+					]
+				},
+				{
+					"cash_after_shop": 92.0,
+					"cash_before_shop": 192,
+					"day": 2,
+					"debt_paid": 33.0,
+					"gross": 184.0,
+					"purchases": [
+						"knife"
+					]
+				},
+				{
+					"cash_after_shop": 23.0,
+					"cash_before_shop": 243,
+					"day": 3,
+					"debt_paid": 33.0,
+					"gross": 184.0,
+					"purchases": [
+						"drink"
+					]
+				},
+				{
+					"cash_after_shop": 61.0,
+					"cash_before_shop": 211,
+					"day": 4,
+					"debt_paid": 41.0,
+					"gross": 229.0,
+					"purchases": [
+						"fryer"
+					]
+				},
+				{
+					"cash_after_shop": 69.0,
+					"cash_before_shop": 249,
+					"day": 5,
+					"debt_paid": 41.0,
+					"gross": 229.0,
+					"purchases": [
+						"paper"
+					]
+				},
+				{
+					"cash_after_shop": 157.0,
+					"cash_before_shop": 257,
+					"day": 6,
+					"debt_paid": 41.0,
+					"gross": 229.0,
+					"purchases": [
+						"store"
+					]
+				},
+				{
+					"cash_after_shop": 345.0,
+					"cash_before_shop": 345,
+					"day": 7,
+					"debt_paid": 41.0,
+					"gross": 229.0,
+					"purchases": []
+				},
+				{
+					"cash_after_shop": 83.0,
+					"cash_before_shop": 533,
+					"day": 8,
+					"debt_paid": 41.0,
+					"gross": 229.0,
+					"purchases": [
+						"secim"
+					]
+				},
+				{
+					"cash_after_shop": 44.0,
+					"cash_before_shop": 304,
+					"day": 9,
+					"debt_paid": 48.0,
+					"gross": 269.0,
+					"purchases": [
+						"grill"
+					]
+				},
+				{
+					"cash_after_shop": 324.0,
+					"cash_before_shop": 324,
+					"day": 10,
+					"debt_paid": 61.0,
+					"gross": 341.0,
+					"purchases": []
+				},
+				{
+					"cash_after_shop": 224.0,
+					"cash_before_shop": 604,
+					"day": 11,
+					"debt_paid": 61.0,
+					"gross": 341.0,
+					"purchases": [
+						"helper"
+					]
+				},
+				{
+					"cash_after_shop": 24.0,
+					"cash_before_shop": 504,
+					"day": 12,
+					"debt_paid": 61.0,
+					"gross": 341.0,
+					"purchases": [
+						"tongs"
+					]
+				}
+			],
+			"before": [
+				{
+					"cash_after_shop": 112.0,
+					"cash_before_shop": 112,
+					"day": 1,
+					"debt_paid": 24.0,
+					"gross": 136.0,
+					"purchases": []
+				},
+				{
+					"cash_after_shop": 224.0,
+					"cash_before_shop": 224,
+					"day": 2,
+					"debt_paid": 24.0,
+					"gross": 136.0,
+					"purchases": []
+				},
+				{
+					"cash_after_shop": 36.0,
+					"cash_before_shop": 336,
+					"day": 3,
+					"debt_paid": 24.0,
+					"gross": 136.0,
+					"purchases": [
+						"tongs"
+					]
+				},
+				{
+					"cash_after_shop": 148.0,
+					"cash_before_shop": 148,
+					"day": 4,
+					"debt_paid": 24.0,
+					"gross": 136.0,
+					"purchases": []
+				},
+				{
+					"cash_after_shop": 10.0,
+					"cash_before_shop": 260,
+					"day": 5,
+					"debt_paid": 24.0,
+					"gross": 136.0,
+					"purchases": [
+						"knife"
+					]
+				},
+				{
+					"cash_after_shop": 122.0,
+					"cash_before_shop": 122,
+					"day": 6,
+					"debt_paid": 24.0,
+					"gross": 136.0,
+					"purchases": []
+				},
+				{
+					"cash_after_shop": 234.0,
+					"cash_before_shop": 234,
+					"day": 7,
+					"debt_paid": 24.0,
+					"gross": 136.0,
+					"purchases": []
+				},
+				{
+					"cash_after_shop": 346.0,
+					"cash_before_shop": 346,
+					"day": 8,
+					"debt_paid": 24.0,
+					"gross": 136.0,
+					"purchases": []
+				},
+				{
+					"cash_after_shop": 458.0,
+					"cash_before_shop": 458,
+					"day": 9,
+					"debt_paid": 24.0,
+					"gross": 136.0,
+					"purchases": []
+				},
+				{
+					"cash_after_shop": 570.0,
+					"cash_before_shop": 570,
+					"day": 10,
+					"debt_paid": 24.0,
+					"gross": 136.0,
+					"purchases": []
+				},
+				{
+					"cash_after_shop": 82.0,
+					"cash_before_shop": 682,
+					"day": 11,
+					"debt_paid": 24.0,
+					"gross": 136.0,
+					"purchases": [
+						"drink"
+					]
+				},
+				{
+					"cash_after_shop": 223.0,
+					"cash_before_shop": 223,
+					"day": 12,
+					"debt_paid": 31.0,
+					"gross": 172.0,
+					"purchases": []
+				}
+			]
+		}
+	}
+}

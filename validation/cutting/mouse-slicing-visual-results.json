@@ -1,0 +1,6 @@
+{
+	"checks": 16,
+	"failures": [],
+	"input": "native mouse events through platform_shell, final GPU pixel comparison",
+	"renderer": "Apple M4"
+}

@@ -1,0 +1,20 @@
+{
+	"advanced_rain": {
+		"frames": 120,
+		"median_ms": 44.073,
+		"p95_ms": 62.566,
+		"scene": "play"
+	},
+	"play": {
+		"frames": 120,
+		"median_ms": 23.512,
+		"p95_ms": 24.211,
+		"scene": "play"
+	},
+	"title": {
+		"frames": 120,
+		"median_ms": 40.262,
+		"p95_ms": 41.962,
+		"scene": "title"
+	}
+}

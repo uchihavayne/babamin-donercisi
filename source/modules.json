@@ -1,0 +1,19 @@
+[
+  "i18n.js",
+  "core.js",
+  "sprites.js",
+  "audio.js",
+  "music.js",
+  "art.js",
+  "sehir.js",
+  "food.js",
+  "chars.js",
+  "data.js",
+  "basarim.js",
+  "game.js",
+  "prologue.js",
+  "logo-veri.js",
+  "logo.js",
+  "ui.js",
+  "main.js"
+]

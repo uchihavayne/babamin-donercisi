@@ -1,0 +1,33 @@
+{
+  "version": "0.6.1",
+  "checks": 488,
+  "failures": [],
+  "suites": {
+    "cutting": 61,
+    "mouse_slicing": 31,
+    "stations": 56,
+    "order_flow": 30,
+    "runtime_state": 31,
+    "platform_input": 84,
+    "counter_input": 17,
+    "regression": 34,
+    "module_services": 18,
+    "counter_design_visual": 62,
+    "order_flow_visual": 19,
+    "mouse_slicing_visual": 16,
+    "stations_visual": 29
+  },
+  "main_lines": 310,
+  "state_lines": 284,
+  "largest_implementation": {
+    "path": "scripts/rendering/characters/customer_draw.gd",
+    "lines": 509
+  },
+  "note": "Godot 4.7.1 macOS Apple M4. Input events are simulated; visual suites use the GPU.",
+  "clean_package": {
+    "import": "passed",
+    "snapshot_cases": 6,
+    "regression_checks": 34,
+    "service_checks": 18
+  }
+}

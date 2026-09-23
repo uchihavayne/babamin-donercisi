@@ -1,0 +1,5 @@
+{
+	"checks": 84,
+	"failures": [],
+	"hardware": "macOS; simulated device input and screen geometry"
+}

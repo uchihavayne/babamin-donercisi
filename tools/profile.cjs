@@ -1,0 +1,3 @@
+const fs=require('fs');let code=fs.readFileSync('scripts/game.gd','utf8'),extra=[];
+code=code.replace(/^func (f_(?:draw\w+|updatePlay|psDraw|ftDraw))\(([^\n]*)\) -> Variant:/gm,(whole,name,params)=>{let args=[...params.matchAll(/p_(\w+): Variant/g)].map(x=>'p_'+x[1]);extra.push(`func ${name}(${params}) -> Variant:\n\tvar started := Time.get_ticks_usec()\n\tvar result: Variant = profile_${name}(${args.join(', ')})\n\tprofile_times[${JSON.stringify(name)}] = profile_times.get(${JSON.stringify(name)}, 0) + Time.get_ticks_usec() - started\n\treturn result\n`);return whole.replace(name,'profile_'+name)});
+fs.writeFileSync('scripts/game.gd',code+'\nvar profile_times: Dictionary = {}\n'+extra.join('\n'));

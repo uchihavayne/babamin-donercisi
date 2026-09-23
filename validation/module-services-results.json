@@ -1,0 +1,5 @@
+{
+	"checks": 18,
+	"coverage": "module ownership, independent state, tuning callbacks, disk save/load and schema compatibility",
+	"failures": []
+}

@@ -1,0 +1,14 @@
+{
+	"checks": 31,
+	"failures": [],
+	"full_tray_seconds": {
+		"120": 2.50833333333333,
+		"30": 2.7,
+		"60": 2.6
+	},
+	"two_second_mouse_counts": [
+		12.0,
+		12.0,
+		12.0
+	]
+}

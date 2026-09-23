@@ -1,0 +1,5 @@
+{
+	"checks": 56,
+	"devices": "synthetic controller, keyboard and touch on macOS",
+	"failures": []
+}

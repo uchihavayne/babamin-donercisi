@@ -1,0 +1,21 @@
+{
+  "host": "Darwin",
+  "godot": "/Applications/Godot.app/Contents/MacOS/Godot",
+  "version": "4.7.1.stable.official.a13da4feb",
+  "export_presets_present": true,
+  "template_directory": "/Users/arzuozsoy/Library/Application Support/Godot/export_templates/4.7.1.stable",
+  "templates": {
+    "Windows": false,
+    "macOS": false,
+    "Linux": false,
+    "Linux ARM64": false,
+    "Android": false,
+    "iOS": false
+  },
+  "android_sdk_directory_present": true,
+  "java_command_present": true,
+  "xcode_present": true,
+  "signing": "Release signing, bundle identifiers and store accounts must be configured by the project owner.",
+  "ps4_ps5": "Requires an approved Sony developer and a licensed Godot console port/export provider; no console SDK is bundled.",
+  "scope": "Prerequisite inventory only; presence does not verify SDK versions, signing, hardware compatibility or certification."
+}

@@ -1,0 +1,58 @@
+{
+  "city--1": {
+    "mean_rgb": 0.42996,
+    "max_channel_difference": 3
+  },
+  "city-0": {
+    "mean_rgb": 1.23954,
+    "max_channel_difference": 4
+  },
+  "city-1": {
+    "mean_rgb": 1.24508,
+    "max_channel_difference": 4
+  },
+  "city-2": {
+    "mean_rgb": 1.24251,
+    "max_channel_difference": 4
+  },
+  "city-3": {
+    "mean_rgb": 2.12944,
+    "max_channel_difference": 87
+  },
+  "city-4": {
+    "mean_rgb": 1.25144,
+    "max_channel_difference": 4
+  },
+  "city-5": {
+    "mean_rgb": 1.56712,
+    "max_channel_difference": 61
+  },
+  "city-6": {
+    "mean_rgb": 1.28196,
+    "max_channel_difference": 4
+  },
+  "city-7": {
+    "mean_rgb": 1.25936,
+    "max_channel_difference": 4
+  },
+  "city-8": {
+    "mean_rgb": 1.35286,
+    "max_channel_difference": 5
+  },
+  "city-9": {
+    "mean_rgb": 0.52316,
+    "max_channel_difference": 4
+  },
+  "play": {
+    "mean_rgb": 0.30584,
+    "max_channel_difference": 3
+  },
+  "story": {
+    "mean_rgb": 0.12442,
+    "max_channel_difference": 1
+  },
+  "title": {
+    "mean_rgb": 0.10671,
+    "max_channel_difference": 2
+  }
+}

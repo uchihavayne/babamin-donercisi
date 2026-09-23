@@ -1,0 +1,17 @@
+{
+  "before": {
+    "frames": 60,
+    "gpu_command_mode": true,
+    "measurement": "CPU simulation and drawing-command preparation only",
+    "median_cpu_ms": 28.174,
+    "p95_cpu_ms": 39.15
+  },
+  "after": {
+    "frames": 60,
+    "gpu_command_mode": true,
+    "measurement": "CPU simulation and drawing-command preparation only",
+    "median_cpu_ms": 25.813,
+    "p95_cpu_ms": 31.16
+  },
+  "context": "Godot 4.7.1 / macOS Apple M4; sequential headless runs with GPU command collection; single 60-frame sample per version; not a hardware FPS measurement"
+}

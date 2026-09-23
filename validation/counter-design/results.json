@@ -1,0 +1,69 @@
+{
+  "version": "0.4.0",
+  "host": "macOS / Apple M4 / Godot 4.7.1",
+  "total_checks": 364,
+  "suites": [
+    {
+      "suite": "stations",
+      "checks": 56,
+      "devices": "synthetic controller, keyboard and touch on macOS",
+      "failures": []
+    },
+    {
+      "suite": "stations-visual",
+      "checks": 29,
+      "failures": [],
+      "host": "macOS; simulated screen sizes and native touch events",
+      "renderer": "Apple M4"
+    },
+    {
+      "suite": "platform-input",
+      "checks": 84,
+      "failures": [],
+      "hardware": "macOS; simulated device input and screen geometry"
+    },
+    {
+      "suite": "platform-visual",
+      "checks": 30,
+      "failures": [],
+      "host": "macOS",
+      "renderer": "Apple M4"
+    },
+    {
+      "suite": "cutting",
+      "checks": 35,
+      "failures": [],
+      "input": "synthetic controller/touch/keyboard on macOS",
+      "two_second_base_knife_counts": [
+        4.0,
+        4.0,
+        4.0
+      ]
+    },
+    {
+      "suite": "mouse-knife",
+      "checks": 17,
+      "failures": []
+    },
+    {
+      "suite": "regression",
+      "checks": 34,
+      "cities": 10,
+      "failures": [],
+      "upgrades": 24
+    },
+    {
+      "suite": "input",
+      "checks": 17,
+      "failures": [],
+      "input": "native mouse events on macOS"
+    },
+    {
+      "suite": "visual",
+      "checks": 62,
+      "failures": [],
+      "renderer": "Apple M4"
+    }
+  ],
+  "hardware_note": "Mouse, keyboard, controller and touch events simulated on macOS; no physical phone or console test."
+}

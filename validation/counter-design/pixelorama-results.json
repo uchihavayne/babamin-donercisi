@@ -1,0 +1,60 @@
+{
+  "application": "Pixelorama 1.2.3",
+  "exports": [
+    {
+      "asset": "counter_design_base",
+      "size": [
+        480,
+        270
+      ],
+      "changed_visible_pixels": 0,
+      "max_rgb_channel_difference": 0,
+      "changed_alpha_pixels": 0,
+      "changed_opaque_pixels": 0
+    },
+    {
+      "asset": "counter_design_trays",
+      "size": [
+        256,
+        128
+      ],
+      "changed_visible_pixels": 0,
+      "max_rgb_channel_difference": 0,
+      "changed_alpha_pixels": 0,
+      "changed_opaque_pixels": 0
+    },
+    {
+      "asset": "counter_fill_et",
+      "size": [
+        384,
+        252
+      ],
+      "changed_visible_pixels": 208,
+      "max_rgb_channel_difference": 1,
+      "changed_alpha_pixels": 0,
+      "changed_opaque_pixels": 0
+    },
+    {
+      "asset": "counter_fill_patates",
+      "size": [
+        384,
+        252
+      ],
+      "changed_visible_pixels": 220,
+      "max_rgb_channel_difference": 1,
+      "changed_alpha_pixels": 0,
+      "changed_opaque_pixels": 0
+    },
+    {
+      "asset": "counter_fill_tursu",
+      "size": [
+        384,
+        252
+      ],
+      "changed_visible_pixels": 0,
+      "max_rgb_channel_difference": 0,
+      "changed_alpha_pixels": 0,
+      "changed_opaque_pixels": 0
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+{
+	"cases": 6,
+	"comparison": "five exact pixel/state snapshots and one save snapshot from 0.5.4",
+	"failures": []
+}

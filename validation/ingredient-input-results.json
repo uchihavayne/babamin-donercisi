@@ -1,0 +1,5 @@
+{
+	"checks": 21,
+	"failures": [],
+	"input": "native mouse events, deterministic simulation"
+}

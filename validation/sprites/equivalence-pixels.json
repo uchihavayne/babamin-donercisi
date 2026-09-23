@@ -1,0 +1,554 @@
+[
+  {
+    "name": "equiv-yogurt-0.0-0.0",
+    "mean_rgb": 9.26e-05,
+    "max": 1,
+    "changed_pixels": 16
+  },
+  {
+    "name": "equiv-yogurt-0.0-0.2",
+    "mean_rgb": 9.26e-05,
+    "max": 1,
+    "changed_pixels": 16
+  },
+  {
+    "name": "equiv-yogurt-0.0-0.5",
+    "mean_rgb": 9.26e-05,
+    "max": 1,
+    "changed_pixels": 16
+  },
+  {
+    "name": "equiv-yogurt-0.0-0.8",
+    "mean_rgb": 9.26e-05,
+    "max": 1,
+    "changed_pixels": 16
+  },
+  {
+    "name": "equiv-yogurt-1.0-0.0",
+    "mean_rgb": 9.26e-05,
+    "max": 1,
+    "changed_pixels": 16
+  },
+  {
+    "name": "equiv-yogurt-1.0-0.2",
+    "mean_rgb": 9.26e-05,
+    "max": 1,
+    "changed_pixels": 16
+  },
+  {
+    "name": "equiv-yogurt-1.0-0.5",
+    "mean_rgb": 9.26e-05,
+    "max": 1,
+    "changed_pixels": 16
+  },
+  {
+    "name": "equiv-yogurt-1.0-0.8",
+    "mean_rgb": 9.26e-05,
+    "max": 1,
+    "changed_pixels": 16
+  },
+  {
+    "name": "equiv-yogurt-12.0-0.0",
+    "mean_rgb": 9.26e-05,
+    "max": 1,
+    "changed_pixels": 16
+  },
+  {
+    "name": "equiv-yogurt-12.0-0.2",
+    "mean_rgb": 9.26e-05,
+    "max": 1,
+    "changed_pixels": 16
+  },
+  {
+    "name": "equiv-yogurt-12.0-0.5",
+    "mean_rgb": 9.26e-05,
+    "max": 1,
+    "changed_pixels": 16
+  },
+  {
+    "name": "equiv-yogurt-12.0-0.8",
+    "mean_rgb": 9.26e-05,
+    "max": 1,
+    "changed_pixels": 16
+  },
+  {
+    "name": "equiv-yogurt-3.0-0.0",
+    "mean_rgb": 9.26e-05,
+    "max": 1,
+    "changed_pixels": 16
+  },
+  {
+    "name": "equiv-yogurt-3.0-0.2",
+    "mean_rgb": 9.26e-05,
+    "max": 1,
+    "changed_pixels": 16
+  },
+  {
+    "name": "equiv-yogurt-3.0-0.5",
+    "mean_rgb": 9.26e-05,
+    "max": 1,
+    "changed_pixels": 16
+  },
+  {
+    "name": "equiv-yogurt-3.0-0.8",
+    "mean_rgb": 9.26e-05,
+    "max": 1,
+    "changed_pixels": 16
+  },
+  {
+    "name": "equiv-yogurt-7.25-0.0",
+    "mean_rgb": 9.26e-05,
+    "max": 1,
+    "changed_pixels": 16
+  },
+  {
+    "name": "equiv-yogurt-7.25-0.2",
+    "mean_rgb": 9.26e-05,
+    "max": 1,
+    "changed_pixels": 16
+  },
+  {
+    "name": "equiv-yogurt-7.25-0.5",
+    "mean_rgb": 9.26e-05,
+    "max": 1,
+    "changed_pixels": 16
+  },
+  {
+    "name": "equiv-yogurt-7.25-0.8",
+    "mean_rgb": 9.26e-05,
+    "max": 1,
+    "changed_pixels": 16
+  },
+  {
+    "name": "equiv-customer-0-angry-0.2",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-0-angry-1.1",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-0-angry-3.7",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-0-happy-0.2",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-0-happy-1.1",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-0-happy-3.7",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-0-neutral-0.2",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-0-neutral-1.1",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-0-neutral-3.7",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-0-served-0.2",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-0-served-1.1",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-0-served-3.7",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-1-angry-0.2",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-1-angry-1.1",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-1-angry-3.7",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-1-happy-0.2",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-1-happy-1.1",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-1-happy-3.7",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-1-neutral-0.2",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-1-neutral-1.1",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-1-neutral-3.7",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-1-served-0.2",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-1-served-1.1",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-1-served-3.7",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-2-angry-0.2",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-2-angry-1.1",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-2-angry-3.7",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-2-happy-0.2",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-2-happy-1.1",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-2-happy-3.7",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-2-neutral-0.2",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-2-neutral-1.1",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-2-neutral-3.7",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-2-served-0.2",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-2-served-1.1",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-2-served-3.7",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-3-angry-0.2",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-3-angry-1.1",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-3-angry-3.7",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-3-happy-0.2",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-3-happy-1.1",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-3-happy-3.7",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-3-neutral-0.2",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-3-neutral-1.1",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-3-neutral-3.7",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-3-served-0.2",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-3-served-1.1",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-customer-3-served-3.7",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-spit-0.0-0.05-0.0",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-spit-0.0-0.05-4.0",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-spit-0.0-0.45-0.0",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-spit-0.0-0.45-4.0",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-spit-0.0-1.0-0.0",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-spit-0.0-1.0-4.0",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-spit-0.45-0.05-0.0",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-spit-0.45-0.05-4.0",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-spit-0.45-0.45-0.0",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-spit-0.45-0.45-4.0",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-spit-0.45-1.0-0.0",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-spit-0.45-1.0-4.0",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-spit-0.9-0.05-0.0",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-spit-0.9-0.05-4.0",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-spit-0.9-0.45-0.0",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-spit-0.9-0.45-4.0",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-spit-0.9-1.0-0.0",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-spit-0.9-1.0-4.0",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-spit-1.2-0.05-0.0",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-spit-1.2-0.05-4.0",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-spit-1.2-0.45-0.0",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-spit-1.2-0.45-4.0",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-spit-1.2-1.0-0.0",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  },
+  {
+    "name": "equiv-spit-1.2-1.0-4.0",
+    "mean_rgb": 0.0,
+    "max": 0,
+    "changed_pixels": 0
+  }
+]

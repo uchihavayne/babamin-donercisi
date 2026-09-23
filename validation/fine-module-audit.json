@@ -1,0 +1,5 @@
+{
+  "compared_function_bodies": 891,
+  "failures": [],
+  "comparison": "0.6.0 implementation tokens vs 0.6.1, ignoring only module qualifiers, whitespace and comments"
+}
