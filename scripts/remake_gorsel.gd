@@ -3485,6 +3485,15 @@ func f_hdSiparisBalon(x: float, y: float, w: float, h: float, acil: bool, secili
 		ctx.globalAlpha = a0
 	return true
 
+# hazirlama seridindeki zeminsiz malzeme ikonu (ikon_hd.py mal_*)
+func f_hdMalzeme(m: String, x: float, y: float) -> bool:
+	if not hd("cip"): return false
+	var A := atlas("ikon")
+	var ad := "ikon_mal_%s" % m
+	if A.is_empty() or not A.parca.has(ad): return false
+	hd_ciz(A, ad, x, y)
+	return true
+
 # yeni balonun malzeme cipi (ikon_hd.py cip): istenen krem, istemiyor pembe + capraz
 func f_hdCip(m: String, x: float, y: float, yasak: bool) -> bool:
 	if not hd("cip"): return false

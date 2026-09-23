@@ -99,7 +99,8 @@ func draw_preparation_overlay(time: Variant = null) -> Variant:
 			var ingredient: String = game.ORDER_FIELDS.keys()[i]
 			var px := x-24+i*16
 			var n := int(w.get(game.ORDER_FIELDS[ingredient], 0))
-			order_ingredient(ingredient, px, y+1)
+			# REMAKE kancasi: HD malzeme ikonu (zeminsiz)
+			if not game.f_hdMalzeme(ingredient, px, y+1): order_ingredient(ingredient, px, y+1)
 			if ingredient in recipe.get("yok", []):
 				game.f_ln(px-5, y+5, px+5, y-4, "#f58d6f")
 				if n > 0: game.text_draw.f_txt("!", px+6, y-2, "#ff8665")

@@ -315,16 +315,17 @@ def yok(m):
     return fn
 
 
-def cip(m, yasak):
+def cip(m, yasak, zemin=True):
     """BIRLESIK SURUM: yeni siparis balonunun (order_draw.order_badge) malzeme
     cipi. Krem (istenen) / pembe (istemiyor) yuvarlak levha + malzeme; istemiyor
     ise kirmizi capraz cizgi (sol alt -> sag ust). Capa: cipin merkezi (x, y);
     levha ekranda x-7..x+7, y-6..y+7."""
     def fn():
         st = [0, .3, .6, .9]
-        zemin = ["#b09d78", "#d2c29e", "#e7dec3", "#f8f1de"] if not yasak else ["#c08e74", "#e0b397", "#f4d3bc", "#fde9dc"]
-        ob = L._egri("cip", [L.yuvarlak_dikdortgen(14, 13, 2.4)], 0.0, -0.5, 0.6, 1.2, 0.35)
-        L.meshle(ob, cel("Cip" + ("Y" if yasak else "N"), zemin, st))
+        renk = ["#b09d78", "#d2c29e", "#e7dec3", "#f8f1de"] if not yasak else ["#c08e74", "#e0b397", "#f4d3bc", "#fde9dc"]
+        if zemin:
+            ob = L._egri("cip", [L.yuvarlak_dikdortgen(14, 13, 2.4)], 0.0, -0.5, 0.6, 1.2, 0.35)
+            L.meshle(ob, cel("Cip" + ("Y" if yasak else "N"), renk, st))
         if m == "pickle":
             Mt = cel("TursuC", ["#2f5a14", "#4a7a22", "#6aa032", "#9ac85a"], st)
             e = I.elipsoid("tursu", 0.0, 0.0, 4.2, 2.6, 1.2, 0.0, Mt, seg=16, ring=8)
@@ -361,6 +362,8 @@ def cip(m, yasak):
 for _m in ("pickle", "yogurt", "fries", "meat"):
     parca("cip_%s" % _m, (-8, -7, 16, 15), cip(_m, False), cizgi="#6b5236", cizgi_alfa=110)
     parca("cip_%s_yok" % _m, (-8, -7, 16, 15), cip(_m, True), cizgi="#6b3a26", cizgi_alfa=110)
+    # hazirlama seridi (order_draw.draw_preparation_overlay): zeminsiz malzeme
+    parca("mal_%s" % _m, (-8, -7, 16, 15), cip(_m, False, False), cizgi="#1e140c", cizgi_alfa=140)
 
 
 for _m in ("pickle", "yogurt", "fries"):
