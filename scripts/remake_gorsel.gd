@@ -139,7 +139,6 @@ func f_dayiHD(x: Variant, y: Variant, st: Variant, t: Variant) -> bool:
 	if A.is_empty(): return false
 	var tt: float = J.n(t)
 	var mod := str(J.getv(st, "mode"))
-	var arm_t: float = J.n(J.getv(st, "armT"))
 	var zipla := -absf(sin(tt * 7.0)) * 3.0 if mod == "happy" else 0.0
 	var dongu := fposmod(tt, 7.4) / 7.4
 	var jest_tip := int(fposmod(floor(tt / 7.4), 3.0))
@@ -164,11 +163,14 @@ func f_dayiHD(x: Variant, y: Variant, st: Variant, t: Variant) -> bool:
 	draw_context.globalAlpha = 1.0
 	hd_ciz(A, "bacak", lx, ly)
 	hd_ciz(A, "govde", ox, oy)
+	# BIRLESIK: doneri oyuncu keser; Dayi kesime yardim etmez (kullanici). Eskiden
+	# "slice" modunda havada bicak sallar gibi kol oynatiyordu ("doneri
+	# kesmiyormus gibi hareket"). Artik kesim sirasinda bekleme pozunda durur,
+	# jest yapmaz, gozleriyle sise bakar.
 	match mod:
 		"slice":
-			var sw := sin(arm_t * 15.0) * 5.0
-			hd_ciz(A, "kol_sol_kesim", ox, oy)
-			hd_ciz(A, "kol_sag_kesim_%d" % clampi(roundi(sw + 5.0), 0, 10), ox, oy)
+			hd_ciz(A, "kol_sol_bosta", ox, oy)
+			hd_ciz(A, "kol_sag_bosta", ox, oy)
 		"happy":
 			hd_ciz(A, "kol_sol_mutlu", ox, oy)
 			hd_ciz(A, "kol_sag_mutlu", ox, oy)
@@ -1074,6 +1076,50 @@ func f_hdSargiUst(tur: String, n: Variant, cx: Variant, cy: Variant) -> bool:
 	var A := atlas("sargi")
 	var ad := "ust_%s_%d_%d" % [tur, k, o]
 	if A.is_empty() or not A.parca.has(ad): return false
+	hd_ciz(A, ad, J.n(cx), J.n(cy))
+	return true
+
+# BIRLESIK (3. tur, kullanici: "malzemeler durumun icinde karismiyor, layer
+# olarak ust uste biniyor"): et x patates x tursu seviyelerinin her birlesimi
+# lavasla TEK 3B sahnede render edildi (blender/models/dolgu_hd.py; atlas
+# dolgu<olcek>). Yogurt ve sos etin yigin seviyesine gore ustune dokulur.
+# Kesirli miktar bir ust seviyeye yuvarlanir (0 disinda en az 1).
+func _sargi_kademe(n: Variant, gerek: Variant) -> int:
+	var v := J.n(n)
+	if v <= 0.0: return 0
+	return clampi(ceili(v / maxf(J.n(gerek), 1.0) * 4.0 - 0.001), 1, 4)
+
+func _dolgu_atlas() -> Dictionary:
+	if not hd_olcekli("sargi"): return {}
+	var o := _durum_olcek(SARGI_OLCEK)
+	if o < 0: return {}
+	return atlas("dolgu%d" % o)
+
+func f_hdSargiDolgu(et: Variant, pat: Variant, tur: Variant, cx: Variant, cy: Variant) -> bool:
+	var A := _dolgu_atlas()
+	if A.is_empty(): return false
+	var e := _sargi_kademe(et, get("j_MEAT_NEED"))
+	var p := _sargi_kademe(pat, get("j_FRIES_NEED"))
+	var t := _sargi_kademe(tur, get("j_PICKLE_NEED"))
+	if e + p + t == 0: return true
+	var ad := "d_%d_%d_%d" % [e, p, t]
+	if not A.parca.has(ad): return false
+	hd_ciz(A, ad, J.n(cx), J.n(cy))
+	return true
+
+func f_hdSargiYogurt(n: Variant, et: Variant, cx: Variant, cy: Variant) -> bool:
+	var A := _dolgu_atlas()
+	if A.is_empty(): return false
+	var ad := "y_%d_%d" % [_sargi_kademe(n, get("j_YOGURT_NEED")), _sargi_kademe(et, get("j_MEAT_NEED"))]
+	if not A.parca.has(ad): return false
+	hd_ciz(A, ad, J.n(cx), J.n(cy))
+	return true
+
+func f_hdSargiSosDok(tur: Variant, et: Variant, cx: Variant, cy: Variant) -> bool:
+	var A := _dolgu_atlas()
+	if A.is_empty(): return false
+	var ad := "s_%s_%d" % ["hot" if J.eq(tur, "hot") else "garlic", _sargi_kademe(et, get("j_MEAT_NEED"))]
+	if not A.parca.has(ad): return false
 	hd_ciz(A, ad, J.n(cx), J.n(cy))
 	return true
 

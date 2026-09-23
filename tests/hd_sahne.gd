@@ -58,6 +58,11 @@ func calis() -> void:
 		g.f_newWrap()
 		var w: Dictionary = g.j_G.boards[0]
 		w.meat = 4; w.pickleN = 4; w.yogurtN = 4; w.friesN = 4
+		# --dolgu E,P,T,Y : acik durumun et / patates / tursu / yogurt miktari
+		if arg("--dolgu") != "":
+			var d := arg("--dolgu").split(",")
+			w.meat = float(d[0]); w.friesN = float(d[1]); w.pickleN = float(d[2]); w.yogurtN = float(d[3])
+		if arg("--sos") != "": w.sauce = arg("--sos")
 		g.customer_system.f_spawnCustomer()
 		var c: Dictionary = g.j_G.customers[0]
 		c.state = "wait"; c.x = c.tx

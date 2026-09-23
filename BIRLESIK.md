@@ -39,6 +39,7 @@ F2: HD aç/kapat (karşılaştırma).
 | `blender/models/ikon_hd.py` | `ikon` | + sipariş balonu malzeme çipleri (istenen / istemiyor), hazırlık şeridi ikonları |
 | `blender/models/sargi_hd.py` | `sargi` | açık dürümün et/patates/turşu/yoğurt/sos katmanları (oyundaki `f_hash1` yerleşimi, 4 seviye × 4 ölçek) |
 | `durum_hd.py`, `yiyecek_hd.py`, `pide_hd.py` | `durum`, `yiyecek`, `pide` | + yeni tahtanın 1.8 / 1.22 / 0.9 ölçekleri |
+| `blender/models/dolgu_hd.py` + `blender/dolgu_birlestir.py` | `dolgu180`, `dolgu122`, `dolgu90`, `dolgu100` | açık dürüm dolgusu: et × patates × turşu (0–4) her birleşimi lavaşla TEK sahnede (parçalar birbirine karışır, gölge düşürür); yoğurt ve sos etin yığın seviyesine göre üste dökülür |
 
 Birleşik yerleşimin ölçüleri (pencere 300×103, cam 292×95, döner şişi) `blender/models/yerlesim.py` içinde; `vitrin_hd.py`, `sokak_arka_hd.py` ve `arac_hd.py` (otomatik kesim rayı) buradan okur.
 
@@ -76,6 +77,15 @@ Kullanıcı geri bildirimiyle gelen düzenlemeler (2026-09-23):
 | Yüzlerde ip gibi çizgi | Kuryenin çene kayışı kaldırıldı, kask alnın üstüne alındı; HD yüzde "çene" ayrıntısının (koyu elips + çizgi) çenenin tamamını kesen şeridi çizilmez |
 | Dayı'nın elleri top gibi | Avuç + dört parmak + başparmaklı eller; dirsekte hafif kırılan, bileğe incelen yen; kısa boyun, çene gölgesi, dik gömlek yakası |
 
+Üçüncü tur:
+
+| Konu | Çözüm |
+| --- | --- |
+| Dayı hiç olmamış | Model baştan: yumurta yüz, kapaklı gözler, gür kaşlar, pala bıyık, konik fes + kordonlu püskül, eğimli omuz + göbek, işlemeli bordo yelek, çizgili kuşak, kıvrımlı şalvar, yemeni, kabarık yenler (katman adları aynı) |
+| Ekmek kesik/yarım | Açık dürüm sarma animasyonu için alttan kırpılıyordu; sarma başlamamışken HD'de kırpma yok |
+| Döner keserken Dayı anlamsız hareket ediyor | Döneri oyuncu keser; Dayı kesimde bekleme pozunda durur, şişe bakar |
+| Dolgu katman katman, karışmıyor | `dolgu_hd.py`: 125 birleşim tek 3B sahnede; yoğurt/sos yığının üstüne dökülür |
+
 Önizleme: `python blender/tezgah2_onizleme.py` (parçaları oyundaki yerlerine dizer).
 
 **Atlas yeniden paketlenince Godot içe aktarması şart**:
@@ -83,6 +93,14 @@ Kullanıcı geri bildirimiyle gelen düzenlemeler (2026-09-23):
 ```sh
 python blender/hd_atlas.py tezgah2_hd tezgah2
 godot --headless --path . --import
+```
+
+Dürüm dolgusu (4 ölçek × 155 render, ölçek başına ~1 dk; ölçekler paralel çalıştırılabilir):
+
+```sh
+blender --background --factory-startup --python blender/models/dolgu_hd.py -- 180   # 122 90 100
+python blender/dolgu_birlestir.py
+python blender/hd_atlas.py dolgu180_hd dolgu180    # her ölçek için
 ```
 
 Yoksa `atlas.json` yeni koordinatları gösterir ama doku eski kalır; parçalar karışık görünür.
@@ -95,6 +113,7 @@ Yoksa `atlas.json` yeni koordinatları gösterir ama doku eski kalır; parçalar
 sh tests/kontrol.sh                                   # tüm betikler ayrıştırılır (tek Godot açılışı)
 godot --path . --resolution 960x540 --script tests/hd_sahne.gd -- --test --gpu-test --full [--sahne shop|title|dayend]
 godot --path . --resolution 960x540 --script tests/hd_sahne.gd -- --test --gpu-test --full --kedi gelis|bekle|yiyor --rakip 330 --kalip kurye
+godot --path . --resolution 960x540 --script tests/hd_sahne.gd -- --test --gpu-test --dolgu 4,3,2,3 --sos garlic   # tek dürüm (1.8 ölçek)
 godot --path . --resolution 960x540 --script tests/hd_musteri_dizi.gd -- --test --gpu-test --adet 32 [--kalip kurye]   # yüz yüz müşteri ızgarası
 godot --path . --resolution 960x540 --script tests/hd_profil.gd -- --test --gpu-test
 godot --headless --path . --script tests/module_snapshot.gd --quit-after 3000 -- --test
