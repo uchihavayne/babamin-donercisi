@@ -103,8 +103,15 @@ func f_drawWrapOpen(p_cx: Variant = null, p_cy: Variant = null, p_wrap: Variant 
 		v_kirpH = 60.0
 	J.method(game.j_ctx, "rect", [(v_cx - 34.0), (v_cy - 26.0), 68.0, v_kirpH])
 	J.method(game.j_ctx, "clip", [])
-	J.setv(game.j_ctx, "globalAlpha", 0.22)
-	game.f_ell(v_cx, (J.add(v_cy, v_ry) - 1.0), v_rx, 3.0, "#000")
+	# BIRLESIK: HD'de golge lavasin hemen altina yapisik (temas golgesi). Eski
+	# elips lavasin 1-3 px ASAGISINA dusuyordu; kirpma kalkinca tahtanin on
+	# kenarindan sarkan bir hilal olarak gorundu, lavas havada duruyordu.
+	if game.hd_gpu():
+		J.setv(game.j_ctx, "globalAlpha", 0.2)
+		game.f_ell(J.add(v_cx, 0.5), J.add(v_cy, 1.0), J.add(v_rx, 0.4), J.add(v_ry, 0.3), "#3a2410")
+	else:
+		J.setv(game.j_ctx, "globalAlpha", 0.22)
+		game.f_ell(v_cx, (J.add(v_cy, v_ry) - 1.0), v_rx, 3.0, "#000")
 	J.setv(game.j_ctx, "globalAlpha", 1.0)
 	# REMAKE kancasi
 	if not game.f_hdLavasAcik(v_cx, v_cy):

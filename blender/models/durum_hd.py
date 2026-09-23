@@ -79,7 +79,8 @@ def durum_acik():
     K = 0.5
     rx, ry = 22.0, 9.0
     Ma = px.flat("LavasAlt", "#c49a64")
-    I.yatay_elips("alt", 0, 0.6, rx, 0.8, Ma, K, ry_ekran=ry, seg=56)
+    # alt kat: lavas ince (eskiden toplam ~2.1 px kalinlik tabak gibi duruyordu)
+    I.yatay_elips("alt", 0, -0.05, rx, 0.6, Ma, K, ry_ekran=ry, seg=56)
     Ml = cel("LavasUst", ["#e2c290", "#ebcd9e", "#f0d5a8", "#f5dfb8"], [0, .3, .55, .88], noise=0.06, noise_scale=7)
     I.yatay_elips("ust", 0, -0.6, rx - 0.3, 1.0, Ml, K, ry_ekran=ry - 0.3, seg=56, egim=0.02)
     zt = 0.6 - 0.5 + 1.0 + 0.02

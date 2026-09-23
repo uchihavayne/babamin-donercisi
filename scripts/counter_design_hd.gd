@@ -89,6 +89,11 @@ func f_drawPreparation(time: Variant = null) -> Variant:
 		var item: Variant = j_G.boards[i]
 		if item == null: continue
 		var cy: float = wrap_system.f_boardCY() - sin(float(item.get("pop", 0)) * PI) * 2
+		# tek urun (1.8 olcek): lavas tahtanin tum derinligini kapliyor, alt kenari
+		# on kenara tasiyordu (kullanici: "tahtanin ustunde durmuyor, havada").
+		# Yalniz cizim yukari alinir; hedef/tiklama noktasi (f_boardCY) ayni.
+		if count == 1:
+			cy -= 3.5
 		match item.kind:
 			"pide": plate_draw.f_drawPideBoard(cx, cy, item, time, scale_value)
 			"plate": plate_draw.f_drawPlate(cx, cy, item, time, scale_value)
