@@ -14,7 +14,7 @@ var hint_time := 0.0
 func _init(owner_game: Node) -> void: game = owner_game
 
 func text(tr_text: String, en_text: String) -> String:
-	return tr_text if game.j_LANG == "tr" else en_text
+	return game.localization.cift(tr_text, en_text)
 
 func tun(key: String) -> Variant: return game.J.method(game.j_TUN, key, [game.j_G])
 

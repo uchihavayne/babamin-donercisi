@@ -2,7 +2,7 @@
 extends "res://scripts/core/game_module.gd"
 
 func order_text(tr_text: String, en_text: String) -> String:
-	return tr_text if game.j_LANG == "tr" else en_text
+	return game.localization.cift(tr_text, en_text)
 
 func f_startDay() -> Variant:
 	game.chosen_order = {}

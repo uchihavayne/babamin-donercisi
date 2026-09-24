@@ -29,6 +29,16 @@ var modal_kind := ""
 var was_processing := false
 var last_language := ""
 var layout_timer := 0.0
+# BIRLESIK (6. tur): ayarlardan acilan kare suresi gostergesi (telefonda olcum)
+var show_perf := false
+var perf_label: Label
+var perf_t := 0.0
+var perf_en := 0.0
+# --olcum N: tam donanimli bir oyun gunu kurulur, N karenin ortalama
+# advance suresi yazilir ve cikilir (release / debug karsilastirmasi)
+var olcum_kare := 0
+var olcum_say := 0
+var olcum_top := 0.0
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -53,6 +63,11 @@ func _ready() -> void:
 		game.storage.path = "res://artifacts/platform-shell-save.json"
 		game.storage.values = {}
 		settings_path = "res://artifacts/platform-settings.cfg"
+	var oa := OS.get_cmdline_user_args().find("--olcum")
+	if oa >= 0:
+		olcum_kare = int(OS.get_cmdline_user_args()[oa + 1]) if oa + 1 < OS.get_cmdline_user_args().size() else 600
+		game.storage.path = "user://olcum-save.json"   # oyuncunun kaydina dokunmaz
+		game.storage.values = {}
 	game_viewport.add_child(game)
 	surface = TextureRect.new()
 	surface.name = "PixelSurface"
@@ -66,7 +81,17 @@ func _ready() -> void:
 	surface.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(surface)
 	build_modal()
+	perf_label = Label.new()
+	perf_label.position = Vector2(6, 4)
+	perf_label.add_theme_font_size_override("font_size", 14)
+	perf_label.add_theme_color_override("font_color", Color("ffe9a0"))
+	perf_label.add_theme_color_override("font_outline_color", Color.BLACK)
+	perf_label.add_theme_constant_override("outline_size", 4)
+	perf_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(perf_label)
 	load_preferences()
+	perf_label.visible = show_perf
+	if olcum_kare > 0: olcum_kur.call_deferred()
 	game.controls.help_requested.connect(show_help)
 	game.settings_requested.connect(show_settings)
 	resized.connect(update_layout)
@@ -76,7 +101,8 @@ func _ready() -> void:
 	update_layout()
 
 func text(tr_text: String, en_text: String) -> String:
-	return tr_text if game != null and game.j_LANG == "tr" else en_text
+	if game == null: return en_text
+	return game.localization.cift(tr_text, en_text)
 
 func make_button(label: String, callback: Callable, focusable := false) -> Button:
 	var button := Button.new()
@@ -160,8 +186,41 @@ func layout_modal() -> void:
 func update_labels() -> void:
 	last_language = game.j_LANG
 
+func olcum_kur() -> void:
+	var g := game
+	g.j_MUTED = true
+	g.j_G.up = {}
+	for u in g.j_UPG: g.j_G.up[u.id] = float(u.lv.size())
+	g.f_startDay()
+	g.j_G.tut = 99; g.j_G.shutT = 0; g.j_G.spawnT = 1000; g.j_G.hintT = 0
+	g.j_G.meat = 12; g.j_G.friesTray = 12
+	for k in g.j_G.stock.keys(): g.j_G.stock[k] = 12; g.j_G.stockAnim[k] = 12
+	g.f_newWrap()
+	for i in 3:
+		g.customer_system.f_spawnCustomer()
+	g.j_G.scene = "play"
+
+func olcum_adim() -> void:
+	olcum_say += 1
+	if olcum_say <= 60: return
+	olcum_top += game.last_frame_ms
+	if olcum_say < 60 + olcum_kare: return
+	var satir := "OLCUM %s ort_ms=%.2f kare=%d fps=%d gpu=%s surucu=%s" % ["debug" if OS.is_debug_build() else "release", olcum_top / olcum_kare, olcum_kare,
+		Engine.get_frames_per_second(), RenderingServer.get_video_adapter_name(), RenderingServer.get_current_rendering_driver_name()]
+	print(satir)
+	var f := FileAccess.open("user://olcum.txt", FileAccess.WRITE)
+	if f: f.store_line(satir); f.close()
+	get_tree().quit()
+
 func _process(delta: float) -> void:
 	if game == null: return
+	if olcum_kare > 0: olcum_adim()
+	if show_perf:
+		perf_t += delta
+		perf_en = maxf(perf_en, game.last_frame_ms)
+		if perf_t >= 0.5:
+			perf_label.text = "%d FPS · %.1f ms" % [Engine.get_frames_per_second(), perf_en]
+			perf_t = 0.0; perf_en = 0.0
 	if game.j_LANG != last_language: update_labels()
 	if game.j_TEXTIN.active and not game.j_TEXTIN.done and not game.j_TEXTIN.cancel and modal_kind != "name": show_name_entry()
 	if modal_kind == "name" and not game.j_TEXTIN.active: close_modal()
@@ -311,6 +370,12 @@ func show_settings() -> void:
 	fps.custom_minimum_size.y = 48 * ui_scale
 	fps.item_selected.connect(func(index: int) -> void: fps_limit = fps.get_item_id(index); Engine.max_fps = fps_limit; save_preferences())
 	modal_body.add_child(fps)
+	var perf := CheckButton.new()
+	perf.text = text("Kare süresini göster", "Show frame time")
+	perf.button_pressed = show_perf
+	perf.custom_minimum_size.y = 48 * ui_scale
+	perf.toggled.connect(func(value: bool) -> void: show_perf = value; perf_label.visible = value; save_preferences())
+	modal_body.add_child(perf)
 	if not mobile: modal_body.add_child(make_button(text("Tam ekran / pencere", "Fullscreen / window"), func() -> void: game.f_fsToggle(), true))
 	var close := make_button(text("Kapat", "Close"), close_modal, true)
 	modal_body.add_child(close)
@@ -361,6 +426,7 @@ func load_preferences() -> void:
 		integer_scale = config.get_value("display", "integer_scale", false)
 		tv_margin = config.get_value("display", "tv_margin", false)
 		fps_limit = config.get_value("display", "fps_limit", 30 if mobile else 60)
+		show_perf = config.get_value("display", "show_perf", false)
 	else: fps_limit = 30 if mobile else 60
 	if fps_limit not in [30, 60]: fps_limit = 60
 	Engine.max_fps = fps_limit
@@ -371,4 +437,5 @@ func save_preferences() -> void:
 	config.set_value("display", "integer_scale", integer_scale)
 	config.set_value("display", "tv_margin", tv_margin)
 	config.set_value("display", "fps_limit", fps_limit)
+	config.set_value("display", "show_perf", show_perf)
 	config.save(settings_path)

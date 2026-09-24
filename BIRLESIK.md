@@ -164,8 +164,8 @@ Kullanıcının sırası: **1, 2, 9 → 15, 18 → 10 → kalanlar**. Biten madd
 - [x] 1 Sarma animasyonu CPU piksel tüp → Blender tüpü (durum_tup_<1..10>, benekler dönerek)
 - [x] 2 İskender tabağı → iskender_hd.py (tabak+pide+et+sos+yoğurt tek sahne; biber, közlenmiş domates katman)
 - [x] 9 Oyun sonu: kutlama → 5 sahnelik kapanış hikâyesi (ÖDENDİ damgası, baba, dolu dükkân, kepenk, SON kartı) → serbest oyun (tests/kapanis.gd)
-- [x] 15 Performans: oyun karesi 14,4 → 13,1 ms, başlık 19,6 → 14,0 ms (uçan et talaşı, elips, çerçeveli yazı, yaya kimliği, sokak ölçüsü önbellekte; başlık vinyetinin görünmeyen 52 çerçevesi kesildi). Mobil zaten 30 FPS. Kalan: release derlemesiyle telefonda ölçüm (dışa aktarma şablonu yok)
-- [ ] 18 Ses efektleri sentez bip (gerçek kayıt yalnız 7 dosya)
+- [x] 15 Performans: oyun karesi 14,4 → 13,1 ms, başlık 19,6 → 14,0 ms (uçan et talaşı, elips, çerçeveli yazı, yaya kimliği, sokak ölçüsü önbellekte; başlık vinyetinin görünmeyen 52 çerçevesi kesildi). Mobil zaten 30 FPS. Release masaüstü 11,5 ms (hata ayıklama 15,6). Android APK: exports/android (ETC2/ASTC açıldı); telefonda Ayarlar → "Kare süresini göster". Ölçüm modu: `-- --olcum 300`
+- [x] 18 Ses: 47 efekt fiziksel modelle sentezlendi (tools/sfx_uret.py → assets/audio/sfx, 111 dosya, çoğu 3 çeşit); dökme döngüsü gerçekçi; kontrol tests/ses_kontrol.gd; dinleme artifacts/ses_tanitim.wav
 - [x] 10 Tempo ölçüldü (tests/tempo.gd, ECONOMY.md): ilk şube 21-35. gün, borç 78-107. gün; borç ilk 60 günde neredeyse erimiyor (karar kullanıcıda)
 - [ ] 3 HUD/paneller 1x piksel, modeller 2x (iki keskinlik)
 - [ ] 4 Parçacıklar 1-2 px kare
@@ -178,7 +178,7 @@ Kullanıcının sırası: **1, 2, 9 → 15, 18 → 10 → kalanlar**. Biten madd
 - [ ] 13 Yükseltme etkisi hissedilmiyor
 - [ ] 14 Olay dengesi ölçülmedi (bahis 20 sn'de sessiz red)
 - [ ] 16 Eski piksel + HD çift yol; ctx.scale altında CPU'ya düşüş
-- [ ] 17 Yeni metinler de/fr/es/pt'de İngilizce
+- [x] 17 (tr, en) çiftleri localization.cift ile sözlükten; 93 metin 4 dile çevrildi (tests/dil_cift.gd)
 - [ ] 19 Üzerine gelince etiketler istasyonları kapatıyor
 - [ ] 20 Alt ipucu satırı hep dolu
 - [ ] 21 Mobil yerleşim denenmedi

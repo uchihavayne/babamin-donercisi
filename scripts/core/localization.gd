@@ -14,6 +14,17 @@ func f_dilVar(p_k: Variant = null) -> Variant:
 	return null
 
 # i18n.js:5001
+# BIRLESIK (6. tur, madde 17): kodda (tr, en) cifti olarak yazilan metinler
+# (istasyon eylemleri, siparis uyarilari, ayarlar penceresi) eskiden de/fr/es/pt'de
+# Ingilizce kaliyordu. Artik sozlukte Turkce anahtar varsa o dilin cevirisi.
+func cift(tr_text: String, en_text: String) -> String:
+	var dil: Variant = game.j_LANG
+	if dil == "tr": return tr_text
+	if dil != "en" and game.j_SOZLUK is Dictionary:
+		var d: Variant = game.j_SOZLUK.get(dil)
+		if d is Dictionary and d.has(tr_text): return d[tr_text]
+	return en_text
+
 func f_T(p_s: Variant = null) -> Variant:
 	var v_d: Variant = null
 	var v_v: Variant = null
