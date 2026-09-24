@@ -503,7 +503,7 @@ def durum_kagit_arka():
 
 # BIRLESIK: yeni tahtada 1 / 2 / 3 urun -> 1.8 / 1.22 / 0.9 olcek (counter_design)
 ACIK_OLCEK = (1.0, 0.74, 0.58, 1.8, 1.22, 0.9)
-SARILI_OLCEK = (1.0, 0.8, 0.74, 0.62, 0.58, 1.8, 1.22, 0.9)
+SARILI_OLCEK = (1.0, 0.8, 0.74, 0.62, 0.58, 1.8, 1.22, 0.9, 0.5)   # 0.5: 3-4 gozlu izgara (2x2)
 parca("durum_acik", (-24, -11, 48, 22), durum_acik, 0.5, ACIK_OLCEK, cizgi="#8a6a3a", cizgi_alfa=110)
 for _ad, _k in KADEME:
     parca("durum_" + _ad, (-26, -10, 52, 20), durum_govde(_k), 0.25, SARILI_OLCEK, cizgi="#5a3a18", cizgi_alfa=120)

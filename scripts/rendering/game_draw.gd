@@ -157,12 +157,20 @@ func f_drawPlay(p_t: Variant = null) -> Variant:
 			game.wrap_draw.f_drawWrapRolled(_v["gsx"], J.add(_v["gsy"], _v["gj"]), J.getv(_v["gs"], "w"), _cells["t"][0], game.grill_system.f_grillSlotSc())
 			_v["gp"] = game.math_utils.f_clamp((float(J.getv(_v["gs"], "t")) / float(max(0.001, J.getv(_v["gs"], "dur")))), 0.0, 1.0)
 			_v["bw"] = (floor((float((J.getv(J.getv(game.j_ST, "grill"), "w") - 10.0)) / float((J.method(game.j_TUN, "grillCap", [game.j_G]) if J.le(J.method(game.j_TUN, "grillCap", [game.j_G]), 2.0) else 2.0))) + 0.5) - 4.0)
+			# BIRLESIK: yeni tezgahta cubuk durumun hemen ustunde, goze sigan boyda
+			var bar_y: float = J.n(_v["gsy"]) - 11.0
+			var bar_h: float = 4.0
+			if game.get("counter_design_enabled"):
+				var gsc: float = J.n(game.grill_system.f_grillSlotSc())
+				_v["bw"] = 18.0 if gsc <= 0.5 else 28.0
+				bar_y = floor(J.n(_v["gsy"]) - 6.5 * gsc - 4.5)
+				bar_h = 3.0
 			if (J.truth(J.getv(_v["gs"], "done")) and J.gt(J.getv(_v["gs"], "yan"), 0.0)):
-				game.counter_draw.f_bar((_v["gsx"] - (float(_v["bw"]) / float(2.0))), (_v["gsy"] - 11.0), _v["bw"], 4.0, (1.0 - J.getv(_v["gs"], "yan")), (J.getv(game.j_P, "bad") if J.gt(J.getv(_v["gs"], "yan"), 0.6) else J.getv(game.j_P, "warn")))
+				game.counter_draw.f_bar((_v["gsx"] - (float(_v["bw"]) / float(2.0))), bar_y, _v["bw"], bar_h, (1.0 - J.getv(_v["gs"], "yan")), (J.getv(game.j_P, "bad") if J.gt(J.getv(_v["gs"], "yan"), 0.6) else J.getv(game.j_P, "warn")))
 				if J.gt(J.getv(_v["gs"], "yan"), _v["yanmaVarmi"]):
 					_v["yanmaVarmi"] = J.getv(_v["gs"], "yan")
 			else:
-				game.counter_draw.f_bar((_v["gsx"] - (float(_v["bw"]) / float(2.0))), (_v["gsy"] - 11.0), _v["bw"], 4.0, _v["gp"], (J.getv(game.j_P, "ok") if J.ge(_v["gp"], 1.0) else J.getv(game.j_P, "warn")))
+				game.counter_draw.f_bar((_v["gsx"] - (float(_v["bw"]) / float(2.0))), bar_y, _v["bw"], bar_h, _v["gp"], (J.getv(game.j_P, "ok") if J.ge(_v["gp"], 1.0) else J.getv(game.j_P, "warn")))
 			if J.truth(J.getv(_v["gs"], "done")):
 				_v["hazirVarmi"] = true
 			_v["gi"] = J.add(_v["gi"], 1.0)

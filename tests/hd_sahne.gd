@@ -91,6 +91,15 @@ func calis() -> void:
 		if arg("--rakip") != "":
 			g.j_G.rakip = {"faz": "gidis", "t": 0.0, "girisT": 0.0, "x": float(arg("--rakip")), "tip": "fiyat",
 				"hedef": 0.0, "para": 0.0, "selam": "", "ilk": false, "sonT": 0.0, "son": ""}
+		# --kurye DURUM : Dayi motorla (leaving: sola cikiyor, back: saga donuyor)
+		if arg("--kurye") != "":
+			g.j_G.courier = {"state": arg("--kurye"), "t": 0.3, "x": 0.0, "pay": 0.0}
+		# --izgara N : izgarada N sarili durum
+		if arg("--izgara") != "":
+			for i in int(arg("--izgara")):
+				var iw: Dictionary = w.duplicate(true)
+				iw.state = "rolled"; iw.roll = 1.0
+				g.j_G.grill.slots.append({"w": iw, "t": 2.0 + i, "dur": 8.0, "done": false, "yan": 0.0})
 		if var_mi("--kesinti"):
 			g.j_G.kesinti = {"faz": "kesik", "t": 3.0, "sure": 20.0, "uyari": 0.0}
 		if var_mi("--kizart"):

@@ -8,6 +8,13 @@ func f_grillSlotX(p_i: Variant = null) -> Variant:
 	var v_k: Variant = null
 	var v_gen: Variant = null
 	var v_i: Variant = p_i
+	# BIRLESIK: yeni tezgahin izgarasi dar (48 px); iki sutunda durumler ust
+	# uste binip tek uzun durum gibi gorunuyordu -> tek sutun, alt alta.
+	if game.get("counter_design_enabled"):
+		var gx: float = J.n(J.getv(J.getv(game.j_ST, "grill"), "x"))
+		if J.n(J.method(game.j_TUN, "grillCap", [game.j_G])) <= 2.0:
+			return floor(gx + J.n(J.getv(J.getv(game.j_ST, "grill"), "w")) / 2.0 + 0.5)
+		return floor(gx + 12.5 + 23.0 * (int(J.n(v_i)) % 2) + 0.5)
 	v_cap = J.method(game.j_TUN, "grillCap", [game.j_G])
 	v_sut = (v_cap if J.le(v_cap, 2.0) else 2.0)
 	v_k = fmod(J.n(v_i), J.n(v_sut))
@@ -21,6 +28,13 @@ func f_grillSlotY(p_i: Variant = null) -> Variant:
 	var v_satir: Variant = null
 	var v_r: Variant = null
 	var v_i: Variant = p_i
+	if game.get("counter_design_enabled"):
+		# tek goz: ortada; iki goz: iki satir; uc-dort goz: 2x2
+		var n: int = clampi(int(J.n(J.method(game.j_TUN, "grillCap", [game.j_G]))), 1, 4)
+		var gy: float = J.n(J.getv(J.getv(game.j_ST, "grill"), "y"))
+		if n == 1: return floor(gy + 24.0 + 0.5)
+		if n == 2: return floor(gy + 18.0 + 15.0 * J.n(v_i) + 0.5)
+		return floor(gy + 19.0 + 15.0 * floor(J.n(v_i) / 2.0) + 0.5)
 	v_cap = J.method(game.j_TUN, "grillCap", [game.j_G])
 	v_satir = (1.0 if J.le(v_cap, 2.0) else 2.0)
 	v_r = (0.0 if J.eq(v_satir, 1.0) else floor((float(v_i) / float(2.0))))
@@ -31,6 +45,8 @@ func f_grillSlotY(p_i: Variant = null) -> Variant:
 func f_grillSlotSc() -> Variant:
 	var v_cap: Variant = null
 	v_cap = J.method(game.j_TUN, "grillCap", [game.j_G])
+	if game.get("counter_design_enabled") and J.gt(v_cap, 2.0):
+		return 0.5
 	return (0.8 if J.eq(v_cap, 1.0) else (0.62 if J.eq(v_cap, 2.0) else 0.58))
 	return null
 
@@ -77,6 +93,14 @@ func f_grillClick() -> Variant:
 			v_i = J.add(v_i, 1.0)
 		if J.ge(v_wi, 0.0):
 			game.grill_system.f_grillPut(v_wi)
+			# BIRLESIK: tek tikta bos goz kadar sarili durumun HEPSI izgaraya
+			# girer (kullanici: "son seviyede 2-3 durumu birden almasi lazim").
+			var v_j: int = int(v_wi) + 1
+			while v_j < int(J.n(J.method(game.j_TUN, "boards", [game.j_G]))) and not J.truth(game.grill_system.f_grillDolu()):
+				var v_b2: Variant = J.getv(J.getv(game.j_G, "boards"), v_j)
+				if J.truth(v_b2) and J.eq(J.getv(v_b2, "kind"), "wrap") and J.eq(J.getv(v_b2, "state"), "rolled") and not J.truth(J.getv(v_b2, "grilled")):
+					game.grill_system.f_grillPut(v_j)
+				v_j += 1
 			return null
 		if J.ge(v_hi, 0.0):
 			game.grill_system.f_grillTakeOut(v_hi)

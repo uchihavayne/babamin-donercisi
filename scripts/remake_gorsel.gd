@@ -1041,7 +1041,7 @@ func f_hdTezgahGovde() -> bool:
 # olcegine en yakin varyant seciliyor (texture_hd konumu olcekliyor, boyutu
 # parcanin kendi piksel olcusu). Dolgu, tup animasyonu, isaretler kodda.
 # 180/122/90: birlesik surumun yeni tahtasi (1/2/3 urun)
-const DURUM_OLCEK := [100, 80, 74, 62, 58, 180, 122, 90]
+const DURUM_OLCEK := [100, 80, 74, 62, 58, 180, 122, 90, 50]
 func _durum_olcek(izinli: Array) -> int:
 	var sc := absf(float(draw_context.transform.x.x))
 	var en := -1
@@ -2853,14 +2853,24 @@ func f_hdScooter(x: Variant, y: Variant, t: Variant, sc: Variant) -> bool:
 	var X := J.n(x)
 	var Y := J.n(y)
 	var wob := floorf(sin(J.n(t) * 22.0) * 0.6 + 0.5)
+	# BIRLESIK: kurye cikarken sola gider (x 24 -> -60) ama model saga bakiyordu
+	# (kullanici: "motor animasyonu ters, diger tarafa bakmasi lazim").
+	# Cikista ayna; donuste (saga gider) oldugu gibi.
+	var cr: Variant = get("j_G").get("courier")
+	var ayna: bool = S == 1.0 and cr is Dictionary and cr.get("state") == "leaving"
 	draw_context.globalAlpha = 0.28
 	f_ell(X, Y + 6.0 * S, 16.0 * S, maxf(1.0, 3.0 * S), "#000")
 	draw_context.globalAlpha = 1.0
-	_olcekli_ciz(A, "scooter_arac" + ek, X, Y, S)
-	_olcekli_ciz(A, "scooter_surucu" + ek, X, Y, S)
-	_olcekli_ciz(A, "scooter_bas" + ek, X, Y + wob * S, S)
+	if ayna:
+		hd_ciz(A, "scooter_arac", X, Y, 1.0, true)
+		hd_ciz(A, "scooter_surucu", X, Y, 1.0, true)
+		hd_ciz(A, "scooter_bas", X, Y + wob, 1.0, true)
+	else:
+		_olcekli_ciz(A, "scooter_arac" + ek, X, Y, S)
+		_olcekli_ciz(A, "scooter_surucu" + ek, X, Y, S)
+		_olcekli_ciz(A, "scooter_bas" + ek, X, Y + wob * S, S)
 	if J.truth(_c("f_chance", 0.35)):
-		_c("f_smoke", X - 16.0, Y + 2.0, 1.0, "rgba(120,110,100,.5)")
+		_c("f_smoke", X + (16.0 if ayna else -16.0), Y + 2.0, 1.0, "rgba(120,110,100,.5)")
 	return true
 
 func f_hdPano(bx: Variant, by: Variant) -> bool:
