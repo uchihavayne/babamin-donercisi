@@ -113,6 +113,8 @@ func calis() -> void:
 				var iw: Dictionary = w.duplicate(true)
 				iw.state = "rolled"; iw.roll = 1.0
 				g.j_G.grill.slots.append({"w": iw, "t": 2.0 + i, "dur": 8.0, "done": false, "yan": 0.0})
+		if var_mi("--yagmur"):
+			g.j_G.weather = "rain"; g.j_G.rainT = 30.0
 		if var_mi("--kesinti"):
 			g.j_G.kesinti = {"faz": "kesik", "t": 3.0, "sure": 20.0, "uyari": 0.0}
 		if var_mi("--kizart"):

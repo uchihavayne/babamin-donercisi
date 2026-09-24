@@ -1766,7 +1766,12 @@ func f_hdYaya(x: Variant, y: Variant, k: Variant, dir: Variant, t: Variant, sc: 
 		hd_ton(A, "yaya_sapka", X, yy, 0, _renk(shirt), ayna, .5)
 	# gozler art.js'te yone gore bir piksel kayiyor: aynada eksen x (govde x+.5)
 	_sabit_ayna(A, "yaya_bas_sabit", X, yy, ayna, 0.0)
-	if J.truth(umb):
+	if J.truth(umb) and A.parca.has("semsiye_kubbe"):
+		# BIRLESIK: dilimli HD semsiye (sokak_hd.semsiye), kisinin rengiyle
+		var PS0: Array = get("j_PED_SHIRT")
+		hd_ton(A, "semsiye_kubbe", X, yy, 0, _renk(PS0[int(fposmod(K * 4.0, PS0.size()))]), ayna, .5)
+		_sabit_ayna(A, "semsiye_sap", X, yy, ayna, .5)
+	elif J.truth(umb):
 		var PS: Array = get("j_PED_SHIRT")
 		f_ell(X, yy - 15 + boy, 6.0, 2.0, "#2f4f6a")
 		f_ell(X, yy - 16 + boy, 6.0, 2.0, PS[int(fposmod(K * 4.0, PS.size()))])

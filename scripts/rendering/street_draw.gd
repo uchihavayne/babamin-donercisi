@@ -235,7 +235,7 @@ func f_drawStreet(p_t: Variant = null, p_dayK: Variant = null, p_rainOn: Variant
 			game.pedestrian_draw.f_drawAsker(v_wx, J.getv(_cells["M"][0], "walkY"), _cells["t"][0], J.getv(v_wk, "dir"), 0.0)
 			game.pedestrian_draw.f_drawAsker((v_wx - (J.getv(v_wk, "dir") * 7.0)), J.getv(_cells["M"][0], "walkY"), _cells["t"][0], J.getv(v_wk, "dir"), 0.0)
 		else:
-			game.pedestrian_draw.f_drawPed(v_wx, J.getv(_cells["M"][0], "walkY"), J.getv(v_wk, "k"), J.getv(v_wk, "dir"), _cells["t"][0], 1.0, (J.eq(fmod(J.n(J.getv(v_wk, "k")), J.n(2.0)), 0.0) if J.truth(_cells["rainOn"][0]) else _cells["rainOn"][0]))
+			game.pedestrian_draw.f_drawPed(v_wx, J.getv(_cells["M"][0], "walkY"), J.getv(v_wk, "k"), J.getv(v_wk, "dir"), _cells["t"][0], 1.0, ((J.n(game.f_hash1(J.n(J.getv(v_wk, "k")) * 1.37)) < 0.8) if J.truth(_cells["rainOn"][0]) else _cells["rainOn"][0]))
 		v_wi = J.add(v_wi, 1.0)
 	_cells["laneY"][0] = [J.getv(_cells["M"][0], "farY"), J.getv(_cells["M"][0], "nearY")]
 	_cells["actors"][0] = []

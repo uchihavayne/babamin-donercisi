@@ -263,6 +263,82 @@ KOKEN["yaya_sapka"] = (-5, -15)
 for _g in (4, 5):
     PARCALAR["yaya_ceket_%d" % _g] = ((-4, -9, 9, 7), yaya_ceket(_g), None)
     KOKEN["yaya_ceket_%d" % _g] = (-4, -9)
+# BIRLESIK (4. tur, kullanici: "insanlarin semsiyeleri olmamis, cok yetersiz").
+# Eskiden kodda iki yassi elips + cizgi. Simdi 8 dilimli kubbe (dilim aralari
+# icerlek, iki tonlu; oyunda kisinin rengiyle CARPAN), tepe ucu, dilim uclari,
+# sap + kivrik tutamak (sabit renk; kubbe holdout ile kapatilir).
+def _semsiye_kubbe(M0, M1):
+    n, R, H = 8, 7.0, 3.5
+    hy = -11.0
+    tepe = -(hy - 7.2)          # z (dunya): gy = hy - 7.2
+    bm = bmesh.new()
+    halkalar = []
+    satir, seg = 7, 48
+    ap = bm.verts.new((0.5, 0.0, tepe))
+    for i in range(1, satir + 1):
+        t = i / float(satir)
+        h = []
+        for j in range(seg):
+            a = 2 * math.pi * j / seg
+            dalga = abs(math.sin(n * a / 2.0))
+            r = R * math.sin(t * math.pi / 2) * (1.0 - 0.05 * dalga * t ** 3)
+            z = tepe - H * (1 - math.cos(t * math.pi / 2)) + 0.9 * dalga * t ** 4
+            h.append(bm.verts.new((0.5 + math.cos(a) * r, math.sin(a) * r, z)))
+        halkalar.append(h)
+    yuzler = []
+    for j in range(seg):
+        yuzler.append((bm.faces.new((ap, halkalar[0][(j + 1) % seg], halkalar[0][j])), j))
+    for a_, b_ in zip(halkalar, halkalar[1:]):
+        for j in range(seg):
+            yuzler.append((bm.faces.new((a_[j], a_[(j + 1) % seg], b_[(j + 1) % seg], b_[j])), j))
+    for f, j in yuzler:
+        f.material_index = (j * n // seg) % 2
+    bmesh.ops.solidify(bm, geom=bm.faces[:], thickness=0.25)
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
+    ob = I.mesh_ob("kubbe", bm, M0, smooth=True)
+    ob.data.materials.append(M1)
+    return ob, tepe, R, H, n
+
+
+def semsiye(bolum):
+    def fn():
+        GECIS[0] = "yok"
+        if bolum == "kubbe":
+            M0 = px.cel("Kubbe0", [gri(.62), gri(.82), gri(1.0), gri(1.14)], [0, .3, .6, .88])
+            M1 = px.cel("Kubbe1", [gri(.5), gri(.68), gri(.84), gri(.98)], [0, .3, .6, .88])
+            _semsiye_kubbe(M0, M1)
+            return
+        # sap: kubbe holdout (sapin kubbe icindeki kismi gorunmez)
+        _semsiye_kubbe(KH.holdout(), KH.holdout())
+        Ms = px.cel("Sap", ["#1e1610", "#2e2218", "#4a3828", "#6a5240"], [0, .3, .6, .88])
+        hy = -11.0
+        uzuv("sap", (1.2, hy - 6.8), (1.2, hy + 4.2), 0.3, -1.4, Ms)
+        # kivrik tutamak (J)
+        for q in range(6):
+            a = math.pi * q / 5.0
+            x = 1.2 - 1.1 + math.cos(a) * 1.1
+            gy = hy + 4.2 + math.sin(a) * 1.1
+            e = I.elipsoid("tutamak%d" % q, x, gy, 0.42, 0.42, 0.42, -1.4, Ms, seg=8, ring=5)
+            e.location = (x, -1.4, ez(gy, -1.4, K))
+        # tepe ucu + one bakan dilim uclari
+        e = I.elipsoid("uc", 0.5, hy - 7.8, 0.35, 0.8, 0.35, 0.0, Ms, seg=8, ring=5)
+        e.location = (0.5, 0.0, ez(hy - 7.8, 0.0, K))
+        R = 7.0
+        for k in range(8):
+            a = 2 * math.pi * k / 8
+            if math.sin(a) > 0.35:
+                continue
+            x, y = 0.5 + math.cos(a) * R, math.sin(a) * R
+            e = I.elipsoid("dilim_uc%d" % k, x, 0, 0.32, 0.32, 0.32, y, Ms, seg=6, ring=4)
+            e.location = (x, y, -(hy - 7.2) - 3.5 + 0.05)
+    return fn
+
+
+PARCALAR["semsiye_kubbe"] = ((-8, -21, 17, 11), semsiye("kubbe"), None)
+KOKEN["semsiye_kubbe"] = (-8, -21)
+PARCALAR["semsiye_sap"] = ((-8, -21, 17, 17), semsiye("sap"), None)
+KOKEN["semsiye_sap"] = (-8, -21)
+
 for _tip in range(6):
     for _sc in (1.0, 0.86):
         Lg = vehlen(_tip, _sc)
