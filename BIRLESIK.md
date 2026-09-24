@@ -90,6 +90,22 @@ Kullanıcı geri bildirimiyle gelen düzenlemeler (2026-09-23):
 | Lavaş pizza hamuruna benziyor | Kabarık kenar halkası ve kusursuz elips kaldırıldı: düzensiz kenarlı ince yufka, yumuşak dalgalı yüzey, soluk kızarma benekleri + un tozu (dolgu yeniden render) |
 | Açık uç görseli iyi değil | Uç baştan: gölgeli iç yüzey (derinlik), ince dalgalı açılmış lavaş ağzı, uçtan kabarık taşan döner talaşları, üç patates çubuğu, yüzü görünen iki turşu dilimi, beyaz sos + kısa damla |
 
+Dördüncü tur:
+
+| Konu | Çözüm |
+| --- | --- |
+| Bahis penceresi ne kabul ne ret | Düğmeler müşteri tıklama alanına düşüyordu; panel açıkken panel içi tıklama istasyonlara/oyun girdisine gitmez (`tests/bahis_input.gd`) |
+| Dayı motorla ters gidiyor | Çıkışta (sola) model aynalanır |
+| Izgara birden fazla dürüm almıyor | Tek tıkta boş göz kadar sarılı dürüm girer; dar ızgarada 1 / 2 satır / 2x2 yerleşim |
+| Tahtada bölüm seçip malzeme eklemek saçma | `wrap_system.f_malzemeHedefi`: malzeme ona ihtiyacı olan ürüne gider (seçili → seçili siparişe bağlı → en eski; sipariş istemiyorsa gitmez); seçili ürün ayrılınca sıradakine geçilir (`tests/akilli_hedef.gd`) |
+| Standart dürümde malzeme çipleri gereksiz | Balonda yalnız istenmeyen malzemeler (üstü çizili) satır açar |
+| Turşu vb. ikonlar kötü | `ikon_hd.malzeme_model`: kornişon+dilim, çanakta yoğurt, kapta patates, talaş et, domates, biber, tereyağı |
+| İskender tabağında ne eksik görünmüyor | Hazırlık şeridi tabak için: et, yoğurt, tereyağı (+ domates, biber); pide için DOĞRA n/N |
+| İskender pidesi (yığın ≠ tahta) | `pide_hd.pide_mesh`: tırnaklı oval pide hem yığında hem tahtada |
+| Şemsiyeler yetersiz | Dilimli HD şemsiye (kubbe + sap); yağmurda yürüyenlerin %80'i şemsiyeli |
+| Hırsız modeli zayıf | Bere, göz maskesi, çizgili kazak, çuval |
+| Yükseltmeler ucuz | Fiyatlar 0.7.0 ile remake arasına çekildi (ECONOMY.md) |
+
 Önizleme: `python blender/tezgah2_onizleme.py` (parçaları oyundaki yerlerine dizer).
 
 **Atlas yeniden paketlenince Godot içe aktarması şart**:

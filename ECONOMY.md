@@ -84,3 +84,34 @@ Test: `godot --headless --path . --script tests/economy.gd -- --test`.
 Görsel/girdi testi: `godot --path . --script tests/economy_visual.gd -- --test --gpu-test`.
 Sonuçlar: `validation/economy-results.json`, `validation/economy/visual-results.json`.
 Önceki fiyatlar karşılaştırma için `tests/fixtures/economy-0.6.1.json` içinde korunur.
+
+## Birleşik sürüm: fiyatlar yeniden yükseltildi
+
+Kullanıcı: "upgrade maliyetleri biraz ucuz, diğer oyunda öyle değildi". Satış fiyatları (0.7.0) aynı; her ekipman seviyesi 0.7.0 fiyatı ile remake (0.6.1) fiyatının ortasına çekildi (onluğa yuvarlı). İlk seviyeler yaklaşık %75, son seviyeler yaklaşık %20 pahalandı. Sabit iş yükü simülasyonunda (6/8/10 sipariş) ilk yararlı alım 2. gün, ilk yeni ürün 5–7. gün (0.7.0: 1. gün / 3–5. gün; 0.6.1: 3–4. gün).
+
+| Ekipman | Seviye fiyatları |
+| --- | --- |
+| Bıçak | 180 / 530 / 1450 / 3900 |
+| Servis Maşası | 200 / 690 / 1900 |
+| Patates Bıçağı | 180 / 560 / 1550 / 4100 |
+| Fritöz | 240 / 740 / 1900 / 4800 |
+| Kağıt Makinesi | 320 / 1650 |
+| Izgara | 480 / 1350 / 3250 / 7250 |
+| İçecek Standı | 410 / 1180 / 2900 / 6400 |
+| Patates Porsiyon | 360 / 1520 |
+| Ayran Kazanı | 530 / 1880 |
+| Tatlı Tepsisi | 730 / 2500 |
+| Domates & Biber | 1000 / 3300 |
+| Sos Standı | 600 / 2750 |
+| İskender Tabağı | 1500 / 4100 / 9750 |
+| Geniş Tezgâh | 490 / 2000 |
+| Çırak | 640 / 2300 / 5750 |
+| Telefon & Motor | 920 / 2850 / 6650 |
+| Dayı | 400 / 1320 / 3300 |
+| Depo | 170 / 550 / 1450 |
+| Güvenlik | 500 / 1650 / 4150 / 8500 |
+| Tabela & Reklam | 350 / 1120 / 2750 |
+| Dükkânı Büyüt | 790 / 2480 / 5900 |
+| Malzeme Seçimi | 1520 / 4500 |
+| Jeneratör | 1020 / 3200 / 7700 |
+| Boya & Dekor | 140 / 440 / 1050 |

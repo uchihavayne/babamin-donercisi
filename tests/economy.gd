@@ -77,12 +77,15 @@ func test_payments() -> void:
 
 func test_upgrades() -> void:
 	fresh(); game.j_G.scene = "shop"
-	game.j_G.money = 109
-	check(not game.upgrade_system.buy("tongs") and game.j_G.money == 109 and game.j_G.up.is_empty(),
+	var tongs_price := 0
+	for u in game.j_UPG:
+		if u.id == "tongs": tongs_price = int(u.lv[0].p)
+	game.j_G.money = tongs_price - 1
+	check(not game.upgrade_system.buy("tongs") and game.j_G.money == tongs_price - 1 and game.j_G.up.is_empty(),
 		"insufficient funds never buy a level or deduct money")
-	game.j_G.money = 110
+	game.j_G.money = tongs_price
 	check(game.upgrade_system.buy("tongs") and game.j_G.money == 0 and game.j_G.up.tongs == 1,
-		"first tongs upgrade is affordable after six good starter orders")
+		"first tongs upgrade costs exactly its listed price")
 	check(game.J.method(game.j_TUN,"meatPerClick",[game.j_G]) == 2,
 		"buying tongs actually doubles portions per action")
 	check(game.f_loadGame().up.tongs == 1 and game.f_loadGame().money == 0,
@@ -177,10 +180,13 @@ func run() -> void:
 	for orders in [6,8,10]:
 		var before := simulate(true,orders)
 		var after := simulate(false,orders)
-		check(first_purchase(after,"tongs") == 1 and first_purchase(before,"tongs") > 1,
-			"first useful purchase is reachable on day one at " + str(orders) + " orders")
-		check(first_purchase(after,"drink") in range(3,6),
-			"first additional product unlock arrives on days 3..5 at " + str(orders) + " orders")
+		# BIRLESIK (kullanici: "upgrade maliyetleri ucuz, diger oyunda oyle degildi"):
+		# fiyatlar 0.7.0 ile 0.6.1 (remake) arasinda -> ilk yararli alim 2. gun,
+		# ilk yeni urun 5..7. gun; yine de 0.6.1'den (3..4. gun) erken.
+		check(first_purchase(after,"tongs") == 2 and first_purchase(before,"tongs") > 2,
+			"first useful purchase is reachable on day two at " + str(orders) + " orders")
+		check(first_purchase(after,"drink") in range(5,8),
+			"first additional product unlock arrives on days 5..7 at " + str(orders) + " orders")
 		check(after[0].cash_before_shop > before[0].cash_before_shop,
 			"starter day's take-home earnings increase at " + str(orders) + " orders")
 		scenarios[str(orders)] = {"before":before,"after":after}
