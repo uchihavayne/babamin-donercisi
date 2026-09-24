@@ -144,6 +144,14 @@ func f_dayiHD(x: Variant, y: Variant, st: Variant, t: Variant) -> bool:
 	var jest_tip := int(fposmod(floor(tt / 7.4), 3.0))
 	var jest_var := mod == "idle" and jest_tip < 2 and dongu > .55 and dongu < .82
 	var jest_k := sin((dongu - .55) / .27 * PI) if jest_var else 0.0
+	# BIRLESIK (6. tur, madde 6): ucuncu jest cay yudumu (bos jest yuvasi):
+	# kol kalkar (.45-.55), yudum (.55-.8, gozler keyifle yari kapali), iner.
+	# El yuze yaklasinca (kare >= 5) kol kafanin ONUNE cizilir.
+	var cay_var: bool = mod == "idle" and jest_tip == 2 and dongu > .45 and dongu < .9 and A.parca.has("kol_sol_cay_8")
+	var cay_k := 0.0
+	if cay_var:
+		cay_k = clampf((dongu - .45) / .1, 0.0, 1.0) if dongu < .55 else (1.0 if dongu < .8 else clampf((.9 - dongu) / .1, 0.0, 1.0))
+	var cay_n := clampi(roundi(cay_k * 8.0), 0, 8)
 	# BEKLEME (birlesik surum, kullanici: "saga sola kayiyor, titriyor"):
 	# eskiden BUTUN govde (ayaklar dahil) tam piksel adimlarla +-1.3 kayip
 	# +-1 inip kalkiyordu. Simdi ayaklar yerde sabit; nefes yalniz ust govdeyi
@@ -175,7 +183,8 @@ func f_dayiHD(x: Variant, y: Variant, st: Variant, t: Variant) -> bool:
 			hd_ciz(A, "kol_sol_mutlu", ox, oy)
 			hd_ciz(A, "kol_sag_mutlu", ox, oy)
 		_:
-			hd_ciz(A, "kol_sol_bosta", ox, oy)
+			if cay_n == 0: hd_ciz(A, "kol_sol_bosta", ox, oy)
+			elif cay_n < 5: hd_ciz(A, "kol_sol_cay_%d" % cay_n, ox, oy)
 			var n := clampi(roundi(jest_k * 8.0), 0, 8)
 			if n == 0: hd_ciz(A, "kol_sag_bosta", ox, oy)
 			else: hd_ciz(A, "kol_sag_jest_%s_%d" % ["fes" if jest_tip == 1 else "biyik", n], ox, oy)
@@ -196,6 +205,8 @@ func f_dayiHD(x: Variant, y: Variant, st: Variant, t: Variant) -> bool:
 		hd_ciz(A, "goz_yari", kx, kafa_y)
 	elif J.n(f_hash1(floor(tt * 1.3))) > .90 and not A.parca.has("goz_yari"):
 		hd_ciz(A, "goz_kapali", kx, kafa_y)
+	elif cay_k >= 1.0:
+		hd_ciz(A, "goz_yari", kx, kafa_y)
 	else:
 		var bak := 1 if mod == "slice" or sin(tt * .6) > 0.0 else 0
 		hd_ciz(A, "goz_acik_%d" % bak, kx, kafa_y)
@@ -203,6 +214,7 @@ func f_dayiHD(x: Variant, y: Variant, st: Variant, t: Variant) -> bool:
 	hd_ciz(A, "allik", kx, kafa_y)
 	hd_ciz(A, "biyik", kx, kafa_y)
 	hd_ciz(A, "agiz_mutlu" if mod == "happy" else "agiz", kx, kafa_y)
+	if cay_n >= 5: hd_ciz(A, "kol_sol_cay_%d" % cay_n, ox, oy)
 	return true
 
 # ---------------------------------------------------------------- doner sisi

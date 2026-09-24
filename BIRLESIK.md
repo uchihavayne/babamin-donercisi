@@ -170,7 +170,7 @@ Kullanıcının sırası: **1, 2, 9 → 15, 18 → 10 → kalanlar**. Biten madd
 - [x] 3 Yazılar HD'de Scale2x (EPX) ile 2x ızgarada (genişlik/düzen aynı, kavisler yumuşak); kutular ve ikonlar zaten HD
 - [x] 4 Parçacık: konfeti dönen kâğıt, büyük benek yuvarlak, hızlı kıvılcım/kırıntı kısa izli
 - [x] 5 Müşteri ifadesi okunur: sabırsız (0,55 altı) ter damlası, kızgın öfke damarı + kırmızı yanak, mutlu pembe yanak (hd_musteri_dizi --ruh)
-- [ ] 6 Dayı'nın hareket çeşidi az
+- [x] 6 Dayı: üçüncü jest çay yudumu (ince belli bardak, 8 kare, yudumda gözler yarı kapalı, kol yüzün önüne geçer); mevcut: nefes, fes/bıyık jesti, kırpma, sevinç
 - [ ] 7 Gece hırsız sahnesi sönük
 - [x] 8 Dükkân: alınan istasyon gri sahnede renkli belirir + altın çerçeve, 1,6 sn'de griye döner (gpu_canvas mono_kar)
 - [ ] 11 Kötü günün bedeli yok (itibar vb.)

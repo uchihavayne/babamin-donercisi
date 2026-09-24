@@ -60,8 +60,11 @@ DUDAK = ["#6a2a22", "#8e3c30", "#a85444", "#c06a58"]
 STOPS = [0.0, 0.34, 0.62, 0.86]
 EK = ["#ffffff", "#2b1a12", "#1a120c", "#f6efe2", "#5a2c22", "#7a3a30", "#c9584a", "#e07a68", "#fff0dc",
       "#3a2418", "#d9cfc0", "#6e6a62"]
+# BIRLESIK (6. tur, madde 6): ince belli bardakta demli cay (yudum jesti)
+CAY = ["#3e0e04", "#6a1c08", "#96300c", "#c24e18"]
+CAM = ["#8a9ea4", "#c4d6da", "#e6f0f2", "#ffffff"]
 IZINLI = sorted(set(sum([SKIN, GOMLEK, YELEK, ALTIN, KUSAK, KUSAK2, SALVAR, LASTIK, CIZME, AK, FES, FES_UST,
-                         PUSKUL, DUDAK], []) + EK))
+                         PUSKUL, DUDAK, CAY, CAM], []) + EK))
 
 
 def sahne():
@@ -462,6 +465,26 @@ KESIM_KARE = 11
 JEST_KARE = 8
 
 
+def cay_bardagi(ad, bx, by, derin, egim):
+    """Ince belli cay bardagi: dibi elin icinde, agzi egim (radyan) yonunde.
+    Govde demli cay rengi (cam ince, icerik okunur), agizda cam halka, yanda
+    parlak cizgi."""
+    ux, uy = math.sin(egim), -math.cos(egim)
+    MC = cel("Cay", CAY)
+    MG = cel("CayCam", CAM)
+    p0 = (bx, by)
+    p1 = (bx + ux * 2.8, by + uy * 2.8)
+    p2 = (bx + ux * 6.0, by + uy * 6.0)
+    tup(ad + "_alt", p0, p1, 1.7, derin, MC, r_b=1.15)
+    tup(ad + "_ust", p1, p2, 1.15, derin, MC, r_b=1.85)
+    elipsoid(ad + "_dip", p0[0], p0[1], 1.8, 0.7, 1.8, derin, MG, seg=14, ring=8)
+    elipsoid(ad + "_agiz", p2[0], p2[1], 1.95, 0.45, 1.95, derin, MG, seg=16, ring=8)
+    nx, ny = -uy, ux
+    egri_tup(ad + "_isik", [(p0[0] - nx * 1.1, p0[1] - ny * 1.1, derin - 1.5),
+                            (p1[0] - nx * 0.7, p1[1] - ny * 0.7, derin - 1.3),
+                            (p2[0] - nx * 1.3, p2[1] - ny * 1.3, derin - 1.7)], [0.22, 0.18, 0.22], px.flat("CayIsik", "#ffffff"))
+
+
 def kol_katmani(ad):
     """Katman adindan poz: kol_sol_bosta, kol_sag_jest_fes_3 ..."""
     by, hx, hy = 50, 23, 30
@@ -482,6 +505,14 @@ def kol_katmani(ad):
         kol(ad, (42.5, by + 9), (46, by + 34 + sw))
     elif ad == "kol_sol_kesim":
         kol(ad, (4.5, by + 12), (4, by + 36.5))
+    elif ad.startswith("kol_sol_cay_"):
+        # yudum: el kalcadan cenenin soluna kalkar, bardak agiza dogru egilir
+        k = int(ad.split("_")[-1]) / float(JEST_KARE)
+        elx = 3.5 + (14.5 - 3.5) * k
+        ely = (by + 40) + (49.0 - (by + 40)) * k
+        d = -6.0 * k - 2.0
+        kol(ad, (4.5, by + 9), (elx, ely), derin=d)
+        cay_bardagi(ad + "_bardak", elx + 1.2, ely - 2.4, d - 2.5, math.radians(38.0) * k * k)
     elif ad == "kol_sol_mutlu":
         kol(ad, (3.5, by + 11), (2, by - 14), manset=False)
     elif ad == "kol_sag_mutlu":
@@ -678,6 +709,7 @@ katman("agiz_mutlu", lambda: agiz(True), cizgi=False)
 for ad in (["kol_sol_bosta", "kol_sag_bosta", "kol_sol_kesim", "kol_sol_mutlu", "kol_sag_mutlu"]
            + ["kol_sag_jest_fes_%d" % i for i in range(1, JEST_KARE + 1)]
            + ["kol_sag_jest_biyik_%d" % i for i in range(1, JEST_KARE + 1)]
+           + ["kol_sol_cay_%d" % i for i in range(1, JEST_KARE + 1)]
            + ["kol_sag_kesim_%d" % i for i in range(KESIM_KARE)]):
     katman(ad, lambda ad=ad: kol_katmani(ad))
 
