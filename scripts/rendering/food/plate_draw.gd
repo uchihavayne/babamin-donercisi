@@ -230,6 +230,12 @@ func f_drawPlate(p_cx: Variant = null, p_cy: Variant = null, p_pl: Variant = nul
 	J.setv(game.j_ctx, "globalAlpha", 0.25)
 	game.f_ell(v_cx, J.add(J.add(v_cy, v_ry), 1.0), v_rx, 3.0, "#000")
 	J.setv(game.j_ctx, "globalAlpha", 1.0)
+	# BIRLESIK (6. tur): HD'de tabak ve icerigi tek Blender parcasi
+	if game.f_hdIskender(v_pl, J.method(game.j_TUN, "iskMeat", [game.j_G]), v_cx, v_cy):
+		if J.truth(J.getv(v_pl, "butter")) and J.truth(game.f_chance(0.1)):
+			game.effects.f_part({"x": J.add(v_cx, game.math_utils.f_rnd((-J.n(10.0)), 10.0)), "y": (v_cy - 6.0), "vx": game.math_utils.f_rnd((-J.n(4.0)), 4.0), "vy": game.math_utils.f_rnd((-J.n(16.0)), (-J.n(8.0))), "life": 0.6, "col": "rgba(255,220,180,.5)", "g": (-J.n(8.0)), "sz": 1.0})
+		J.method(game.j_ctx, "restore", [])
+		return null
 	# REMAKE kancasi
 	if not game.f_hdTabak(v_cx, v_cy):
 		game.f_ell(v_cx, J.add(v_cy, 2.0), v_rx, v_ry, "#aeb6bd")

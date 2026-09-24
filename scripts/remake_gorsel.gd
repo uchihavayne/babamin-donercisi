@@ -1191,6 +1191,31 @@ func f_hdTabak(cx: Variant, cy: Variant) -> bool:
 	hd_ciz(A, "tabak_%d" % o, J.n(cx), J.n(cy))
 	return true
 
+# BIRLESIK (6. tur, analiz madde 2): Iskender tabaginin icerigi. Tabak +
+# pide + et (E 0..4) + tereyagli sos (B) + yogurt (Y 0..3) tek Blender
+# sahnesi; biber (etin ustunde, E'ye gore) ve kozlenmis domates ayri katman
+# (blender/models/iskender_hd.py). Pidesiz tabak (olmaz) ya da olcek yoksa
+# false -> kod cizer.
+const ISK_OLCEK := [180, 122, 90, 85, 100]
+func f_hdIskender(pl: Dictionary, et_gerek: Variant, cx: Variant, cy: Variant) -> bool:
+	if not J.truth(pl.get("pide")) or not hd_olcekli("tabak"): return false
+	var o := _durum_olcek(ISK_OLCEK)
+	if o < 0: return false
+	var A := atlas("iskender")
+	if A.is_empty(): return false
+	var e := _sargi_kademe(pl.get("meat", 0), et_gerek)
+	var yk := clampi(ceili(J.n(pl.get("yogurtN", 0)) / J.n(get("j_PLATE_YOGURT")) * 3.0 - 0.001), 0, 3)
+	var ad := "isk_%d_%d_%d_%d" % [e, 1 if J.truth(pl.get("butter")) else 0, yk, o]
+	if not A.parca.has(ad): return false
+	var x := J.n(cx)
+	var y := J.n(cy)
+	hd_ciz(A, ad, x, y)
+	var b := mini(int(J.n(pl.get("pepper", 0))), 2)
+	if b > 0: hd_ciz(A, "isk_bib_%d_%d_%d" % [b, e, o], x, y)
+	var d := mini(int(J.n(pl.get("tomato", 0))), 3)
+	if d > 0: hd_ciz(A, "isk_dom_%d_%d" % [d, o], x, y)
+	return true
+
 func f_hdPatatesKutusu(cx: Variant, cy: Variant, q: Variant, t: Variant) -> bool:
 	if not hd("patates_kutusu"): return false
 	var A := atlas("yiyecek")
