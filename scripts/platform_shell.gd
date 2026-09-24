@@ -200,13 +200,15 @@ func olcum_kur() -> void:
 		g.customer_system.f_spawnCustomer()
 	g.j_G.scene = "play"
 
+var olcum_odak := ""
 func olcum_adim() -> void:
 	olcum_say += 1
+	if olcum_say == 61: olcum_odak = "evet" if get_window().has_focus() else "hayir"
 	if olcum_say <= 60: return
 	olcum_top += game.last_frame_ms
 	if olcum_say < 60 + olcum_kare: return
-	var satir := "OLCUM %s ort_ms=%.2f kare=%d fps=%d gpu=%s surucu=%s" % ["debug" if OS.is_debug_build() else "release", olcum_top / olcum_kare, olcum_kare,
-		Engine.get_frames_per_second(), RenderingServer.get_video_adapter_name(), RenderingServer.get_current_rendering_driver_name()]
+	var satir := "OLCUM %s ort_ms=%.2f kare=%d fps=%d gpu=%s surucu=%s odak=%s" % ["debug" if OS.is_debug_build() else "release", olcum_top / olcum_kare, olcum_kare,
+		Engine.get_frames_per_second(), RenderingServer.get_video_adapter_name(), RenderingServer.get_current_rendering_driver_name(), olcum_odak]
 	print(satir)
 	var f := FileAccess.open("user://olcum.txt", FileAccess.WRITE)
 	if f: f.store_line(satir); f.close()
