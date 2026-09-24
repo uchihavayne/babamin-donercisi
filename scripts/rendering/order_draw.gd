@@ -11,14 +11,20 @@ func order_standard_disi(item: Dictionary) -> bool:
 # genisler (eskiden sabit 58 px'e 3 urun sikisip ust uste biniyordu).
 const SIP_HUCRE := 20.0
 
+# satirda en fazla 3 urun (musteri yuvalari 66 px arali; daha genis balon komsuya biner)
+const SIP_SUTUN := 3
+
 func order_bubble_width(customer: Dictionary) -> float:
-	return maxf(46.0, 8.0 + SIP_HUCRE * customer.items.size())
+	return maxf(46.0, 8.0 + SIP_HUCRE * mini(customer.items.size(), SIP_SUTUN))
+
+func order_icon_rows(customer: Dictionary) -> int:
+	return maxi(1, int(ceil(customer.items.size() / float(SIP_SUTUN))))
 
 func order_bubble_rect(customer: Dictionary) -> Rect2:
 	var wraps := 0
 	for item in customer.items:
 		if order_standard_disi(item): wraps += 1
-	var height := 27 + 19 * wraps
+	var height := 27 + 18 * (order_icon_rows(customer) - 1) + 19 * wraps
 	var w := order_bubble_width(customer)
 	return Rect2(clampf(customer.x - w / 2.0, 2, 478 - w), maxf(game.j_VIEW.top + 3, customer.y - 56 - height), w, height)
 
@@ -75,14 +81,18 @@ func f_drawOrderBubble(customer: Variant = null, time: Variant = null) -> Varian
 		game.f_rrect(r.position.x+1, r.position.y+1, r.size.x-2, r.size.y-2, 2, "#fff1cf")
 		game.f_fr(customer.x-2, r.end.y, 5, 2, border)
 		game.f_fr(customer.x-1, r.end.y+2, 3, 2, border)
-	var bos: float = (r.size.x - 8.0 - SIP_HUCRE * customer.items.size()) / 2.0
-	for i in customer.items.size():
-		var x: float = r.position.x + 4 + bos + SIP_HUCRE * (i + 0.5)
+	var n_items: int = customer.items.size()
+	for i in n_items:
+		var satir: int = i / SIP_SUTUN
+		var bu_satir: int = mini(SIP_SUTUN, n_items - satir * SIP_SUTUN)
+		var bos: float = (r.size.x - 8.0 - SIP_HUCRE * bu_satir) / 2.0
+		var x: float = r.position.x + 4 + bos + SIP_HUCRE * (i % SIP_SUTUN + 0.5)
+		var iy: float = r.position.y + 12 + 18 * satir
 		game.j_ctx.globalAlpha = 0.35 if customer.done[i] else 1.0
-		order_icon(customer.items[i], x, r.position.y+12, time)
+		order_icon(customer.items[i], x, iy, time)
 		game.j_ctx.globalAlpha = 1
-		if customer.done[i]: game.icon_draw.f_drawCheck(x, r.position.y+12, "#50843b")
-	var row_y := r.position.y+31
+		if customer.done[i]: game.icon_draw.f_drawCheck(x, iy, "#50843b")
+	var row_y := r.position.y + 31 + 18 * (order_icon_rows(customer) - 1)
 	for i in customer.items.size():
 		var item: Dictionary = customer.items[i]
 		if not order_standard_disi(item): continue

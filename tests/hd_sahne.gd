@@ -87,6 +87,14 @@ func calis() -> void:
 			c.items = [{"kind": "wrap", "sauce": "hot"}, {"kind": "fbox"}, {"kind": "sweet"}]
 			c.done = [false, false, false]
 			c.bubble = 1.0
+		if var_mi("--siparis4"):
+			g.customer_system.f_spawnCustomer()
+			var c2: Dictionary = g.j_G.customers[1]
+			c2.state = "wait"; c2.x = c2.tx
+			c.items = [{"kind": "wrap", "sauce": "garlic", "yok": ["fries"]}, {"kind": "drink", "type": "fanta"}, {"kind": "fbox"}, {"kind": "sweet"}]
+			c.done = [false, true, false, false]; c.bubble = 1.0
+			c2.items = [{"kind": "wrap"}, {"kind": "wrap", "yok": ["pickle", "yogurt"]}, {"kind": "drink", "type": "ayran"}]
+			c2.done = [false, false, false]; c2.bubble = 1.0
 		if var_mi("--paket"):
 			g.j_G.phone.state = "order"
 			g.j_G.phone.order = [{"kind": "wrap", "sauce": "garlic", "yok": ["pickle"]}, {"kind": "wrap", "sauce": "hot"}, {"kind": "fbox"}, {"kind": "drink", "type": "cola"}, {"kind": "sweet"}]

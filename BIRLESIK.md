@@ -106,6 +106,18 @@ Dördüncü tur:
 | Hırsız modeli zayıf | Bere, göz maskesi, çizgili kazak, çuval |
 | Yükseltmeler ucuz | Fiyatlar 0.7.0 ile remake arasına çekildi (ECONOMY.md) |
 
+Beşinci tur (cila):
+
+| Konu | Çözüm |
+| --- | --- |
+| Pide yığınının üstü kesik | Tuval üstten büyüdü; katmanlar hafif dönük (paralel çizgi gibiydi) |
+| Moto siparişinde sos ikonları farklı | `phone_draw` yeni fişi modülde arıyordu (hep eski fiş); fiş balonla aynı HD ikonlar, ölçeksiz |
+| Balonda patates dürümden büyük, üst üste | Ürün başına eşit 20 px hücre, tek tip `sip_*` ikonlar, satırda en fazla 3 ürün |
+| Gün sonu / rekor listesinde ikonlar taşıyor | Küçük tek tip `lst_*` ikonlar |
+| Hava rozeti telefonun üstünde | Üst satırda borç kutusunun yanında |
+| "BOZUK" moto etiketi Dayı'nın üstünde | Bölmenin altında |
+| Hata taraması | `tests/kaos.gd` (HD, rastgele eylem + olaylar): 4 tur, 29.000 kare, 0 betik hatası; bozuk üç test onarıldı |
+
 Önizleme: `python blender/tezgah2_onizleme.py` (parçaları oyundaki yerlerine dizer).
 
 **Atlas yeniden paketlenince Godot içe aktarması şart**:
@@ -136,6 +148,7 @@ godot --path . --resolution 960x540 --script tests/hd_sahne.gd -- --test --gpu-t
 godot --path . --resolution 960x540 --script tests/hd_sahne.gd -- --test --gpu-test --dolgu 4,3,2,3 --sos garlic   # tek dürüm (1.8 ölçek)
 godot --path . --resolution 960x540 --script tests/hd_musteri_dizi.gd -- --test --gpu-test --adet 32 [--kalip kurye]   # yüz yüz müşteri ızgarası
 godot --path . --resolution 960x540 --script tests/hd_profil.gd -- --test --gpu-test
+godot --path . --resolution 960x540 --script tests/kaos.gd -- --test --gpu-test --kare 9000 --tohum 7   # rastgele oyun turu, hata avı
 godot --headless --path . --script tests/module_snapshot.gd --quit-after 3000 -- --test
 ```
 
