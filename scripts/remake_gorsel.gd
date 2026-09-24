@@ -2193,6 +2193,84 @@ func _hp(x: float, y: float, w: float, h: float, c: Color) -> void:
 func _hr(x: float, y: float, w: float, h: float, c: Variant) -> void:
 	draw_context.rect_hd(roundf(x * 2.0), roundf(y * 2.0), w * 2.0, h * 2.0, _renk(c))
 
+# BIRLESIK (6. tur, analiz madde 5): sabirsiz ve kizgin yuz oyun olceginde
+# birbirine benziyordu. Cizgi film isaretleri: kizginda yanak kizarikligi +
+# zonklayan ofke damari, sabirsizda sakaktan suzulen ter damlasi, mutluda pembe
+# yanak. Dokular bir kez uretilir (HD piksel, murekkep kenarli).
+var _isaret_doku: Dictionary = {}
+
+func _isaret(ad: String) -> ImageTexture:
+	if _isaret_doku.has(ad): return _isaret_doku[ad]
+	var img: Image
+	if ad.begins_with("damar"):
+		var R := 5.4 if ad == "damar" else 6.4
+		var N := 16 if ad == "damar" else 18
+		img = Image.create(N, N, false, Image.FORMAT_RGBA8)
+		var m := N / 2.0
+		var dolu := {}
+		for j in N:
+			for i in N:
+				var x := i + 0.5 - m
+				var y := j + 0.5 - m
+				if absf(x) < 1.3 or absf(y) < 1.3 or absf(x) > m - 0.8 or absf(y) > m - 0.8: continue
+				var cx := signf(x) * m
+				var cy := signf(y) * m
+				var d := Vector2(x - cx, y - cy).length()
+				if absf(d - R) < 1.05: dolu[Vector2i(i, j)] = true
+		for k in dolu: img.set_pixelv(k, Color("e23a2a"))
+		for k in dolu:
+			for o in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+				var q: Vector2i = k + o
+				if q.x >= 0 and q.y >= 0 and q.x < N and q.y < N and not dolu.has(q): img.set_pixelv(q, Color("6a1008"))
+	else:
+		img = Image.create(8, 12, false, Image.FORMAT_RGBA8)
+		for j in 12:
+			for i in 8:
+				var x := i + 0.5 - 4.0
+				var y := j + 0.5
+				var ic := false
+				if y >= 7.0: ic = Vector2(x, y - 7.5).length() < 3.0
+				else: ic = absf(x) < 3.0 * (y / 7.0)
+				if ic: img.set_pixel(i, j, Color("a8dcff"))
+		var kenar := img.duplicate()
+		for j in 12:
+			for i in 8:
+				if img.get_pixel(i, j).a > 0: continue
+				for o in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+					var q: Vector2i = Vector2i(i, j) + o
+					if q.x >= 0 and q.y >= 0 and q.x < 8 and q.y < 12 and img.get_pixelv(q).a > 0:
+						kenar.set_pixel(i, j, Color("2e5a86"))
+		img = kenar
+		img.set_pixel(3, 8, Color.WHITE)
+		img.set_pixel(3, 9, Color("e8f6ff"))
+	var tex := ImageTexture.create_from_image(img)
+	_isaret_doku[ad] = tex
+	return tex
+
+func f_hdMusteriIsaret(hx: Variant, hy: Variant, fy: Variant, my: Variant, ang: Variant, hap: Variant, imp: Variant, t: Variant, seed: Variant) -> bool:
+	if not hd("yuz"): return false
+	var X := J.n(hx)
+	var T := J.n(t) + J.n(seed) * 1.7
+	var ctx: GpuCanvas = draw_context
+	if J.truth(ang) or J.truth(hap):
+		ctx.globalAlpha = 0.34 if J.truth(ang) else 0.26
+		var renk := "#ff4a3a" if J.truth(ang) else "#ff7a9a"
+		_hd_elips(floorf(X - 5.0), floorf(J.n(my) - 2.0), 2.0, 1.0, _renk(renk))
+		_hd_elips(floorf(X + 5.0), floorf(J.n(my) - 2.0), 2.0, 1.0, _renk(renk))
+		ctx.globalAlpha = 1.0
+	if J.truth(ang):
+		var buyuk := fposmod(T * 2.2, 1.0) < 0.45
+		var d := _isaret("damar_b" if buyuk else "damar")
+		var n := d.get_width()
+		ctx.texture_hd(d, Rect2(0, 0, n, n), X + 10.0 - n / 4.0, J.n(hy) - 12.0 - n / 4.0)
+	elif J.truth(imp):
+		var u := fposmod(T * 0.7, 1.0)
+		var dam := _isaret("ter")
+		ctx.globalAlpha = clampf((1.0 - u) * 3.0, 0.0, 1.0) * clampf(u * 6.0, 0.0, 1.0)
+		ctx.texture_hd(dam, Rect2(0, 0, 8, 12), X - 11.0, floorf((J.n(fy) - 4.0 + u * 7.0) * 2.0) / 2.0)
+		ctx.globalAlpha = 1.0
+	return true
+
 func f_hdKaslar(kSol: Variant, kSag: Variant, browY: Variant, kaW: Variant, kaH: Variant, kaD: Variant, kaC: Variant, kas: Variant, ang: Variant, hap: Variant) -> bool:
 	if not hd("yuz"): return false
 	var c := _renk(kaC)

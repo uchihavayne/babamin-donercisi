@@ -40,11 +40,19 @@ func calis() -> void:
 	var hw := 128
 	var hh := 150
 	var izgara := Image.create(hw * sutun, hh * ceili(adet / float(sutun)), false, Image.FORMAT_RGBA8)
+	# --ruh : her musteri 4 durumda yan yana (normal, sabirsiz, kizgin, mutlu)
+	var ruh := "--ruh" in OS.get_cmdline_user_args()
+	if ruh: sutun = 4
+	izgara = Image.create(hw * sutun, hh * ceili(adet / float(sutun)), false, Image.FORMAT_RGBA8)
 	for i in adet:
-		g.j_G.customers.clear()
-		g.customer_system.f_spawnCustomer()
+		if not ruh or i % 4 == 0:
+			g.j_G.customers.clear()
+			g.customer_system.f_spawnCustomer()
 		var c: Dictionary = g.j_G.customers[0]
 		c.state = "wait"; c.x = c.tx; c.bubble = 0.0
+		if ruh:
+			c.patience = [1.0, 0.45, 0.1, 1.0][i % 4]
+			c.mood = ["wait", "wait", "angry", "happy"][i % 4]
 		if arg("--kalip") != "" and c.get("look") is Dictionary:
 			c.look.kalip = arg("--kalip")
 		g.j_G.spawnT = 1000

@@ -242,7 +242,9 @@ func f_drawCustomer(p_c: Variant = null, p_t: Variant = null) -> Variant:
 	v_mood = J.getv(v_c, "mood")
 	v_ang = J.eq(v_mood, "angry")
 	v_hap = (J.eq(v_mood, "happy") if J.eq(v_mood, "happy") else J.eq(v_mood, "served"))
-	v_imp = ((not J.truth(v_hap)) if (not J.eq(J.getv(v_c, "patience"), null) and J.lt(J.getv(v_c, "patience"), 0.35)) else (J.lt(J.getv(v_c, "patience"), 0.35) if not J.eq(J.getv(v_c, "patience"), null) else not J.eq(J.getv(v_c, "patience"), null)))
+	# BIRLESIK (6. tur, madde 5): sabirsiz yuz eskiden yalniz 0.30-0.35 sabirda
+	# (0.30 altinda musteri zaten kizgin) gorunuyordu; artik 0.55'ten itibaren.
+	v_imp = ((not J.truth(v_hap)) if (not J.eq(J.getv(v_c, "patience"), null) and J.lt(J.getv(v_c, "patience"), 0.55)) else (J.lt(J.getv(v_c, "patience"), 0.55) if not J.eq(J.getv(v_c, "patience"), null) else not J.eq(J.getv(v_c, "patience"), null)))
 	v_icE = max(0.0, min(2.0, floor(((11.0 - J.invoke(v_konG, [(-J.n(1.0))])) * 0.6) + 0.5)))
 	v_fy = J.add(v_hy, ((1.0 if J.eq(J.getv(v_F, "oran"), null) else J.getv(v_F, "oran")) - 1.0))
 	v_agzU = ((1.0 if J.eq(J.getv(v_F, "agizU"), null) else J.getv(v_F, "agizU")) - 1.0)
@@ -520,7 +522,9 @@ func f_drawCustomer(p_c: Variant = null, p_t: Variant = null) -> Variant:
 						game.f_px(J.add(v_glG, 2.0), (v_fy - 2.0), "rgba(255,255,255,.8)")
 	if (J.truth(v_ang) and J.truth(game.f_chance(0.05))):
 		game.effects.f_smoke(J.add(v_hx, game.math_utils.f_rnd((-J.n(11.0)), 11.0)), (v_hy - 13.0), 1.0, "rgba(230,90,60,.55)")
-	if J.truth(v_ang):
+	# BIRLESIK (6. tur): HD'de okunur isaretler (ofke damari, ter, yanak)
+	var v_isaret: bool = game.f_hdMusteriIsaret(v_hx, v_hy, v_fy, v_my, v_ang, v_hap, v_imp, v_t, J.getv(v_L, "seed"))
+	if J.truth(v_ang) and not v_isaret:
 		v_vx2 = J.add(v_hx, 8.0)
 		v_vy2 = (v_hy - 9.0)
 		if J.gt(sin((v_t * 8.0)), 0.0):
