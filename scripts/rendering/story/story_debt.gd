@@ -143,8 +143,10 @@ func f_proDebt(p_t: Variant = null, p_k: Variant = null) -> Variant:
 		v_i = J.add(v_i, 1.0)
 	game.story_canvas.f_pb(J.add((-J.n(54.0)), v_Y), (-J.n(10.0)), J.add(50.0, v_Y), 12.0, "#a8a090")
 	game.story_canvas.f_pb(J.add((-J.n(52.0)), v_Y), (-J.n(8.0)), J.add(48.0, v_Y), 10.0, "#f2eede")
-	game.text_draw.f_txt("TOPLAM BORÇ", game.story_canvas.f_pbx(J.add((-J.n(2.0)), v_Y)), game.story_canvas.f_pby(9.0), "#7a3428", {"align": "c"})
-	game.text_draw.f_txt("$5.000.000", game.story_canvas.f_pbx(J.add((-J.n(2.0)), v_Y)), game.story_canvas.f_pby(2.0), "#a8201a", {"align": "c", "sc": 2.0})
+	var epi: bool = J.truth(J.getv(game.j_PRO, "epi"))
+	var mur: String = "#2e7a3a" if epi else "#a8201a"
+	game.text_draw.f_txt("KALAN BORÇ" if epi else "TOPLAM BORÇ", game.story_canvas.f_pbx(J.add((-J.n(2.0)), v_Y)), game.story_canvas.f_pby(9.0), "#7a3428", {"align": "c"})
+	game.text_draw.f_txt("$0" if epi else "$5.000.000", game.story_canvas.f_pbx(J.add((-J.n(2.0)), v_Y)), game.story_canvas.f_pby(2.0), mur, {"align": "c", "sc": 2.0})
 	v_i = 0.0
 	while J.lt(v_i, 9.0):
 		game.story_canvas.f_pb(J.add(J.add(20.0, (v_i * 4.0)), v_Y), J.add((-J.n(14.0)), (fmod(J.n(v_i), J.n(3.0)) * 2.0)), J.add(J.add(24.0, (v_i * 4.0)), v_Y), J.add((-J.n(12.0)), (fmod(J.n(v_i), J.n(3.0)) * 2.0)), "#3a3a4a")
@@ -156,13 +158,13 @@ func f_proDebt(p_t: Variant = null, p_k: Variant = null) -> Variant:
 		if (J.gt(v_stampK, 0.95) and J.lt(v_stampK, 1.0)):
 			game.effects.f_shake(2.0)
 		J.setv(game.j_ctx, "globalAlpha", (0.9 * J.add(0.4, (0.6 * v_stampK))))
-		game.f_ring(game.story_canvas.f_pbx(J.add(44.0, v_Y)), game.story_canvas.f_pby(v_mz), 16.0, "#a8201a")
-		game.f_ring(game.story_canvas.f_pbx(J.add(44.0, v_Y)), game.story_canvas.f_pby(v_mz), 15.0, "#a8201a")
-		game.f_ring(game.story_canvas.f_pbx(J.add(44.0, v_Y)), game.story_canvas.f_pby(v_mz), 11.0, "#a8201a")
-		game.text_draw.f_txt("ÖDENMEDİ", game.story_canvas.f_pbx(J.add(44.0, v_Y)), game.story_canvas.f_pby(J.add(v_mz, 3.0)), "#a8201a", {"align": "c"})
+		game.f_ring(game.story_canvas.f_pbx(J.add(44.0, v_Y)), game.story_canvas.f_pby(v_mz), 16.0, mur)
+		game.f_ring(game.story_canvas.f_pbx(J.add(44.0, v_Y)), game.story_canvas.f_pby(v_mz), 15.0, mur)
+		game.f_ring(game.story_canvas.f_pbx(J.add(44.0, v_Y)), game.story_canvas.f_pby(v_mz), 11.0, mur)
+		game.text_draw.f_txt("ÖDENDİ" if epi else "ÖDENMEDİ", game.story_canvas.f_pbx(J.add(44.0, v_Y)), game.story_canvas.f_pby(J.add(v_mz, 3.0)), mur, {"align": "c"})
 		J.setv(game.j_ctx, "globalAlpha", 1.0)
 		if J.ge(v_stampK, 1.0):
-			game.story_canvas.f_pbA(J.add(52.0, v_Y), 6.0, J.add(64.0, v_Y), 12.0, "#a8201a", 0.35)
+			game.story_canvas.f_pbA(J.add(52.0, v_Y), 6.0, J.add(64.0, v_Y), 12.0, mur, 0.35)
 	v_eller = [[(-J.n(84.0)), (-J.n(1.0))], [78.0, 1.0]]
 	v_i = 0.0
 	while J.lt(v_i, 2.0):

@@ -301,6 +301,8 @@ func f_drawDebtFree(p_t: Variant = null) -> Variant:
 	if (J.gt(J.getv(v_C, "t"), 2.4) and J.truth(game.f_button(((float(game.j_W) / float(2.0)) - 52.0), J.add(v_yy, 92.0), 104.0, 18.0, "DEVAM ET", "#3f8a4a", true))):
 		J.setv(game.j_G, "celeb", null)
 		J.method(game.j_SFX, "ui", [])
+		# BIRLESIK (6. tur): kutlamadan sonra kapanis hikayesi
+		game.story_draw.f_epiStart()
 	game.effects.f_psDraw()
 	game.effects.f_ftDraw()
 	return null

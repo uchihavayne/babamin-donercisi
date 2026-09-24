@@ -3230,9 +3230,12 @@ func f_hdProDebt(t: Variant, _k: Variant) -> bool:
 	_pbA(-70.0 + sw, -22.0, 82.0 + sw, 58.0, "#000000", 0.4)
 	hd_ciz(A, "p4_kagit", 40.0 + sw, 44.0)
 	_c("f_txt", "İCRA VE İFLAS MÜDÜRLÜĞÜ", _pbx(2.0 + sw), _pby(55.0), "#4a4438", {"align": "c"})
-	_c("f_txt", "TOPLAM BORÇ", _pbx(-2.0 + sw), _pby(9.0), "#7a3428", {"align": "c"})
-	_c("f_txt", "$5.000.000", _pbx(-2.0 + sw), _pby(2.0), "#a8201a", {"align": "c", "sc": 2.0})
 	var PRO: Dictionary = get("j_PRO")
+	# kapanis hikayesi (PRO.epi): kalan borc $0, damga yesil "ODENDI"
+	var epi := J.truth(PRO.get("epi"))
+	var mur := "#2e7a3a" if epi else "#a8201a"
+	_c("f_txt", "KALAN BORÇ" if epi else "TOPLAM BORÇ", _pbx(-2.0 + sw), _pby(9.0), "#7a3428", {"align": "c"})
+	_c("f_txt", "$0" if epi else "$5.000.000", _pbx(-2.0 + sw), _pby(2.0), mur, {"align": "c", "sc": 2.0})
 	var stampK := clampf((J.n(PRO.t) - 2.0) * 3.2, 0.0, 1.0)
 	if stampK > 0.0:
 		var drop := floorf((1.0 - stampK) * 30.0 + 0.5)
@@ -3240,13 +3243,13 @@ func f_hdProDebt(t: Variant, _k: Variant) -> bool:
 		if stampK > 0.95 and stampK < 1.0:
 			_c("f_shake", 2.0)
 		draw_context.globalAlpha = 0.9 * (0.4 + 0.6 * stampK)
-		f_ring(_pbx(44.0 + sw), _pby(mz), 16.0, "#a8201a")
-		f_ring(_pbx(44.0 + sw), _pby(mz), 15.0, "#a8201a")
-		f_ring(_pbx(44.0 + sw), _pby(mz), 11.0, "#a8201a")
-		_c("f_txt", "ÖDENMEDİ", _pbx(44.0 + sw), _pby(mz + 3.0), "#a8201a", {"align": "c"})
+		f_ring(_pbx(44.0 + sw), _pby(mz), 16.0, mur)
+		f_ring(_pbx(44.0 + sw), _pby(mz), 15.0, mur)
+		f_ring(_pbx(44.0 + sw), _pby(mz), 11.0, mur)
+		_c("f_txt", "ÖDENDİ" if epi else "ÖDENMEDİ", _pbx(44.0 + sw), _pby(mz + 3.0), mur, {"align": "c"})
 		draw_context.globalAlpha = 1.0
 		if stampK >= 1.0:
-			_pbA(52.0 + sw, 6.0, 64.0 + sw, 12.0, "#a8201a", 0.35)
+			_pbA(52.0 + sw, 6.0, 64.0 + sw, 12.0, mur, 0.35)
 	hd_ciz(A, "p4_eller", 40.0, 44.0)
 	if J.truth(_c("f_chance", 0.1)):
 		_c("f_part", {"x": _pbx(146.0) + J.n(_rnd(-5.0, 5.0)), "y": _pby(18.0), "vx": _rnd(-4.0, 4.0), "vy": _rnd(-16.0, -7.0), "life": 1.0, "col": "rgba(255,225,180,.30)", "g": -10.0, "sz": 1.0})

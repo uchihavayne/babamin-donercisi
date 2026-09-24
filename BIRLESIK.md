@@ -163,7 +163,7 @@ Kullanıcının sırası: **1, 2, 9 → 15, 18 → 10 → kalanlar**. Biten madd
 
 - [x] 1 Sarma animasyonu CPU piksel tüp → Blender tüpü (durum_tup_<1..10>, benekler dönerek)
 - [x] 2 İskender tabağı → iskender_hd.py (tabak+pide+et+sos+yoğurt tek sahne; biber, közlenmiş domates katman)
-- [ ] 9 Oyunun sonu yok (borç bitince tek kutlama) → final sahnesi + serbest mod
+- [x] 9 Oyun sonu: kutlama → 5 sahnelik kapanış hikâyesi (ÖDENDİ damgası, baba, dolu dükkân, kepenk, SON kartı) → serbest oyun (tests/kapanis.gd)
 - [ ] 15 Mobil performans (f_drawPlay ~10.5 ms; duvar süsü 3.2, parçacık 2.1)
 - [ ] 18 Ses efektleri sentez bip (gerçek kayıt yalnız 7 dosya)
 - [ ] 10 Uzun vadeli tempo (şube/borç günü) yeni fiyatlarla ölçülmedi

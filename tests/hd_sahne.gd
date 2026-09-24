@@ -72,6 +72,15 @@ func calis() -> void:
 		var c: Dictionary = g.j_G.customers[0]
 		c.state = "wait"; c.x = c.tx
 		if sahne != "play": g.j_G.scene = sahne
+		# --hikaye N : acilis hikayesinin N. sahnesi (yazi tamam)
+		if arg("--hikaye") != "":
+			g.j_G.scene = "prologue"
+			g.j_PRO.i = float(arg("--hikaye")); g.j_PRO.t = 6.0; g.j_PRO.ch = 999.0
+		# --kapanis N : borc bitince oynayan kapanis hikayesinin N. sahnesi
+		if arg("--kapanis") != "":
+			g.j_G.scene = "prologue"; g.j_PRO.epi = true
+			g.j_G.stats.wraps = 4210.0; g.j_G.stats.isk = 655.0; g.j_G.stats.earned = 27950000.0; g.j_G.day = 96.0
+			g.j_PRO.i = float(arg("--kapanis")); g.j_PRO.t = 6.0; g.j_PRO.ch = 999.0
 		if var_mi("--ders-gorulmus"):
 			g.j_G.dersGorulmus = true; g.j_G.ders = null
 		if var_mi("--mac"):
