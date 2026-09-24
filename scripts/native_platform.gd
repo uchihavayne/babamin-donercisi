@@ -42,7 +42,6 @@ func _ready() -> void:
 	game.initialize_game()
 	game.j_SFX.moto = J.ref(native_moto, 0)
 	f_audioInit()
-	ornekleri_yukle()
 	Input.mouse_mode = Input.MOUSE_MODE_HIDDEN
 	if not test_mode:
 		get_window().focus_exited.connect(func() -> void: f_appPause())
@@ -228,55 +227,6 @@ func f_sndLoad() -> Variant:
 			def.buf = true
 	return null
 
-# BIRLESIK (6. tur, analiz madde 18): efektler eskiden o an kare/testere
-# dalgasiyla sentezlenen bip'lerdi. Artik fiziksel modelle uretilmis ornekler
-# (tools/sfx_uret.py -> assets/audio/sfx/<ad>_<n>.wav); her calista cesitlerden
-# biri + hafif perde farki. Secim oyunun RNG'sini tuketmez. Dosya yoksa eski
-# sentez calisir. coin gercek kayit (j_SND) olarak kalir.
-const ORNEK_SFX := {"chop": 3, "slice": 3, "knife": 3, "pick": 3, "drop": 3, "cash": 3, "serve": 3,
-	"crinkle": 3, "wrap": 3, "roll": 3, "fry": 3, "sizzle": 3, "steam": 3, "pour": 3, "squirt": 3,
-	"plate": 3, "glass": 3, "basket": 3, "scoop": 3, "potato": 3, "sack": 3, "drawer_ac": 3,
-	"drawer_kapa": 3, "stamp": 3, "footstep": 3, "slam": 3, "shutter": 3, "carPass": 3, "horn": 3,
-	"moto": 1, "phone": 1, "door": 3, "bell": 1, "ding": 1, "ui": 1, "uiBack": 1, "tick": 1, "pop": 1,
-	"warn": 1, "bad": 3, "fail": 1, "angry": 3, "levelup": 1, "fanfare": 1, "fine": 1,
-	"pour_ayran": 1, "pour_kola": 1}
-var ornek_akis: Dictionary = {}
-var ornek_rng := RandomNumberGenerator.new()
-
-func ornekleri_yukle() -> void:
-	for ad in ORNEK_SFX:
-		var liste: Array = []
-		for i in int(ORNEK_SFX[ad]):
-			var yol := "res://assets/audio/sfx/%s_%d.wav" % [ad, i]
-			if ResourceLoader.exists(yol): liste.append(load(yol))
-		if not liste.is_empty(): ornek_akis[ad] = liste
-	for ad in ornek_akis:
-		if game.j_SFX.has(ad): game.j_SFX[ad] = _ornek_cagri.bind(ad)
-	if ornek_akis.has("drawer_ac"): game.j_SFX.drawer = _cekmece_cagri
-	if ornek_akis.has("carPass"): game.j_SFX.carPass = _araba_cagri
-
-func ornek_cal(ad: String, kazanc: float = 1.0) -> bool:
-	if not ornek_akis.has(ad): return false
-	if game.j_MUTED or test_mode: return true
-	var liste: Array = ornek_akis[ad]
-	var p := new_player(liste[ornek_rng.randi() % liste.size()], kazanc, "sfx")
-	p.pitch_scale = ornek_rng.randf_range(0.96, 1.04)
-	p.finished.connect(p.queue_free)
-	p.play()
-	return true
-
-func _ornek_cagri(_args: Array, ad: String) -> Variant:
-	ornek_cal(ad)
-	return null
-
-func _cekmece_cagri(args: Array, _captures: Dictionary = {}) -> Variant:
-	ornek_cal("drawer_kapa" if J.truth(J.arg(args, 0)) else "drawer_ac")
-	return null
-
-func _araba_cagri(args: Array, _captures: Dictionary = {}) -> Variant:
-	ornek_cal("carPass", 1.0 if J.truth(J.arg(args, 0)) else 0.55)
-	return null
-
 func f_sndBus(_def: Variant = null) -> Variant: return true
 func f_sndFallback(_def: Variant = null) -> Variant: return null
 func f_sndElVol(def: Variant = null) -> Variant:
@@ -413,25 +363,15 @@ func native_moto() -> Variant:
 func f_pourSndStart(type: Variant = null) -> Variant:
 	if game.j_MUTED or game.j_AC == null: return null
 	f_pourSndStop()
-	var dongu := "pour_ayran" if type == "ayran" else "pour_kola"
-	var stream: AudioStreamWAV
-	if ornek_akis.has(dongu):
-		# gercekci dokme dongusu (akis + kabarcik; kola kopuklu)
-		stream = (ornek_akis[dongu][0] as AudioStreamWAV).duplicate()
-		stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
-		stream.loop_begin = 0
-		stream.loop_end = int(stream.get_length() * stream.mix_rate)
-	else:
-		stream = synth("noise", 520 if type == "ayran" else 900, 2.2, "", .10 if type == "ayran" else .075, 1200, 3.4).duplicate()
-		stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
-		stream.loop_end = stream.data.size() / 2
+	var stream := synth("noise", 520 if type == "ayran" else 900, 2.2, "", .10 if type == "ayran" else .075, 1200, 3.4).duplicate()
+	stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
+	stream.loop_end = stream.data.size() / 2
 	pour_player = new_player(stream, 1.0)
 	if not test_mode: pour_player.play()
 	game.j_POUR = {"type": type}
 	return null
 func f_pourSndLevel(fill: Variant = null) -> Variant:
-	# bardak dolarken hava sutunu kisalir, perde yukselir (ornekte daha olculu)
-	if is_instance_valid(pour_player): pour_player.pitch_scale = 1.0 + clampf(J.n(fill), 0, 1) * (.25 if ornek_akis.has("pour_kola") else .7)
+	if is_instance_valid(pour_player): pour_player.pitch_scale = 1.0 + clampf(J.n(fill), 0, 1) * .7
 	return null
 func f_pourSndStop(splash: Variant = null) -> Variant:
 	if is_instance_valid(pour_player):
