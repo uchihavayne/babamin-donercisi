@@ -36,8 +36,17 @@ func gun_oyna(beceri: float) -> void:
 	G.stat.wraps = float(servis)
 	G.stat.lost = float(gelen - servis)
 	game.session_system.f_endDay()
+	if hirsiz:
+		# gece: gercek olay zari (guvenlik yukseltmesi azaltir); calinan para duser
+		game.event_system.f_rollNight()
+		var N: Variant = G.get("night")
+		if N is Dictionary and J.truth(N.stole):
+			G.money = maxf(0.0, G.money - float(N.amount))
+			calinan += float(N.amount)
 
 var biriktir := false   # true: sube acilabiliyorsa yukseltme almadan ona biriktir
+var hirsiz := false     # true: gece hirsizi (f_rollNight) dahil
+var calinan := 0.0
 
 func alisveris() -> Array:
 	var G: Dictionary = game.j_G
@@ -101,6 +110,14 @@ func run() -> void:
 		print("TEMPO --- alim kurali: %s" % ("subeye biriktir" if kip else "en ucuz yukseltme"))
 		for beceri in [0.55, 0.7, 0.85]:
 			tek(beceri, gunler)
+	if "--hirsiz" in OS.get_cmdline_user_args():
+		hirsiz = true
+		biriktir = true
+		print("TEMPO --- subeye biriktir + gece hirsizi")
+		for beceri in [0.55, 0.7, 0.85]:
+			calinan = 0.0
+			tek(beceri, gunler)
+			print("  calinan toplam: %d" % calinan)
 	game.free(); quit(0)
 
 func tek(beceri: float, gunler: int) -> void:

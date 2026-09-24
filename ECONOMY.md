@@ -134,3 +134,5 @@ Bulgular: 120 gün başarımı her profilde tutuyor. Borç ilk 60 günde %10'dan
 ```sh
 godot --headless --path . --script tests/tempo.gd --quit-after 1000000 -- --test [--gun 200]
 ```
+
+Gece hırsızı dahil (`--hirsiz`, gerçek `f_rollNight`, güvenlik yükseltmesi azaltır; şubeye biriktiren oyuncu): borç 95. / 87. / 82. günde biter (hırsızsız 93 / 85 / 78). 200 günde çalınan toplam $13-88 bin, geç oyunda önemsiz. Olay sıklıkları: maç günü 8-12 günde bir (6. günden), kedi %30/gün (4. günden), elektrik kesintisi %16/gün (8. günden, 34 sn), rakip teklifi 5-8 günde bir (panelde 20 sn geri sayım), hırsız %24 ziyaret × %62 çalma (güvenliksiz), paranın %8-20'si.

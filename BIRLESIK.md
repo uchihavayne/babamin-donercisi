@@ -176,9 +176,9 @@ Kullanıcının sırası: **1, 2, 9 → 15, 18 → 10 → kalanlar**. Biten madd
 - [ ] 11 Kötü günün bedeli yok (itibar vb.)
 - [ ] 12 Sipariş çeşidi tekdüze
 - [x] 13 Ertesi gün başında "YENİ: Fritöz 6.5sn > 4.8sn" bildirimi + istasyon parlaması
-- [ ] 14 Olay dengesi ölçülmedi (bahis 20 sn'de sessiz red)
+- [x] 14 Olay dengesi ölçüldü: bahis panelinde geri sayım zaten var; gece hırsızı borç bitişini 2-4 gün geciktiriyor, güvenlik azaltıyor (tempo.gd --hirsiz) → değişiklik gerekmedi
 - [ ] 16 Eski piksel + HD çift yol; ctx.scale altında CPU'ya düşüş
 - [x] 17 (tr, en) çiftleri localization.cift ile sözlükten; 93 metin 4 dile çevrildi (tests/dil_cift.gd)
 - [x] 19 İstasyon adı etiketi fare 0,45 sn durunca belirir (çerçeve hemen)
 - [x] 20 Öğretici/onay mesajları oyun başına ilk 3 kez; hata ve olaylar her zaman
-- [ ] 21 Mobil yerleşim denenmedi
+- [x] 21 Mobil: telefon oranında (2,17:1) kesilme/çakışma yok; Android yatay kilitli (dikey hiç oluşmaz)
