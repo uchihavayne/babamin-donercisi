@@ -167,40 +167,97 @@ def pelerin_malz():
     return I.cel("Pelerin", [hexmul(C0, 0.8), C0, C1, C2, C3], [0, .18, .4, .7, .92], noise=0.06, noise_scale=10)
 
 
+# BIRLESIK (4. tur, kullanici: "hirsiz modellemesi cok zayif"). Eskiden
+# yuzu kara bosluk, iki parlak gozlu kukuletali bir yumru (hayalet gibi).
+# Simdi klasik hirsiz: siyah orgu bere, gozleri acik siyah maske, yana bakan
+# kurnaz gozler, sakal golgesi + sirit, siyah-beyaz cizgili kazak, koyu
+# pantolon, sinsi adim, eldivenler; sag el cuvalin agzini tutar.
+# Parca adlari ve capalar ayni (oyun kodu degismez).
+HT_TEN = "#c8906a"
+
+
+def _cizgili(i):
+    return I.cel("Kazak%d" % (i % 2), ["#0c0c10", "#16161c", "#22222a", "#34343e"] if i % 2 == 0 else
+                 ["#8e8e88", "#b8b8b0", "#d6d6ce", "#eeeee6"], [0, .3, .6, .88])
+
+
 def hirsiz_govde():
-    Mp = pelerin_malz()
-    T.torna("pelerin", [(13.2, 0), (13.0, 8), (12.2, 18), (10.8, 24), (7.0, 28), (2.0, 29.6)], 0.5, 1.0, 1.0, 0.45, Mp, K, seg=28)
-    on_levha([(0.1, -24), (0.9, -24), (0.9, 0), (0.1, 0)], -5.4, mat_duz("#12161c"))
-    for sx in (-6.0, 7.0):                              # cep kapaklari
-        kutu(sx - 3, sx + 3, -10.5, -7.0, -5.8, -5.0, c3(C0, f=(0.7, 0.9, 1.0, 1.4)), bevel=0.4)
-    # ayaklar
-    for sx in (-5.0, 6.0):
-        elipsoid(sx, 0.2, 3.0, 1.4, 2.0, -3.0, c3("#0f1218", f=(0.8, 1.0, 1.0, 1.8)), seg=10, ring=6)
+    # pantolon + bacaklar (sinsi adim: sol ayak onde)
+    Mp = I.cel("Pantolon", ["#0e1118", "#161b26", "#212838", "#2e3850"], [0, .3, .6, .88])
+    for (x0, x1, y) in ((-4.8, -6.4, -1.2), (5.2, 7.0, 0.6)):
+        uzuv((x0, -13.0), (x1, -1.6), 3.3, y, Mp)
+    kutu(-9.0, 10.0, -15.0, -11.0, -3.8, 3.8, Mp, bevel=1.2)
+    # spor ayakkabi
+    Ma = I.cel("Ayakkabi", ["#0a0a0c", "#18181c", "#2a2a30", "#4a4a52"], [0, .3, .6, .88])
+    for (x, y, yon) in ((-7.4, -2.6, -1), (7.8, -0.4, 1)):
+        e = elipsoid(x + yon * 1.0, -0.8, 3.6, 1.6, 2.6, y, Ma, seg=12, ring=8)
+        kutu(x - 3.2 + yon * 1.0, x + 3.4 + yon * 1.0, -0.4, 0.4, y - 2.4, y + 2.4, mat_duz("#d8d8d0"))
+    # cizgili kazak: 6 serit, omuza dogru daralan govde
+    for i in range(6):
+        gy0 = -13.0 - i * 3.0
+        r0 = 10.6 - max(0, i - 3) * 1.2
+        r1 = 10.6 - max(0, i - 2) * 1.2
+        T.torna("kazak%d" % i, [(r0, 0), (r1 + (0.3 if i < 4 else -0.4), 3.0)], 0.5, gy0, 0.2, 0.62, _cizgili(i), K, seg=28)
+    # bel lastigi
+    T.torna("lastik", [(10.9, 0), (10.9, 1.4)], 0.5, -12.6, 0.2, 0.63, mat_duz("#0c0c10"), K, seg=28)
 
 
 def hirsiz_bas():
     hy = -42.0
-    Mp = pelerin_malz()
-    elipsoid(0.5, hy + 1.5, 13.2, 12.6, 9.0, 1.0, Mp, seg=24, ring=16)
-    # yuz boslugu
-    elipsoid(0.5, hy + 2.5, 8.4, 7.4, 3.5, -6.0, mat_duz("#080a0e"), seg=20, ring=12)
-    # gozler (parlayan)
-    for ex in (-3.5, 5.0):
-        kutu(ex - 1.8, ex + 2.0, hy + 0.2, hy + 2.0, -9.7, -9.5, mat_duz("#cfd8e2"))
-        kutu(ex - 0.6, ex + 0.6, hy + 0.3, hy + 1.1, -9.8, -9.7, mat_duz("#ffffff"))
-    # yaka + dugmeler
-    kutu(-7.5, 9.0, hy + 9.5, hy + 15.5, -6.0, 2.0, Mp, bevel=1.2)
-    for sx in (-4.5, 5.5):
-        for gy in (hy + 12, hy + 14):
-            elipsoid(sx, gy, 0.6, 0.6, 0.3, -6.3, mat_duz("#5a6474"), seg=6, ring=4)
+    Mt = I.cel("HTen", ["#8a5a3a", "#b07a52", "#c8906a", "#e0ae88"], [0, .3, .6, .88])
+    # boyun + balikci yaka (kazak)
+    T.torna("yaka", [(5.4, 0), (4.8, 3.4)], 0.5, hy + 16.4, 0.0, 0.8, _cizgili(0), K, seg=20)
+    # kafa ve cene (sakal golgesi)
+    e = I.elipsoid("kafa", 0.5, hy + 3.0, 8.6, 9.4, 7.8, 0.0, Mt, seg=26, ring=18)
+    e.location = (0.5, 0.0, ez(hy + 3.0, 0.0, K))
+    sg = I.elipsoid("sakal", 0.5, hy + 8.2, 7.0, 3.8, 5.4, -3.0, I.cel("Sakal", ["#4a3a30", "#5a483c", "#6e5a4a", "#806a58"], [0, .3, .6, .88]), seg=20, ring=10)
+    sg.location = (0.5, -3.0, ez(hy + 8.2, -3.0, K))
+    for sx in (-8.0, 9.0):
+        elipsoid(sx, hy + 3.0, 1.6, 2.4, 1.2, 0.4, Mt, seg=10, ring=6)
+    burun = I.elipsoid("burun", 1.8, hy + 4.4, 2.0, 1.7, 1.8, -7.2, Mt, seg=14, ring=10)
+    burun.location = (1.8, -7.2, ez(hy + 4.4, -7.2, K))
+    # sirit (yan, sinsi)
+    uzuv((-2.2, hy + 8.4), (4.6, hy + 7.4), 0.45, -7.8, mat_duz("#3a1a14"))
+    kutu(-0.8, 3.8, hy + 7.6, hy + 8.3, -8.2, -8.0, mat_duz("#f4f0e6"))
+    # siyah maske (goz bandi) + goz delikleri + yana bakan gozler
+    Mm = I.cel("Maske", ["#050506", "#0e0e12", "#1a1a20", "#2e2e36"], [0, .3, .6, .88])
+    m = I.elipsoid("maske", 0.5, hy + 0.6, 9.2, 2.6, 8.0, 0.0, Mm, seg=26, ring=10)
+    m.location = (0.5, -0.4, ez(hy + 0.6, -0.4, K))
+    for ex in (-2.6, 4.0):
+        elipsoid(ex, hy + 0.6, 1.9, 1.3, 0.6, -8.2, mat_duz("#f4f0e6"), seg=12, ring=8)
+        elipsoid(ex + 0.9, hy + 0.7, 0.8, 0.9, 0.4, -8.6, mat_duz("#141010"), seg=8, ring=5)
+    for sx in (-10.6, 11.6):   # maske baglari
+        uzuv((sx, hy + 0.4), (sx + (-1.6 if sx < 0 else 1.6), hy + 3.6), 0.5, 1.5, Mm)
+    # orgu bere: kubbe + katlanmis kenar (ribana)
+    Mb = I.cel("Bere", ["#08080a", "#121216", "#1e1e24", "#30303a"], [0, .3, .6, .88], noise=0.1, noise_scale=18)
+    T.torna("bere", [(9.1, 0), (8.9, 2.6), (7.6, 5.2), (4.6, 7.0), (0.6, 7.6)], 0.5, hy - 4.2, 0.4, 0.86, Mb, K, seg=28)
+    T.torna("bere_kenar", [(9.7, 0), (9.8, 1.4), (9.5, 2.8)], 0.5, hy - 1.8, 0.4, 0.87, Mb, K, seg=28)
+    for q in range(9):
+        x = -7.0 + q * 1.9
+        uzuv((x, hy - 4.4), (x, hy - 2.0), 0.18, -8.6 + abs(x - 0.5) * 0.45, mat_duz("#2a2a32"))
 
 
 def hirsiz_kol(sol):
     def fn():
-        Mp = pelerin_malz()
-        x = -14.0 if sol else 13.5
-        uzuv((x, -22.5), (x - (0.5 if sol else -0.5), -2.5), 2.6, -1.0 if sol else -2.0, Mp)
-        elipsoid(x - (0.5 if sol else -0.5), -1.5, 3.0, 3.0, 2.5, -2.5, c3("#0f1218", f=(0.8, 1.0, 1.0, 1.6)), seg=10, ring=6)
+        Mg = I.cel("Eldiven", ["#050506", "#101014", "#1c1c22", "#303038"], [0, .3, .6, .88])
+        if sol:
+            # sol kol: dirsekten bukuk, el onde (parmak ucunda yuruyus)
+            omuz, dirsek, el = (-10.5, -26.0), (-14.0, -18.0), (-10.0, -12.5)
+            y = -1.0
+        else:
+            # sag kol: cuvalin agzini tutmaya uzanir (cuval x+20, y-21)
+            omuz, dirsek, el = (11.0, -26.0), (16.0, -22.0), (18.6, -20.5)
+            y = -2.0
+        for q, (a, b) in enumerate(((omuz, dirsek), (dirsek, el))):
+            n = 4
+            for k in range(n):
+                u0, u1 = k / float(n), (k + 1) / float(n)
+                p0 = (a[0] + (b[0] - a[0]) * u0, a[1] + (b[1] - a[1]) * u0)
+                p1 = (a[0] + (b[0] - a[0]) * u1, a[1] + (b[1] - a[1]) * u1)
+                uzuv(p0, p1, 2.5 - q * 0.3, y, _cizgili(k + q))
+        elipsoid(el[0], el[1], 2.4, 2.2, 2.0, y - 0.8, Mg, seg=12, ring=8)
+        for f in range(3):
+            elipsoid(el[0] + (1.4 if not sol else -1.2), el[1] - 1.2 + f * 1.1, 0.9, 0.6, 0.7, y - 1.4, Mg, seg=8, ring=5)
     return fn
 
 
