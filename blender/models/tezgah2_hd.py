@@ -713,18 +713,14 @@ def _lavas_yigin(cx, taban_gy, adet, rx, K):
 
 
 def _pide_yigin(cx, taban_gy, adet, rx, K):
-    Mp = cel("PideY", ["#7a4e20", "#a06a2e", "#d9a765", "#eec78c"], S4, noise=0.12, noise_scale=12)
+    """BIRLESIK (4. tur): ust uste tirnakli pideler (pide_hd.pide_mesh; eskiden
+    kubbeli diskler bazlama gibi duruyordu)."""
+    import pide_hd as PH
     Mg = px.flat_a("PideGolge", "#3a2210", 0.35)
-    I.yatay_elips("golge", cx + 1.0, taban_gy + 1.4, rx + 1.5, 0.1, Mg, K, ry_ekran=4.0)
+    I.yatay_elips("golge", cx + 1.0, taban_gy + 1.0, rx + 1.2, 0.1, Mg, K, ry_ekran=3.8)
     for i in range(adet):
-        I.yatay_elips("pide%d" % i, cx, taban_gy - i * 3.2, rx - i * 0.8, 2.2, Mp, K, ry_ekran=3.6, egim=0.18)
-    ust = taban_gy - (adet - 1) * 3.2
-    Mb = px.flat("PideSusam", "#8a5f31")
-    for q in range(7):
-        # ust pidenin ust yuzunde (merkez derinlik 0, yuzey z = -gy + kalinlik/2)
-        gy = ust - 0.6 + ((q * 3) % 5 - 2) * 0.45
-        e = I.elipsoid("susam", cx - 9 + q * 3, gy, 0.7, 0.4, 0.4, 0.0, Mb, seg=8, ring=4)
-        e.location = (cx - 9 + q * 3, 0.0, -gy + 1.1)
+        PH.pide_mesh("pide%d" % i, cx + (0.5 if i % 2 else -0.4), taban_gy - i * 2.3, rx - i * 0.6, 9.0 - i * 0.3, 2.5,
+                     desen=True, tohum=i * 11.0, tohumlar=(i == adet - 1))
 
 
 def ekmek_lavas_tek():
