@@ -42,7 +42,8 @@ func f_drawStatsPanel(p_t: Variant = null) -> Variant:
 		v_rx = J.add(J.add(v_x, 14.0), (v_col * 152.0))
 		v_ry = J.add(J.add(v_y, 16.0), (v_row * v_rowSp))
 		if J.truth(J.getv(J.getv(v_rows, v_i), 0.0)):
-			game.icon_draw.f_icon(J.getv(J.getv(v_rows, v_i), 0.0), J.add(v_rx, 6.0), J.add(v_ry, 5.0), v_t)
+			if not game.f_hdIkon("lst_" + str(J.getv(J.getv(v_rows, v_i), 0.0)), J.add(v_rx, 6.0), J.add(v_ry, 5.0)):
+				game.icon_draw.f_icon(J.getv(J.getv(v_rows, v_i), 0.0), J.add(v_rx, 6.0), J.add(v_ry, 5.0), v_t)
 		game.text_draw.f_txt(J.getv(J.getv(v_rows, v_i), 1.0), J.add(v_rx, 16.0), J.add(v_ry, 2.0), J.getv(game.j_P, "ui4"))
 		game.text_draw.f_txt(J.add("", J.getv(J.getv(v_rows, v_i), 2.0)), J.add(v_rx, 140.0), J.add(v_ry, 2.0), J.getv(game.j_P, "ink"), {"align": "r"})
 		J.setv(game.j_ctx, "globalAlpha", 0.25)

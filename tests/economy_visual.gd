@@ -35,7 +35,15 @@ func run() -> void:
 	game.storage.path = "res://artifacts/economy-visual-save.json"; game.storage.values = {}
 	game.localization.f_setLang("tr"); game.f_startDay()
 	game.j_G.scene = "shop"; game.j_G.dersGorulmus = true; game.j_G.ders = null
-	game.j_G.money = 150; game.j_G.up = {}; game.j_SHOP.sec = "fryer"
+	# fiyatlar data/upg.gd'den (BIRLESIK: fiyatlar degisti, testte sabit yazmasin)
+	var fiyat := func(id: String, lv: int) -> int:
+		for u in game.j_UPG:
+			if u.id == id: return int(u.lv[lv].p)
+		return -1
+	var fryer1: int = fiyat.call("fryer", 0)
+	var fryer2: int = fiyat.call("fryer", 1)
+	var drink1: int = fiyat.call("drink", 0)
+	game.j_G.money = fryer1; game.j_G.up = {}; game.j_SHOP.sec = "fryer"
 	game.pointer(Vector2(475,265)); await step()
 	await snap("first-fryer")
 	var point := button_center("SATIN AL")
@@ -48,8 +56,8 @@ func run() -> void:
 		mouse.pressed = true; Input.parse_input_event(mouse); await step(1)
 		mouse.pressed = false; Input.parse_input_event(mouse); await step()
 	check(game.j_G.up.get("fryer",0) == 1 and game.j_G.money == 0,
-		"mouse purchase deducts 150 and installs fryer level one")
-	game.j_G.money = 520; game.pointer(Vector2(475,265)); await step()
+		"mouse purchase deducts " + str(fryer1) + " and installs fryer level one")
+	game.j_G.money = fryer2; game.pointer(Vector2(475,265)); await step()
 	await snap("fryer-next-level")
 	point = button_center("GELİŞTİR")
 	check(point.is_finite(), "owned equipment shows an upgrade action")
@@ -59,11 +67,11 @@ func run() -> void:
 		accept.pressed = true; Input.parse_input_event(accept); await step(1)
 		accept.pressed = false; Input.parse_input_event(accept); await step()
 	check(game.j_G.up.get("fryer",0) == 2 and game.j_G.money == 0,
-		"controller upgrade deducts 520 and reaches level two exactly once")
+		"controller upgrade deducts " + str(fryer2) + " and reaches level two exactly once")
 	check(game.J.method(game.j_TUN,"fryTime",[game.j_G]) == 4.8,
 		"the purchased level uses the displayed 4.8-second frying time")
 	root.size = Vector2i(1170,540); shell.mobile = true
-	game.j_G.up = {}; game.j_G.money = 220; game.j_SHOP.sec = "drink"
+	game.j_G.up = {}; game.j_G.money = drink1; game.j_SHOP.sec = "drink"
 	game.controls.set_mode("touch"); game.pointer(Vector2(475,265)); shell.update_layout(); await step(8)
 	await snap("phone-first-drink")
 	point = button_center("SATIN AL")

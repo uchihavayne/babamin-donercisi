@@ -10,6 +10,9 @@ func f_drawMotoBadge(p_t: Variant = null) -> Variant:
 		return null
 	v_bx = J.add(J.getv(J.getv(game.j_ST, "uncle"), "x"), 2.0)
 	v_by = 186.0
+	# BIRLESIK: yeni tezgahta Dayi bolmeyi dolduruyor; 186'da gobeginin ustune
+	# biniyordu -> bolmenin altina (ayak hizasi)
+	if game.get("counter_design_enabled"): v_by = 238.0
 	J.setv(game.j_ctx, "globalAlpha", J.add(0.5, (0.3 * sin((v_t * 5.0)))))
 	game.f_rrect(v_bx, v_by, 44.0, 22.0, 3.0, "rgba(20,14,12,.85)")
 	game.f_rrectOut(v_bx, v_by, 44.0, 22.0, 3.0, J.getv(game.j_P, "bad"))

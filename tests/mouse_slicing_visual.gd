@@ -25,11 +25,14 @@ func blade_pixels(label: String) -> void:
 	var offset: Array=g.sprite_library.manifest["knife/0/-1"].offset
 	var origin:=Vector2i(roundi(g.j_IN.x-5),roundi(clampf(g.j_IN.y,g.j_LAY.spit.top+8,g.j_LAY.spit.bot-12)))+Vector2i(offset[0],offset[1])
 	var wrong:=0
+	# BIRLESIK: oyun gorunumu 2x HD tuvale cizilir (960x540); mantik pikselini
+	# kendi bloğunun ilk pikselinden oku
+	var s: int=maxi(1,actual.get_width()/480)
 	for y in blade.image.get_height():
 		for x in blade.image.get_width():
 			var expected: Color=blade.image.get_pixel(x,y)
 			if expected.a!=1: continue
-			var pixel: Color=actual.get_pixel(origin.x+x,origin.y+y)
+			var pixel: Color=actual.get_pixel((origin.x+x)*s,(origin.y+y)*s)
 			if maxf(absf(pixel.r-expected.r),maxf(absf(pixel.g-expected.g),absf(pixel.b-expected.b)))>2.0/255: wrong+=1
 	check(wrong==0,label+": all opaque knife pixels survive final GPU composition (covered: "+str(wrong)+")")
 func run() -> void:
@@ -37,6 +40,10 @@ func run() -> void:
 	root.content_scale_aspect=Window.CONTENT_SCALE_ASPECT_EXPAND; root.content_scale_size=Vector2i(960,540)
 	shell=load("res://scenes/main.tscn").instantiate(); root.add_child(shell)
 	var g: Node=shell.game
+	# BIRLESIK: bu test tabanin PIKSEL bicak sprite'inin son GPU birlesiminde
+	# ortulmedigini denetler; HD'de bicak baska modelle (f_hdBicak) cizilir ve
+	# katmani hd_sahne goruntuleriyle dogrulanir -> burada HD kapali.
+	g.hd_acik=false
 	g.j_MUTED=true; g.localization.f_setLang("tr"); g.j_G.up={"phone":1.0,"uncle":1.0}; g.f_startDay()
 	g.j_G.tut=99; g.j_G.shutT=0; g.j_G.spawnT=10000; g.j_G.timeLeft=80
 	g.j_G.phone.state="order"; g.j_G.phone.order=[{"kind":"wrap","yok":["pickle"]},{"kind":"wrap","yok":["fries"]},{"kind":"drink","type":"ayran"},{"kind":"fbox"},{"kind":"sweet"}]; g.j_G.phone.done=[false,false,false,false,false]

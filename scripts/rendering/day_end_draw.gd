@@ -42,7 +42,9 @@ func f_drawDayEnd(p_t: Variant = null) -> Variant:
 			v_i = J.add(v_i, 1.0)
 			continue
 		if J.truth(J.getv(J.getv(v_rows, v_i), 0.0)):
-			game.icon_draw.f_icon(J.getv(J.getv(v_rows, v_i), 0.0), ((float(game.j_W) / float(2.0)) - 86.0), J.add(v_ry, 4.0), v_t)
+			# BIRLESIK: tek tip kucuk urun ikonu (eskileri farkli boyda, satirlara tasiyordu)
+			if not game.f_hdIkon("lst_" + str(J.getv(J.getv(v_rows, v_i), 0.0)), ((float(game.j_W) / float(2.0)) - 86.0), J.add(v_ry, 4.0)):
+				game.icon_draw.f_icon(J.getv(J.getv(v_rows, v_i), 0.0), ((float(game.j_W) / float(2.0)) - 86.0), J.add(v_ry, 4.0), v_t)
 		game.text_draw.f_txt(J.getv(J.getv(v_rows, v_i), 1.0), ((float(game.j_W) / float(2.0)) - 74.0), v_ry, J.getv(game.j_P, "ui4"))
 		game.text_draw.f_txt(J.add("x", J.getv(J.getv(v_rows, v_i), 2.0)), J.add((float(game.j_W) / float(2.0)), 92.0), v_ry, (J.getv(game.j_P, "ink") if J.truth(J.getv(J.getv(v_rows, v_i), 0.0)) else J.getv(game.j_P, "ui3")), {"align": "r"})
 		J.setv(game.j_ctx, "globalAlpha", 0.28)

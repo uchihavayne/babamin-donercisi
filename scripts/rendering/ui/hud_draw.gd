@@ -2,6 +2,15 @@
 extends "res://scripts/core/game_module.gd"
 
 # ui.js:48
+# BIRLESIK: hava rozeti ust satirda, borc kutusunun saginda (eskiden (8, 32):
+# yeni tezgahta telefonun ustune biniyor, yazi panelin disina tasiyordu).
+func f_havaYer() -> Vector2:
+	var x := 88.0
+	if J.gt(J.getv(game.j_G, "debt"), 0.0):
+		var ds: Variant = J.add("$", game.math_utils.f_fmtShort(J.getv(game.j_G, "debt")))
+		x = 88.0 + J.n(J.add(J.add(game.f_textW("BORÇ"), game.f_textW(ds)), 16.0)) + 6.0
+	return Vector2(x, 7.0)
+
 func f_hudSagKenar() -> Variant:
 	return ((game.j_W - J.getv(game.j_VIEW, "right")) - (8.0 if J.truth(game.j_TOUCH) else 0.0))
 	return null
@@ -129,10 +138,11 @@ func f_drawHUD(p_t: Variant = null) -> Variant:
 	game.icon_draw.f_icon("coin", J.add(v_mx, 9.0), (12.0 - floor((v_mpop * 2.0) + 0.5)), v_t)
 	game.text_draw.f_txt(v_ms, (J.add(v_mx, v_mw) - 5.0), (8.0 - floor((v_mpop * 2.0) + 0.5)), ("#ff6a56" if J.lt(v_mval, 0.0) else J.getv(game.j_P, "au0")), {"align": "r", "mono": true})
 	if J.eq(J.getv(game.j_G, "weather"), "rain"):
-		v_wx = 8.0
-		v_wy = (22.0 if J.truth(v_kompakt) else 32.0)
+		var hy0 := f_havaYer()
+		v_wx = hy0.x
+		v_wy = hy0.y
 		J.setv(game.j_ctx, "globalAlpha", 0.85)
-		game.f_rrect((v_wx - 2.0), (v_wy - 2.0), 28.0, 14.0, 3.0, "rgba(30,40,60,.8)")
+		game.f_rrect((v_wx - 2.0), (v_wy - 3.0), J.add(30.0, game.f_textW("YAĞMUR")), 16.0, 4.0, "rgba(30,40,60,.8)")
 		J.setv(game.j_ctx, "globalAlpha", 1.0)
 		# REMAKE kancasi: HD hava ikonu (Blender bulut/gunes, yarim piksel damla)
 		if not J.truth(game.f_hdHava("rain", v_wx, v_wy, v_t)):
@@ -144,13 +154,14 @@ func f_drawHUD(p_t: Variant = null) -> Variant:
 				game.f_px(J.add(J.add(v_wx, 3.0), (v_ri * 4.0)), v_ry2, "#6b9ad8")
 				game.f_px(J.add(J.add(v_wx, 3.0), (v_ri * 4.0)), J.add(v_ry2, 1.0), "#8fb8e0")
 				v_ri = J.add(v_ri, 1.0)
-		game.text_draw.f_txt("YAĞMUR", J.add(v_wx, 28.0), J.add(v_wy, 1.0), "#8fb8e0")
+		game.text_draw.f_txt("YAĞMUR", J.add(v_wx, 24.0), J.add(v_wy, 1.0), "#bcd8f4")
 	else:
 		if J.eq(J.getv(game.j_G, "weather"), "kar"):
-			v_kx = 8.0
-			v_ky = (22.0 if J.truth(v_kompakt) else 32.0)
+			var hy1 := f_havaYer()
+			v_kx = hy1.x
+			v_ky = hy1.y
 			J.setv(game.j_ctx, "globalAlpha", 0.85)
-			game.f_rrect((v_kx - 2.0), (v_ky - 2.0), 28.0, 14.0, 3.0, "rgba(40,58,80,.8)")
+			game.f_rrect((v_kx - 2.0), (v_ky - 3.0), J.add(30.0, game.f_textW("KAR")), 16.0, 4.0, "rgba(40,58,80,.8)")
 			J.setv(game.j_ctx, "globalAlpha", 1.0)
 			# REMAKE kancasi: HD hava ikonu (Blender bulut/gunes, yarim piksel damla)
 			if not J.truth(game.f_hdHava("kar", v_kx, v_ky, v_t)):
@@ -162,13 +173,14 @@ func f_drawHUD(p_t: Variant = null) -> Variant:
 					game.f_px(J.add(J.add(v_kx, 3.0), (v_ki * 4.0)), v_ky2, "#ffffff")
 					game.f_px(J.add(J.add(v_kx, 4.0), (v_ki * 4.0)), J.add(v_ky2, 1.0), "#cfe2f4")
 					v_ki = J.add(v_ki, 1.0)
-			game.text_draw.f_txt("KAR", J.add(v_kx, 28.0), J.add(v_ky, 1.0), "#dbe7f2")
+			game.text_draw.f_txt("KAR", J.add(v_kx, 24.0), J.add(v_ky, 1.0), "#e8f0f8")
 		else:
 			if J.eq(J.getv(game.j_G, "weather"), "sicak"):
-				v_sx4 = 8.0
-				v_sy4 = (22.0 if J.truth(v_kompakt) else 32.0)
+				var hy2 := f_havaYer()
+				v_sx4 = hy2.x
+				v_sy4 = hy2.y
 				J.setv(game.j_ctx, "globalAlpha", 0.85)
-				game.f_rrect((v_sx4 - 2.0), (v_sy4 - 2.0), 28.0, 14.0, 3.0, "rgba(70,40,10,.8)")
+				game.f_rrect((v_sx4 - 2.0), (v_sy4 - 3.0), J.add(30.0, game.f_textW("SICAK")), 16.0, 4.0, "rgba(70,40,10,.8)")
 				J.setv(game.j_ctx, "globalAlpha", 1.0)
 				# REMAKE kancasi: HD hava ikonu (Blender bulut/gunes, yarim piksel damla)
 				if not J.truth(game.f_hdHava("sicak", v_sx4, v_sy4, v_t)):
@@ -178,7 +190,7 @@ func f_drawHUD(p_t: Variant = null) -> Variant:
 						v_a4 = J.add((v_si4 * 0.785), (sin((v_t * 1.6)) * 0.12))
 						game.f_px(J.add(J.add(v_sx4, 7.0), floor((cos(v_a4) * 6.0) + 0.5)), J.add(J.add(v_sy4, 5.0), floor((sin(v_a4) * 6.0) + 0.5)), "#ffb23c")
 						v_si4 = J.add(v_si4, 1.0)
-				game.text_draw.f_txt("SICAK", J.add(v_sx4, 28.0), J.add(v_sy4, 1.0), "#ffc86a")
+				game.text_draw.f_txt("SICAK", J.add(v_sx4, 24.0), J.add(v_sy4, 1.0), "#ffc86a")
 	# BIRLESIK: "MAC CIKISI" yazisi kaldirildi; mac dalgasi disaridaki insanlarin
 	# ve musterilerin takim atkilariyla anlasiliyor (remake_gorsel atki)
 	if false and (J.eq(J.kind(J.ref(game.weather_system.f_macDalgada, 0)), "function") and J.truth(game.weather_system.f_macDalgada())):

@@ -489,6 +489,8 @@ SIP_OLCEK = {"wrap": (wrap, 0.9, "#2b1f14"), "fbox": (fbox, 0.6, "#2b1f14"), "sw
              "fanta": (bardak("fanta"), 0.68, "#3f4a52"), "ayran": (bardak("ayran"), 0.68, "#3f4a52")}
 for _id, (_fn, _s, _c) in SIP_OLCEK.items():
     parca("sip_%s" % _id, (-9, -9, 18, 17), olcekli(_fn, _s), cizgi=_c, cizgi_alfa=120)
+    # liste satirlari (gun sonu raporu, rekorlar): 13 px satira sigan kucuk takim
+    parca("lst_%s" % _id, (-8, -7, 16, 14), olcekli(_fn, _s * 0.78), cizgi=_c, cizgi_alfa=120)
 
 
 # BIRLESIK: balondaki "!" / "G" sos isareti anlasilmiyordu -> kucuk sos rozeti:

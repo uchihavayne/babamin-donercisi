@@ -72,6 +72,8 @@ func calis() -> void:
 		var c: Dictionary = g.j_G.customers[0]
 		c.state = "wait"; c.x = c.tx
 		if sahne != "play": g.j_G.scene = sahne
+		if var_mi("--ders-gorulmus"):
+			g.j_G.dersGorulmus = true; g.j_G.ders = null
 		if var_mi("--mac"):
 			g.j_G.macGun = true
 			g.j_G.timeLeft = g.j_G.cfg.len * (1.0 - (g.j_MAC_BAS + g.j_MAC_BIT) / 2.0)
@@ -123,6 +125,8 @@ func calis() -> void:
 				g.j_G.grill.slots.append({"w": iw, "t": 2.0 + i, "dur": 8.0, "done": false, "yan": 0.0})
 		if var_mi("--yagmur"):
 			g.j_G.weather = "rain"; g.j_G.rainT = 30.0
+		if var_mi("--moto-bozuk"):
+			g.j_G.moto = {"broken": true, "cost": 520.0}
 		if var_mi("--kesinti"):
 			g.j_G.kesinti = {"faz": "kesik", "t": 3.0, "sure": 20.0, "uyari": 0.0}
 		if var_mi("--kizart"):
