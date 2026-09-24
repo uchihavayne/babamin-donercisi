@@ -204,7 +204,9 @@ func f_deliver(p_c: Variant = null) -> Variant:
 		return null
 	v_idx = (-J.n(1.0))
 	v_pass = 0.0
-	while (J.lt(v_pass, 2.0) and J.lt(v_idx, 0.0)):
+	# BIRLESIK (7. tur): 3. gecis eksik malzemeli durumu da kabul eder (once ayni
+	# soslu kalem); ucret kaliteyle (order_system.order_quality) carpilir.
+	while (J.lt(v_pass, 4.0) and J.lt(v_idx, 0.0)):
 		v_i = 0.0
 		while J.lt(v_i, J.getv(J.getv(v_c, "items"), "length")):
 			if J.truth(J.getv(J.getv(v_c, "done"), v_i)):
@@ -217,10 +219,14 @@ func f_deliver(p_c: Variant = null) -> Variant:
 			if (J.eq(J.getv(v_it, "kind"), "drink") and not J.eq(J.getv(v_o, "type"), J.getv(v_it, "type"))):
 				v_i = J.add(v_i, 1.0)
 				continue
-			if ((J.eq(v_pass, 0.0) and J.eq(J.getv(v_it, "kind"), "wrap")) and not J.eq((J.getv(v_o, "sauce") if J.truth(J.getv(v_o, "sauce")) else null), (J.getv(v_it, "sauce") if J.truth(J.getv(v_it, "sauce")) else null))):
+			if (((J.eq(v_pass, 0.0) or J.eq(v_pass, 2.0)) and J.eq(J.getv(v_it, "kind"), "wrap")) and not J.eq((J.getv(v_o, "sauce") if J.truth(J.getv(v_o, "sauce")) else null), (J.getv(v_it, "sauce") if J.truth(J.getv(v_it, "sauce")) else null))):
 				v_i = J.add(v_i, 1.0)
 				continue
-			if J.eq(J.getv(v_it, "kind"), "wrap") and not game.f_secimUyuyor(v_it, v_o):
+			if J.lt(v_pass, 2.0) and J.eq(J.getv(v_it, "kind"), "wrap") and not game.f_secimUyuyor(v_it, v_o):
+				v_i = J.add(v_i, 1.0)
+				continue
+			# gevsek gecis: order_system'in sectigi en iyi kalem (order_loose_index)
+			if J.ge(v_pass, 2.0) and v_it is Dictionary and v_it.has("_teslim_idx") and not J.eq(v_i, v_it._teslim_idx):
 				v_i = J.add(v_i, 1.0)
 				continue
 			v_idx = v_i

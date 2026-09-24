@@ -150,23 +150,61 @@ func order_reject(w: Dictionary, owner: Dictionary) -> void:
 	owner.wrongT = 0.8
 	J.method(game.j_SFX, "bad", [])
 
+# BIRLESIK (7. tur, kullanici: "eksik malzemeli verirsek verebilelim, illa tam
+# malzeme olmasina gerek yok, ona gore para aliriz"). Siparise birebir uyan durum
+# yoksa bekleyen ilk durum kalemine (once ayni soslu) verilir; ucret siparise
+# gore tamamlik oraniyla carpilir: et %40, patates %28, tursu %16, yogurt %16.
+# "Istenmeyen" malzeme konmamissa o pay tam, konmussa kesilir.
+# en iyi kalem: once ayni soslu, sonra en yuksek tamamlik orani
+func order_loose_index(w: Dictionary, owner: Dictionary) -> int:
+	var items := order_items(owner)
+	var en := -1
+	var en_puan := -1.0
+	for i in items.size():
+		if owner.done[i] or items[i].kind != "wrap": continue
+		var puan := order_quality(w, items[i]) + (2.0 if w.get("sauce") == items[i].get("sauce") else 0.0)
+		if puan > en_puan:
+			en_puan = puan
+			en = i
+	return en
+
+func order_quality(w: Dictionary, recipe: Dictionary) -> float:
+	var q := 0.4 * minf(float(w.get("meat", 0)) / float(game.j_MEAT_NEED), 1.0)
+	for pay in [["pickle", 0.16], ["yogurt", 0.16], ["fries", 0.28]]:
+		var amount := float(w.get(game.ORDER_FIELDS[pay[0]], 0))
+		if pay[0] in recipe.get("yok", []): q += pay[1] if amount == 0 else 0.0
+		else: q += pay[1] * minf(amount / 4.0, 1.0)
+	return clampf(q, 0.0, 1.0)
+
 func f_deliver(customer: Variant = null) -> Variant:
 	var w: Variant = game.j_G.hand
 	if w is Dictionary and w.kind == "wrap" and customer.state == "wait" and not game.leader_system.f_liderBekliyor():
 		if order_match_index(w, customer) < 0:
-			order_reject(w, customer)
-			return null
+			var i := order_loose_index(w, customer)
+			if i < 0:
+				order_reject(w, customer)
+				return null
+			if not w.get("burnt", false): w.quality = order_quality(w, order_items(customer)[i])
+			w._teslim_idx = i
 		# Intentional omissions never reduce the quality of a correct order.
-		if not w.get("burnt", false): w.quality = 1.0
+		elif not w.get("burnt", false): w.quality = 1.0
 	return game.customer_system.f_deliver(customer)
 
 func f_giveToCourier() -> Variant:
 	var w: Variant = game.j_G.hand
 	if w is Dictionary and w.kind == "wrap" and game.j_G.phone.state == "order":
-		if order_match_index(w, game.j_G.phone) < 0:
-			order_reject(w, game.j_G.phone)
-			return false
-		# Rebind a correctly matched spare wrap for the courier's completeness check.
-		order_bind(w, game.j_G.phone, order_match_index(w, game.j_G.phone))
-		if not w.get("burnt", false): w.quality = 1.0
+		var tam := order_match_index(w, game.j_G.phone)
+		if tam < 0:
+			# eksik malzemeli paket de verilir (ucret tamamlik oraniyla)
+			var i := order_loose_index(w, game.j_G.phone)
+			if i < 0:
+				order_reject(w, game.j_G.phone)
+				return false
+			order_bind(w, game.j_G.phone, i)
+			if not w.get("burnt", false): w.quality = order_quality(w, order_items(game.j_G.phone)[i])
+			w._teslim_idx = i
+		else:
+			# Rebind a correctly matched spare wrap for the courier's completeness check.
+			order_bind(w, game.j_G.phone, tam)
+			if not w.get("burnt", false): w.quality = 1.0
 	return game.phone_system.f_giveToCourier()

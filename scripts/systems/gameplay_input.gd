@@ -117,6 +117,18 @@ func f_handleInput() -> Variant:
 	if J.truth(game.f_hitST("board")):
 		v_idx = game.drag_system.f_boardAt(v_mx, v_my)
 		v_w = J.getv(J.getv(game.j_G, "boards"), v_idx)
+		# BIRLESIK (7. tur, kullanici: "durumu tahtaya geri birakamiyorum, bazen
+		# oluyor bazen olmuyor"): eldeki durum/tabak BOS tahtaya tiklaninca oraya
+		# birakilir. Eskiden bos tahtada dolu tahta araniyor, bulunamayinca hicbir
+		# sey olmuyordu (yalniz tahta disina tiklamak geri koyuyordu).
+		var v_el: Variant = J.getv(game.j_G, "hand")
+		if (not J.truth(v_w)) and J.truth(v_el) and (J.eq(J.getv(v_el, "kind"), "wrap") or J.eq(J.getv(v_el, "kind"), "plate")) and J.lt(v_idx, J.method(game.j_TUN, "boards", [game.j_G])):
+			J.setv(J.getv(game.j_G, "boards"), v_idx, v_el)
+			J.setv(v_el, "pop", 1.0)
+			J.setv(game.j_G, "hand", null)
+			J.setv(game.j_G, "act", v_idx)
+			J.method(game.j_SFX, "drop", [])
+			return null
 		if (not J.truth(v_w)):
 			v_bi2 = 0.0
 			while J.lt(v_bi2, J.method(game.j_TUN, "boards", [game.j_G])):
@@ -146,7 +158,10 @@ func f_handleInput() -> Variant:
 			J.setv(game.j_G, "act", v_idx)
 			game.assembly_system.f_pideChop(v_idx)
 			return null
-		if ((J.truth(v_w) and J.eq(J.getv(v_w, "state"), "open")) and (not J.truth(J.getv(game.j_G, "hand")))):
+		# BIRLESIK (7. tur): secili tahtadaki eksik tabak ikinci tiklamada ele alinir
+		# (eskiden yalniz tamamen dolunca alinabiliyordu; "teslim edemiyorum").
+		var v_tabakAl: bool = J.truth(v_w) and J.eq(J.getv(v_w, "kind"), "plate") and J.truth(game.recipe_system.f_plateAny(v_w)) and J.eq(J.getv(game.j_G, "act"), v_idx)
+		if ((J.truth(v_w) and J.eq(J.getv(v_w, "state"), "open")) and (not J.truth(J.getv(game.j_G, "hand")))) and not v_tabakAl:
 			if not J.eq(J.getv(game.j_G, "act"), v_idx):
 				J.setv(game.j_G, "act", v_idx)
 				J.method(game.j_SFX, "pick", [])

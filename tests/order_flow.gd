@@ -74,27 +74,39 @@ func run() -> void:
 	var w3: Dictionary=game.j_G.boards[0]
 	hold("meat"); hold("pickle"); hold("yogurt"); hold("friesT"); hold("board:0",20)
 	check(w3.state=="rolled" and not w3.has("_order_recipe"),"a wrap matching no order still rolls and becomes a free wrap")
+	# BIRLESIK (7. tur, kullanici: "eksik malzemeli verirsek verebilelim, illa tam
+	# malzeme olmasina gerek yok, ona gore para aliriz"): eskiden istenmeyen ya da
+	# eksik malzemeli durum reddediliyordu. Artik kabul edilir; kalite (ucret carpani)
+	# siparise gore: et .40, patates .28, tursu .16, yogurt .16; istenmeyen konmamissa tam.
 	fresh({"secim":2.0})
 	c=customer([{"kind":"wrap","yok":["pickle","fries"]}])
 	w=ready(["fries"]); w.pickleN=1; game.j_G.hand=w
 	game.f_deliver(c)
-	check(not c.done[0] and is_same(game.j_G.hand,w) and game.j_G.stat.wraps==0,"even one forbidden pickle is rejected without consuming food or recording a sale")
-	w.pickleN=0; w.yogurtN=3; game.f_deliver(c)
-	check(not c.done[0] and game.j_G.hand!=null,"a partially filled required ingredient is rejected")
-	w.yogurtN=4; w.sauce="hot"; game.f_deliver(c)
-	check(not c.done[0],"unrequested sauce does not count as the plain recipe")
-	w.sauce=null; game.f_deliver(c)
-	check(c.done[0] and game.j_G.hand==null,"correct double omission is accepted")
+	check(c.done[0] and game.j_G.hand==null and absf(float(w.quality)-0.84)<0.001,"a forbidden pickle is accepted at reduced quality (0.84)")
+	fresh({"secim":2.0})
+	c=customer([{"kind":"wrap","yok":["pickle","fries"]}])
+	w=ready(["pickle","fries"]); w.yogurtN=3; game.j_G.hand=w; game.f_deliver(c)
+	check(c.done[0] and absf(float(w.quality)-0.96)<0.001,"a partially filled required ingredient is accepted at reduced quality (0.96)")
+	fresh({"secim":2.0,"sauce":1.0})
+	c=customer([{"kind":"wrap","yok":["pickle","fries"]}])
+	w=ready(["pickle","fries"]); w.sauce="hot"; game.j_G.hand=w; game.f_deliver(c)
+	check(c.done[0] and game.j_G.hand==null,"unrequested sauce is accepted (sauce penalty applies in pricing)")
+	fresh({"secim":2.0})
+	c=customer([{"kind":"wrap","yok":["pickle","fries"]}])
+	w=ready(["pickle","fries"]); game.j_G.hand=w; game.f_deliver(c)
+	check(c.done[0] and game.j_G.hand==null and float(w.quality)==1.0,"correct double omission is accepted at full quality")
 	fresh({"secim":2.0})
 	c=customer([{"kind":"wrap","yok":["pickle"]},{"kind":"wrap","yok":["yogurt"]}])
 	game.j_G.hand=ready(["yogurt"]); game.f_deliver(c)
 	check(c.done==[false,true],"matching is ingredient-specific when one customer orders two wraps")
 	fresh({"phone":1.0,"secim":2.0})
 	game.j_G.phone.state="order"; game.j_G.phone.order=[{"kind":"wrap","yok":["pickle"]},{"kind":"wrap","yok":["fries"]}]; game.j_G.phone.done=[false,false]
-	w=ready(); game.j_G.hand=w; game.f_giveToCourier()
-	check(game.j_G.phone.done==[false,false] and is_same(game.j_G.hand,w),"courier rejects unwanted ingredients without consuming the item")
 	game.j_G.hand=ready(["fries"]); game.f_giveToCourier()
 	check(game.j_G.phone.done==[false,true],"courier resolves the correct wrap among different preferences")
+	# BIRLESIK (7. tur): istenmeyen malzemeli durum da pakete gider, en iyi uyan
+	# kaleme (burada tek kalan: tursusuz) dusuk kaliteyle.
+	w=ready(); game.j_G.hand=w; game.f_giveToCourier()
+	check(game.j_G.phone.done==[true,true] and game.j_G.hand==null and absf(float(w.quality)-0.84)<0.001,"courier accepts unwanted ingredients at reduced quality")
 	fresh({"board":1.0})
 	game.f_newWrap(0); game.f_newWrap(1); game.j_G.act=0
 	game.stations.select("meat"); game.stations.accept(true,"test"); step(4); game.j_G.act=1; step(40); game.stations.accept(false,"test")

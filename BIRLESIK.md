@@ -167,7 +167,7 @@ Kullanıcının sırası: **1, 2, 9 → 15, 18 → 10 → kalanlar**. Biten madd
 - [x] 15 Performans: oyun karesi 14,4 → 13,1 ms, başlık 19,6 → 14,0 ms (uçan et talaşı, elips, çerçeveli yazı, yaya kimliği, sokak ölçüsü önbellekte; başlık vinyetinin görünmeyen 52 çerçevesi kesildi). Mobil zaten 30 FPS. Release masaüstü 11,5 ms (hata ayıklama 15,6). Android APK: exports/android (ETC2/ASTC açıldı); telefonda Ayarlar → "Kare süresini göster". Ölçüm modu: `-- --olcum 300`
 - [—] 18 Ses: fiziksel modelle sentezlenmiş örnekler denendi, kullanıcı beğenmedi ("eski sesler daha iyiydi") → kaldırıldı, eski sesler duruyor
 - [x] 10 Tempo ölçüldü (tests/tempo.gd, ECONOMY.md): ilk şube 21-35. gün, borç 78-107. gün; borç ilk 60 günde neredeyse erimiyor (karar kullanıcıda)
-- [x] 3 Yazılar HD'de Scale2x (EPX) ile 2x ızgarada (genişlik/düzen aynı, kavisler yumuşak); kutular ve ikonlar zaten HD
+- [—] 3 Yazıya Scale2x denendi, kullanıcı beğenmedi ("yazı kalitesini niye böyle yaptın") → eski piksel yazı
 - [x] 4 Parçacık: konfeti dönen kâğıt, büyük benek yuvarlak, hızlı kıvılcım/kırıntı kısa izli
 - [x] 5 Müşteri ifadesi okunur: sabırsız (0,55 altı) ter damlası, kızgın öfke damarı + kırmızı yanak, mutlu pembe yanak (hd_musteri_dizi --ruh)
 - [x] 6 Dayı: üçüncü jest çay yudumu (ince belli bardak, 8 kare, yudumda gözler yarı kapalı, kol yüzün önüne geçer); mevcut: nefes, fes/bıyık jesti, kırpma, sevinç
@@ -182,3 +182,14 @@ Kullanıcının sırası: **1, 2, 9 → 15, 18 → 10 → kalanlar**. Biten madd
 - [x] 19 İstasyon adı etiketi fare 0,45 sn durunca belirir (çerçeve hemen)
 - [x] 20 Öğretici/onay mesajları oyun başına ilk 3 kez; hata ve olaylar her zaman
 - [x] 21 Mobil: telefon oranında (2,17:1) kesilme/çakışma yok; Android yatay kilitli (dikey hiç oluşmaz)
+
+## Yedinci tur (2026-09-24)
+
+| Kullanıcı | Yapılan |
+| --- | --- |
+| Yazı kalitesi/tipi kötü | Scale2x kaldırıldı, eski piksel yazı |
+| Yeni sesler kötü | Sentez sesler kaldırıldı, eski sesler |
+| Toplu sipariş | 5. günden sonra telefonun %22'si "x4/x5": 4-5 standart dürüm, ürün başı paket ücretinin 1,4 katı (`tests/toplu_siparis.gd`) |
+| Dürüm tahtaya geri konmuyor, bazen | Elde ürünle BOŞ tahtaya tıklamak hiçbir şey yapmıyordu; artık bırakır |
+| Hazır İskender teslim edilemiyor | Tabak ancak tamamen dolunca alınabiliyordu; seçili tahtada ikinci tıklamada eksik tabak da alınır |
+| Eksik malzemeyle verilebilsin, ücret ona göre | Müşteri ve paket eksik/fazla malzemeli dürümü kabul eder; en iyi uyan kaleme gider; ücret çarpanı et .40 + patates .28 + turşu .16 + yoğurt .16 (istenmeyen konmamışsa tam). Sarılmamış/kâğıtsız/ızgarasız/yanık yine verilmez (`tests/eksik_teslim.gd`; tabanın order_flow testi karara göre güncellendi) |

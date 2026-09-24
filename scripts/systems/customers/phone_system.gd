@@ -180,7 +180,7 @@ func f_giveToCourier() -> Variant:
 	v_it = J.getv(game.j_G, "hand")
 	v_idx = (-J.n(1.0))
 	v_pass = 0.0
-	while (J.lt(v_pass, 2.0) and J.lt(v_idx, 0.0)):
+	while (J.lt(v_pass, 4.0) and J.lt(v_idx, 0.0)):
 		v_i = 0.0
 		while J.lt(v_i, J.getv(J.getv(v_p, "order"), "length")):
 			if J.truth(J.getv(J.getv(v_p, "done"), v_i)):
@@ -193,10 +193,14 @@ func f_giveToCourier() -> Variant:
 			if (J.eq(J.getv(v_it, "kind"), "drink") and not J.eq(J.getv(v_o, "type"), J.getv(v_it, "type"))):
 				v_i = J.add(v_i, 1.0)
 				continue
-			if ((J.eq(v_pass, 0.0) and J.eq(J.getv(v_it, "kind"), "wrap")) and not J.eq((J.getv(v_o, "sauce") if J.truth(J.getv(v_o, "sauce")) else null), (J.getv(v_it, "sauce") if J.truth(J.getv(v_it, "sauce")) else null))):
+			if (((J.eq(v_pass, 0.0) or J.eq(v_pass, 2.0)) and J.eq(J.getv(v_it, "kind"), "wrap")) and not J.eq((J.getv(v_o, "sauce") if J.truth(J.getv(v_o, "sauce")) else null), (J.getv(v_it, "sauce") if J.truth(J.getv(v_it, "sauce")) else null))):
 				v_i = J.add(v_i, 1.0)
 				continue
-			if J.eq(J.getv(v_it, "kind"), "wrap") and not game.f_secimUyuyor(v_it, v_o):
+			if J.lt(v_pass, 2.0) and J.eq(J.getv(v_it, "kind"), "wrap") and not game.f_secimUyuyor(v_it, v_o):
+				v_i = J.add(v_i, 1.0)
+				continue
+			# gevsek gecis: order_system'in sectigi en iyi kalem (order_loose_index)
+			if J.ge(v_pass, 2.0) and v_it is Dictionary and v_it.has("_teslim_idx") and not J.eq(v_i, v_it._teslim_idx):
 				v_i = J.add(v_i, 1.0)
 				continue
 			v_idx = v_i
@@ -205,13 +209,7 @@ func f_giveToCourier() -> Variant:
 		v_pass = J.add(v_pass, 1.0)
 	if J.lt(v_idx, 0.0):
 		return false
-	if (J.eq(J.getv(J.getv(game.j_G, "hand"), "kind"), "wrap") or J.eq(J.getv(J.getv(game.j_G, "hand"), "kind"), "plate")):
-		v_tam = (game.recipe_system.f_plateFull(J.getv(game.j_G, "hand")) if J.eq(J.getv(J.getv(game.j_G, "hand"), "kind"), "plate") else game.f_wrapFull(J.getv(game.j_G, "hand")))
-		if (not J.truth(v_tam)):
-			J.method(game.j_SFX, "bad", [])
-			game.effects.f_ftext(game.localization.f_T("EKSİK — PAKETE OLMAZ"), J.add(J.getv(J.getv(game.j_ST, "uncle"), "x"), 24.0), 120.0, J.getv(game.j_P, "bad"), {"life": 1.5})
-			game.session_system.f_say("Paket siparişi eksik ürün kabul etmez — tamamla")
-			return false
+	# BIRLESIK (7. tur): eksik urun de pakete gider; ucret kaliteyle (asagida v_q)
 	v_ord = J.getv(J.getv(v_p, "order"), v_idx)
 	v_sauceOk = ((not J.truth(J.getv(v_ord, "sauce"))) if (not J.truth(J.getv(v_ord, "sauce"))) else J.eq(J.getv(v_it, "sauce"), J.getv(v_ord, "sauce")))
 	v_price = (game.recipe_system.f_itemPrice({"kind": "wrap", "grilled": J.getv(v_it, "grilled"), "sauce": (J.getv(v_ord, "sauce") if J.truth(v_sauceOk) else null)}, game.j_G) if J.eq(J.getv(v_it, "kind"), "wrap") else game.recipe_system.f_itemPrice(v_it, game.j_G))
