@@ -21,7 +21,10 @@ func f_drawTitle(p_t: Variant = null) -> Variant:
 	game.f_fr(0.0, 0.0, game.j_W, game.j_H, "#180d07")
 	J.setv(game.j_ctx, "globalAlpha", 1.0)
 	v_i = 0.0
-	while J.lt(v_i, 60.0):
+	# BIRLESIK (6. tur performans): 60 cerceveden yalniz ilk 8'i ekrana dusuyor
+	# (koseler 8 px yaricapli; 8. cerceveden sonrasi tamamen ekran disi) -> ayni
+	# goruntu, kare basina ~3 ms daha az.
+	while J.lt(v_i, 8.0):
 		J.setv(game.j_ctx, "globalAlpha", (float((0.012 * (60.0 - v_i))) / float(6.0)))
 		game.f_rrectOut((-J.n(v_i)), (-J.n(v_i)), J.add(game.j_W, (v_i * 2.0)), J.add(game.j_H, (v_i * 2.0)), 8.0, "#000")
 		v_i = J.add(v_i, 1.0)

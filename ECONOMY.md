@@ -115,3 +115,22 @@ Kullanıcı: "upgrade maliyetleri biraz ucuz, diğer oyunda öyle değildi". Sat
 | Malzeme Seçimi | 1520 / 4500 |
 | Jeneratör | 1020 / 3200 / 7700 |
 | Boya & Dekor | 140 / 440 / 1050 |
+
+## Uzun vadeli tempo (6. tur, `tests/tempo.gd`)
+
+Gerçek sipariş üretimi, fiyatlar, gün sonu (şube geliri + %18 borç kesintisi) ve satın alma fonksiyonlarıyla 200 günlük simülasyon. Oyuncu gelen müşterinin (`dayCfg`: `(len - 25) / rate`) belli bir oranına yetişir. Telefon, Dayı, bahşiş ve olay gelirleri yok; tarihler temkinli. Toplam 70 yükseltme seviyesi, 9 şube.
+
+| Alım kuralı | Yetişme | İlk şube | Yükseltmeler biter | Borç biter | 60. gün kalan borç |
+| --- | --- | --- | --- | --- | --- |
+| En ucuz yükseltme | %55 | 35. gün | ~60. gün | 107. gün | $4,95M |
+| En ucuz yükseltme | %70 | 26. gün | ~50. gün | 93. gün | $4,89M |
+| En ucuz yükseltme | %85 | 24. gün | ~45. gün | 84. gün | $4,77M |
+| Şubeye biriktir | %55 | 25. gün | ~80. gün | 93. gün | $4,89M |
+| Şubeye biriktir | %70 | 23. gün | ~75. gün | 85. gün | $4,79M |
+| Şubeye biriktir | %85 | 21. gün | ~70. gün | 78. gün | $4,54M |
+
+Bulgular: 120 gün başarımı her profilde tutuyor. Borç ilk 60 günde %10'dan az eriyor, sonra şube geliriyle (New York 570 bin/gün) 25-30 günde bitiyor. Yani uzun süre borç çubuğu kıpırdamıyor. Yükseltmeler 45-80. günde tükeniyor, sonrasında yalnız şube alınabiliyor.
+
+```sh
+godot --headless --path . --script tests/tempo.gd --quit-after 1000000 -- --test [--gun 200]
+```

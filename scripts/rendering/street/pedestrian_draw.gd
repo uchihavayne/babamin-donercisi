@@ -2,14 +2,22 @@
 extends "res://scripts/core/game_module.gd"
 
 # art.js:1349
+# BIRLESIK (6. tur performans): kimlik yalniz k'ye (ve beton sehre) bagli ama
+# her karede her yaya icin closure cagrilariyla yeniden kuruluyordu (~50 us).
+var _kimlik: Dictionary = {}
 func f_pedKimlik(p_k: Variant = null) -> Variant:
+	var beton := J.truth(game.traffic_system.f_betonSehir())
+	var anahtar := Vector2(J.n(p_k), 1.0 if beton else 0.0)
+	var hazir: Variant = _kimlik.get(anahtar)
+	if hazir != null: return hazir
+	if _kimlik.size() > 1024: _kimlik.clear()
 	var _cells: Dictionary = {"k": [p_k]}
 	var v_h: Variant = null
 	var v_GOM: Variant = null
 	v_h = game.pedestrian_draw._closure_55.bind({"203:k": _cells["k"]})
-	v_GOM = (game.j_PED_SHIRT_BETON if J.truth(game.traffic_system.f_betonSehir()) else game.j_PED_SHIRT)
-	return {"shirt": J.getv(v_GOM, fmod(J.n(_cells["k"][0]), J.n(J.getv(v_GOM, "length")))), "pant": J.getv(game.j_PED_PANT, fmod(J.n((_cells["k"][0] * 3.0)), J.n(J.getv(game.j_PED_PANT, "length")))), "skin": J.getv(game.j_PED_SKIN, fmod(J.n((_cells["k"][0] * 5.0)), J.n(J.getv(game.j_PED_SKIN, "length")))), "hair": J.getv(game.j_PED_HAIR, fmod(J.n((_cells["k"][0] * 2.0)), J.n(J.getv(game.j_PED_HAIR, "length")))), "boy": ((-J.n(2.0)) if J.lt(J.invoke(v_h, [1.0]), 0.22) else (1.0 if J.gt(J.invoke(v_h, [1.0]), 0.82) else 0.0)), "genis": (1.0 if J.gt(J.invoke(v_h, [2.0]), 0.74) else 0.0), "sac": floor((J.invoke(v_h, [3.0]) * 4.0)), "esya": floor((J.invoke(v_h, [4.0]) * 5.0)), "sapka": J.gt(J.invoke(v_h, [5.0]), 0.8), "ceket": J.gt(J.invoke(v_h, [6.0]), 0.62), "tempo": J.add(5.6, (J.invoke(v_h, [7.0]) * 2.8))}
-	return null
+	v_GOM = (game.j_PED_SHIRT_BETON if beton else game.j_PED_SHIRT)
+	_kimlik[anahtar] = {"shirt": J.getv(v_GOM, fmod(J.n(_cells["k"][0]), J.n(J.getv(v_GOM, "length")))), "pant": J.getv(game.j_PED_PANT, fmod(J.n((_cells["k"][0] * 3.0)), J.n(J.getv(game.j_PED_PANT, "length")))), "skin": J.getv(game.j_PED_SKIN, fmod(J.n((_cells["k"][0] * 5.0)), J.n(J.getv(game.j_PED_SKIN, "length")))), "hair": J.getv(game.j_PED_HAIR, fmod(J.n((_cells["k"][0] * 2.0)), J.n(J.getv(game.j_PED_HAIR, "length")))), "boy": ((-J.n(2.0)) if J.lt(J.invoke(v_h, [1.0]), 0.22) else (1.0 if J.gt(J.invoke(v_h, [1.0]), 0.82) else 0.0)), "genis": (1.0 if J.gt(J.invoke(v_h, [2.0]), 0.74) else 0.0), "sac": floor((J.invoke(v_h, [3.0]) * 4.0)), "esya": floor((J.invoke(v_h, [4.0]) * 5.0)), "sapka": J.gt(J.invoke(v_h, [5.0]), 0.8), "ceket": J.gt(J.invoke(v_h, [6.0]), 0.62), "tempo": J.add(5.6, (J.invoke(v_h, [7.0]) * 2.8))}
+	return _kimlik[anahtar]
 
 # art.js:1367
 func f_drawPed(p_x: Variant = null, p_y: Variant = null, p_k: Variant = null, p_dir: Variant = null, p_t: Variant = null, p_sc: Variant = null, p_umbrella: Variant = null) -> Variant:

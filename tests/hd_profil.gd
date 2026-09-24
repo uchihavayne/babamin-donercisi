@@ -19,7 +19,7 @@ func olc(ad: String, fn: Callable) -> void:
 		c.begin_frame()
 		fn.call()
 		c.end_frame()
-	print("%-28s %7.2f ms" % [ad, (Time.get_ticks_usec() - t0) / 1000.0 / N])
+	print("%-28s %7.2f ms   rect %5d  doku %4d  paket %4d" % [ad, (Time.get_ticks_usec() - t0) / 1000.0 / N, c.stat_rects, c.stat_images, c.stat_batches])
 
 func calis() -> void:
 	root.size = Vector2i(960, 540)
@@ -78,5 +78,7 @@ func calis() -> void:
 		for c in g.j_G.customers: g.f_drawOrderBubble(c, t))
 	olc("hud", func() -> void: g.hud_draw.f_drawHUD(t))
 	olc("particles", func() -> void: g.effects.f_psDraw())
-	print("  parcacik: %d" % g.j_PS.size())
+	var turler := {}
+	for q in g.j_PS: turler[str(q.get("type", "px"))] = int(turler.get(str(q.get("type", "px")), 0)) + 1
+	print("  parcacik: %d %s" % [g.j_PS.size(), turler])
 	quit(0)

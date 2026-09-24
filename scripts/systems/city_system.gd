@@ -3,10 +3,13 @@ extends "res://scripts/core/game_module.gd"
 
 # sehir.js:175
 func f_sehirTema() -> Variant:
-	var v_i: Variant = null
-	v_i = (J.getv(game.j_G, "city") if ((not J.eq(J.kind(game.j_G), "undefined") and J.truth(game.j_G)) and J.eq(J.kind(J.getv(game.j_G, "city")), "number")) else (-J.n(1.0)))
-	return J.getv(game.j_SEHIR, game.math_utils.f_clamp(J.add(v_i, 1.0), 0.0, (J.getv(game.j_SEHIR, "length") - 1.0)))
-	return null
+	var i := -1.0
+	var G: Variant = game.j_G
+	if G is Dictionary:
+		var c: Variant = G.get("city")
+		if c is float or c is int: i = float(c)
+	var S: Array = game.j_SEHIR
+	return S[clampi(int(floor(i + 1.0)), 0, S.size() - 1)]
 
 # sehir.js:180
 func f_sehirAdi(p_i: Variant = null) -> Variant:

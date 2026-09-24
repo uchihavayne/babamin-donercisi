@@ -1290,6 +1290,7 @@ func f_hdTatliTabagi(cx: Variant, cy: Variant, t: Variant) -> bool:
 var _ton_carpan: ShaderMaterial = null
 var _ton_palet: ShaderMaterial = null
 
+var _ton_mono: Dictionary = {}
 func _ton(kip: int) -> RID:
 	if _ton_carpan == null:
 		var sh: Shader = load("res://shaders/ton.gdshader")
@@ -1307,7 +1308,10 @@ func _ton(kip: int) -> RID:
 		_ton_palet.set_shader_parameter("palet", ImageTexture.create_from_image(img))
 		_ton_palet.set_shader_parameter("satirlar", skins.size())
 	var m: ShaderMaterial = _ton_palet if kip == 1 else _ton_carpan
-	m.set_shader_parameter("mono", draw_context.mono)
+	# parametre yalniz degisince (her parcada material_set_param pahaliydi)
+	if _ton_mono.get(kip) != draw_context.mono:
+		m.set_shader_parameter("mono", draw_context.mono)
+		_ton_mono[kip] = draw_context.mono
 	return m.get_rid()
 
 func _ms() -> Dictionary:
@@ -2502,16 +2506,35 @@ func f_ell(cx: Variant = null, cy: Variant = null, rx: Variant = null, ry: Varia
 	if float(ry) == 0.0: return null
 	return _hd_elips(floorf(float(cx) + .5), floorf(float(cy) + .5), float(rx), float(ry), _renk(c))
 
-# eski disk/elips pikselin merkezinden (cx+.5) rx+.5 yaricapla kapliyor
+# BIRLESIK (6. tur performans): elips satir satir dikdortgenle ciziliyordu
+# (8x3 elips ~30 us; golgeler her karede onlarca kez). Ayni (rx, ry) icin
+# beyaz maske bir kez dokuya yazilir (asagidaki satir kuraliyla birebir),
+# sonraki cizimler tek doku, renk modulate ile.
+var _elips_doku: Dictionary = {}
 func _hd_elips(cx: float, cy: float, rx: float, ry: float, col: Color) -> Variant:
+	var anahtar := Vector2(rx, ry)
+	var e: Variant = _elips_doku.get(anahtar)
+	if e == null:
+		e = _elips_maske(rx, ry)
+		if _elips_doku.size() > 512: _elips_doku.clear()
+		_elips_doku[anahtar] = e
+	if (e as Array).is_empty(): return null
 	var ctx: GpuCanvas = draw_context
-	var CX := cx * 2.0 + 1.0
-	var CY := cy * 2.0 + 1.0
+	ctx.texture_hd(e[0], Rect2(0, 0, e[3], e[4]), (cx * 2.0 + 1.0 + e[1]) / 2.0, (cy * 2.0 + 1.0 + e[2]) / 2.0, col.a, false, Color(col.r, col.g, col.b))
+	return null
+
+# maske: [doku, sol, ust (merkeze gore HD px), gen, yuk]; pozitif merkezle hesaplanir
+# (roundf yarimda sifirdan uzaga yuvarlar; ekran koordinatlari pozitif)
+func _elips_maske(rx: float, ry: float) -> Array:
+	var CX := 2001.0
 	var RX := rx * 2.0 + 1.0
 	var RY := ry * 2.0 + 1.0
 	var n := int(RY)
+	var parcalar: Array = []
 	var onceki := Vector2(-1, -1)
 	var bas := 0
+	var x0 := INF
+	var x1 := -INF
 	for j in range(-n, n + 1):
 		var v := (j + 0.5) / RY
 		var sp := Vector2(-1, -1)
@@ -2519,10 +2542,18 @@ func _hd_elips(cx: float, cy: float, rx: float, ry: float, col: Color) -> Varian
 			sp = _hd_satir(CX, RX * sqrt(1.0 - v * v))
 		if sp != onceki:
 			if onceki.x >= 0 and onceki.y > onceki.x:
-				ctx.rect_hd(onceki.x, CY + bas, onceki.y - onceki.x, j - bas, col)
+				parcalar.append([onceki.x, onceki.y, bas, j])
+				x0 = minf(x0, onceki.x)
+				x1 = maxf(x1, onceki.y)
 			onceki = sp
 			bas = j
-	return null
+	if parcalar.is_empty(): return []
+	var y0: int = parcalar[0][2]
+	var y1: int = parcalar[-1][3]
+	var img := Image.create(int(x1 - x0), y1 - y0, false, Image.FORMAT_RGBA8)
+	for p in parcalar:
+		img.fill_rect(Rect2i(int(p[0] - x0), p[2] - y0, int(p[1] - p[0]), p[3] - p[2]), Color.WHITE)
+	return [ImageTexture.create_from_image(img), x0 - CX, float(y0), img.get_width(), img.get_height()]
 
 func f_ring(cx: Variant = null, cy: Variant = null, r: Variant = null, c: Variant = null) -> Variant:
 	if not _prim_hd(): return super(cx, cy, r, c)
@@ -2634,23 +2665,49 @@ func f_hdEtDilimi(x: Variant, y: Variant, kv: Variant, k: Variant, sc: Variant) 
 	var X := floorf(J.n(x) + 0.5)
 	var Y := floorf(J.n(y) + 0.5)
 	var KV := J.n(kv)
+	# BIRLESIK (6. tur performans): talas ~130 dikdortgendi (6 ucan talas ~1.5 ms).
+	# Ayni (boy, kivrim, donus) bir kez dokuya cizilir; kivrim/donus 1/40 adimli.
+	var anahtar := Vector3i(int(boy), roundi(KV * 40.0), roundi(don * 40.0))
+	var e: Variant = _talas_doku.get(anahtar)
+	if e == null:
+		e = _talas_uret(boy, anahtar.y / 40.0, anahtar.z / 40.0)
+		if _talas_doku.size() > 2048: _talas_doku.clear()
+		_talas_doku[anahtar] = e
+	draw_context.texture_hd(e[0], Rect2(0, 0, e[3], e[4]), X + e[1] / 2.0, Y + e[2] / 2.0)
+	return true
+
+var _talas_doku: Dictionary = {}
+# [doku, sol, ust (capaya gore HD px), gen, yuk]; pozitif tabanla yuvarlanir
+func _talas_uret(boy: float, KV: float, don: float) -> Array:
+	var B := 2000.0
 	var kabuk := Color8(0x7e, 0x44, 0x12)
 	var koyu := Color8(0x9c, 0x57, 0x18)
 	var govde := Color8(0xbd, 0x70, 0x24)
 	var acik := Color8(0xee, 0xb4, 0x63)
 	var n := int(boy) * 7            # kivrik talasta ardisik ornekler bosluk birakmasin
+	var R: Array = []
 	for i in n:
 		var u := i / float(n - 1) if n > 1 else 0.5
 		var a := u * PI * 1.35 * KV + don
-		var cx := roundf((X + sin(a) * boy * 0.55) * 2.0)
-		var cy := roundf((Y + (1.0 - cos(a)) * boy * 0.4 - roundf(boy * 0.2)) * 2.0)
+		var cx := roundf(B + sin(a) * boy * 0.55 * 2.0) - B
+		var cy := roundf(B + ((1.0 - cos(a)) * boy * 0.4 - roundf(boy * 0.2)) * 2.0) - B
 		var kal := 2.0 + (2.0 if (u > 0.18 and u < 0.82) else 0.0)
-		_hp(cx, cy, 2.0, kal + 2.0, kabuk)
-		_hp(cx, cy, 2.0, 2.0, govde if u < 0.5 else koyu)
+		R.append([cx, cy, 2.0, kal + 2.0, kabuk])
+		R.append([cx, cy, 2.0, 2.0, govde if u < 0.5 else koyu])
 		if kal > 2.0:
-			_hp(cx, cy + 2.0, 2.0, 2.0, acik if u < 0.55 else govde)
-	_hp(roundf((X + sin(don) * boy * 0.55) * 2.0), roundf((Y - roundf(boy * 0.2)) * 2.0), 2.0, 1.0, Color8(0xff, 0xd2, 0x91))
-	return true
+			R.append([cx, cy + 2.0, 2.0, 2.0, acik if u < 0.55 else govde])
+	R.append([roundf(B + sin(don) * boy * 0.55 * 2.0) - B, roundf(B - roundf(boy * 0.2) * 2.0) - B, 2.0, 1.0, Color8(0xff, 0xd2, 0x91)])
+	var x0 := INF
+	var y0 := INF
+	var x1 := -INF
+	var y1 := -INF
+	for r in R:
+		x0 = minf(x0, r[0]); y0 = minf(y0, r[1])
+		x1 = maxf(x1, r[0] + r[2]); y1 = maxf(y1, r[1] + r[3])
+	var img := Image.create(int(x1 - x0), int(y1 - y0), false, Image.FORMAT_RGBA8)
+	for r in R:
+		img.fill_rect(Rect2i(int(r[0] - x0), int(r[1] - y0), int(r[2]), int(r[3])), r[4])
+	return [ImageTexture.create_from_image(img), x0, y0, img.get_width(), img.get_height()]
 
 # ---------------------------------------------------------------- imlec
 # food.js drawCursor: ok (isaret), yumruk (tutma), bicak. Maskeler bir kez

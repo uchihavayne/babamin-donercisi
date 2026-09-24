@@ -421,14 +421,24 @@ func random_unit() -> float:
 var string_cache: Dictionary = {}
 var meat_cache: Dictionary = {}
 var meat_quantized: Dictionary = {}
+# BIRLESIK (6. tur performans): genislik harf harf her cagrida hesaplaniyordu
+# (~14 us); metin + mono basina onbellek.
+var _gen_onbellek: Dictionary = {}
 func f_textW(text: Variant = null, scale_value: Variant = null, mono: Variant = null) -> Variant:
 	var value: String = J.s(game.localization.f_T(text))
 	var scale_factor: float = J.n(scale_value) if J.truth(scale_value) else 1.0
-	var width := 0
-	for ch in value:
-		var glyph: Dictionary = game.j_FONT.get(ch, game.j_FONT["?"])
-		width += (maxi(int(glyph.w), 4) if J.truth(mono) else int(glyph.w)) + 1
-	return (width - 1) * scale_factor
+	var m := J.truth(mono)
+	var anahtar := value + ("\u0001" if m else "")
+	var width: Variant = _gen_onbellek.get(anahtar)
+	if width == null:
+		var gw := 0
+		for ch in value:
+			var glyph: Dictionary = game.j_FONT.get(ch, game.j_FONT["?"])
+			gw += (maxi(int(glyph.w), 4) if m else int(glyph.w)) + 1
+		if _gen_onbellek.size() > 4096: _gen_onbellek.clear()
+		_gen_onbellek[anahtar] = gw
+		width = gw
+	return (int(width) - 1) * scale_factor
 
 func f_drawStr(text: Variant = null, x: Variant = null, y: Variant = null, color: Variant = null, scale_value: Variant = null, mono: Variant = null) -> Variant:
 	var value: String = J.s(text)
@@ -443,24 +453,58 @@ func f_drawStr(text: Variant = null, x: Variant = null, y: Variant = null, color
 		cached.width = maxi(1, width)
 		cached.height = 8
 		cached.ensure()
-		var c: Color = Canvas.parse_color(str(color))
-		var cursor := 0
-		for ch in value:
-			var glyph: Dictionary = game.j_FONT.get(ch, game.j_FONT["?"])
-			var gw: int = maxi(int(glyph.w), 4) if J.truth(mono) else int(glyph.w)
-			var offset: int = int(floor((gw - glyph.w) / 2.0)) if J.truth(mono) else 0
-			if ch != " ":
-				for row_index in glyph.rows.size():
-					var row: String = glyph.rows[row_index]
-					for column in int(glyph.w):
-						var i: int = int(glyph.x0) + column
-						if i < row.length() and row[i] == "#": cached.image.set_pixel(cursor + offset + column, row_index, c)
-			cursor += gw + 1
+		_str_yaz(cached, value, Canvas.parse_color(str(color)), J.truth(mono), 0, 0)
 		if string_cache.size() > 1024: string_cache.clear()
 		string_cache[key] = cached
 	var scale_factor: float = J.n(scale_value) if scale_value != null else 1.0
 	draw_context.drawImage(cached, x, y, cached.width * scale_factor, 8 * scale_factor)
 	return null
+
+# glif piksellerini tuvale yaz (ox, oy kaymasiyla); ust uste yazim son rengi birakir
+func _str_yaz(cv: Variant, value: String, c: Color, mono: bool, ox: int, oy: int) -> void:
+	var cursor := 0
+	for ch in value:
+		var glyph: Dictionary = game.j_FONT.get(ch, game.j_FONT["?"])
+		var gw: int = maxi(int(glyph.w), 4) if mono else int(glyph.w)
+		var offset: int = int(floor((gw - glyph.w) / 2.0)) if mono else 0
+		if ch != " ":
+			for row_index in glyph.rows.size():
+				var row: String = glyph.rows[row_index]
+				for column in int(glyph.w):
+					var i: int = int(glyph.x0) + column
+					if i < row.length() and row[i] == "#": cv.image.set_pixel(ox + cursor + offset + column, oy + row_index, c)
+		cursor += gw + 1
+
+# BIRLESIK (6. tur performans): cerceveli yazi 9 ayri cizimdi (~140 us),
+# golgeli 2. Cerceve (8 komsu) ya da golge (+1,+1) ve yazi tek tuvalde pisirilir;
+# olcek (sc) tuvalin tamamina uygulanir -> eski cizimle ayni pikseller.
+# cerceve: true -> 8 komsu, false -> golge
+func f_drawStrKenar(text: Variant, x: Variant, y: Variant, color: Variant, kenar: Variant, cerceve: bool, scale_value: Variant, mono: Variant) -> void:
+	var value: String = J.s(text)
+	var m := J.truth(mono)
+	var key: Array = [value, color, kenar, cerceve, m]
+	var cached: Variant = string_cache.get(key)
+	if cached == null:
+		var width := 0
+		for ch in value:
+			var glyph: Dictionary = game.j_FONT.get(ch, game.j_FONT["?"])
+			width += (maxi(int(glyph.w), 4) if m else int(glyph.w)) + 1
+		cached = Canvas.new()
+		cached.width = maxi(1, width) + 2
+		cached.height = 10
+		cached.ensure()
+		var kc: Color = Canvas.parse_color(str(kenar))
+		if cerceve:
+			for dy in [-1, 0, 1]:
+				for dx in [-1, 0, 1]:
+					if dx != 0 or dy != 0: _str_yaz(cached, value, kc, m, 1 + dx, 1 + dy)
+		else:
+			_str_yaz(cached, value, kc, m, 2, 2)
+		_str_yaz(cached, value, Canvas.parse_color(str(color)), m, 1, 1)
+		if string_cache.size() > 1024: string_cache.clear()
+		string_cache[key] = cached
+	var sf: float = J.n(scale_value) if scale_value != null else 1.0
+	draw_context.drawImage(cached, J.n(x) - sf, J.n(y) - sf, cached.width * sf, 10 * sf)
 
 func f_asinF(value: Variant = null) -> Variant:
 	return game.j_ASIN_LUT[clampi(int((value + 1) * 512), 0, 1024)]

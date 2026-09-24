@@ -67,13 +67,11 @@ func f_vehLen(p_type: Variant = null, p_sc: Variant = null) -> Variant:
 	return null
 
 # art.js:1344
+# BIRLESIK (6. tur performans): yaya/arac basina cagriliyor; yansimali
+# fonksiyon denetimi (J.kind(J.ref)) her seferinde ~10 us idi.
 func f_betonSehir() -> Variant:
-	var v_tm: Variant = null
-	if not J.eq(J.kind(J.ref(game.city_system.f_sehirTema, 0)), "function"):
-		return false
-	v_tm = game.city_system.f_sehirTema()
-	return (not (not ((J.truth(v_tm) and J.truth(J.getv(v_tm, "cephe"))) and J.eq(J.getv(J.getv(v_tm, "cephe"), "tarz"), "beton"))))
-	return null
+	var v_tm: Variant = game.city_system.f_sehirTema()
+	return v_tm is Dictionary and v_tm.get("cephe") is Dictionary and v_tm.cephe.get("tarz") == "beton"
 
 # art.js:1592
 func f_trafInit() -> Variant:

@@ -73,19 +73,14 @@ func f_txt(p_s: Variant = null, p_x: Variant = null, p_y: Variant = null, p_col:
 			v_ax = (v_x - (v_w * v_sc))
 	v_ax = floor(v_ax + 0.5)
 	v_y = floor(v_y + 0.5)
+	# BIRLESIK (6. tur performans): cerceve / golge + yazi tek pisirilmis doku
 	if J.truth(J.getv(v_o, "outline")):
 		v_oc = (J.getv(game.j_P, "ui5") if J.eq(J.getv(v_o, "outline"), true) else J.getv(v_o, "outline"))
-		v_dy = (-J.n(1.0))
-		while J.le(v_dy, 1.0):
-			v_dx = (-J.n(1.0))
-			while J.le(v_dx, 1.0):
-				if (J.truth(v_dx) or J.truth(v_dy)):
-					game.f_drawStr(v_s, J.add(v_ax, (v_dx * v_sc)), J.add(v_y, (v_dy * v_sc)), v_oc, v_sc, v_mono)
-				v_dx = J.add(v_dx, 1.0)
-			v_dy = J.add(v_dy, 1.0)
-	else:
-		if J.truth(J.getv(v_o, "shadow")):
-			game.f_drawStr(v_s, J.add(v_ax, v_sc), J.add(v_y, v_sc), (J.getv(v_o, "shcol") if J.truth(J.getv(v_o, "shcol")) else "rgba(0,0,0,.5)"), v_sc, v_mono)
+		game.f_drawStrKenar(v_s, v_ax, v_y, v_col, v_oc, true, v_sc, v_mono)
+		return (v_w * v_sc)
+	if J.truth(J.getv(v_o, "shadow")):
+		game.f_drawStrKenar(v_s, v_ax, v_y, v_col, (J.getv(v_o, "shcol") if J.truth(J.getv(v_o, "shcol")) else "rgba(0,0,0,.5)"), false, v_sc, v_mono)
+		return (v_w * v_sc)
 	game.f_drawStr(v_s, v_ax, v_y, v_col, v_sc, v_mono)
 	return (v_w * v_sc)
 	return null

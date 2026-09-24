@@ -155,7 +155,7 @@ godot --headless --path . --script tests/module_snapshot.gd --quit-after 3000 --
 
 Tabanın bütün testleri geçiyor (sipariş akışı, kesim, istasyonlar, girişler, ekonomi, anlık görüntü 6/6). Anlık görüntü referansında tek değişiklik `upgraded-shop`: taban projede boyalı duvar siyah çiziliyordu (`js_compat` `toString(16)` tabanı yok sayıyordu), birleşik sürümde doğru renk.
 
-Kare süresi (tam yükseltmeli oyun ekranı çizimi, Ryzen 5 3600X + RTX 5060): 12 ms; başlık 18 ms.
+Kare süresi (tam yükseltmeli oyun, 300 kare ortalaması, editör motoru, Ryzen 5 3600X + RTX 5060): 13,1 ms; başlık 14 ms. Ölçüm: `hd_sahne.gd --full --kare 60 --olc 300`, ayrıntı `tests/hd_profil.gd`, tek çağrı maliyetleri `tests/hd_mikro.gd`.
 
 ## Yapılacaklar (6. tur analizi, 2026-09-24)
 
@@ -164,9 +164,9 @@ Kullanıcının sırası: **1, 2, 9 → 15, 18 → 10 → kalanlar**. Biten madd
 - [x] 1 Sarma animasyonu CPU piksel tüp → Blender tüpü (durum_tup_<1..10>, benekler dönerek)
 - [x] 2 İskender tabağı → iskender_hd.py (tabak+pide+et+sos+yoğurt tek sahne; biber, közlenmiş domates katman)
 - [x] 9 Oyun sonu: kutlama → 5 sahnelik kapanış hikâyesi (ÖDENDİ damgası, baba, dolu dükkân, kepenk, SON kartı) → serbest oyun (tests/kapanis.gd)
-- [ ] 15 Mobil performans (f_drawPlay ~10.5 ms; duvar süsü 3.2, parçacık 2.1)
+- [x] 15 Performans: oyun karesi 14,4 → 13,1 ms, başlık 19,6 → 14,0 ms (uçan et talaşı, elips, çerçeveli yazı, yaya kimliği, sokak ölçüsü önbellekte; başlık vinyetinin görünmeyen 52 çerçevesi kesildi). Mobil zaten 30 FPS. Kalan: release derlemesiyle telefonda ölçüm (dışa aktarma şablonu yok)
 - [ ] 18 Ses efektleri sentez bip (gerçek kayıt yalnız 7 dosya)
-- [ ] 10 Uzun vadeli tempo (şube/borç günü) yeni fiyatlarla ölçülmedi
+- [x] 10 Tempo ölçüldü (tests/tempo.gd, ECONOMY.md): ilk şube 21-35. gün, borç 78-107. gün; borç ilk 60 günde neredeyse erimiyor (karar kullanıcıda)
 - [ ] 3 HUD/paneller 1x piksel, modeller 2x (iki keskinlik)
 - [ ] 4 Parçacıklar 1-2 px kare
 - [ ] 5 Müşteriler durağan, ifade az

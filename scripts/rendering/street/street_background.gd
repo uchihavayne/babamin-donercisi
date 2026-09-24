@@ -26,11 +26,18 @@ func f_mixHex(p_a: Variant = null, p_b: Variant = null, p_k: Variant = null) -> 
 	return null
 
 # art.js:77
+# BIRLESIK (6. tur performans): karede onlarca kez cagriliyor (~16 us); cam
+# olculeri degismedikce ayni sozluk (yalniz okunur) doner.
+var _stm: Dictionary = {}
+var _stm_anahtar := Vector4(-1, -1, -1, -1)
 func f_stM() -> Variant:
 	var v_G0: Variant = null
 	v_G0 = J.getv(game.j_LAY, "glass")
-	return {"gx": J.getv(v_G0, "x"), "gy": J.getv(v_G0, "y"), "gw": J.getv(v_G0, "w"), "gh": J.getv(v_G0, "h"), "base": J.add(J.getv(v_G0, "y"), 50.0), "walkY": J.add(J.getv(v_G0, "y"), 57.0), "roadY": J.add(J.getv(v_G0, "y"), 58.0), "roadH": 26.0, "farY": J.add(J.getv(v_G0, "y"), 70.0), "nearY": J.add(J.getv(v_G0, "y"), 82.0), "curb2": J.add(J.getv(v_G0, "y"), 84.0)}
-	return null
+	var anahtar := Vector4(J.n(v_G0.x), J.n(v_G0.y), J.n(v_G0.w), J.n(v_G0.h))
+	if anahtar == _stm_anahtar: return _stm
+	_stm_anahtar = anahtar
+	_stm = {"gx": J.getv(v_G0, "x"), "gy": J.getv(v_G0, "y"), "gw": J.getv(v_G0, "w"), "gh": J.getv(v_G0, "h"), "base": J.add(J.getv(v_G0, "y"), 50.0), "walkY": J.add(J.getv(v_G0, "y"), 57.0), "roadY": J.add(J.getv(v_G0, "y"), 58.0), "roadH": 26.0, "farY": J.add(J.getv(v_G0, "y"), 70.0), "nearY": J.add(J.getv(v_G0, "y"), 82.0), "curb2": J.add(J.getv(v_G0, "y"), 84.0)}
+	return _stm
 
 # art.js:397
 func f_bakeStreet() -> Variant:
