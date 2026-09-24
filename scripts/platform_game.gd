@@ -360,6 +360,12 @@ func _ready() -> void:
 
 func _input(event: InputEvent) -> void:
 	if hd_tus(event): return
+	# BIRLESIK (7. tur): kabuk tuslari oyun eylemlerine cevirir; ham tus listesine
+	# (effects.f_keyp) yazilmadigi icin T ile gelistirici paneli acilmiyordu.
+	if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == KEY_T 			and not j_TEXTIN.active and J.truth(J.getv(j_window, "__DEV_BUILD")) and str(j_G.scene) in ["play", "shop", "pause"]:
+		j_G.test = not J.truth(j_G.get("test"))
+		J.method(j_SFX, "ui", [])
+		return
 	if controls != null and not suspended: controls.handle(event)
 
 func advance(delta: float) -> void:

@@ -185,6 +185,10 @@ func f_devDugmeTik(p_mx: Variant = null, p_my: Variant = null) -> Variant:
 		return false
 	J.setv(game.j_G, "test", (not J.truth(J.getv(game.j_G, "test"))))
 	J.method(game.j_SFX, "ui", [])
+	# BIRLESIK (7. tur, kullanici: "DEV yazisina tiklayinca bazen gun bitiyor"):
+	# panel ekranin neredeyse tamamini kaplar ve AYNI karede acilir; tiklama
+	# tuketilmezse imlecin altina denk gelen panel dugmesi (gunu bitir) de basilir.
+	J.setv(game.j_IN, "pressed", false)
 	return true
 	return null
 
