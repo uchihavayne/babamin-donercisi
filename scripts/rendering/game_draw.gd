@@ -134,9 +134,11 @@ func f_drawPlay(p_t: Variant = null) -> Variant:
 		J.method(game.j_ctx, "translate", [0.0, 12.0])
 		game.f_drawBreadStack(J.getv(J.getv(game.j_ST, "bread"), "x"), J.getv(J.getv(game.j_ST, "bread"), "y"), J.getv(J.getv(game.j_ST, "bread"), "w"), J.getv(J.getv(game.j_ST, "bread"), "h"), "")
 		J.method(game.j_ctx, "restore", [])
-		J.setv(game.j_ctx, "globalAlpha", 0.28)
-		game.f_hl(J.add(J.getv(J.getv(game.j_ST, "bread"), "x"), 5.0), J.add(J.getv(J.getv(game.j_ST, "bread"), "y"), 15.0), (J.getv(J.getv(game.j_ST, "bread"), "w") - 10.0), "#ffffff")
-		J.setv(game.j_ctx, "globalAlpha", 1.0)
+		# BIRLESIK: pide / lavas ayirici cizgisi HD'de pide yiginin icinden geciyordu
+		if not game.hd_gpu():
+			J.setv(game.j_ctx, "globalAlpha", 0.28)
+			game.f_hl(J.add(J.getv(J.getv(game.j_ST, "bread"), "x"), 5.0), J.add(J.getv(J.getv(game.j_ST, "bread"), "y"), 15.0), (J.getv(J.getv(game.j_ST, "bread"), "w") - 10.0), "#ffffff")
+			J.setv(game.j_ctx, "globalAlpha", 1.0)
 	else:
 		game.f_drawBreadStack(J.getv(J.getv(game.j_ST, "bread"), "x"), J.getv(J.getv(game.j_ST, "bread"), "y"), J.getv(J.getv(game.j_ST, "bread"), "w"), J.getv(J.getv(game.j_ST, "bread"), "h"))
 	game.f_drawPreparation(_cells["t"][0])
