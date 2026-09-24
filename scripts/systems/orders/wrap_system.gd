@@ -55,9 +55,7 @@ func f_activeWrap(p_yerVar: Variant = null) -> Variant:
 		if (not J.truth(J.invoke(v_uygun, [v_b]))):
 			v_i = J.add(v_i, 1.0)
 			continue
-		if (J.truth(v_tur) and not J.eq(J.getv(v_b, "kind"), v_tur)):
-			v_i = J.add(v_i, 1.0)
-			continue
+		# BIRLESIK: tur kisiti yok (acik durum doluysa malzeme iskender tabagina da gidebilir)
 		if ((not J.truth(v_best)) or J.gt(J.getv(v_b, "born"), J.getv(v_best, "born"))):
 			v_best = v_b
 			v_bi = v_i
@@ -102,6 +100,92 @@ func f_yerIng(p_k: Variant = null) -> Variant:
 	var _cells: Dictionary = {"k": [p_k]}
 	return game.wrap_system._closure_245.bind({"639:k": _cells["k"]})
 	return null
+
+# ---------------------------------------------------------------- akilli hedef
+# BIRLESIK (4. tur, kullanici: "tahtada bolum secip malzeme ekliyoruz, ne kadar
+# sacma; iskender tabagi varsa malzeme oraya, durum varsa oraya gitsin; siparis
+# bitince bosta ne varsa ona gecelim"). Tiklanan malzeme ona GERCEKTEN ihtiyaci
+# olan urune gider: once secili urun, sonra secili siparise bagli urun, sonra en
+# eski urun. Siparisin istemedigi malzeme (yok listesi, farkli sos) o urune
+# gitmez.
+const MALZEME_ALANI := {"meat": "meat", "pickle": "pickleN", "yogurt": "yogurtN", "fries": "friesN", "tomato": "tomato", "pepper": "pepper"}
+
+func f_malzemeIhtiyac(b: Variant, k: String) -> bool:
+	if not (b is Dictionary) or b.get("kind") == "pide": return false
+	var kind := str(b.get("kind"))
+	var st := str(b.get("state"))
+	var r: Variant = b.get("_order_recipe")
+	if k in ["hot", "garlic"]:
+		if kind != "wrap": return false
+		if st != "open" and not (st == "rolled" and J.truth(J.method(game.j_TUN, "sauceLate", [game.j_G]))): return false
+		if J.truth(b.get("sauce")): return false
+		return not (r is Dictionary) or r.get("sauce") == k
+	if st != "open": return false
+	if k == "butter": return kind == "plate" and not J.truth(b.get("butter"))
+	var alan: String = MALZEME_ALANI.get(k, "")
+	if alan == "": return false
+	var n := J.n(b.get(alan, 0.0))
+	if kind == "plate":
+		match k:
+			"meat": return n < J.n(J.method(game.j_TUN, "iskMeat", [game.j_G]))
+			"yogurt": return n < J.n(game.j_PLATE_YOGURT)
+			"tomato": return J.truth(J.method(game.j_TUN, "garnishOn", [game.j_G])) and n < J.n(game.j_TOMATO_NEED)
+			"pepper": return J.truth(J.method(game.j_TUN, "garnishOn", [game.j_G])) and n < J.n(game.j_PEPPER_NEED)
+		return false
+	if kind != "wrap" or k in ["tomato", "pepper"]: return false
+	if r is Dictionary and k in r.get("yok", []): return false
+	var gerek := {"meat": game.j_MEAT_NEED, "pickle": game.j_PICKLE_NEED, "yogurt": game.j_YOGURT_NEED, "fries": game.j_FRIES_NEED}
+	return n < J.n(gerek[k])
+
+func f_malzemeHedefi(k: String) -> int:
+	var n := int(J.n(J.method(game.j_TUN, "boards", [game.j_G])))
+	var act := int(J.n(game.j_G.act))
+	if act >= 0 and act < n and f_malzemeIhtiyac(game.j_G.boards[act], k): return act
+	var secili: Variant = game.get("chosen_order")
+	var en := -1
+	var en_puan := INF
+	for i in n:
+		var b: Variant = game.j_G.boards[i]
+		if not f_malzemeIhtiyac(b, k): continue
+		var puan := J.n(b.get("born", 0.0))
+		if secili is Dictionary and not secili.is_empty() and is_same(b.get("_order_owner"), secili): puan -= 1.0e6
+		if puan < en_puan:
+			en_puan = puan
+			en = i
+	return en
+
+func f_malzemeYonlendir(k: String) -> void:
+	var h := f_malzemeHedefi(k)
+	if h >= 0: game.j_G.act = float(h)
+
+# secili urun tezgahtan ayrilinca (servis, izgara, alinan tabak) secim
+# siradaki bekleyen urune gecer: acik urunler (en eski) > pide > sarili/hazir.
+var _act_nesne: Variant = null
+var _act_idx := -1
+
+func f_actTakip() -> void:
+	var n := int(J.n(J.method(game.j_TUN, "boards", [game.j_G])))
+	var act := int(J.n(game.j_G.act))
+	var simdi: Variant = game.j_G.boards[act] if act >= 0 and act < n else null
+	# yalniz AYNI bolmedeki urun ayrildiysa gec; oyuncu bos bir bolme sectiyse dokunma
+	if simdi == null and _act_nesne != null and act == _act_idx:
+		var en := -1
+		var en_puan := INF
+		for i in n:
+			var b: Variant = game.j_G.boards[i]
+			if not (b is Dictionary): continue
+			var puan := J.n(b.get("born", 0.0))
+			if b.get("kind") == "pide": puan += 1.0e6
+			elif b.get("state") != "open": puan += 2.0e6
+			if puan < en_puan:
+				en_puan = puan
+				en = i
+		if en >= 0:
+			game.j_G.act = float(en)
+			act = en
+			simdi = game.j_G.boards[en]
+	_act_nesne = simdi
+	_act_idx = act
 
 # game.js:1013
 func f_boardCX(p_i: Variant = null) -> Variant:

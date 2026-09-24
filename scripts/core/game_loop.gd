@@ -115,6 +115,7 @@ func f_updatePlay(p_dt: Variant = null) -> Variant:
 			J.method(game.j_SFX, "drop", [])
 	if (not J.truth(v_dragged)):
 		game.gameplay_input.f_handleInput()
+	game.wrap_system.f_actTakip()
 	return null
 
 # main.js:22

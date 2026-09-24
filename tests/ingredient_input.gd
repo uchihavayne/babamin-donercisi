@@ -98,7 +98,8 @@ func run() -> void:
 	fresh({"board":1.0}); game.f_newWrap(0); game.f_newWrap(1); game.j_G.act = 0
 	game.j_G.boards[0].pickleN = 4
 	tap("pickle"); step(3)
-	check(game.j_G.boards[1].pickleN == 0 and game.j_G.act == 0, "full active portion does not redirect an extra tap to another order")
+	# BIRLESIK (kullanici karari): dolu bolmedeki fazladan tik, ihtiyaci olan urune gider
+	check(game.j_G.boards[1].pickleN == 1 and game.j_G.boards[0].pickleN == 4 and game.j_G.act == 1, "full active portion sends an extra tap to the portion that needs it")
 	fresh(); queue_legacy_tap(); tap("bread"); mouse(center("pickle"),true); motion(Vector2(470,265)); step(45); mouse(Vector2(470,265),false); step(3)
 	w = game.j_G.boards[0]
 	check(w.pickleN == 1 and game.stations.holding.is_empty(), "motion outside a deferred tray press cancels its hold")

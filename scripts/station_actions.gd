@@ -222,6 +222,9 @@ func actions() -> Array[Dictionary]:
 	if t.group == "board": list = board_actions(w)
 	elif t.group == "ingredient" or selected == "paper":
 		var id: String = "fries" if selected == "friesT" else selected
+		# akilli hedef: malzeme secili bolmeye degil, ona ihtiyaci olan urune gider
+		var hedef: int = game.wrap_system.f_malzemeHedefi(id) if id in MALZEMELER else -1
+		if hedef >= 0: w = game.j_G.boards[hedef]
 		if id in ["bread","pide"]:
 			list.append(action(id,"AL","TAKE",free and game.wrap_system.f_emptyBoard() >= 0))
 		else:
@@ -334,7 +337,10 @@ func press(id: String, source := "world") -> void:
 	if id in ["meat","pickle","yogurt","fries"] and board() is Dictionary:
 		holding = {"id":id,"source":source,"target":selected,"time":0.0,"board":board(),"index":int(game.j_G.act),"repeat":true,"next":0.24}
 
+const MALZEMELER := ["meat","pickle","yogurt","fries","tomato","pepper","hot","garlic","butter"]
+
 func execute(id: String, t: Dictionary) -> void:
+	if t.group != "board" and id in MALZEMELER: game.wrap_system.f_malzemeYonlendir(id)
 	var idx: int = t.index if t.group == "board" or (t.group == "grill" and t.object is Dictionary) else int(game.j_G.act)
 	if t.group == "board": game.j_G.act = idx
 	recipe_board = idx if t.group in ["board","ingredient","paper"] else -1
@@ -435,6 +441,9 @@ func tick(delta: float) -> void:
 		if int(game.j_G.act) != idx or w.state != "open": cancel(); return
 		holding.time += delta
 		if holding.time < holding.next: return
+		# basili tutmak "bu urunu doldur" demek: urun dolunca durur (fazlasi
+		# baska urune tasmaz; tek tik ise ihtiyaci olan urune yonlenir)
+		if not game.wrap_system.f_malzemeIhtiyac(w, holding.id): cancel(); return
 		var allowed := false
 		for a in actions():
 			if a.id == holding.id and a.enabled: allowed = true; break

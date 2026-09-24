@@ -21,6 +21,7 @@ func f_addMeat() -> Variant:
 	var v_w: Variant = null
 	var v_need: Variant = null
 	var v_n: Variant = null
+	game.wrap_system.f_malzemeYonlendir("meat")
 	v_w = game.wrap_system.f_selWrap(J.ref(game.wrap_system.f_yerEt, 1))
 	if (not J.truth(v_w)):
 		J.method(game.j_SFX, "bad", [])
@@ -62,6 +63,7 @@ func f_addIng(p_k: Variant = null) -> Variant:
 	var v_an: Variant = null
 	var v_src: Variant = null
 	var v_k: Variant = p_k
+	game.wrap_system.f_malzemeYonlendir(str(v_k))
 	v_w = game.wrap_system.f_selWrap(game.wrap_system.f_yerIng(v_k))
 	if (not J.truth(v_w)):
 		J.method(game.j_SFX, "bad", [])
@@ -173,6 +175,7 @@ func f_garnishClick(p_mx: Variant = null) -> Variant:
 		return null
 	v_isTom = J.lt(v_mx, J.add(J.getv(J.getv(game.j_ST, "garnish"), "x"), (J.getv(J.getv(game.j_ST, "garnish"), "w") * 0.52)))
 	v_k = ("tomato" if J.truth(v_isTom) else "pepper")
+	game.wrap_system.f_malzemeYonlendir(v_k)
 	v_w = null
 	v_wi = (-J.n(1.0))
 	v_act = J.getv(J.getv(game.j_G, "boards"), J.getv(game.j_G, "act"))
@@ -291,6 +294,7 @@ func f_sauceClick(p_mx: Variant = null) -> Variant:
 		J.method(game.j_SFX, "bad", [])
 		game.session_system.f_say(("Tereyağı sosu İskender ile gelir" if J.eq(v_i, 2.0) else "Sos standı kapalı — dükkândan aç"))
 		return null
+	game.wrap_system.f_malzemeYonlendir(str(v_id))
 	v_w = game.wrap_system.f_selWrap()
 	if ((not J.truth(v_w)) and J.truth(J.method(game.j_TUN, "sauceLate", [game.j_G]))):
 		v_sb = 0.0

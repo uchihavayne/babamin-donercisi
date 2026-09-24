@@ -179,7 +179,8 @@ func run() -> void:
 	tap(JOY_BUTTON_LEFT_SHOULDER)
 	check(game.j_G.act == 1 and game.stations.selected == "meat","bumper switches preparation board while keeping ingredient selected")
 	tap(JOY_BUTTON_A)
-	check(game.j_G.boards[2].meat == 1,"ingredient on empty active board cannot spill to another board")
+	# BIRLESIK (kullanici karari): malzeme secili bos bolmeye degil, ona ihtiyaci olan urune gider
+	check(game.j_G.boards[2].meat == 2 and game.j_G.act == 2,"ingredient with an empty active board goes to the wrap that needs it")
 	select("board:2"); button(JOY_BUTTON_A,true); step(20); button(JOY_BUTTON_A,false)
 	select("grill"); tap(JOY_BUTTON_A)
 	check(game.j_G.grill.slots.size() == 1 and game.j_G.boards[2] == null,"actual grill fixture accepts active rolled wrap")
