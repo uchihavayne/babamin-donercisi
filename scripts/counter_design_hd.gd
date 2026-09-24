@@ -223,22 +223,11 @@ func f_drawPotatoBin(x: Variant = null, y: Variant = null, w: Variant = null, h:
 	hd_ciz(_t2(), "patates_kasa", x, y)
 	return null
 
-# Depo cekmecesi: onunde ACIK olan butun stok turlerinin ikonu (kullanici:
-# "yalniz iki sey varmis gibi gorunuyor"); cekmece acilirken kayar.
+# Depo cekmecesi: yalniz cekmece (kullanici 6. tur: "depodaki ikonlara gerek
+# yok"; stoklar cekmece acilinca panelde gorunuyor). Acilirken kayar.
 func f_drawCrate(x: Variant = null, y: Variant = null, w: Variant = null, h: Variant = null, opened: Variant = null, time: Variant = null, progress: Variant = null) -> Variant:
 	if not t2_hd(): return super.f_drawCrate(x, y, w, h, opened, time, progress)
-	var A := _t2()
-	var shift := J.n(progress) * 4
-	var yy: float = f_hdYarimPx(y - shift)
-	hd_ciz(A, "stok_bos", x, yy)
-	var turler: Array = ["pickle", "yogurt"]
-	if tun_design("ayranOn"): turler.append("ayran")
-	if tun_design("sweetOn"): turler.append("sweet")
-	if tun_design("garnishOn"): turler.append_array(["tomato", "pepper"])
-	var adim: float = minf(7.2, (w - 12.0) / maxf(1.0, turler.size() - 1.0))
-	var x0: float = x + w / 2.0 - adim * (turler.size() - 1) / 2.0
-	for i in turler.size():
-		hd_ciz(A, "stok_ikon_%s" % turler[i], f_hdYarimPx(x0 + i * adim), yy + 24.5)
+	hd_ciz(_t2(), "stok_bos", x, f_hdYarimPx(y - J.n(progress) * 4))
 	return null
 
 func f_drawTrash(x: Variant = null, y: Variant = null, w: Variant = null, h: Variant = null, time: Variant = null, emptying: Variant = null, fullness: Variant = null) -> Variant:
