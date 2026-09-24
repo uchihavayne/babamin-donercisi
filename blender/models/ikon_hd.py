@@ -291,70 +291,149 @@ def yok(m):
         Mh = cel("YokHalka", ["#6d1a12", "#8e1c14", "#c0281c", "#e2483a"], [0, .3, .6, .9])
         L.halka("halka", 5.2, 5.2, 0.9, 0.0, 0.0, 0.2, Mh)
         L.disk("yuz", 4.6, 0.0, 0.0, 0.8, 0.4, 0.1, cel("YokYuz", ["#d8cdb4", "#efe6d0", "#f7efdc", "#fffaf0"], [0, .3, .6, .9]))
-        if m == "pickle":
-            Mt = cel("TursuY", ["#2f5a14", "#4a7a22", "#6aa032", "#9ac85a"], [0, .3, .6, .9])
-            e = I.elipsoid("tursu", 0.0, 0.0, 3.4, 2.4, 1.2, 0.0, Mt, seg=16, ring=8)
-            e.location = (0.0, -0.4, 0.0)
-            for k in range(5):
-                a = k * 1.256
-                d = I.elipsoid("cekirdek", 0, 0, 0.35, 0.35, 0.2, 0, px.flat("TursuC", "#d8ec9a"), seg=6, ring=4)
-                d.location = (math.cos(a) * 1.4, -1.5, math.sin(a) * 1.0)
-        elif m == "yogurt":
-            My = cel("YogY", ["#b8c4d0", "#dfe7ee", "#f4f8fb", "#ffffff"], [0, .3, .6, .9])
-            e = I.elipsoid("yog1", 0.0, 0.0, 3.4, 1.8, 1.4, 0.0, My, seg=16, ring=8)
-            e.location = (0.0, -0.5, -0.8)
-            e = I.elipsoid("yog2", 0.0, 0.0, 2.2, 1.6, 1.2, 0.0, My, seg=14, ring=8)
-            e.location = (0.0, -1.0, 0.8)
-        else:
-            Mp = cel("PatY", ["#b8791e", "#e0a83c", "#f7cc63", "#ffe9a3"], [0, .3, .62, .9])
-            for k, (x, h, a) in enumerate(((-2.0, 5.2, -12), (0.2, 6.2, 2), (2.3, 5.0, 14))):
-                L.kutu("pat%d" % k, x - 0.6, x + 0.6, -3.0, -3.0 + h, -1.5, -0.3, Mp).rotation_euler = (0, math.radians(a), 0)
-        # capraz yasak cizgisi (sol ust -> sag alt), ustte
-        ob = L.kutu("cizgi", -5.0, 5.0, -0.65, 0.65, -2.6, -2.0, cel("YokCizgi", ["#8e1c14", "#c0281c", "#e2483a", "#ff7a6a"], [0, .3, .6, .9]))
+        once = set(bpy.data.objects.keys())
+        malzeme_model(m)
+        for ob in bpy.data.objects:
+            if ob.name not in once and ob.type == "MESH":
+                ob.location = (ob.location.x * 0.62, ob.location.y - 1.0, ob.location.z * 0.62)
+                ob.scale = ob.scale * 0.62
+        ob = L.kutu("cizgi", -5.0, 5.0, -0.65, 0.65, -3.2, -2.6, cel("YokCizgi", ["#8e1c14", "#c0281c", "#e2483a", "#ff7a6a"], [0, .3, .6, .9]))
         ob.rotation_euler = (0, math.radians(45), 0)
     return fn
 
 
+def _talas_ikon(ad, x, gy, y, boy, en, rot, kivrim, tohum, M, Mk):
+    """Kucuk doner talasi (ikon olcegi): kivrik yaprak, yan yuzu koyu."""
+    bm = bmesh.new()
+    nu, nv = 6, 4
+    g = []
+    for i_ in range(nu):
+        u = i_ / (nu - 1.0) * 2 - 1
+        sira = []
+        for j_ in range(nv):
+            v = j_ / (nv - 1.0) * 2 - 1
+            gx = u * boy / 2.0
+            gy_ = v * en / 2.0 * (1.0 - 0.25 * u * u)
+            gz = kivrim * u * u + 0.15 * math.sin(u * 3.0 + tohum)
+            sira.append(bm.verts.new((gx, gy_, gz)))
+        g.append(sira)
+    for i_ in range(nu - 1):
+        for j_ in range(nv - 1):
+            bm.faces.new((g[i_][j_], g[i_ + 1][j_], g[i_ + 1][j_ + 1], g[i_][j_ + 1]))
+    bmesh.ops.solidify(bm, geom=bm.faces[:], thickness=0.45)
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
+    ob = I.mesh_ob(ad, bm, M, smooth=True)
+    ob.data.materials.append(Mk)
+    for pol in ob.data.polygons:
+        if abs(pol.normal.z) < 0.45:
+            pol.material_index = 1
+    ob.rotation_euler = rot
+    ob.location = (x, y, ez(gy, y, K))
+    return ob
+
+
+def malzeme_model(m, st=(0, .3, .6, .9)):
+    """BIRLESIK (4. tur, kullanici: "tursu vs kotu gorunuyor"): serit / cip /
+    yok ikonlarinin ortak malzeme modelleri. Merkez (0, 0.5), x -6.5..6.5."""
+    st = list(st)
+    if m == "pickle":
+        # kornison: egri, yumrulu, koyu yesil; onde ic yuzu gorunen bir dilim
+        Mg = cel("Kornison", ["#243808", "#3a5414", "#557520", "#7a9a36"], st, noise=0.1, noise_scale=6)
+        kor = el("kornison", -1.6, -0.6, 5.0, 2.2, 2.1, 0.5, Mg, seg=20, ring=12)
+        kor.rotation_euler = (0, math.radians(28), 0)
+        Mb = px.flat("KornisonYumru", "#8aa84a")
+        for q in range(6):
+            u = -0.8 + q * 0.32
+            bx, by = -1.6 + u * 4.4, -0.6 - u * 2.3 + (0.9 if q % 2 else -0.6)
+            el("yumru%d" % q, bx, by, 0.45, 0.4, 0.3, -1.6, Mb, seg=6, ring=4)
+        el("sap", -5.5, 1.6, 0.8, 0.7, 0.7, 0.3, px.flat("KornisonSap", "#3f4a1c"), seg=8, ring=5)
+        # dilim (kameraya donuk disk)
+        cx, cy = 2.8, 2.3
+        L.disk("dilim_kabuk", 2.7, cx, -cy, -1.8, 0.6, 0.15, cel("DilimKabuk", ["#2a4010", "#3f5a18", "#557520", "#6e9128"], st))
+        L.disk("dilim_ic", 2.15, cx, -cy, -2.25, 0.2, 0.1, cel("DilimIc", ["#8e9c3c", "#aab458", "#c4cc78", "#d8dea0"], st))
+        for q in range(6):
+            a = q * math.pi / 3 + 0.3
+            d = I.elipsoid("cek%d" % q, 0, 0, 0.3, 0.3, 0.12, 0, px.flat("Cekirdek", "#eeecbc"), seg=6, ring=4)
+            d.location = (cx + math.cos(a) * 1.1, -2.45, -cy + math.sin(a) * 1.0)
+    elif m == "yogurt":
+        # mavi desenli canak + tepesi kivrik yogurt
+        Mk = cel("Canak", ["#3e6a86", "#5a88a4", "#86b0c6", "#c4dfeb"], st)
+        T.torna("canak", [(2.4, 0), (4.6, 1.4), (5.6, 3.4), (5.8, 4.2)], 0.0, 5.3, 0.0, 0.5, Mk, K, seg=28)
+        My = cel("YogIkon", ["#c7c0ae", "#e9e3d4", "#f8f5ec", "#ffffff"], st)
+        el("yog", 0.0, 0.6, 5.0, 1.9, 2.4, -0.3, My, seg=20, ring=12)
+        el("yog_tepe", 0.2, -1.2, 2.7, 1.6, 1.6, -0.6, My, seg=16, ring=10)
+        el("yog_uc", 0.8, -2.8, 1.0, 1.2, 0.8, -0.8, My, seg=10, ring=6)
+        el("parilti", -1.6, -0.9, 1.1, 0.5, 0.3, -2.6, px.flat("YogParlak", "#ffffff"), seg=8, ring=4)
+    elif m == "fries":
+        # kirmizi kagit kapta yelpaze gibi acilan patates cubuklari
+        Mp = cel("PatIkon", ["#8a5518", "#c9852c", "#ecc050", "#fbe39a"], st)
+        for q, (x0, aci, uz) in enumerate(((-2.4, -18, 6.2), (-0.9, -7, 7.0), (0.6, 4, 7.2), (2.1, 14, 6.4), (-0.2, -1, 5.8))):
+            ob = L.kutu("pat%d" % q, x0 - 0.8, x0 + 0.8, -0.6, -0.6 + uz, -1.4 + q * 0.12, 0.0 + q * 0.12, Mp)
+            ob.rotation_euler = (0, math.radians(aci), 0)
+        Mc = cel("Kap", ["#7a1a12", "#a8231a", "#d8362a", "#f06a52"], st)
+        on_poligon("kap", [(-4.2, 1.8), (4.2, 1.8), (3.2, 7.4), (-3.2, 7.4)], -2.2, Mc, K, derin=0.5)
+        on_poligon("kap_serit", [(-3.9, 3.4), (3.9, 3.4), (3.7, 4.4), (-3.7, 4.4)], -2.3, px.flat("KapSerit", "#fff1d8"), K, derin=0.05)
+    elif m == "meat":
+        # kucuk doner talasi yigini
+        Me = cel("EtIkon", ["#5a2c0c", "#8c4c1c", "#b86c2c", "#e2a452"], st, noise=0.15, noise_scale=5)
+        Mk = cel("EtIkonKenar", ["#3a1c08", "#5a2c0c", "#7a3e12", "#9a561e"], st)
+        for q, (x, gy, y, aci) in enumerate(((-2.0, 2.4, 0.0, -18), (2.2, 2.0, -0.6, 22), (0.0, 0.2, -1.2, -4), (-1.2, -1.8, -1.8, 12))):
+            _talas_ikon("talas%d" % q, x, gy, y, 7.0, 4.2, (math.radians(38), math.radians(aci), 0.0), 0.9, q * 1.7, Me, Mk)
+    elif m == "tomato":
+        cx, cy = 0.0, 0.5
+        L.disk("dis", 5.4, cx, -cy, -0.6, 0.8, 0.2, cel("Domates", ["#7a1810", "#b02a1c", "#d8402c", "#f06a52"], st))
+        L.disk("ic", 4.3, cx, -cy, -1.3, 0.2, 0.1, cel("DomatesIc", ["#b83424", "#d8503c", "#ee6e56", "#ff9478"], st))
+        for q in range(4):
+            a = q * math.pi / 2 + 0.4
+            L.disk("cek%d" % q, 1.1, cx + math.cos(a) * 2.2, -cy + math.sin(a) * 2.0, -1.5, 0.1, 0.05, px.flat("DomCek", "#f2c46a"))
+        L.disk("orta", 0.9, cx, -cy, -1.55, 0.1, 0.05, px.flat("DomOrta", "#ffb0a0"))
+    elif m == "pepper":
+        # sivri yesil biber: kivrik, uca dogru incelen, parlak; sapli
+        Mb = cel("Biber", ["#1f4a10", "#357018", "#4e9a24", "#8ccc52"], st)
+        for q in range(7):
+            u = q / 6.0
+            x = -4.2 + u * 8.6
+            gy = -1.4 + 3.2 * u * u
+            r = 2.0 - 1.55 * u
+            el("biber%d" % q, x, gy, r * 1.3, r, r, -0.2, Mb, seg=14, ring=8)
+        el("parilti", -2.2, -2.3, 1.6, 0.35, 0.3, -2.6, px.flat("BiberParlak", "#d8f0a0"), seg=8, ring=4)
+        Ms = cel("BiberSap", ["#3a4a14", "#56701e", "#6e8a2a", "#8aa83a"], st)
+        el("sap_bas", -5.4, -1.8, 1.2, 1.4, 1.2, -0.2, Ms, seg=10, ring=6)
+        ob = L.kutu("sap", -7.0, -5.6, -0.4, 0.4, -0.6, 0.2, Ms)
+        ob.rotation_euler = (0, math.radians(-35), 0)
+        ob.location = (0.0, 0.0, ez(-2.6, 0, K) + 2.6)
+    else:  # butter
+        My = cel("Tereyag", ["#b8943a", "#e2c05a", "#f6dc84", "#fff0b8"], st)
+        ob = L.kutu("blok", -4.6, 4.6, -3.2, 1.6, -2.8, 2.8, My)
+        bm = bmesh.new()
+        bm.from_mesh(ob.data)
+        bmesh.ops.bevel(bm, geom=bm.edges[:], offset=0.6, segments=2, profile=0.5, affect="EDGES")
+        bm.to_mesh(ob.data)
+        bm.free()
+        el("kivrim", 1.4, -3.6, 2.4, 0.9, 1.2, -0.6, My, seg=12, ring=6)
+        el("erime", -2.6, 2.4, 1.6, 0.6, 1.0, -2.6, cel("Erime", ["#c8a040", "#ecca66", "#fbe290", "#fff4c8"], st), seg=10, ring=6)
+        el("parilti", -2.2, -1.2, 1.4, 0.5, 0.3, -3.0, px.flat("TereyagParlak", "#fffbe8"), seg=8, ring=4)
+
+
 def cip(m, yasak, zemin=True):
-    """BIRLESIK SURUM: yeni siparis balonunun (order_draw.order_badge) malzeme
-    cipi. Krem (istenen) / pembe (istemiyor) yuvarlak levha + malzeme; istemiyor
-    ise kirmizi capraz cizgi (sol alt -> sag ust). Capa: cipin merkezi (x, y);
-    levha ekranda x-7..x+7, y-6..y+7."""
+    """Siparis balonu cipi (krem / pembe yuvarlak levha + malzeme; istemiyorsa
+    kirmizi capraz cizgi) ya da zeminsiz hazirlik seridi ikonu. Capa: merkez."""
     def fn():
         st = [0, .3, .6, .9]
         renk = ["#b09d78", "#d2c29e", "#e7dec3", "#f8f1de"] if not yasak else ["#c08e74", "#e0b397", "#f4d3bc", "#fde9dc"]
         if zemin:
             ob = L._egri("cip", [L.yuvarlak_dikdortgen(14, 13, 2.4)], 0.0, -0.5, 0.6, 1.2, 0.35)
             L.meshle(ob, cel("Cip" + ("Y" if yasak else "N"), renk, st))
-        if m == "pickle":
-            Mt = cel("TursuC", ["#2f5a14", "#4a7a22", "#6aa032", "#9ac85a"], st)
-            e = I.elipsoid("tursu", 0.0, 0.0, 4.2, 2.6, 1.2, 0.0, Mt, seg=16, ring=8)
-            e.location = (0.0, -0.5, 0.2)
-            for k in range(5):
-                a = k * 1.256
-                d = I.elipsoid("cekirdek", 0, 0, 0.4, 0.4, 0.2, 0, px.flat("TursuCC", "#e9dd8a"), seg=6, ring=4)
-                d.location = (math.cos(a) * 1.8, -1.7, 0.2 + math.sin(a) * 1.1)
-        elif m == "yogurt":
-            Mk = cel("YogKase", ["#46707f", "#5a8798", "#6f9aab", "#a8c8d4"], st)
-            e = I.elipsoid("kase", 0.0, 0.0, 4.4, 2.2, 1.3, 0.0, Mk, seg=18, ring=8)
-            e.location = (0.0, -0.4, -1.4)
-            My = cel("YogC", ["#c9c1ad", "#ece2c8", "#fff5de", "#ffffff"], st)
-            e = I.elipsoid("yog", 0.0, 0.0, 3.8, 1.5, 1.2, 0.0, My, seg=16, ring=8)
-            e.location = (0.0, -1.0, 0.3)
-            e = I.elipsoid("yog2", 0.0, 0.0, 1.8, 1.2, 0.9, 0.0, My, seg=12, ring=6)
-            e.location = (1.3, -1.5, 1.4)
-        elif m == "fries":
-            Mp = cel("PatC", ["#8a5518", "#c9852c", "#e8b44a", "#f4ce69"], [0, .3, .62, .9])
-            for k, (x, h, a) in enumerate(((-3.2, 7.6, -8), (0.0, 8.2, 0), (3.2, 7.4, 8))):
-                L.kutu("pat%d" % k, x - 0.8, x + 0.8, -4.2, -4.2 + h, -1.6, -0.2, Mp).rotation_euler = (0, math.radians(a), 0)
-        else:
-            Me = cel("EtC", ["#5a2f10", "#9c5427", "#c47a3c", "#e4a45b"], st)
-            for k in range(3):
-                ob = L.kutu("et%d" % k, -3.6, 3.6, -0.9, 0.9, -1.6, -0.3, Me)
-                ob.location = (-1.0 + k * 1.6, 0.0, 2.2 - k * 2.0)
-                ob.rotation_euler = (0, math.radians(-14), 0)
+        once = set(bpy.data.objects.keys())
+        malzeme_model(m)
+        if zemin:
+            # levhaya sigsin (%88) ve levhanin onunde dursun
+            for ob in bpy.data.objects:
+                if ob.name not in once and ob.type == "MESH":
+                    ob.location = (ob.location.x * 0.86, ob.location.y - 1.2, ob.location.z * 0.86)
+                    ob.scale = ob.scale * 0.86
         if yasak:
-            ob = L.kutu("cizgi", -6.2, 6.2, -0.75, 0.75, -2.8, -2.1, cel("CipCizgi", ["#7a1a14", "#b33028", "#d8483a", "#ff7a6a"], st))
+            ob = L.kutu("cizgi", -6.2, 6.2, -0.75, 0.75, -3.4, -2.7, cel("CipCizgi", ["#7a1a14", "#b33028", "#d8483a", "#ff7a6a"], st))
             ob.rotation_euler = (0, math.radians(-45), 0)
     return fn
 
@@ -422,11 +501,11 @@ for _t in ("hot", "garlic"):
     parca("sos_%s" % _t, (-6, -6, 12, 12), sos_rozet(_t), cizgi="#2b1f14", cizgi_alfa=130)
 
 
-for _m in ("pickle", "yogurt", "fries", "meat"):
+for _m in ("pickle", "yogurt", "fries", "meat", "tomato", "pepper", "butter"):
     parca("cip_%s" % _m, (-8, -7, 16, 15), cip(_m, False), cizgi="#6b5236", cizgi_alfa=110)
     parca("cip_%s_yok" % _m, (-8, -7, 16, 15), cip(_m, True), cizgi="#6b3a26", cizgi_alfa=110)
     # hazirlama seridi (order_draw.draw_preparation_overlay): zeminsiz malzeme
-    parca("mal_%s" % _m, (-8, -7, 16, 15), cip(_m, False, False), cizgi="#1e140c", cizgi_alfa=140)
+    parca("mal_%s" % _m, (-8, -8, 16, 17), cip(_m, False, False), cizgi="#1e140c", cizgi_alfa=140)
 
 
 for _m in ("pickle", "yogurt", "fries"):

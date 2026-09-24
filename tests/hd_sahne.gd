@@ -77,6 +77,10 @@ func calis() -> void:
 			g.j_G.timeLeft = g.j_G.cfg.len * (1.0 - (g.j_MAC_BAS + g.j_MAC_BIT) / 2.0)
 			g.j_G.macDalga = true
 			for cc in g.j_G.customers: cc.mac = true
+		if var_mi("--standart"):
+			c.items = [{"kind": "wrap"}, {"kind": "drink", "type": "cola"}]
+			c.done = [false, false]
+			c.bubble = 1.0
 		if var_mi("--siparis"):
 			c.items = [{"kind": "wrap", "sauce": "hot", "yok": ["pickle"]}, {"kind": "drink", "type": "cola"}]
 			c.done = [false, false]
@@ -94,6 +98,15 @@ func calis() -> void:
 		# --kurye DURUM : Dayi motorla (leaving: sola cikiyor, back: saga donuyor)
 		if arg("--kurye") != "":
 			g.j_G.courier = {"state": arg("--kurye"), "t": 0.3, "x": 0.0, "pay": 0.0}
+		# --tabak ET,YOG,TEREYAG,DOM,BIB : tahtadaki urun iskender tabagi
+		if arg("--tabak") != "":
+			var tb := arg("--tabak").split(",")
+			g.j_G.boards[0] = {"kind": "plate", "pide": true, "meat": float(tb[0]), "yogurtN": float(tb[1]),
+				"yogurt": float(tb[1]) >= g.j_PLATE_YOGURT, "butter": tb[2] == "1", "tomato": float(tb[3]),
+				"pepper": float(tb[4]), "state": "open", "pop": 0.0, "born": 0.0}
+		# --pide N : tahtada dogranan pide (N dilim)
+		if arg("--pide") != "":
+			g.j_G.boards[0] = {"kind": "pide", "n": float(arg("--pide")), "state": "open", "pop": 0.0, "born": 0.0}
 		# --izgara N : izgarada N sarili durum
 		if arg("--izgara") != "":
 			for i in int(arg("--izgara")):

@@ -1,10 +1,16 @@
 # Order bubbles, ingredient icons and the courier receipt.
 extends "res://scripts/core/game_module.gd"
 
+# BIRLESIK (kullanici): standart durumde (her sey var) tursu / yogurt / patates
+# cipleri gereksiz kalabalik. Satir yalniz standarttan sapan durumde acilir ve
+# yalniz istenmeyen malzemeler (ustu cizili) gosterilir; sos simgenin rozetinde.
+func order_standard_disi(item: Dictionary) -> bool:
+	return item.kind == "wrap" and not item.get("yok", []).is_empty()
+
 func order_bubble_rect(customer: Dictionary) -> Rect2:
 	var wraps := 0
 	for item in customer.items:
-		if item.kind == "wrap": wraps += 1
+		if order_standard_disi(item): wraps += 1
 	var height := 27 + 19 * wraps
 	return Rect2(clampf(customer.x - 29, 2, 420), maxf(game.j_VIEW.top + 3, customer.y - 56 - height), 58, height)
 
@@ -68,12 +74,12 @@ func f_drawOrderBubble(customer: Variant = null, time: Variant = null) -> Varian
 	var row_y := r.position.y+31
 	for i in customer.items.size():
 		var item: Dictionary = customer.items[i]
-		if item.kind != "wrap": continue
+		if not order_standard_disi(item): continue
 		game.f_hl(r.position.x+4, row_y-9, 50, "#d8bc8e")
 		game.j_ctx.globalAlpha = 0.35 if customer.done[i] else 1.0
-		for k in 3:
-			var ingredient: String = ["pickle", "yogurt", "fries"][k]
-			order_badge(ingredient, r.position.x+13+k*16, row_y, ingredient in item.get("yok", []))
+		var yok: Array = item.get("yok", [])
+		for k in yok.size():
+			order_badge(str(yok[k]), r.position.x + 29 + (k - (yok.size() - 1) / 2.0) * 16, row_y, true)
 		game.j_ctx.globalAlpha = 1
 		row_y += 19
 	# Patience is integrated into the order; no extra panel or text obscures it.
@@ -84,12 +90,49 @@ func f_drawOrderBubble(customer: Variant = null, time: Variant = null) -> Varian
 	game.j_ctx.restore()
 	return null
 
+# BIRLESIK (kullanici: "iskender tabaginda ne eksik gorunmuyor"): tabak / pide
+# icin de serit. Tabak: et, yogurt, tereyagi (+ garnitur acikken domates, biber)
+# ve her birinin dolma noktalari; pide: dograma sayaci.
+func draw_plate_overlay(w: Dictionary, x: float, y: float) -> void:
+	if w.kind == "pide":
+		game.f_rrect(x-32, y-3, 64, 14, 2, "#493222")
+		game.text_draw.f_txt(game.order_text("DOĞRA ", "CHOP ") + str(int(w.get("n", 0))) + "/" + str(int(game.j_PIDE_NEED)), x, y, "#f8d880", {"align":"c"})
+		return
+	if w.state != "open":
+		game.f_rrect(x-32, y-3, 64, 14, 2, "#493222")
+		game.text_draw.f_txt(game.order_text("SERVİS", "SERVE"), x, y, "#f8d880", {"align":"c"})
+		return
+	var parts: Array = [["meat", J.n(w.get("meat", 0)), J.n(J.method(game.j_TUN, "iskMeat", [game.j_G]))],
+		["yogurt", J.n(w.get("yogurtN", 0)), J.n(game.j_PLATE_YOGURT)],
+		["butter", 1.0 if J.truth(w.get("butter")) else 0.0, 1.0]]
+	if J.truth(J.method(game.j_TUN, "garnishOn", [game.j_G])):
+		parts.append(["tomato", J.n(w.get("tomato", 0)), J.n(game.j_TOMATO_NEED)])
+		parts.append(["pepper", J.n(w.get("pepper", 0)), J.n(game.j_PEPPER_NEED)])
+	var aralik := 15.0
+	var gen := parts.size() * aralik + 4.0
+	game.f_rrect(x - gen / 2.0, y-3, gen, 14, 2, "#493222")
+	for i in parts.size():
+		var m: String = parts[i][0]
+		var n: int = int(parts[i][1])
+		var need: int = maxi(1, int(parts[i][2]))
+		var px := x - (parts.size() - 1) * aralik / 2.0 + i * aralik
+		if not game.f_hdMalzeme(m, px, y+1):
+			if m in ["meat", "pickle", "yogurt", "fries"]: order_ingredient(m, px, y+1)
+			else: game.f_disc(px, y+1, 4, {"tomato": "#d8402c", "pepper": "#4e9a24", "butter": "#f6dc84"}[m])
+		var adim := minf(3.0, 12.0 / need)
+		var dx0 := px - (need - 1) * adim / 2.0
+		for dot in need:
+			game.f_fr(floor(dx0 + dot * adim - 0.5 + 0.5), y+7, 2 if adim >= 3.0 else 1, 2, "#f8d880" if dot < n else "#7a6246")
+
 func draw_preparation_overlay(time: Variant = null) -> Variant:
 	var idx := int(game.j_G.act)
 	var w: Variant = game.j_G.boards[idx]
-	if not w is Dictionary or w.kind != "wrap": return null
+	if not w is Dictionary: return null
 	var x: float = game.wrap_system.f_boardCX(idx)
 	var y: float = game.j_ST.board.y + game.j_ST.board.h - 4
+	if w.kind != "wrap":
+		draw_plate_overlay(w, x, y)
+		return null
 	var recipe: Dictionary = w.get("_order_recipe", {})
 	game.f_rrect(x-32, y-3, 64, 14, 2, "#493222")
 	# musteri sira numarasi balonlardan kaldirildi; tahtada yalniz telefon ("P") isareti kalir
