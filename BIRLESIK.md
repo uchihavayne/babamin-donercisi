@@ -167,8 +167,8 @@ Kullanıcının sırası: **1, 2, 9 → 15, 18 → 10 → kalanlar**. Biten madd
 - [x] 15 Performans: oyun karesi 14,4 → 13,1 ms, başlık 19,6 → 14,0 ms (uçan et talaşı, elips, çerçeveli yazı, yaya kimliği, sokak ölçüsü önbellekte; başlık vinyetinin görünmeyen 52 çerçevesi kesildi). Mobil zaten 30 FPS. Release masaüstü 11,5 ms (hata ayıklama 15,6). Android APK: exports/android (ETC2/ASTC açıldı); telefonda Ayarlar → "Kare süresini göster". Ölçüm modu: `-- --olcum 300`
 - [x] 18 Ses: 47 efekt fiziksel modelle sentezlendi (tools/sfx_uret.py → assets/audio/sfx, 111 dosya, çoğu 3 çeşit); dökme döngüsü gerçekçi; kontrol tests/ses_kontrol.gd; dinleme artifacts/ses_tanitim.wav
 - [x] 10 Tempo ölçüldü (tests/tempo.gd, ECONOMY.md): ilk şube 21-35. gün, borç 78-107. gün; borç ilk 60 günde neredeyse erimiyor (karar kullanıcıda)
-- [ ] 3 HUD/paneller 1x piksel, modeller 2x (iki keskinlik)
-- [ ] 4 Parçacıklar 1-2 px kare
+- [x] 3 Yazılar HD'de Scale2x (EPX) ile 2x ızgarada (genişlik/düzen aynı, kavisler yumuşak); kutular ve ikonlar zaten HD
+- [x] 4 Parçacık: konfeti dönen kâğıt, büyük benek yuvarlak, hızlı kıvılcım/kırıntı kısa izli
 - [ ] 5 Müşteriler durağan, ifade az
 - [ ] 6 Dayı'nın hareket çeşidi az
 - [ ] 7 Gece hırsız sahnesi sönük

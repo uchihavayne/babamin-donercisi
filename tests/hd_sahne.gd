@@ -172,6 +172,11 @@ func calis() -> void:
 		if var_mi("--kizart"):
 			g.j_G.fryer.state = "fry"; g.j_G.fryer.dur = 20; g.j_G.fryer.t = 4; g.j_G.fryer.load = 6
 			g.j_G.cut.potato = true; g.j_G.cut.prog = 0.4; g.j_G.cut.cutting = true
+	# --parcacik : konfeti + kirinti + kivilcim patlamalari (madde 4)
+	if var_mi("--parcacik"):
+		g.effects.f_burst(240.0, 120.0, 40, ["#e2483a", "#3f8a4a", "#3f6fbd", "#ffd75e", "#ffffff"], {"spMax": 90.0, "sz": 2.0, "drag": 0.3, "g": 26.0, "lifeMin": 2.0, "lifeMax": 3.0})
+		g.effects.f_burst(150.0, 200.0, 24, ["#f8e6c4", "#e0bd85"], {"sz": 1.0, "spMax": 120.0, "up": 60.0})
+		g.effects.f_burst(380.0, 190.0, 24, ["#ffd75e", "#ff9a3a"], {"sz": 1.0, "spMin": 80.0, "spMax": 160.0, "up": 40.0})
 	await adim(int(arg("--kare", "20")))
 	if arg("--olc") != "":
 		var top := 0.0

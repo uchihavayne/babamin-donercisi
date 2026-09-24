@@ -3911,8 +3911,29 @@ func f_hdPsDraw(PS: Variant) -> bool:
 				_c("f_drawEtDilimi", x, y, 0.35 + k * 1.05, p.get("k") if J.truth(p.get("k")) else 1.0, p.get("sc") if J.truth(p.get("sc")) else 1.0)
 				ctx.globalAlpha = 1.0
 			_:
-				ctx.globalAlpha = (1.0 - (k - 0.75) * 4.0) if k > 0.75 else 1.0
-				_hp(roundf((x - sz * 0.5) * 2.0), roundf((y - sz * 0.5) * 2.0), sz * 2.0, sz * 2.0, _renk(p.get("col")))
+				# BIRLESIK (6. tur, analiz madde 4): duz kare yerine
+				#  konfeti (drag): donen kagit — genislik zamanla salinir
+				#  buyuk (sz >= 2): yuvarlak benek (onbellekli elips maskesi)
+				#  kucuk ve hizli (kivilcim, kirinti): arkasinda kisa iz
+				var al: float = (1.0 - (k - 0.75) * 4.0) if k > 0.75 else 1.0
+				var c := _renk(p.get("col"))
+				if J.truth(p.get("drag")):
+					var don := absf(sin(J.n(p.get("t")) * 9.0 + x * 0.37 + y * 0.11))
+					var gw := maxf(1.0, roundf(sz * 2.0 * (0.2 + 0.8 * don)))
+					ctx.globalAlpha = al
+					_hp(roundf(x * 2.0 - gw * 0.5), roundf((y - sz * 0.5) * 2.0), gw, sz * 2.0, c.darkened(0.25 * (1.0 - don)))
+				elif sz >= 2.0:
+					ctx.globalAlpha = al
+					_hd_elips(floorf(x), floorf(y), sz * 0.5, sz * 0.5, c)
+				else:
+					var vx := J.n(p.get("vx"))
+					var vy := J.n(p.get("vy"))
+					if vx * vx + vy * vy > 6400.0:
+						for iz in [2, 1]:
+							ctx.globalAlpha = al * (0.45 if iz == 1 else 0.2)
+							_hp(roundf((x - vx * 0.011 * iz - sz * 0.5) * 2.0), roundf((y - vy * 0.011 * iz - sz * 0.5) * 2.0), sz * 2.0, sz * 2.0, c)
+					ctx.globalAlpha = al
+					_hp(roundf((x - sz * 0.5) * 2.0), roundf((y - sz * 0.5) * 2.0), sz * 2.0, sz * 2.0, c)
 				ctx.globalAlpha = 1.0
 	return true
 

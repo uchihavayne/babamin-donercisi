@@ -502,7 +502,8 @@ func f_textW(text: Variant = null, scale_value: Variant = null, mono: Variant = 
 
 func f_drawStr(text: Variant = null, x: Variant = null, y: Variant = null, color: Variant = null, scale_value: Variant = null, mono: Variant = null) -> Variant:
 	var value: String = J.s(text)
-	var key: Array = [value, color, J.truth(mono)]
+	var hd := _yazi_hd()
+	var key: Array = [value, color, J.truth(mono), hd]
 	var cached: Variant = string_cache.get(key)
 	if cached == null:
 		var width := 0
@@ -514,11 +515,44 @@ func f_drawStr(text: Variant = null, x: Variant = null, y: Variant = null, color
 		cached.height = 8
 		cached.ensure()
 		_str_yaz(cached, value, Canvas.parse_color(str(color)), J.truth(mono), 0, 0)
+		if hd: cached = _epx(cached)
 		if string_cache.size() > 1024: string_cache.clear()
 		string_cache[key] = cached
 	var scale_factor: float = J.n(scale_value) if scale_value != null else 1.0
-	draw_context.drawImage(cached, x, y, cached.width * scale_factor, 8 * scale_factor)
+	draw_context.drawImage(cached, x, y, float(cached.get_meta("lw", cached.width)) * scale_factor, float(cached.get_meta("lh", 8)) * scale_factor)
 	return null
+
+# BIRLESIK (6. tur, analiz madde 3): modeller 2x HD iken yazilar 5 px'lik
+# yazi tipinin kaba 2x buyutmesiydi. HD'de her yazi Scale2x (EPX) ile 2x
+# izgaraya cikarilir: harf genislikleri ve yerlesim ayni, capraz ve kavisler
+# yumusar, pikselli karakter korunur. CPU tuvali (testler) eskisi gibi.
+func _yazi_hd() -> bool:
+	return get("hd_acik") == true and draw_context is GPUCanvas
+
+func _epx(cv: Variant) -> Variant:
+	var src: Image = cv.image
+	var w := src.get_width()
+	var h := src.get_height()
+	var bos := Color(0, 0, 0, 0)
+	var out := Canvas.new()
+	out.width = w * 2
+	out.height = h * 2
+	out.ensure()
+	var d: Image = out.image
+	for y in h:
+		for x in w:
+			var P := src.get_pixel(x, y)
+			var A := src.get_pixel(x, y - 1) if y > 0 else bos
+			var B := src.get_pixel(x + 1, y) if x < w - 1 else bos
+			var C := src.get_pixel(x - 1, y) if x > 0 else bos
+			var D := src.get_pixel(x, y + 1) if y < h - 1 else bos
+			d.set_pixel(x * 2, y * 2, A if (C == A and C != D and A != B) else P)
+			d.set_pixel(x * 2 + 1, y * 2, B if (A == B and A != C and B != D) else P)
+			d.set_pixel(x * 2, y * 2 + 1, C if (D == C and D != B and C != A) else P)
+			d.set_pixel(x * 2 + 1, y * 2 + 1, D if (B == D and B != A and D != C) else P)
+	out.set_meta("lw", w)
+	out.set_meta("lh", h)
+	return out
 
 # glif piksellerini tuvale yaz (ox, oy kaymasiyla); ust uste yazim son rengi birakir
 func _str_yaz(cv: Variant, value: String, c: Color, mono: bool, ox: int, oy: int) -> void:
@@ -542,7 +576,8 @@ func _str_yaz(cv: Variant, value: String, c: Color, mono: bool, ox: int, oy: int
 func f_drawStrKenar(text: Variant, x: Variant, y: Variant, color: Variant, kenar: Variant, cerceve: bool, scale_value: Variant, mono: Variant) -> void:
 	var value: String = J.s(text)
 	var m := J.truth(mono)
-	var key: Array = [value, color, kenar, cerceve, m]
+	var hd := _yazi_hd()
+	var key: Array = [value, color, kenar, cerceve, m, hd]
 	var cached: Variant = string_cache.get(key)
 	if cached == null:
 		var width := 0
@@ -561,10 +596,11 @@ func f_drawStrKenar(text: Variant, x: Variant, y: Variant, color: Variant, kenar
 		else:
 			_str_yaz(cached, value, kc, m, 2, 2)
 		_str_yaz(cached, value, Canvas.parse_color(str(color)), m, 1, 1)
+		if hd: cached = _epx(cached)
 		if string_cache.size() > 1024: string_cache.clear()
 		string_cache[key] = cached
 	var sf: float = J.n(scale_value) if scale_value != null else 1.0
-	draw_context.drawImage(cached, J.n(x) - sf, J.n(y) - sf, cached.width * sf, 10 * sf)
+	draw_context.drawImage(cached, J.n(x) - sf, J.n(y) - sf, float(cached.get_meta("lw", cached.width)) * sf, float(cached.get_meta("lh", 10)) * sf)
 
 func f_asinF(value: Variant = null) -> Variant:
 	return game.j_ASIN_LUT[clampi(int((value + 1) * 512), 0, 1024)]
