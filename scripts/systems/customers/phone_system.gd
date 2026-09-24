@@ -86,6 +86,7 @@ func f_updatePhone(p_dt: Variant = null) -> Variant:
 		J.setv(v_p, "t", (J.getv(v_p, "t") - v_dt))
 		if (J.le(J.getv(v_p, "t"), 0.0) and J.gt(J.getv(game.j_G, "timeLeft"), 25.0)):
 			J.setv(v_p, "kind", "order")
+			game.phone_system.f_topluKarar(v_p)
 			J.setv(v_p, "state", "ring")
 			J.setv(v_p, "ringT", 0.0)
 			J.setv(v_p, "beep", 0.0)
@@ -109,6 +110,19 @@ func f_updatePhone(p_dt: Variant = null) -> Variant:
 				J.setv(v_p, "t", (J.method(game.j_TUN, "phoneGap", [game.j_G]) * 0.6))
 	return null
 
+# BIRLESIK (6. tur, madde 12 — kullanici "toplu siparis: 4-5 durum, paket,
+# yuksek odeme"): telefon calarken toplu olup olmadigi belirlenir (telefonun
+# ustunde xN rozeti). Siparis N standart durum (+ bazen icecek); her urun paket
+# ucretinin TOPLU_KAT kati oder.
+const TOPLU_GUN := 5.0
+const TOPLU_SANS := 0.22
+const TOPLU_KAT := 1.4
+
+func f_topluKarar(p: Variant) -> void:
+	var olur: bool = J.n(game.j_G.day) >= TOPLU_GUN and J.n(game.j_G.timeLeft) > 60.0 and J.truth(game.f_chance(TOPLU_SANS))
+	J.setv(p, "toplu", olur)
+	J.setv(p, "topluN", (5.0 if J.truth(game.f_chance(0.5)) else 4.0) if olur else 0.0)
+
 # game.js:3694
 func f_phoneClick() -> Variant:
 	var v_p: Variant = null
@@ -119,10 +133,13 @@ func f_phoneClick() -> Variant:
 		return null
 	if J.eq(J.getv(v_p, "state"), "ring"):
 		J.setv(v_p, "state", "order")
-		J.setv(v_p, "order", game.recipe_system.f_makePhoneOrder(game.j_G))
+		if J.truth(J.getv(v_p, "toplu")):
+			J.setv(v_p, "order", game.recipe_system.f_makeTopluOrder(game.j_G, J.getv(v_p, "topluN")))
+		else:
+			J.setv(v_p, "order", game.recipe_system.f_makePhoneOrder(game.j_G))
 		J.setv(v_p, "done", J.method(J.getv(v_p, "order"), "map", [game.phone_system._closure_265.bind({})]))
 		J.method(game.j_SFX, "ding", [])
-		game.session_system.f_say("Paket sipariş alındı — Dayıya ver!")
+		game.session_system.f_say("Toplu sipariş! Dürümleri Dayıya ver" if J.truth(J.getv(v_p, "toplu")) else "Paket sipariş alındı — Dayıya ver!")
 		return null
 	if J.eq(J.getv(v_p, "state"), "order"):
 		game.session_system.f_say("Ürünleri Dayıya ver")
@@ -218,7 +235,8 @@ func f_giveToCourier() -> Variant:
 		game.effects.f_ftext("SOS YANLIŞ!", J.add(J.getv(J.getv(game.j_ST, "uncle"), "x"), 24.0), 126.0, J.getv(game.j_P, "bad"), {"life": 1.3})
 		J.method(game.j_SFX, "bad", [])
 	J.setv(game.j_G, "totalSold", J.add(J.getv(game.j_G, "totalSold"), 1.0))
-	J.setv(J.getv(game.j_G, "courier"), "pay", J.add(J.getv(J.getv(game.j_G, "courier"), "pay"), floor((v_price * game.j_PHONE_MUL) + 0.5)))
+	var kat: float = TOPLU_KAT if J.truth(J.getv(v_p, "toplu")) else 1.0
+	J.setv(J.getv(game.j_G, "courier"), "pay", J.add(J.getv(J.getv(game.j_G, "courier"), "pay"), floor((v_price * game.j_PHONE_MUL * kat) + 0.5)))
 	J.setv(J.getv(v_p, "done"), v_idx, true)
 	J.setv(game.j_G, "hand", null)
 	J.method(game.j_SFX, "serve", [])
@@ -239,6 +257,10 @@ func f_giveToCourier() -> Variant:
 		J.method(game.j_SFX, "bell", [])
 		J.method(game.j_SFX, "moto", [])
 		game.effects.f_ftext("KURYE YOLDA!", 60.0, 130.0, J.getv(game.j_P, "au0"), {"life": 1.6})
+		if J.truth(J.getv(v_p, "toplu")):
+			game.effects.f_ftext("TOPLU SİPARİŞ +%40", 60.0, 116.0, J.getv(game.j_P, "ok"), {"life": 1.8})
+			J.setv(J.getv(game.j_G, "stats"), "toplu", J.add((J.getv(J.getv(game.j_G, "stats"), "toplu") if J.truth(J.getv(J.getv(game.j_G, "stats"), "toplu")) else 0.0), 1.0))
+			J.setv(v_p, "toplu", false)
 	return true
 	return null
 

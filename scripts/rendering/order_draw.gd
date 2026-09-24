@@ -191,11 +191,25 @@ func draw_order_receipt(time: float) -> void:
 		else: sides.append(i)
 	# BIRLESIK: balonla ayni HD ikonlar (olceksiz; ctx.scale HD'yi eski piksele
 	# dusuruyordu), yan urunler iki sutun, istenmeyenler kucuk "yok" rozeti.
-	var height := 14 + wraps.size()*20 + 17*int(ceil(sides.size()/3.0))
-	game.f_rrect(2,top,47,height,2,"#b39663")
+	# BIRLESIK (6. tur): toplu sipariste standart durumlar iki sutun (rozet yok)
+	var toplu: bool = p.get("toplu", false) == true
+	var wrap_h: int = 18*int(ceil(wraps.size()/2.0)) if toplu else wraps.size()*20
+	var height := 14 + wrap_h + 17*int(ceil(sides.size()/3.0))
+	game.f_rrect(2,top,47,height,2,"#6a8a3a" if toplu else "#b39663")
 	game.f_rrect(3,top+1,45,height-2,1,"#fff1cf")
-	game.text_draw.f_txt(game.order_text("PAKET","TO GO"),25,top+3,"#963d2e",{"align":"c"})
+	game.text_draw.f_txt(game.order_text("TOPLU","BULK") if toplu else game.order_text("PAKET","TO GO"),25,top+3,"#4a6a1e" if toplu else "#963d2e",{"align":"c"})
 	var y := top+21
+	if toplu:
+		for n in wraps.size():
+			var i: int = wraps[n]
+			var wx: float = 14 + (n%2)*22
+			var wy: float = y + floor(n/2.0)*18
+			game.j_ctx.globalAlpha = 0.35 if p.done[i] else 1.0
+			order_icon(p.order[i],wx,wy,time)
+			game.j_ctx.globalAlpha = 1.0
+			if p.done[i]: game.icon_draw.f_drawCheck(wx,wy,"#50843b")
+		y += wrap_h
+		wraps.clear()
 	for i in wraps:
 		var item: Dictionary = p.order[i]
 		game.j_ctx.globalAlpha = 0.35 if p.done[i] else 1.0

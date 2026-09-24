@@ -173,11 +173,11 @@ Kullanıcının sırası: **1, 2, 9 → 15, 18 → 10 → kalanlar**. Biten madd
 - [x] 6 Dayı: üçüncü jest çay yudumu (ince belli bardak, 8 kare, yudumda gözler yarı kapalı, kol yüzün önüne geçer); mevcut: nefes, fes/bıyık jesti, kırpma, sevinç
 - [x] 7 Gece hırsızı: sinsi parmak ucu yürüyüş, kasada çömelip iki elle karıştırma + çuvala uçan banknotlar, kaçışta toz (süsler saat+hash)
 - [x] 8 Dükkân: alınan istasyon gri sahnede renkli belirir + altın çerçeve, 1,6 sn'de griye döner (gpu_canvas mono_kar)
-- [ ] 11 Kötü günün bedeli yok (itibar vb.)
-- [ ] 12 Sipariş çeşidi tekdüze
+- [—] 11 İtibar sistemi önerildi, kullanıcı seçmedi
+- [x] 12 Toplu sipariş (kullanıcı seçimi): 5. günden sonra telefon %22 "x4/x5" çalar, 4-5 standart dürüm (+ bazen içecek), ürün başı paket ücretinin 1,4 katı, fiş "TOPLU" iki sütun (tests/toplu_siparis.gd); acele/müdavim istenmedi
 - [x] 13 Ertesi gün başında "YENİ: Fritöz 6.5sn > 4.8sn" bildirimi + istasyon parlaması
 - [x] 14 Olay dengesi ölçüldü: bahis panelinde geri sayım zaten var; gece hırsızı borç bitişini 2-4 gün geciktiriyor, güvenlik azaltıyor (tempo.gd --hirsiz) → değişiklik gerekmedi
-- [ ] 16 Eski piksel + HD çift yol; ctx.scale altında CPU'ya düşüş
+- [—] 16 Eski piksel yolu bilinçli kalıyor (testler + ölçekli çizim yedeği)
 - [x] 17 (tr, en) çiftleri localization.cift ile sözlükten; 93 metin 4 dile çevrildi (tests/dil_cift.gd)
 - [x] 19 İstasyon adı etiketi fare 0,45 sn durunca belirir (çerçeve hemen)
 - [x] 20 Öğretici/onay mesajları oyun başına ilk 3 kez; hata ve olaylar her zaman

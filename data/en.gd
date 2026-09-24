@@ -1026,5 +1026,8 @@ const VALUE = {
 	"SATILAN İSKENDER": "ISKENDER SOLD",
 	"TOPLAM KAZANÇ": "TOTAL EARNED",
 	"ÖDENEN BORÇ": "DEBT PAID",
-	"YENİ": "NEW"
+	"YENİ": "NEW",
+	"TOPLU": "BULK",
+	"Toplu sipariş! Dürümleri Dayıya ver": "Bulk order! Hand the wraps to the uncle",
+	"TOPLU SİPARİŞ +%40": "BULK ORDER +40%"
 }

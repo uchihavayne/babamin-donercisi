@@ -1119,5 +1119,8 @@ const VALUE = {
 	"Sarımsaklı sos isteniyor": "Sauce à l'ail demandée",
 	"Sossuz isteniyor": "Sans sauce demandé",
 	"Bu sipariş farklı": "Commande différente",
-	"YENİ": "NOUVEAU"
+	"YENİ": "NOUVEAU",
+	"TOPLU": "GROUPÉ",
+	"Toplu sipariş! Dürümleri Dayıya ver": "Commande groupée ! Donne les dürüms à l'oncle",
+	"TOPLU SİPARİŞ +%40": "COMMANDE GROUPÉE +40%"
 }

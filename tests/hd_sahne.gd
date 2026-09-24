@@ -79,6 +79,14 @@ func calis() -> void:
 		if var_mi("--yeni"):
 			g.j_G.yeniAlim = [{"id": "fryer", "st": "fryer", "ad": "Fritöz", "ozet": "6.5sn > 4.8sn"},
 				{"id": "knife", "st": "meat", "ad": "Bıçak", "ozet": "ADET 3 > 4"}]
+		# --toplu cal|fis : toplu siparis (madde 12) telefonda caliyor / fis acik
+		if arg("--toplu") != "":
+			g.j_G.day = 6.0
+			var ph: Dictionary = g.j_G.phone
+			ph.toplu = true; ph.topluN = 5.0; ph.state = "ring"; ph.ringT = 0.5
+			if arg("--toplu") == "fis":
+				g.phone_system.f_phoneClick()
+				ph.done[0] = true; ph.done[1] = true
 		# --fare X,Y : imlec o noktada bekler (madde 19: etiket gecikmesi)
 		if arg("--fare") != "":
 			var fx := arg("--fare").split(",")

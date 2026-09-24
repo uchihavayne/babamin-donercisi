@@ -98,6 +98,13 @@ func f_drawPhone(p_t: Variant = null) -> Variant:
 		J.setv(game.j_ctx, "globalAlpha", 1.0)
 		v_bo = (sin((v_t * 8.0)) * 2.0)
 		game.text_draw.f_txt("!", J.add(v_x, 28.0), J.add((v_y - 2.0), v_bo), J.getv(game.j_P, "bad"), {"align": "c", "outline": true, "sc": 2.0})
+		# BIRLESIK (6. tur): toplu siparis calarken "xN" rozeti
+		if J.truth(J.getv(v_p, "toplu")):
+			var rx: float = J.n(v_x) + 34.0
+			var ry: float = J.n(v_y) - 4.0 + J.n(v_bo) * 0.5
+			game.f_rrect(rx, ry, 16.0, 10.0, 2.0, "#3f8a4a")
+			game.f_rrectOut(rx, ry, 16.0, 10.0, 2.0, "#1e3a14")
+			game.text_draw.f_txt("x" + str(int(J.n(J.getv(v_p, "topluN")))), rx + 8.0, ry + 2.0, "#fff2b0", {"align": "c"})
 		J.setv(game.j_ctx, "globalAlpha", J.add(0.3, (0.3 * sin((v_t * 8.0)))))
 		game.f_rrectOut((J.getv(v_s, "x") - 2.0), (J.getv(v_s, "y") - 2.0), J.add(J.getv(v_s, "w"), 4.0), J.add(J.getv(v_s, "h"), 4.0), 3.0, J.getv(game.j_P, "au0"))
 		J.setv(game.j_ctx, "globalAlpha", 1.0)

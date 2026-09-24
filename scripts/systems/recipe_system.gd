@@ -93,6 +93,18 @@ func f_makePhoneOrder(p_G: Variant = null) -> Variant:
 	return v_items
 	return null
 
+# BIRLESIK (6. tur): toplu paket — n standart durum (is yeri siparisi: yok /
+# ozel sos yok, fisin iki sutununa sigar) + icecek standi varsa yari olasilikla bir icecek.
+func f_makeTopluOrder(p_G: Variant = null, p_n: Variant = null) -> Variant:
+	var items: Array = []
+	for i in int(J.n(p_n) if J.truth(p_n) else 4.0):
+		items.append({"kind": "wrap", "sauce": null})
+	if J.truth(J.method(game.j_TUN, "drinkOn", [p_G])) and J.truth(game.f_chance(0.5)):
+		var drinks: Array = ["cola", "fanta"]
+		if J.truth(J.method(game.j_TUN, "ayranOn", [p_G])): drinks.append("ayran")
+		items.append({"kind": "drink", "type": game.math_utils.f_pick(drinks)})
+	return items
+
 # data.js:506
 func f_itemPrice(p_it: Variant = null, p_G: Variant = null) -> Variant:
 	var v_v: Variant = null
