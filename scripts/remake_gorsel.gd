@@ -2982,24 +2982,65 @@ func f_hdHirsiz(x: Variant, y: Variant, t: Variant, phase: Variant, running: Var
 	if A.is_empty(): return false
 	var T := J.n(t)
 	var kos := J.truth(running)
-	var sway := sin(T * 11.0) * 1.2 if (J.n(phase) == 0.0 or kos) else 0.0
-	var bob := sin(T * 2.2) * 0.8
-	var X := f_hdYarimPx(J.n(x) + sway)
-	var Y := f_hdYarimPx(J.n(y) + bob)
+	var faz := J.n(phase)
+	# BIRLESIK (6. tur, analiz madde 7): eskiden yuruyuste hizli titreme, kasada
+	# dikilip sallanma. Simdi beden dili (yalniz cizim; oyun mantigi ayni):
+	#  sinsi yuruyus: parmak ucunda yavas sekme, kollar sirayla
+	#  kasada: comelir, iki eliyle sirayla karistirir; caldiysa kasadan
+	#          cuvala banknot ucar (donen kagit parcaciklari)
+	#  kacis: kollar savrulur, ayak dibinde toz
+	# Susleme zamanlamasi saat + hash (oyunun RNG'si tuketilmez).
+	var N: Variant = (get("j_G") as Dictionary).get("night")
+	var caldi: bool = N is Dictionary and J.truth(N.get("stole"))
+	var bob := 0.0
+	var aoL := 0.0
+	var aoR := 0.0
+	var comel := 0.0
+	if kos:
+		bob = -absf(sin(T * 9.0)) * 1.5
+		aoL = floorf(sin(T * 15.0) * 4.0 + 0.5) / 2.0
+		aoR = -aoL
+	elif faz == 0.0:
+		var adim := T * 5.0
+		bob = -absf(sin(adim)) * 2.5
+		aoL = sin(adim) * 1.0
+		aoR = -aoL
+	else:
+		comel = 3.0
+		var el := sin(T * 16.0) > 0.0
+		aoL = 3.0 if el else 0.5
+		aoR = 0.5 if el else 3.0
+		bob = sin(T * 16.0) * 0.4
+	var X := f_hdYarimPx(J.n(x))
+	var Y := f_hdYarimPx(J.n(y) + bob + comel)
 	draw_context.globalAlpha = 0.38
-	f_ell(X, Y + 1.0, 14.0, 3.0, "#000")
+	f_ell(X, J.n(y) + 1.0, 14.0, 3.0, "#000")
 	draw_context.globalAlpha = 1.0
-	var ao := floorf(sin(T * 15.0) * 4.0 + 0.5) / 2.0 if kos else 0.0
 	hd_ciz(A, "hirsiz_govde", X, Y)
-	hd_ciz(A, "hirsiz_kol_sol", X, Y + ao)
-	hd_ciz(A, "hirsiz_kol_sag", X, Y - ao)
-	hd_ciz(A, "hirsiz_bas", X, Y)
+	hd_ciz(A, "hirsiz_kol_sol", X, Y + aoL)
+	hd_ciz(A, "hirsiz_kol_sag", X, Y + aoR)
+	hd_ciz(A, "hirsiz_bas", X, Y + comel * 0.5)
 	var sx := X + 20.0
-	var sy := Y - 30.0 + 8.0 - ao + floorf(sin(T * 6.0) * 1.2 + 0.5)
+	var sy := Y - 30.0 + 8.0 - (aoL if kos else 0.0) + floorf(sin(T * 6.0) * 1.2 + 0.5)
+	if faz == 1.0 and not kos:
+		sy = J.n(y) - 15.0     # cuval yerde, agzi acik
 	draw_context.globalAlpha = 0.3
 	f_ell(sx, sy + 15.0, 8.0, 2.0, "#000")
 	draw_context.globalAlpha = 1.0
 	hd_ciz(A, "hirsiz_canta", sx, sy)
+	if N is Dictionary:
+		var adim_no := floorf(T * 12.0)
+		if adim_no != J.n(N.get("sus_adim", -1.0)):
+			N.sus_adim = adim_no
+			var h1 := J.n(f_hash1(adim_no * 1.37))
+			var h2 := J.n(f_hash1(adim_no * 2.91))
+			if faz == 1.0 and not kos and caldi:
+				var yesil := h1 > 0.35
+				_c("f_part", {"x": X + 2.0 + h2 * 6.0, "y": Y - 22.0, "vx": (sx - X) * (0.9 + h2 * 0.8), "vy": -52.0 - h1 * 24.0, "life": 0.8,
+					"col": ("#4e9a52" if h2 > 0.5 else "#78c07a") if yesil else get("j_P").au0, "g": 130.0, "sz": 3.5 if yesil else 1.5, "drag": 0.25 if yesil else 0.06, "kagit": yesil})
+			elif kos:
+				_c("f_part", {"x": X - 6.0 * signf(J.n(x) - 236.0 + 0.01), "y": J.n(y) - 1.0, "vx": (h1 - 0.5) * 16.0, "vy": -6.0 - h2 * 8.0,
+					"life": 0.5, "col": "rgba(150,150,165,.45)", "g": -4.0, "sz": 2.0, "type": "smoke"})
 	return true
 
 # "govde": yalniz gövde (musteri katmani), "balon": yalniz konusma balonu,
@@ -4007,7 +4048,8 @@ func f_hdPsDraw(PS: Variant) -> bool:
 				#  kucuk ve hizli (kivilcim, kirinti): arkasinda kisa iz
 				var al: float = (1.0 - (k - 0.75) * 4.0) if k > 0.75 else 1.0
 				var c := _renk(p.get("col"))
-				if J.truth(p.get("drag")):
+				# f_part her parcaciga drag 0.06 verir; konfeti drag >= 0.2 ya da kagit bayragi
+				if J.n(p.get("drag")) >= 0.2 or J.truth(p.get("kagit")):
 					var don := absf(sin(J.n(p.get("t")) * 9.0 + x * 0.37 + y * 0.11))
 					var gw := maxf(1.0, roundf(sz * 2.0 * (0.2 + 0.8 * don)))
 					ctx.globalAlpha = al
