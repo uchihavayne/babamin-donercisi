@@ -143,6 +143,7 @@ Yoksa `atlas.json` yeni koordinatları gösterir ama doku eski kalır; parçalar
 
 ```sh
 sh tests/kontrol.sh                                   # tüm betikler ayrıştırılır (tek Godot açılışı)
+sh tests/hepsi.sh                                     # ayrıştırma + tabanın tüm testleri + görsel testler (~3 dk)
 godot --path . --resolution 960x540 --script tests/hd_sahne.gd -- --test --gpu-test --full [--sahne shop|title|dayend]
 godot --path . --resolution 960x540 --script tests/hd_sahne.gd -- --test --gpu-test --full --kedi gelis|bekle|yiyor --rakip 330 --kalip kurye
 godot --path . --resolution 960x540 --script tests/hd_sahne.gd -- --test --gpu-test --dolgu 4,3,2,3 --sos garlic   # tek dürüm (1.8 ölçek)
@@ -160,7 +161,7 @@ Kare süresi (tam yükseltmeli oyun ekranı çizimi, Ryzen 5 3600X + RTX 5060): 
 
 Kullanıcının sırası: **1, 2, 9 → 15, 18 → 10 → kalanlar**. Biten madde `[x]`.
 
-- [ ] 1 Sarma animasyonu CPU piksel tüp (HD dolgunun altında sırıtıyor)
+- [x] 1 Sarma animasyonu CPU piksel tüp → Blender tüpü (durum_tup_<1..10>, benekler dönerek)
 - [ ] 2 İskender tabağı zayıf (et turuncu artı, domates düz daire)
 - [ ] 9 Oyunun sonu yok (borç bitince tek kutlama) → final sahnesi + serbest mod
 - [ ] 15 Mobil performans (f_drawPlay ~10.5 ms; duvar süsü 3.2, parçacık 2.1)

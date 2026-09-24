@@ -101,6 +101,8 @@ func f_drawWrapOpen(p_cx: Variant = null, p_cy: Variant = null, p_wrap: Variant 
 	var v_kirpH: float = max(0.0, (v_topCut - (v_cy - 26.0)))
 	if J.le(v_roll, 0.0) and game.hd_gpu():
 		v_kirpH = 60.0
+	elif game.hd_gpu():
+		v_kirpH += 1.5   # HD tupun yuvarlak ust kenari kalan kanadin ucunu ortsun (arada bosluk kalmasin)
 	J.method(game.j_ctx, "rect", [(v_cx - 34.0), (v_cy - 26.0), 68.0, v_kirpH])
 	J.method(game.j_ctx, "clip", [])
 	# BIRLESIK: HD'de golge lavasin hemen altina yapisik (temas golgesi). Eski
@@ -255,6 +257,13 @@ func f_drawWrapOpen(p_cx: Variant = null, p_cy: Variant = null, p_wrap: Variant 
 		v_tw = floor(((v_rx * 2.0) * J.add(0.88, (0.12 * v_roll))) + 0.5)
 		v_tx = floor((v_cx - (float(v_tw) / float(2.0))) + 0.5)
 		v_rr = min(5.0, floor((float(v_th) / float(2.0))))
+		# BIRLESIK (6. tur): HD'de tup Blender silindiri (durum_tup_<kademe>);
+		# golge tupun altina yapisik ve tupla birlikte geriye yurur.
+		if game.f_hdSarmaTup(v_roll, v_cx, v_frontY, v_tubeH, v_tw):
+			if (J.lt(v_roll, 1.0) and J.truth(game.f_chance(0.3))):
+				game.effects.f_part({"x": J.add(v_cx, game.math_utils.f_rnd((-J.n(16.0)), 16.0)), "y": v_ty, "vx": game.math_utils.f_rnd((-J.n(6.0)), 6.0), "vy": game.math_utils.f_rnd((-J.n(20.0)), (-J.n(6.0))), "life": 0.35, "col": "#f8e6c4", "g": 90.0, "sz": 1.0})
+			J.method(game.j_ctx, "restore", [])
+			return null
 		J.setv(game.j_ctx, "globalAlpha", 0.26)
 		game.f_ell(v_cx, J.add(J.add(v_cy, v_ry), 1.0), (float(v_tw) / float(2.0)), 3.0, "#000")
 		J.setv(game.j_ctx, "globalAlpha", 1.0)

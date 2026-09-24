@@ -1143,6 +1143,22 @@ func f_hdDurumGovde(cx: Variant, cy: Variant, kiz: Variant, yanik: Variant) -> b
 	hd_ciz(A, "durum_%s_%d" % [kademe, o], J.n(cx), J.n(cy))
 	return true
 
+# BIRLESIK (6. tur): sarma animasyonunun tupu (durum_hd.durum_tup, TUP_N
+# kademe). y: tupun ekrandaki merkezi; golge tupun altina yapisik.
+const TUP_N := 10
+func f_hdSarmaTup(roll: Variant, cx: Variant, y: Variant, th: Variant, tw: Variant) -> bool:
+	if not hd_olcekli("durum"): return false
+	var o := _durum_olcek(SARGI_OLCEK)
+	if o < 0: return false
+	var A := atlas("durum")
+	var ad := "durum_tup_%d_%d" % [clampi(roundi(J.n(roll) * TUP_N), 1, TUP_N), o]
+	if A.is_empty() or not A.parca.has(ad): return false
+	draw_context.globalAlpha = 0.22
+	f_ell(J.n(cx) + 0.5, J.n(y) + J.n(th) / 2.0 - 0.6, J.n(tw) / 2.0 - 1.0, 1.4, "#3a2410")
+	draw_context.globalAlpha = 1.0
+	hd_ciz(A, ad, J.n(cx), J.n(y))
+	return true
+
 func f_hdKagitArka(cx: Variant, cy: Variant, po: Variant, pt: Variant) -> bool:
 	if not hd_olcekli("durum"): return false
 	var o := _durum_olcek(DURUM_OLCEK)

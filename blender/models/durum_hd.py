@@ -501,6 +501,109 @@ def durum_kagit_arka():
     x_egim()
 
 
+# ---------------------------------------------------------------- sarma tupu
+# BIRLESIK (6. tur, analiz madde 1): sarma animasyonundaki tup eskiden kodda
+# duz piksel bir serit (rrect + capraz cizgiler) idi; HD dolgunun altinda
+# siritiyordu. Simdi lavasin on kenardan kivrilarak olusan silindiri: dis kat
+# benekli yufka, sag ucta sarmal katlar ve koyu ic. Oyun (food.js drawWrapOpen)
+# tupu roll'a gore buyutur: yukseklik 3 -> 13, boy 44 * (0.88 + 0.12 roll).
+# Kademe q/TUP_N; benekler roll ile doner (yuvarlanma hissi). Capa: tupun
+# ekrandaki merkezi (cx, frontY).
+TUP_N = 10
+
+
+def durum_tup(q):
+    u = q / float(TUP_N)
+
+    def fn():
+        K = 0.25
+        th = 3.0 + 10.0 * u
+        R = th / (2.0 * math.sqrt(1.0 + K * K))
+        Lx = 44.0 * (0.88 + 0.12 * u) / 2.0 - R * KX      # x_egim ile uclar R*KX acilir
+        base, shade, lite = "#f0d5a8", "#c9a06a", "#f8e6c4"
+        Mg = cel("Tup", [hexmul(shade, .85), shade, base, lite], [0, .3, .5, .82], noise=0.08, noise_scale=10)
+        Mi = cel("TupIc", [hexmul(base, .8), hexmul(base, .9), base, hexmul(base, 1.04)], [0, .3, .5, .82])
+        Mig = cel("TupIcGolge", [hexmul(base, .38), hexmul(base, .46), hexmul(base, .56), hexmul(base, .66)], [0, .3, .5, .82])
+        T_ = min(0.45, R * 0.22)
+        seg = 32
+
+        def halka(x, r):
+            return [(x, -r * math.cos(2 * math.pi * j / seg), r * math.sin(2 * math.pi * j / seg)) for j in range(seg)]
+
+        # dis kat: iki ucu acik silindir; uclarda dalgali, hafif genisleyen agiz
+        bm = bmesh.new()
+        xs = [-Lx + (2 * Lx) * i_ / 12 for i_ in range(13)]
+        dis = []
+        for x in xs:
+            gen = 1.0 + 0.06 * max(0.0, (abs(x) - (Lx - 2.5)) / 2.5) ** 1.5
+            dis.append([bm.verts.new(v) for v in halka(x, R * gen)])
+        for a_, b_ in zip(dis, dis[1:]):
+            for j in range(seg):
+                bm.faces.new((a_[j], a_[(j + 1) % seg], b_[(j + 1) % seg], b_[j]))
+        kenar, ic = [], []
+        for uc, yon in ((dis[-1], 1.0), (dis[0], -1.0)):
+            for j in range(seg):
+                t = 2 * math.pi * j / seg
+                uc[j].co.x += yon * (0.3 * math.sin(5 * t + 1.0) + 0.15 * math.sin(3 * t))
+            r_ic = R * 1.06 - T_
+            on = [bm.verts.new((uc[j].co.x - yon * 0.05, -r_ic * math.cos(2 * math.pi * j / seg), r_ic * math.sin(2 * math.pi * j / seg))) for j in range(seg)]
+            arka = [bm.verts.new((uc[0].co.x - yon * min(4.0, Lx * 0.4), -(R - T_) * math.cos(2 * math.pi * j / seg), (R - T_) * math.sin(2 * math.pi * j / seg))) for j in range(seg)]
+            for j in range(seg):
+                kenar.append(bm.faces.new((uc[j], uc[(j + 1) % seg], on[(j + 1) % seg], on[j])))
+                ic.append(bm.faces.new((on[j], on[(j + 1) % seg], arka[(j + 1) % seg], arka[j])))
+            ic.append(bm.faces.new(arka))
+        for f in kenar:
+            f.material_index = 1
+        for f in ic:
+            f.material_index = 2
+        bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
+        xu = dis[-1][0].co.x
+        ob = I.mesh_ob("tup", bm, Mg)
+        ob.data.materials.append(Mi)
+        ob.data.materials.append(Mig)
+        # sag uctan gorunen sarmal ic katlar (kademe buyudukce tur sayisi artar)
+        tur = 0.5 + 0.9 * u
+        bm2 = bmesh.new()
+        n = 36
+        on_, arka_ = [], []
+        for k in range(n + 1):
+            a = 0.9 + k / float(n) * math.tau * tur
+            rr = (R * 1.06 - T_ - 0.15) * (1.0 - 0.55 * k / float(n))
+            yy, zz = -rr * math.cos(a), rr * math.sin(a)
+            on_.append(bm2.verts.new((xu - 0.4, yy, zz)))
+            arka_.append(bm2.verts.new((xu - min(3.5, Lx * 0.35), yy, zz)))
+        for k in range(n):
+            bm2.faces.new((on_[k], on_[k + 1], arka_[k + 1], arka_[k]))
+        bmesh.ops.solidify(bm2, geom=bm2.faces[:], thickness=min(0.3, T_ * 0.8))
+        bmesh.ops.recalc_face_normals(bm2, faces=bm2.faces[:])
+        I.mesh_ob("sarmal", bm2, Mi)
+
+        # kizarmis benekler: yuzeye yapisik; roll ile doner
+        don = u * 3.2
+        for b in range(int(18 + 40 * u)):
+            fi = hash1(b * 3.1) * math.tau + don            # tum cevre; yarisi gorunur
+            xb = -Lx + 1.5 + hash1(b * 7.3) * (2 * Lx - 3.0)
+            koyu = hash1(b * 1.3) > 0.7
+            rb = (0.3 + hash1(b * 1.7) * (0.35 if koyu else 0.6)) * (0.6 + 0.4 * min(1.0, R / 3.0))
+            renk = "#c8955e" if koyu else "#dcb27e"
+            bm3 = bmesh.new()
+            vs = []
+            for k in range(8):
+                a = 2 * math.pi * k / 8
+                rr = 1.0 + 0.25 * math.sin(3 * a + b)
+                x = xb + math.cos(a) * rb * 1.3 * rr
+                f2 = fi + math.sin(a) * rb * rr / R
+                vs.append(bm3.verts.new((x, -(R + 0.04) * math.cos(f2), (R + 0.04) * math.sin(f2))))
+            bm3.faces.new(vs)
+            bmesh.ops.recalc_face_normals(bm3, faces=bm3.faces[:])
+            o = I.mesh_ob("benek%d" % b, bm3, px.flat("TBenek%s" % renk, renk), smooth=False)
+            for pol in o.data.polygons:
+                if pol.normal.y * -math.cos(fi) + pol.normal.z * math.sin(fi) < 0:
+                    pol.flip()
+        x_egim()
+    return fn
+
+
 # BIRLESIK: yeni tahtada 1 / 2 / 3 urun -> 1.8 / 1.22 / 0.9 olcek (counter_design)
 ACIK_OLCEK = (1.0, 0.74, 0.58, 1.8, 1.22, 0.9)
 SARILI_OLCEK = (1.0, 0.8, 0.74, 0.62, 0.58, 1.8, 1.22, 0.9, 0.5)   # 0.5: 3-4 gozlu izgara (2x2)
@@ -509,6 +612,8 @@ for _ad, _k in KADEME:
     parca("durum_" + _ad, (-26, -10, 52, 20), durum_govde(_k), 0.25, SARILI_OLCEK, cizgi="#5a3a18", cizgi_alfa=120)
 parca("durum_kagit", (-26, -10, 30, 20), durum_kagit, 0.25, SARILI_OLCEK)
 parca("durum_kagit_arka", (-27, -10, 32, 20), durum_kagit_arka, 0.25, SARILI_OLCEK)
+for _q in range(1, TUP_N + 1):
+    parca("durum_tup_%d" % _q, (-26, -9, 52, 18), durum_tup(_q), 0.25, (1.0, 1.8, 1.22, 0.9), cizgi="#8a6a3a", cizgi_alfa=110)
 
 
 def uret(ad):
