@@ -7,15 +7,26 @@ extends "res://scripts/core/game_module.gd"
 func order_standard_disi(item: Dictionary) -> bool:
 	return item.kind == "wrap" and not item.get("yok", []).is_empty()
 
+# BIRLESIK (5. tur): her urune esit 20 px hucre; balon urun sayisina gore
+# genisler (eskiden sabit 58 px'e 3 urun sikisip ust uste biniyordu).
+const SIP_HUCRE := 20.0
+
+func order_bubble_width(customer: Dictionary) -> float:
+	return maxf(46.0, 8.0 + SIP_HUCRE * customer.items.size())
+
 func order_bubble_rect(customer: Dictionary) -> Rect2:
 	var wraps := 0
 	for item in customer.items:
 		if order_standard_disi(item): wraps += 1
 	var height := 27 + 19 * wraps
-	return Rect2(clampf(customer.x - 29, 2, 420), maxf(game.j_VIEW.top + 3, customer.y - 56 - height), 58, height)
+	var w := order_bubble_width(customer)
+	return Rect2(clampf(customer.x - w / 2.0, 2, 478 - w), maxf(game.j_VIEW.top + 3, customer.y - 56 - height), w, height)
 
 func order_icon(item: Dictionary, x: float, y: float, time: float) -> void:
-	game.icon_draw.f_icon(item.get("type", "cola") if item.kind == "drink" else ("iskender" if item.kind == "plate" else item.kind), x, y, time)
+	var id: String = str(item.get("type", "cola")) if item.kind == "drink" else ("iskender" if item.kind == "plate" else str(item.kind))
+	# tek tip boyda HD siparis ikonu (ikon_hd sip_*); yoksa eski ikon
+	if not game.f_hdIkon("sip_" + id, x, y):
+		game.icon_draw.f_icon(id, x, y, time)
 	if item.get("sauce") != null:
 		var hot: bool = item.sauce == "hot"
 		# REMAKE kancasi: "!" / "G" yerine HD sos rozeti (aci biber / sarimsak)
@@ -64,9 +75,9 @@ func f_drawOrderBubble(customer: Variant = null, time: Variant = null) -> Varian
 		game.f_rrect(r.position.x+1, r.position.y+1, r.size.x-2, r.size.y-2, 2, "#fff1cf")
 		game.f_fr(customer.x-2, r.end.y, 5, 2, border)
 		game.f_fr(customer.x-1, r.end.y+2, 3, 2, border)
-	var step_x: float = 50.0 / max(1, customer.items.size())
+	var bos: float = (r.size.x - 8.0 - SIP_HUCRE * customer.items.size()) / 2.0
 	for i in customer.items.size():
-		var x: float = r.position.x + 4 + step_x*(i+0.5)
+		var x: float = r.position.x + 4 + bos + SIP_HUCRE * (i + 0.5)
 		game.j_ctx.globalAlpha = 0.35 if customer.done[i] else 1.0
 		order_icon(customer.items[i], x, r.position.y+12, time)
 		game.j_ctx.globalAlpha = 1
@@ -75,16 +86,16 @@ func f_drawOrderBubble(customer: Variant = null, time: Variant = null) -> Varian
 	for i in customer.items.size():
 		var item: Dictionary = customer.items[i]
 		if not order_standard_disi(item): continue
-		game.f_hl(r.position.x+4, row_y-9, 50, "#d8bc8e")
+		game.f_hl(r.position.x+4, row_y-9, r.size.x-8, "#d8bc8e")
 		game.j_ctx.globalAlpha = 0.35 if customer.done[i] else 1.0
 		var yok: Array = item.get("yok", [])
 		for k in yok.size():
-			order_badge(str(yok[k]), r.position.x + 29 + (k - (yok.size() - 1) / 2.0) * 16, row_y, true)
+			order_badge(str(yok[k]), r.position.x + r.size.x / 2.0 + (k - (yok.size() - 1) / 2.0) * 16, row_y, true)
 		game.j_ctx.globalAlpha = 1
 		row_y += 19
 	# Patience is integrated into the order; no extra panel or text obscures it.
-	game.f_fr(r.position.x+4, r.end.y-4, 50, 2, "#ceb58d")
-	game.f_fr(r.position.x+4, r.end.y-4, floor(50*clampf(customer.patience, 0, 1)), 2, "#b33028" if customer.patience < 0.3 else "#6c8e48")
+	game.f_fr(r.position.x+4, r.end.y-4, r.size.x-8, 2, "#ceb58d")
+	game.f_fr(r.position.x+4, r.end.y-4, floor((r.size.x-8)*clampf(customer.patience, 0, 1)), 2, "#b33028" if customer.patience < 0.3 else "#6c8e48")
 	# (sira numarasi rozeti kaldirildi: balonun ustunde gereksiz kalabalik)
 	if customer.get("wrongT", 0) > 0: game.icon_draw.f_drawX(customer.x, customer.y-34, "#d64932")
 	game.j_ctx.restore()
@@ -168,11 +179,12 @@ func draw_order_receipt(time: float) -> void:
 	for i in p.order.size():
 		if p.order[i].kind == "wrap": wraps.append(i)
 		else: sides.append(i)
-	# Two mains and three sides fit above the chef, including every omission.
-	var height := 12 + wraps.size()*20 + 17*int(ceil(sides.size()/3.0))
-	game.f_rrect(2,top,43,height,2,"#b39663")
-	game.f_rrect(3,top+1,41,height-2,1,"#fff1cf")
-	game.text_draw.f_txt(game.order_text("PAKET","TO GO"),23,top+3,"#963d2e",{"align":"c"})
+	# BIRLESIK: balonla ayni HD ikonlar (olceksiz; ctx.scale HD'yi eski piksele
+	# dusuruyordu), yan urunler iki sutun, istenmeyenler kucuk "yok" rozeti.
+	var height := 14 + wraps.size()*20 + 17*int(ceil(sides.size()/3.0))
+	game.f_rrect(2,top,47,height,2,"#b39663")
+	game.f_rrect(3,top+1,45,height-2,1,"#fff1cf")
+	game.text_draw.f_txt(game.order_text("PAKET","TO GO"),25,top+3,"#963d2e",{"align":"c"})
 	var y := top+21
 	for i in wraps:
 		var item: Dictionary = p.order[i]
@@ -180,19 +192,18 @@ func draw_order_receipt(time: float) -> void:
 		order_icon(item,12,y,time)
 		var omissions: Array = item.get("yok",[])
 		for k in omissions.size():
-			game.j_ctx.save(); game.j_ctx.translate(27+k*12,y); game.j_ctx.scale(0.75,0.75)
-			order_badge(omissions[k],0,0,true)
-			game.j_ctx.restore()
+			if not game.f_hdIkon("yok_" + str(omissions[k]), 29+k*13, y):
+				game.j_ctx.save(); game.j_ctx.translate(29+k*13,y); game.j_ctx.scale(0.75,0.75)
+				order_badge(omissions[k],0,0,true)
+				game.j_ctx.restore()
 		game.j_ctx.globalAlpha = 1.0
 		if p.done[i]: game.icon_draw.f_drawCheck(12,y,"#50843b")
 		y += 20
 	for n in sides.size():
 		var i: int = sides[n]
-		var x: float = 10+(n%3)*13
-		var side_y: float = y-1+floor(n/3.0)*17
+		var x: float = 11+(n%3)*14
+		var side_y: float = y+floor(n/3.0)*17
 		game.j_ctx.globalAlpha = 0.35 if p.done[i] else 1.0
-		game.j_ctx.save(); game.j_ctx.translate(x,side_y); game.j_ctx.scale(0.65,0.65)
-		order_icon(p.order[i],0,0,time)
-		game.j_ctx.restore()
+		order_icon(p.order[i],x,side_y,time)
 		game.j_ctx.globalAlpha = 1.0
 		if p.done[i]: game.icon_draw.f_drawCheck(x,side_y,"#50843b")

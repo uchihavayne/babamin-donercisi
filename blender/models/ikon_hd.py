@@ -470,6 +470,27 @@ for _t in ("cola", "fanta", "ayran"):
     parca("bardak_%s" % _t, (-8, -11, 16, 21), bardak(_t), cizgi="#3f4a52", cizgi_alfa=90)
 
 
+# BIRLESIK (5. tur, kullanici: "siparis balonlarina duzen getir; patates durumden
+# bile buyuk ve onde"): balon / paket fisi icin AYNI gorsel boyda urun ikonlari.
+# Her urun modeli olceklenip ~16x14'luk kutuya sigdirilir.
+def olcekli(fn, s, dz=0.0):
+    def g():
+        once = set(bpy.data.objects.keys())
+        fn()
+        for ob in bpy.data.objects:
+            if ob.name not in once and ob.type == "MESH":
+                ob.location = (ob.location.x * s, ob.location.y * s, ob.location.z * s + dz)
+                ob.scale = ob.scale * s
+    return g
+
+
+SIP_OLCEK = {"wrap": (wrap, 0.9, "#2b1f14"), "fbox": (fbox, 0.6, "#2b1f14"), "sweet": (sweet, 0.74, "#2b1f14"),
+             "iskender": (iskender, 0.68, "#2b1f14"), "cola": (bardak("cola"), 0.68, "#3f4a52"),
+             "fanta": (bardak("fanta"), 0.68, "#3f4a52"), "ayran": (bardak("ayran"), 0.68, "#3f4a52")}
+for _id, (_fn, _s, _c) in SIP_OLCEK.items():
+    parca("sip_%s" % _id, (-9, -9, 18, 17), olcekli(_fn, _s), cizgi=_c, cizgi_alfa=120)
+
+
 # BIRLESIK: balondaki "!" / "G" sos isareti anlasilmiyordu -> kucuk sos rozeti:
 # aci sos = kirmizi rozet + aci biber, sarimsakli = krem rozet + sarimsak
 def sos_rozet(tur):

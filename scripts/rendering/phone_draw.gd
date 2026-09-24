@@ -98,8 +98,10 @@ func f_drawPhone(p_t: Variant = null) -> Variant:
 		J.setv(game.j_ctx, "globalAlpha", J.add(0.3, (0.3 * sin((v_t * 8.0)))))
 		game.f_rrectOut((J.getv(v_s, "x") - 2.0), (J.getv(v_s, "y") - 2.0), J.add(J.getv(v_s, "w"), 4.0), J.add(J.getv(v_s, "h"), 4.0), 3.0, J.getv(game.j_P, "au0"))
 		J.setv(game.j_ctx, "globalAlpha", 1.0)
-	if has_method("draw_order_receipt"):
-		call("draw_order_receipt", v_t)
+	# BIRLESIK: yeni paket fisi oyun nesnesinde (order_flow); modulun kendisinde
+	# aranınca hic bulunmuyor, eski fis (farkli sos isaretleri) ciziliyordu.
+	if game.has_method("draw_order_receipt"):
+		game.call("draw_order_receipt", v_t)
 		return null
 	if J.eq(J.getv(v_p, "state"), "order"):
 		v_n = J.getv(J.getv(v_p, "order"), "length")

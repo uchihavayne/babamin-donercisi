@@ -719,8 +719,12 @@ def _pide_yigin(cx, taban_gy, adet, rx, K):
     Mg = px.flat_a("PideGolge", "#3a2210", 0.35)
     I.yatay_elips("golge", cx + 1.0, taban_gy + 1.0, rx + 1.2, 0.1, Mg, K, ry_ekran=3.8)
     for i in range(adet):
-        PH.pide_mesh("pide%d" % i, cx + (0.5 if i % 2 else -0.4), taban_gy - i * 2.3, rx - i * 0.6, 9.0 - i * 0.3, 2.5,
-                     desen=True, tohum=i * 11.0, tohumlar=(i == adet - 1))
+        # hafif donuk ve farkli boyda: kenarlar paralel cizgi gibi durmasin
+        ob = PH.pide_mesh("pide%d" % i, cx + (0.8 if i % 2 else -0.6), taban_gy - i * 2.3, rx - i * 0.5 + (0.4 if i == 1 else 0.0),
+                          9.0 - i * 0.4, 2.5, desen=True, tohum=i * 11.0, tohumlar=(i == adet - 1))
+        ob.data.transform(__import__("mathutils").Matrix.Translation((-cx, 0, 0)))
+        ob.location.x = cx
+        ob.rotation_euler = (0.0, math.radians((-1.2, 1.6, -0.8)[i % 3]), math.radians((3.0, -4.0, 2.0)[i % 3]))
 
 
 def ekmek_lavas_tek():
@@ -870,7 +874,7 @@ parca("cop", (-1, -1, 34, 52), cop2)
 parca("altlik", (-1, -1, 50, 37), altlik)
 parca("kutu_raf_46", (0, 12, 46, 8), lambda: T.kutu_raf(46), K=0.4)
 parca("ekmek_lavas_tek", (2, 2, 44, 34), ekmek_lavas_tek, cizgi="#8a6a3a", cizgi_alfa=110)
-parca("ekmek_pide_arka", (4, 4, 40, 22), ekmek_pide_arka, cizgi="#5a3a18", cizgi_alfa=110)
+parca("ekmek_pide_arka", (4, -4, 40, 30), ekmek_pide_arka, cizgi="#5a3a18", cizgi_alfa=110)   # ust pide tuvalden tasmasin
 parca("ekmek_lavas_on", (3, 16, 42, 22), ekmek_lavas_on, cizgi="#8a6a3a", cizgi_alfa=110)
 for _i in range(3):
     parca("sise_%d" % _i, (-8, -25, 16, 28), sise2(_i), K=0.3, cizgi=T.hexmul(SOS2[_i]["ramp"][0], .7), cizgi_alfa=150)

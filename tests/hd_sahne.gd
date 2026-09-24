@@ -81,6 +81,14 @@ func calis() -> void:
 			c.items = [{"kind": "wrap"}, {"kind": "drink", "type": "cola"}]
 			c.done = [false, false]
 			c.bubble = 1.0
+		if var_mi("--siparis3"):
+			c.items = [{"kind": "wrap", "sauce": "hot"}, {"kind": "fbox"}, {"kind": "sweet"}]
+			c.done = [false, false, false]
+			c.bubble = 1.0
+		if var_mi("--paket"):
+			g.j_G.phone.state = "order"
+			g.j_G.phone.order = [{"kind": "wrap", "sauce": "garlic", "yok": ["pickle"]}, {"kind": "wrap", "sauce": "hot"}, {"kind": "fbox"}, {"kind": "drink", "type": "cola"}, {"kind": "sweet"}]
+			g.j_G.phone.done = [false, true, false, false, false]
 		if var_mi("--siparis"):
 			c.items = [{"kind": "wrap", "sauce": "hot", "yok": ["pickle"]}, {"kind": "drink", "type": "cola"}]
 			c.done = [false, false]
