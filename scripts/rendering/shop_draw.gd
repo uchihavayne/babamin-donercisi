@@ -205,6 +205,8 @@ func f_drawShop(p_t: Variant = null) -> Variant:
 					if not game.upgrade_system.buy(str(v_kartU.id)): return null
 					J.method(game.j_SFX, "cash", [])
 					J.setv(game.j_SHOP, "buyT", 1.0)
+					J.setv(game.j_SHOP, "renkSt", J.getv(v_kartU, "st"))
+					J.setv(game.j_SHOP, "renkT", 1.6)
 					J.setv(game.j_SHOP, "bake", null)
 					v_alinanRozet = null
 					v_z = 0.0

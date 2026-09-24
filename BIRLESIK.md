@@ -172,13 +172,13 @@ Kullanıcının sırası: **1, 2, 9 → 15, 18 → 10 → kalanlar**. Biten madd
 - [ ] 5 Müşteriler durağan, ifade az
 - [ ] 6 Dayı'nın hareket çeşidi az
 - [ ] 7 Gece hırsız sahnesi sönük
-- [ ] 8 Dükkân ekranı sade, alımda geri bildirim yok
+- [x] 8 Dükkân: alınan istasyon gri sahnede renkli belirir + altın çerçeve, 1,6 sn'de griye döner (gpu_canvas mono_kar)
 - [ ] 11 Kötü günün bedeli yok (itibar vb.)
 - [ ] 12 Sipariş çeşidi tekdüze
-- [ ] 13 Yükseltme etkisi hissedilmiyor
+- [x] 13 Ertesi gün başında "YENİ: Fritöz 6.5sn > 4.8sn" bildirimi + istasyon parlaması
 - [ ] 14 Olay dengesi ölçülmedi (bahis 20 sn'de sessiz red)
 - [ ] 16 Eski piksel + HD çift yol; ctx.scale altında CPU'ya düşüş
 - [x] 17 (tr, en) çiftleri localization.cift ile sözlükten; 93 metin 4 dile çevrildi (tests/dil_cift.gd)
-- [ ] 19 Üzerine gelince etiketler istasyonları kapatıyor
-- [ ] 20 Alt ipucu satırı hep dolu
+- [x] 19 İstasyon adı etiketi fare 0,45 sn durunca belirir (çerçeve hemen)
+- [x] 20 Öğretici/onay mesajları oyun başına ilk 3 kez; hata ve olaylar her zaman
 - [ ] 21 Mobil yerleşim denenmedi

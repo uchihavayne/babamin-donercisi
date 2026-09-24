@@ -131,8 +131,51 @@ func f_drawCursor(x: Variant = null, y: Variant = null, mode: Variant = null, he
 	if controls != null and controls.station_mode() and not J.truth(held_item): return null
 	return super.f_drawCursor(x,y,mode,held_item,time)
 
+# BIRLESIK (6. tur, madde 13): dukkanda alinanlar gunun ilk saniyelerinde
+const YENI_SURE := 6.0
+func yeni_alim_ciz(time: Variant) -> void:
+	var T := float(J.n(time))
+	if j_G.get("yeniAlim") is Array and not (j_G.yeniAlim as Array).is_empty() and J.eq(j_G.scene, "play"):
+		j_G.yeniGoster = {"liste": j_G.yeniAlim, "bas": T}
+		j_G.yeniAlim = []
+	var Y: Variant = j_G.get("yeniGoster")
+	if not (Y is Dictionary): return
+	var gecen := T - float(Y.bas)
+	if gecen < 0.0 or gecen > YENI_SURE:
+		j_G.yeniGoster = null
+		return
+	var a := clampf(gecen / 0.3, 0.0, 1.0) * clampf((YENI_SURE - gecen) / 0.8, 0.0, 1.0)
+	var liste: Array = Y.liste
+	var goruldu := {}
+	for e in liste:
+		var st: Variant = (j_ST as Dictionary).get(e.st)
+		if not (st is Dictionary) or goruldu.has(e.st): continue
+		goruldu[e.st] = true
+		j_ctx.globalAlpha = a * (0.5 + 0.4 * sin(T * 7.0))
+		f_rrectOut(float(st.x) - 2.0, float(st.y) - 2.0, float(st.w) + 4.0, float(st.h) + 4.0, 3.0, "#ffd75e")
+		f_rrectOut(float(st.x) - 3.0, float(st.y) - 3.0, float(st.w) + 6.0, float(st.h) + 6.0, 4.0, "#fff2b0")
+	j_ctx.globalAlpha = a
+	var satirlar: Array = []
+	for e in liste.slice(0, 3):
+		satirlar.append(str(e.ad) + ("  " + str(e.ozet) if str(e.ozet) != "" else ""))
+	if liste.size() > 3: satirlar.append("+%d" % (liste.size() - 3))
+	var gen := 0.0
+	for s in satirlar: gen = maxf(gen, float(J.n(f_textW(s))))
+	gen += 38.0
+	var x := floorf(240.0 - gen / 2.0)
+	var y := float(J.n(j_VIEW.top)) + 26.0
+	var h := 6.0 + satirlar.size() * 11.0
+	f_rrect(x, y, gen, h, 3.0, "rgba(20,14,12,.9)")
+	f_rrectOut(x, y, gen, h, 3.0, "#b08a3a")
+	f_rrect(x + 4.0, y + 4.0, 26.0, 9.0, 2.0, "#3f8a4a")
+	text_draw.f_txt("YENİ", x + 17.0, y + 5.0, "#fff2b0", {"align": "c"})
+	for i in satirlar.size():
+		text_draw.f_txt(satirlar[i], x + 34.0, y + 5.0 + i * 11.0, j_P.ui0)
+	j_ctx.globalAlpha = 1.0
+
 func f_drawPlay(time: Variant = null) -> Variant:
 	var result: Variant = super.f_drawPlay(time)
+	yeni_alim_ciz(time)
 	# Draw after the receipt, counter, flying food and other world objects.
 	draw_cut_blade(time)
 	if controls != null and controls.mode == "touch" and J.truth(j_G.hand):

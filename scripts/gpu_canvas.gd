@@ -72,6 +72,9 @@ var tutulan: Array = []
 var _kayitta := false
 var _kayit: Array = []
 var mono_material: RID
+var mono_kar_material: RID
+var mono_kar_shader: RID
+var mono_k := 1.0
 var mono_shader: RID
 # pisirme dokulari (gpu_bake) on-carpilmis alfa tasir: saydam zemine yari saydam
 # cizim renk*alfa birakir, normal karisimla basilinca ikinci kez alfa ile carpilip
@@ -101,6 +104,17 @@ void fragment() {
 }
 "
 
+# BIRLESIK (6. tur, madde 8): kismi gri (k: 0 renkli .. 1 tam gri); dukkanda
+# yeni alinan istasyon griden renge gecip yavasca geri doner.
+const MONO_KAR_KOD := "shader_type canvas_item;
+uniform float k = 1.0;
+void fragment() {
+	vec4 c = COLOR;
+	float v = dot(c.rgb, vec3(0.32, 0.55, 0.13)) * 0.8 + 44.0 / 255.0;
+	COLOR = vec4(mix(c.rgb, vec3(v, v, min(1.0, v * 1.02)), k), c.a);
+}
+"
+
 const PREMUL_KOD := "shader_type canvas_item;
 render_mode blend_premul_alpha;
 "
@@ -117,7 +131,12 @@ func _premul() -> RID:
 	return premul_mono_material if mono else premul_material
 
 func _varsayilan() -> RID:
+	if mono and mono_k < 0.999 and mono_kar_material.is_valid(): return mono_kar_material
 	return mono_material if mono else RID()
+
+func mono_kar(k: float) -> void:
+	mono_k = k
+	if mono_kar_material.is_valid(): RenderingServer.material_set_param(mono_kar_material, "k", k)
 
 func setup(parent_item: RID, olcek: float) -> void:
 	root = RenderingServer.canvas_item_create()
@@ -131,6 +150,10 @@ func setup(parent_item: RID, olcek: float) -> void:
 	RenderingServer.shader_set_code(mono_shader, MONO_KOD)
 	mono_material = RenderingServer.material_create()
 	RenderingServer.material_set_shader(mono_material, mono_shader)
+	mono_kar_shader = RenderingServer.shader_create()
+	RenderingServer.shader_set_code(mono_kar_shader, MONO_KAR_KOD)
+	mono_kar_material = RenderingServer.material_create()
+	RenderingServer.material_set_shader(mono_kar_material, mono_kar_shader)
 	premul_shader = RenderingServer.shader_create()
 	RenderingServer.shader_set_code(premul_shader, PREMUL_KOD)
 	premul_material = RenderingServer.material_create()
@@ -148,7 +171,7 @@ func free_resources() -> void:
 	if sat_shader.is_valid(): RenderingServer.free_rid(sat_shader)
 	if mono_material.is_valid(): RenderingServer.free_rid(mono_material)
 	if mono_shader.is_valid(): RenderingServer.free_rid(mono_shader)
-	for r in [premul_material, premul_mono_material, premul_shader, premul_mono_shader]:
+	for r in [premul_material, premul_mono_material, premul_shader, premul_mono_shader, mono_kar_material, mono_kar_shader]:
 		if r.is_valid(): RenderingServer.free_rid(r)
 	textures.clear()
 

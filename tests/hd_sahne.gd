@@ -72,6 +72,17 @@ func calis() -> void:
 		var c: Dictionary = g.j_G.customers[0]
 		c.state = "wait"; c.x = c.tx
 		if sahne != "play": g.j_G.scene = sahne
+		# --dukkan-renk ST : dukkanda yeni alinan istasyon renklenir (madde 8)
+		if arg("--dukkan-renk") != "":
+			g.j_SHOP.renkSt = arg("--dukkan-renk"); g.j_SHOP.renkT = 1.6
+		# --yeni : gun basinda "YENI" bildirimi + istasyon parlamasi (madde 13)
+		if var_mi("--yeni"):
+			g.j_G.yeniAlim = [{"id": "fryer", "st": "fryer", "ad": "Fritöz", "ozet": "6.5sn > 4.8sn"},
+				{"id": "knife", "st": "meat", "ad": "Bıçak", "ozet": "ADET 3 > 4"}]
+		# --fare X,Y : imlec o noktada bekler (madde 19: etiket gecikmesi)
+		if arg("--fare") != "":
+			var fx := arg("--fare").split(",")
+			g.pointer(Vector2(float(fx[0]), float(fx[1])))
 		# --hikaye N : acilis hikayesinin N. sahnesi (yazi tamam)
 		if arg("--hikaye") != "":
 			g.j_G.scene = "prologue"

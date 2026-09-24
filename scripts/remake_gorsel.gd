@@ -1013,7 +1013,39 @@ func f_hdDukkanArka() -> bool:
 	_c("f_drawShopStatic", 0.0, true)
 	draw_context.mono = false
 	draw_context.globalAlpha = 1.0
+	_dukkan_renk()
 	return true
+
+# BIRLESIK (6. tur, madde 8): alinan yukseltmenin istasyonu gri dukkanin
+# icinden renkli belirir, altin cerceveyle parlar, ~1.6 sn'de griye doner.
+func _dukkan_renk() -> void:
+	var SH: Variant = get("j_SHOP")
+	if not (SH is Dictionary): return
+	var rt := J.n(SH.get("renkT", 0.0))
+	if rt <= 0.0: return
+	SH.renkT = rt - 1.0 / 60.0
+	var st: Variant = (get("j_ST") as Dictionary).get(SH.get("renkSt", ""))
+	if not (st is Dictionary): return
+	var k := clampf(rt / 0.7, 0.0, 1.0)          # 1 renkli -> 0 gri (son 0.7 sn)
+	var x := J.n(st.x) - 3.0
+	var y := J.n(st.y) - 3.0
+	var w := J.n(st.w) + 6.0
+	var h := J.n(st.h) + 6.0
+	var ctx: GpuCanvas = draw_context
+	ctx.save()
+	ctx.beginPath()
+	ctx.rect(x, y, w, h)
+	ctx.clip()
+	ctx.mono = true
+	ctx.mono_kar(1.0 - k)
+	_c("f_drawShopStatic", 0.0, true)
+	ctx.mono = false
+	ctx.mono_k = 1.0     # parametre kare sonunda islenir: malzemeye dokunma, yalniz secimi geri al
+	ctx.restore()
+	ctx.globalAlpha = k * (0.55 + 0.35 * sin(rt * 14.0))
+	f_rrectOut(x, y, w, h, 3.0, "#ffd75e")
+	f_rrectOut(x - 1.0, y - 1.0, w + 2.0, h + 2.0, 4.0, "#fff2b0")
+	ctx.globalAlpha = 1.0
 
 
 # ---------------------------------------------------------------- tezgah govdesi

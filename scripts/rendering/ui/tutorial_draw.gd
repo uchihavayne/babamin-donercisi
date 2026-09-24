@@ -15,6 +15,10 @@ func f_hoverStation() -> Variant:
 	return null
 
 # game.js:3400
+const ETIKET_GECIKME := 0.45
+var _etiket_ad: Variant = null
+var _etiket_bas := 0.0
+
 func f_drawHoverHint(p_t: Variant = null) -> Variant:
 	var v_hw0: Variant = null
 	var v_hy0: Variant = null
@@ -42,6 +46,14 @@ func f_drawHoverHint(p_t: Variant = null) -> Variant:
 	v_h = game.tutorial_draw.f_hoverStation()
 	if J.eq(v_h, "spit"):
 		v_h = null
+	# BIRLESIK (6. tur, analiz madde 19): cerceve hemen yanar; ad etiketi fare
+	# ayni istasyonda ETIKET_GECIKME kadar durunca yumusakca belirir (fareyi
+	# gezdirirken etiketler ust uste yanip sonup istasyonlari ortmesin).
+	var simdi: float = J.n(v_t)
+	if v_h != _etiket_ad or simdi < _etiket_bas:
+		_etiket_ad = v_h
+		_etiket_bas = simdi
+	var etiket_a: float = clampf((simdi - _etiket_bas - ETIKET_GECIKME) / 0.15, 0.0, 1.0)
 	if J.truth(v_h):
 		v_s = J.getv(game.j_ST, v_h)
 		J.setv(game.j_ctx, "globalAlpha", 0.45)
@@ -65,8 +77,11 @@ func f_drawHoverHint(p_t: Variant = null) -> Variant:
 		v_ty = (J.getv(v_s, "y") - 12.0)
 		if J.lt(v_ty, J.add(J.getv(game.j_VIEW, "top"), 22.0)):
 			v_ty = J.add(J.add(J.getv(v_s, "y"), J.getv(v_s, "h")), 3.0)
-		game.f_rrect(v_tx, v_ty, v_w, 11.0, 2.0, "rgba(20,14,12,.82)")
-		game.text_draw.f_txt(v_nm, J.add(v_tx, 3.0), J.add(v_ty, 2.0), J.getv(game.j_P, "ui0"))
+		if etiket_a > 0.0:
+			J.setv(game.j_ctx, "globalAlpha", etiket_a)
+			game.f_rrect(v_tx, v_ty, v_w, 11.0, 2.0, "rgba(20,14,12,.82)")
+			game.text_draw.f_txt(v_nm, J.add(v_tx, 3.0), J.add(v_ty, 2.0), J.getv(game.j_P, "ui0"))
+			J.setv(game.j_ctx, "globalAlpha", 1.0)
 	if J.gt(J.getv(game.j_G, "hintT"), 0.0):
 		J.setv(game.j_ctx, "globalAlpha", min(1.0, (J.getv(game.j_G, "hintT") * 2.0)))
 		v_hw = J.add(game.f_textW(J.getv(game.j_G, "hint")), 12.0)

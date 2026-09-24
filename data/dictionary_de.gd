@@ -1118,5 +1118,6 @@ const VALUE = {
 	"Acı sos isteniyor": "Scharfe Soße gewünscht",
 	"Sarımsaklı sos isteniyor": "Knoblauchsoße gewünscht",
 	"Sossuz isteniyor": "Ohne Soße gewünscht",
-	"Bu sipariş farklı": "Andere Bestellung"
+	"Bu sipariş farklı": "Andere Bestellung",
+	"YENİ": "NEU"
 }

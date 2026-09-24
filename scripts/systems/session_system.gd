@@ -9,9 +9,24 @@ func f_hitST(p_k: Variant = null) -> Variant:
 	return game.math_utils.f_inRect(J.getv(game.j_IN, "x"), J.getv(game.j_IN, "y"), J.getv(v_s, "x"), J.getv(v_s, "y"), J.getv(v_s, "w"), J.getv(v_s, "h"))
 	return null
 
+# BIRLESIK (6. tur, analiz madde 20): alttaki ipucu satiri surekli doluydu.
+# Ogretici / onay mesajlari (hata ve olay degil) oyun basina ilk 3 kez
+# gosterilir; hatalar ("Yer yok!", "Once ...") ve olaylar her zaman.
+const OGRETICI := ["Yeni lavaş — malzemeler buna gidiyor", "Tabağa geçti — şimdi döner koy",
+	"Kızarıyor…", "Daha doluyor…", "Daha pişiyor…", "Kutu açık — tıklayarak doldur",
+	"Kutu kendi dolduruyor", "Çöpe atıldı", "Yanmış dürüm çöpe atıldı", "Çöp boşaltıldı — tertemiz!",
+	"Tereyağı sosu döküldü", "Sarmak için yukarı doğru sürükle", "Kağıdı tutup dürümün üstüne sürükle",
+	"Kutuyu patates tepsisine sürükle", "Pideyi doğra — tahtaya tıkla", "Ürünleri Dayıya ver"]
+const OGRETICI_EN_COK := 3
+var _ogretici_sayac: Dictionary = {}
+
 # game.js:34
 func f_say(p_s: Variant = null) -> Variant:
 	var v_s: Variant = p_s
+	if v_s in OGRETICI:
+		var n: int = _ogretici_sayac.get(v_s, 0)
+		if n >= OGRETICI_EN_COK: return null
+		_ogretici_sayac[v_s] = n + 1
 	J.setv(game.j_G, "hint", game.localization.f_T(v_s))
 	J.setv(game.j_G, "hintT", 1.8)
 	return null

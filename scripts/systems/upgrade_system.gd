@@ -25,6 +25,11 @@ func buy(id: String) -> bool:
 	if upgrade.has("gerek") and int(game.j_G.up.get(upgrade.gerek, 0)) <= 0: return false
 	var cost: Variant = price(upgrade)
 	if cost == null or game.j_G.money < cost: return false
+	# BIRLESIK (6. tur, madde 13): ertesi gunun basinda istasyon parlar ve
+	# "YENI: Fritoz 6.5sn > 4.8sn" bildirimi cikar (ne degistigi oyunda gorunsun)
+	var ozet := preview(upgrade)
+	if not (game.j_G.get("yeniAlim") is Array): game.j_G.yeniAlim = []
+	game.j_G.yeniAlim.append({"id": id, "st": upgrade.get("st", ""), "ad": game.localization.f_T(upgrade.name), "ozet": ozet})
 	game.j_G.money -= cost
 	game.j_G.up[id] = int(game.j_G.up.get(id, 0)) + 1
 	game.j_SHOP.bake = null
