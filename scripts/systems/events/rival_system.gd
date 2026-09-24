@@ -75,6 +75,22 @@ func f_bahisMetni(p_R: Variant = null) -> Variant:
 	return null
 
 # game.js:4803
+# BIRLESIK: bahis paneli acikken (teklif) panelin dikdortgeni. Panelin
+# dugmeleri musterilerin tiklama alaninin ustune dusuyor; tiklama once
+# istasyonlara (musteri) gidip dugmeye hic ulasmiyordu (kullanici: "bahis geldi,
+# ne reddedebildim ne kabul"). Girdi katmanlari bu dikdortgeni panele birakir.
+func f_bahisAcik() -> bool:
+	var v_R: Variant = J.getv(game.j_G, "rakip")
+	return J.truth(v_R) and J.eq(J.getv(v_R, "faz"), "teklif")
+
+func f_bahisPanelRect() -> Rect2:
+	var pw := 230.0
+	var px0 := floorf(J.n(game.j_W) / 2.0 - pw / 2.0 + 0.5)
+	return Rect2(px0, 22.0, pw, 96.0)
+
+func f_bahisPanelde(x: Variant, y: Variant) -> bool:
+	return f_bahisAcik() and f_bahisPanelRect().has_point(Vector2(J.n(x), J.n(y)))
+
 func f_rakipCevap(p_kabul: Variant = null, p_sessiz: Variant = null) -> Variant:
 	var v_R: Variant = null
 	var v_kabul: Variant = p_kabul

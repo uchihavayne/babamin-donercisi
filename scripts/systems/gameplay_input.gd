@@ -28,6 +28,9 @@ func f_handleInput() -> Variant:
 		return null
 	if J.truth(game.debug_draw.f_testHit(v_mx, v_my)):
 		return null
+	# bahis paneli uzerindeki tiklama panelin dugmelerine aittir
+	if game.rival_system.f_bahisPanelde(v_mx, v_my):
+		return null
 	if J.truth(game.math_utils.f_inRect(v_mx, v_my, (game.hud_draw.f_hudSagKenar() - 22.0), J.add(4.0, J.getv(game.j_VIEW, "top")), 18.0, 16.0)):
 		J.setv(game.j_G, "scene", "pause")
 		J.method(game.j_SFX, "ui", [])

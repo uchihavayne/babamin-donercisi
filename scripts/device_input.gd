@@ -83,7 +83,7 @@ func route_pointer(position: Vector2, down: bool, source: String) -> void:
 	else: dispatch_pointer(position,down,source)
 
 func dispatch_pointer(position: Vector2, down: bool, source: String, queued := false) -> void:
-	if source == "touch":
+	if source == "touch" and not game.rival_system.f_bahisPanelde(position.x, position.y):
 		if down and game.stations != null and game.stations.select_at(position):
 			touch_select_only = true
 			game.stations.accept(true,"world-touch")
@@ -91,6 +91,16 @@ func dispatch_pointer(position: Vector2, down: bool, source: String, queued := f
 		if not down and touch_select_only:
 			game.stations.release("world-touch")
 			touch_select_only = false
+			return
+	elif game.rival_system.f_bahisPanelde(position.x, position.y):
+		# bahis paneli: tiklama istasyonlara degil panelin dugmelerine gider
+		if not down and touch_select_only:
+			game.stations.release("world-touch")
+			touch_select_only = false
+			return
+		if not down and mouse_station:
+			game.stations.release("world-mouse")
+			mouse_station = false
 			return
 	else:
 		if down and game.stations != null: game.stations.select_at(position,false)
@@ -231,7 +241,7 @@ func handle(event: InputEvent) -> void:
 		return
 
 func station_mode() -> bool:
-	return game.stations != null and game.stations.available() and mode in ["controller","keyboard"] and fine_axis <= 0.4 and not held.get("game_fine",false)
+	return game.stations != null and game.stations.available() and mode in ["controller","keyboard"] and fine_axis <= 0.4 and not held.get("game_fine",false) and not game.rival_system.f_bahisAcik()
 
 func tick(delta: float) -> void:
 	if quick_cut_active:
