@@ -31,3 +31,8 @@ artifacts/**
 # atlaslar assets/remake altinda ayrica tutulur
 blender/out/*
 !blender/out/logo_font.json
+
+# App Store Connect kimlik bilgileri: asla depoya/pakete girmez
+store/
+*.p8
+asc.json
