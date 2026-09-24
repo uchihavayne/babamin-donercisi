@@ -155,3 +155,29 @@ godot --headless --path . --script tests/module_snapshot.gd --quit-after 3000 --
 Tabanın bütün testleri geçiyor (sipariş akışı, kesim, istasyonlar, girişler, ekonomi, anlık görüntü 6/6). Anlık görüntü referansında tek değişiklik `upgraded-shop`: taban projede boyalı duvar siyah çiziliyordu (`js_compat` `toString(16)` tabanı yok sayıyordu), birleşik sürümde doğru renk.
 
 Kare süresi (tam yükseltmeli oyun ekranı çizimi, Ryzen 5 3600X + RTX 5060): 12 ms; başlık 18 ms.
+
+## Yapılacaklar (6. tur analizi, 2026-09-24)
+
+Kullanıcının sırası: **1, 2, 9 → 15, 18 → 10 → kalanlar**. Biten madde `[x]`.
+
+- [ ] 1 Sarma animasyonu CPU piksel tüp (HD dolgunun altında sırıtıyor)
+- [ ] 2 İskender tabağı zayıf (et turuncu artı, domates düz daire)
+- [ ] 9 Oyunun sonu yok (borç bitince tek kutlama) → final sahnesi + serbest mod
+- [ ] 15 Mobil performans (f_drawPlay ~10.5 ms; duvar süsü 3.2, parçacık 2.1)
+- [ ] 18 Ses efektleri sentez bip (gerçek kayıt yalnız 7 dosya)
+- [ ] 10 Uzun vadeli tempo (şube/borç günü) yeni fiyatlarla ölçülmedi
+- [ ] 3 HUD/paneller 1x piksel, modeller 2x (iki keskinlik)
+- [ ] 4 Parçacıklar 1-2 px kare
+- [ ] 5 Müşteriler durağan, ifade az
+- [ ] 6 Dayı'nın hareket çeşidi az
+- [ ] 7 Gece hırsız sahnesi sönük
+- [ ] 8 Dükkân ekranı sade, alımda geri bildirim yok
+- [ ] 11 Kötü günün bedeli yok (itibar vb.)
+- [ ] 12 Sipariş çeşidi tekdüze
+- [ ] 13 Yükseltme etkisi hissedilmiyor
+- [ ] 14 Olay dengesi ölçülmedi (bahis 20 sn'de sessiz red)
+- [ ] 16 Eski piksel + HD çift yol; ctx.scale altında CPU'ya düşüş
+- [ ] 17 Yeni metinler de/fr/es/pt'de İngilizce
+- [ ] 19 Üzerine gelince etiketler istasyonları kapatıyor
+- [ ] 20 Alt ipucu satırı hep dolu
+- [ ] 21 Mobil yerleşim denenmedi

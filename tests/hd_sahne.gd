@@ -135,6 +135,18 @@ func calis() -> void:
 			g.j_G.weather = "rain"; g.j_G.rainT = 30.0
 		if var_mi("--moto-bozuk"):
 			g.j_G.moto = {"broken": true, "cost": 520.0}
+		# --gece T : gece hirsiz sahnesi (T sn ilerlemis)
+		if arg("--gece") != "":
+			g.j_G.night = {"t": float(arg("--gece")), "phase": 0.0, "stole": true, "amount": 120.0, "sec": 0.0, "line": "...", "paid": false}
+			g.j_G.scene = "night"
+		# --el : elde kagitli durum; --sarma U : acik durum sariliyor (0..1)
+		if var_mi("--el"):
+			var hw: Dictionary = w.duplicate(true)
+			hw.state = "ready"; hw.paper = true; hw.roll = 1.0
+			g.j_G.hand = hw
+			g.pointer(Vector2(250, 120))
+		if arg("--sarma") != "":
+			w.roll = float(arg("--sarma"))
 		if var_mi("--kesinti"):
 			g.j_G.kesinti = {"faz": "kesik", "t": 3.0, "sure": 20.0, "uyari": 0.0}
 		if var_mi("--kizart"):
