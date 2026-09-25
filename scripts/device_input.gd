@@ -59,10 +59,10 @@ func set_mode(value: String) -> void:
 			game.j_TUT[0].s = hints.get(game.j_LANG, hints.en)
 			if value == "controller": game.j_TUT[0].s = "R2 / RT: " + game.j_TUT[0].s
 			elif value == "keyboard": game.j_TUT[0].s = "R: " + game.j_TUT[0].s
-		else: game.j_TUT[0].s = "Fareyi dönerin üstünde gezdir; tıklamadan kes." if game.j_LANG == "tr" else "Move the mouse over the spit to slice; no click needed."
+		else: game.j_TUT[0].s = "Fareyi dönerin üstünde gezdir; tıklamadan kes." # cizimde f_T ile cevrilir
 		var direct: bool = game.stations != null and game.stations.enabled and value != "mouse"
-		game.j_TUT[10].s = ("Dürümü basılı tutarak sar" if game.j_LANG == "tr" else "Hold the wrap to roll") if direct else "Dürümü tutup YUKARI sürükleyerek sar"
-		game.j_TUT[11].s = ("Dürümü tekrar basılı tut; kağıtlansın" if game.j_LANG == "tr" else "Hold again to wrap in paper") if direct else "Kağıdı tut, dürümün üstüne bırak"
+		game.j_TUT[10].s = "Dürümü basılı tutarak sar" if direct else "Dürümü tutup YUKARI sürükleyerek sar"
+		game.j_TUT[11].s = "Dürümü tekrar basılı tut; kağıtlansın" if direct else "Kağıdı tut, dürümün üstüne bırak"
 
 func queue_pointer(position: Vector2, down: bool, source: String) -> void:
 	pointer_events.append({"position": position, "down": down, "source": source})
