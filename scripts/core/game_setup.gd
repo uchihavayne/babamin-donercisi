@@ -214,6 +214,8 @@ func initialize_game() -> void:
 	game.j_UPG = preload("res://data/upg.gd").VALUE.duplicate(true)
 	game.j_TUN = {
 		"meatPerClick": game.equipment_tuning.meat_per_click.bind({}),
+		"tongsTargets": game.equipment_tuning.tongs_targets.bind({}),
+		"tongsSet": game.equipment_tuning.tongs_set.bind({}),
 		"shaveDist": game.equipment_tuning.shave_dist.bind({}),
 		"shaveCd": game.equipment_tuning.shave_cd.bind({}),
 		"autoShaveCd": game.equipment_tuning.auto_shave_cd.bind({}),

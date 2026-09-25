@@ -7,7 +7,7 @@ const SPEED := {
 	"fbox":"fboxTime", "phone":"courierTime",
 }
 const CAPACITY := {
-	"tongs":"meatPerClick", "pknife":"cutYield", "fryer":"fryCap",
+	"tongs":"tongsTargets", "pknife":"cutYield", "fryer":"fryCap",
 	"grill":"grillCap", "ayran":"ayranMax", "sweet":"sweetMax",
 	"garnish":"garnishMax", "board":"boards", "store":"stockMax",
 	"uncle":"uncleUses", "expand":"slots", "secim":"secimEnCok",
@@ -59,6 +59,9 @@ func preview(upgrade: Dictionary) -> String:
 	after.up[id] = int(before.up.get(id, 0)) + 1
 	var parts: Array[String] = []
 	if SPEED.has(id): parts.append(transition(SPEED[id], before, after, "sn" if game.j_LANG == "tr" else "s"))
+	# masanin son seviyesi urun sayisini degil yan malzeme setini acar
+	if id == "tongs" and int(before.up.get(id, 0)) == 2:
+		return game.localization.cift("3 MALZEME TEK TIK", "3 SIDES, ONE CLICK")
 	if CAPACITY.has(id):
 		var label: String = {"tr":"ADET ","en":"QTY ","de":"ANZ. ","fr":"QTÉ ","es":"CANT. ","pt":"QTD. "}.get(game.j_LANG,"QTY ")
 		parts.append(label + transition(CAPACITY[id], before, after, ""))

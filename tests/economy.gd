@@ -46,8 +46,14 @@ func test_payments() -> void:
 	check(game.j_G.money == 23 and game.j_G.stat.earned == 23,
 		"one ordinary wrap pays exactly 20 plus 3 tip")
 	game.session_system.f_endDay()
+	# BIRLESIK (8. tur): ilk 5 gun taksit yok, 6. gunden itibaren %18
+	check(game.j_G.money == 23 and game.j_G.stat.debtPaid == 0,
+		"the first five days keep the whole income (no debt payment yet)")
+	fresh(); game.j_G.day = 6.0
+	sale([{"kind":"wrap"}], 0.7)
+	game.session_system.f_endDay()
 	check(game.j_G.money == 19 and game.j_G.stat.debtPaid == 4,
-		"day-end debt is still 18 percent; displayed and spendable income agree")
+		"from day six the day-end debt is 18 percent; displayed and spendable income agree")
 	var exact := true
 	for total in range(1, 301):
 		var count := clampi(int(floor(total / 10.0 + 0.5)), 1, 6)
@@ -77,17 +83,21 @@ func test_payments() -> void:
 
 func test_upgrades() -> void:
 	fresh(); game.j_G.scene = "shop"
+	game.j_G.money = 100000
+	check(not game.upgrade_system.buy("tongs") and game.j_G.money == 100000,
+		"tongs need the wide counter (a second board) first")
+	game.j_G.up = {"board": 1}
 	var tongs_price := 0
 	for u in game.j_UPG:
 		if u.id == "tongs": tongs_price = int(u.lv[0].p)
 	game.j_G.money = tongs_price - 1
-	check(not game.upgrade_system.buy("tongs") and game.j_G.money == tongs_price - 1 and game.j_G.up.is_empty(),
+	check(not game.upgrade_system.buy("tongs") and game.j_G.money == tongs_price - 1 and not game.j_G.up.has("tongs"),
 		"insufficient funds never buy a level or deduct money")
 	game.j_G.money = tongs_price
 	check(game.upgrade_system.buy("tongs") and game.j_G.money == 0 and game.j_G.up.tongs == 1,
 		"first tongs upgrade costs exactly its listed price")
-	check(game.J.method(game.j_TUN,"meatPerClick",[game.j_G]) == 2,
-		"buying tongs actually doubles portions per action")
+	check(game.J.method(game.j_TUN,"meatPerClick",[game.j_G]) >= game.j_MEAT_NEED and game.J.method(game.j_TUN,"tongsTargets",[game.j_G]) == 2,
+		"one click is a full portion; buying tongs serves a second item per click")
 	check(game.f_loadGame().up.tongs == 1 and game.f_loadGame().money == 0,
 		"purchased equipment and spent cash persist in the save")
 	game.save_system.f_loadAndGo()
@@ -143,7 +153,7 @@ func simulate(legacy: bool, orders_per_day: int) -> Array:
 	var schedule: Array = []
 	# Fixed workload isolates money pacing. It is not a simulated human or an
 	# assertion that everyone finishes this many orders in a real timed day.
-	var plan := ["tongs","knife","drink","fryer","paper","store","secim","grill","helper","tongs","phone","knife"]
+	var plan := ["knife","drink","fryer","paper","store","board","tongs","secim","grill","helper","phone","knife"]
 	var next := 0
 	for day in range(1, 13):
 		game.j_G.day = day
@@ -180,13 +190,13 @@ func run() -> void:
 	for orders in [6,8,10]:
 		var before := simulate(true,orders)
 		var after := simulate(false,orders)
-		# BIRLESIK (kullanici: "upgrade maliyetleri ucuz, diger oyunda oyle degildi"):
-		# fiyatlar 0.7.0 ile 0.6.1 (remake) arasinda -> ilk yararli alim 2. gun,
-		# ilk yeni urun 5..7. gun; yine de 0.6.1'den (3..4. gun) erken.
-		check(first_purchase(after,"tongs") == 2 and first_purchase(before,"tongs") > 2,
-			"first useful purchase is reachable on day two at " + str(orders) + " orders")
-		check(first_purchase(after,"drink") in range(5,8),
-			"first additional product unlock arrives on days 5..7 at " + str(orders) + " orders")
+		# BIRLESIK (8. tur, oyuncu elestirisi "en basit sey icin 7-8 tur"): ilk
+		# seviyeler 0.7.0 fiyatinda, sonrakiler pahali; ilk 5 gun taksit yok ->
+		# ilk yararli alim 1. gun, ilk yeni urun en gec 4. gun.
+		check(first_purchase(after,"knife") == 1 and first_purchase(before,"knife") > 1,
+			"first useful purchase is reachable on day one at " + str(orders) + " orders")
+		check(first_purchase(after,"drink") in range(2,5),
+			"first additional product unlock arrives on days 2..4 at " + str(orders) + " orders")
 		check(after[0].cash_before_shop > before[0].cash_before_shop,
 			"starter day's take-home earnings increase at " + str(orders) + " orders")
 		scenarios[str(orders)] = {"before":before,"after":after}

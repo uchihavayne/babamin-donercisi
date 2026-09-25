@@ -16,6 +16,47 @@ func ingredient_problem(id: String, wrap: Variant) -> String:
 	if id in ["pickle","yogurt"] and game.j_G.stock[id] <= 0: return label+" bitti — kutudan doldur!"
 	return ""
 
+# BIRLESIK (8. tur): tiklanan malzeme secili urune kondu; masa seviyesi kadar
+# siradaki urunlere de (akilli hedefle) sessizce konur. Son seviyede turşu /
+# yogurt / patates tiklamasi uc yan malzemeyi birlikte koyar.
+const YAN := ["pickle", "yogurt", "fries"]
+const KAYNAK := {"meat": ["meat", 8.0, "#c98436"], "pickle": ["pickle", 10.0, "g1"], "yogurt": ["yogurt", 10.0, "s0"], "fries": ["friesT", 10.0, "p1"]}
+
+func masa_yay(k: String) -> void:
+	var set_var: bool = k in YAN and J.truth(J.method(game.j_TUN, "tongsSet", [game.j_G]))
+	var turler: Array = YAN if set_var else [k]
+	var i := int(J.n(game.j_G.act))
+	for tur in turler: sessiz_ekle(i, tur)
+	for n in int(J.n(J.method(game.j_TUN, "tongsTargets", [game.j_G]))) - 1:
+		i = game.wrap_system.f_malzemeHedefi(k)
+		if i < 0 or not sessiz_ekle(i, k): break
+		if set_var:
+			for tur in YAN: sessiz_ekle(i, tur)
+
+func sessiz_ekle(i: int, k: String) -> bool:
+	var b: Variant = game.j_G.boards[i]
+	if not game.wrap_system.f_malzemeIhtiyac(b, k): return false
+	var alan: String = game.wrap_system.MALZEME_ALANI[k]
+	var gerek: float = {"meat": game.j_MEAT_NEED, "pickle": game.j_PICKLE_NEED, "yogurt": game.j_YOGURT_NEED, "fries": game.j_FRIES_NEED}[k]
+	if b.kind == "plate": gerek = J.n(J.method(game.j_TUN, "iskMeat", [game.j_G])) if k == "meat" else J.n(game.j_PLATE_YOGURT)
+	var var_olan: float = J.n(game.j_G.meat) if k == "meat" else (J.n(game.j_G.friesTray) if k == "fries" else J.n(game.j_G.stock[k]))
+	var n := minf(gerek - J.n(b.get(alan, 0.0)), var_olan)
+	if n <= 0.0: return false
+	if k == "meat": game.j_G.meat -= n
+	elif k == "fries": game.j_G.friesTray -= n
+	else: game.j_G.stock[k] -= n
+	b[alan] = J.n(b.get(alan, 0.0)) + n
+	b.pop = 1.0
+	game.j_G.fxTray[k] = 1.0
+	var s: Array = KAYNAK[k]
+	var st: Dictionary = game.j_ST[s[0]]
+	var col: String = s[2] if str(s[2]).begins_with("#") else game.j_P[s[2]]
+	f_flyTo(J.n(st.x) + (J.n(st.w) / 2.0 if k == "meat" else 19.0), J.n(st.y) + s[1], game.wrap_system.f_boardCX(i), game.wrap_system.f_boardCY(), col, 5.0)
+	if b.kind == "plate":
+		if k == "yogurt": b.yogurt = J.n(b.yogurtN) >= J.n(game.j_PLATE_YOGURT)
+		game.recipe_system.f_finishPlate(i)
+	return true
+
 # game.js:1015
 func f_addMeat() -> Variant:
 	var v_w: Variant = null
@@ -49,6 +90,7 @@ func f_addMeat() -> Variant:
 	J.setv(v_w, "pop", 1.0)
 	J.setv(J.getv(game.j_G, "fxTray"), "meat", 1.0)
 	game.assembly_system.f_flyTo(J.add(J.getv(J.getv(game.j_ST, "meat"), "x"), (float(J.getv(J.getv(game.j_ST, "meat"), "w")) / float(2.0))), J.add(J.getv(J.getv(game.j_ST, "meat"), "y"), 8.0), game.wrap_system.f_boardCX(J.getv(game.j_G, "act")), game.wrap_system.f_boardCY(), "#c98436", 5.0)
+	masa_yay("meat")
 	J.method(game.j_SFX, "pop", [])
 	game.equipment_system.f_checkAuto()
 	return null
@@ -99,6 +141,7 @@ func f_addIng(p_k: Variant = null) -> Variant:
 		J.setv(v_w, "pop", 1.0)
 		J.method(game.j_SFX, "pop", [])
 		game.recipe_system.f_finishPlate(J.getv(game.j_G, "act"))
+		masa_yay("yogurt")
 		return null
 	if J.eq(v_k, "fries"):
 		if J.ge(J.getv(v_w, "friesN"), game.j_FRIES_NEED):
@@ -116,6 +159,7 @@ func f_addIng(p_k: Variant = null) -> Variant:
 		game.assembly_system.f_flyTo(J.add(J.getv(J.getv(game.j_ST, "friesT"), "x"), 19.0), J.add(J.getv(J.getv(game.j_ST, "friesT"), "y"), 10.0), game.wrap_system.f_boardCX(J.getv(game.j_G, "act")), game.wrap_system.f_boardCY(), J.getv(game.j_P, "p1"), 6.0)
 		J.setv(v_w, "pop", 1.0)
 		J.method(game.j_SFX, "pop", [])
+		masa_yay("fries")
 		game.equipment_system.f_checkAuto()
 		return null
 	else:
@@ -138,6 +182,7 @@ func f_addIng(p_k: Variant = null) -> Variant:
 		game.assembly_system.f_flyTo(J.add(J.getv(v_src, "x"), 19.0), J.add(J.getv(v_src, "y"), 10.0), game.wrap_system.f_boardCX(J.getv(game.j_G, "act")), game.wrap_system.f_boardCY(), (J.getv(game.j_P, "g1") if J.eq(v_k, "pickle") else J.getv(game.j_P, "s0")), 6.0)
 	J.setv(v_w, "pop", 1.0)
 	J.method(game.j_SFX, "pop", [])
+	masa_yay(str(v_k))
 	game.equipment_system.f_checkAuto()
 	return null
 

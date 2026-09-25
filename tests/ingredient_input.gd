@@ -52,22 +52,24 @@ func run() -> void:
 	fresh(); queue_legacy_tap()
 	tap("bread"); tap("meat"); tap("pickle"); step(12)
 	var w: Variant = game.j_G.boards[0]
-	check(w is Dictionary and w.meat == 1 and w.pickleN == 1, "bread, meat and pickle clicks between two frames keep their order")
-	check(game.j_G.meat == 15 and game.j_G.stock.pickle == 15, "rapid preparation consumes each portion exactly once")
+	# BIRLESIK (8. tur): tek tik tam porsiyon (4)
+	check(w is Dictionary and w.meat == 4 and w.pickleN == 4, "bread, meat and pickle clicks between two frames keep their order")
+	check(game.j_G.meat == 12 and game.j_G.stock.pickle == 12, "rapid preparation consumes each portion exactly once")
 	fresh(); game.f_newWrap(); w = game.j_G.boards[0]; w.meat = 1
 	mouse(center("board"),true); step()
 	mouse(center("board"),false); tap("pickle"); step(12)
-	check(w.pickleN == 1 and game.j_G.drag == null, "board release followed immediately by pickle tap does not swallow the tap")
+	check(w.pickleN == 4 and game.j_G.drag == null, "board release followed immediately by pickle tap does not swallow the tap")
 	fresh(); game.f_newWrap(); w = game.j_G.boards[0]
 	for key in ["meat","pickle","yogurt","friesT"]:
 		for i in 3: tap(key)
 	step(30)
-	check(w.meat == 3 and w.pickleN == 3 and w.yogurtN == 3 and w.friesN == 3, "bursts of three taps add three portions to each ingredient")
+	check(w.meat == 4 and w.pickleN == 4 and w.yogurtN == 4 and w.friesN == 4 and game.j_G.meat == 12 and game.j_G.stock.pickle == 12 and game.j_G.stock.yogurt == 12 and game.j_G.friesTray == 12,
+		"bursts of three taps fill each ingredient once and never over-fill")
 	for frames in [6,18,45]:
 		fresh(); game.f_newWrap(); w = game.j_G.boards[0]
 		game.j_G.kedi = {"faz":"bekle","t":0.0,"x":300.0,"miyav":0.0}
 		mouse(center("meat"),true); step(frames); mouse(center("meat"),false); step(3)
-		check(w.meat == 1 and game.j_G.meat == 15, "cat present: stationary meat click lasting %d frames still adds meat" % frames)
+		check(w.meat == 4 and game.j_G.meat == 12, "cat present: stationary meat click lasting %d frames still adds meat" % frames)
 	fresh(); game.f_newWrap(); w = game.j_G.boards[0]; game.j_G.stock.pickle = 0; game.j_G.hint = ""
 	tap("pickle"); step(3)
 	check(w.pickleN == 0 and game.j_G.hint.contains("bitti"), "empty pickle tray explains why the click could not add anything")
@@ -99,10 +101,10 @@ func run() -> void:
 	game.j_G.boards[0].pickleN = 4
 	tap("pickle"); step(3)
 	# BIRLESIK (kullanici karari): dolu bolmedeki fazladan tik, ihtiyaci olan urune gider
-	check(game.j_G.boards[1].pickleN == 1 and game.j_G.boards[0].pickleN == 4 and game.j_G.act == 1, "full active portion sends an extra tap to the portion that needs it")
+	check(game.j_G.boards[1].pickleN == 4 and game.j_G.boards[0].pickleN == 4 and game.j_G.act == 1, "full active portion sends an extra tap to the portion that needs it")
 	fresh(); queue_legacy_tap(); tap("bread"); mouse(center("pickle"),true); motion(Vector2(470,265)); step(45); mouse(Vector2(470,265),false); step(3)
 	w = game.j_G.boards[0]
-	check(w.pickleN == 1 and game.stations.holding.is_empty(), "motion outside a deferred tray press cancels its hold")
+	check(w.pickleN == 4 and game.j_G.stock.pickle == 12 and game.stations.holding.is_empty(), "motion outside a deferred tray press cancels its hold")
 	fresh(); queue_legacy_tap(); tap("bread"); tap("pickle"); game.controls.pause(); game.j_G.scene = "play"; step(12)
 	check(game.j_G.boards[0] == null and game.j_G.stock.pickle == 16, "pause discards pending preparation clicks")
 	fresh()
@@ -111,7 +113,7 @@ func run() -> void:
 		var point := Vector2(475,265) if key == "" else center(key)
 		touch(point,true); touch(point,false)
 	step(16); w = game.j_G.boards[0]
-	check(w is Dictionary and w.meat == 1 and w.pickleN == 1, "touch preparation also respects preceding queued input")
+	check(w is Dictionary and w.meat == 4 and w.pickleN == 4, "touch preparation also respects preceding queued input")
 	check(game.controls.touch_id == -1 and not game.controls.touch_select_only and game.stations.holding.is_empty(), "rapid touch releases leave no captured finger or hold")
 	fresh(); queue_legacy_tap(); tap("bread"); tap("pickle"); game.controls.set_mode("controller"); step(12)
 	check(game.j_G.boards[0] == null and game.j_G.stock.pickle == 16, "switching input device cancels queued pointer actions")

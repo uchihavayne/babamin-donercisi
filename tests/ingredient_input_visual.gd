@@ -53,9 +53,10 @@ func run() -> void:
 			press(key,true,mobile); press(key,false,mobile)
 		await step(12)
 		var w: Variant = game.j_G.boards[0]
-		check(w is Dictionary and w.meat == 1 and w.pickleN == 1 and w.yogurtN == 1 and w.friesN == 1,
+		# BIRLESIK (8. tur): tek tik tam porsiyon (4)
+		check(w is Dictionary and w.meat == 4 and w.pickleN == 4 and w.yogurtN == 4 and w.friesN == 4,
 			"viewport rapid bread + four ingredients: " + ("touch" if mobile else "mouse"))
-		check(game.j_G.meat == 15 and game.j_G.stock.pickle == 15 and game.j_G.stock.yogurt == 15 and game.j_G.friesTray == 15,
+		check(game.j_G.meat == 12 and game.j_G.stock.pickle == 12 and game.j_G.stock.yogurt == 12 and game.j_G.friesTray == 12,
 			"viewport consumes each portion once: " + ("touch" if mobile else "mouse"))
 		check(game.stations.holding.is_empty() and not game.j_IN.down and game.j_G.drag == null,
 			"viewport releases all input: " + ("touch" if mobile else "mouse"))

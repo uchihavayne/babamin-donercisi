@@ -71,13 +71,14 @@ func run() -> void:
 	var w: Variant = game.j_G.boards[0]
 	game.j_G.meat = 4; game.j_G.stock.pickle = 4
 	use_target("meat","mouse"); use_target("pickle","mouse")
-	check(w is Dictionary and w.meat == 1 and w.pickleN == 1 and game.j_G.customers.is_empty(),
+	# BIRLESIK (8. tur): tek tik tam porsiyon
+	check(w is Dictionary and w.meat == 4 and w.pickleN == 4 and game.j_G.customers.is_empty(),
 		"ingredients can be prepared before an order exists")
 	game.customer_system.f_spawnCustomer()
 	var customer: Dictionary = game.j_G.customers.back()
 	customer.state = "wait"; customer.items = [{"kind":"wrap","yok":[]}]; customer.done = [false]
 	game.order_select(customer)
-	check(w is Dictionary and is_same(w.get("_order_owner"),customer) and w.meat == 1 and w.pickleN == 1,
+	check(w is Dictionary and is_same(w.get("_order_owner"),customer) and w.meat == 4 and w.pickleN == 4,
 		"later customer selection binds the prepared bread without losing ingredients")
 	var report := {"checks":checks,"failures":failures,"input":"first-day mouse, touch and controller events with no customer"}
 	var file := FileAccess.open("res://validation/bread-preparation-results.json",FileAccess.WRITE)

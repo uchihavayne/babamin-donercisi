@@ -1,11 +1,17 @@
 # Equipment tuning. See CODE_MAP.md.
 extends "res://scripts/core/game_module.gd"
 
+# BIRLESIK (8. tur, oyuncu elestirisi: "ayni seye defalarca bastiriyorsun"):
+# tek tik = tam porsiyon (cagiranlar ihtiyac ve stokla sinirlar). Masa artik
+# ayni tikla 2-3 urune birden koyar; son seviyesi yan malzeme seti.
 func meat_per_click(_args: Array, _captures: Dictionary = {}) -> Variant:
-	var v_G: Variant = null
-	v_G = J.arg(_args, 0)
-	return game.equipment_system.f_LV([1.0, 2.0, 3.0, 4.0], game.equipment_system.f_UV(v_G, "tongs"))
-	return null
+	return 99.0
+
+func tongs_targets(_args: Array, _captures: Dictionary = {}) -> Variant:
+	return game.equipment_system.f_LV([1.0, 2.0, 3.0, 3.0], game.equipment_system.f_UV(J.arg(_args, 0), "tongs"))
+
+func tongs_set(_args: Array, _captures: Dictionary = {}) -> Variant:
+	return J.n(game.equipment_system.f_UV(J.arg(_args, 0), "tongs")) >= 3.0
 
 func shave_dist(_args: Array, _captures: Dictionary = {}) -> Variant:
 	var v_G: Variant = null

@@ -136,3 +136,28 @@ godot --headless --path . --script tests/tempo.gd --quit-after 1000000 -- --test
 ```
 
 Gece hırsızı dahil (`--hirsiz`, gerçek `f_rollNight`, güvenlik yükseltmesi azaltır; şubeye biriktiren oyuncu): borç 95. / 87. / 82. günde biter (hırsızsız 93 / 85 / 78). 200 günde çalınan toplam $13-88 bin, geç oyunda önemsiz. Olay sıklıkları: maç günü 8-12 günde bir (6. günden), kedi %30/gün (4. günden), elektrik kesintisi %16/gün (8. günden, 34 sn), rakip teklifi 5-8 günde bir (panelde 20 sn geri sayım), hırsız %24 ziyaret × %62 çalma (güvenliksiz), paranın %8-20'si.
+
+## 8. tur: ilk günlerin temposu ve tekrar (oyuncu eleştirisi)
+
+Eleştiri: "En basit şeyi almak için 7-8 tur oynuyorsun; sürekli aynı şeye defalarca bastırarak keyif olmaz." Ölçüm doğruladı: ilk 3 gün 5-6 müşteri geliyordu (gün ~62 sn), günlük net $49-66; oyunu değiştiren ilk alım 7-10. güne kalıyordu. Sade dürüm ~20 tık tutuyordu, 16'sı aynı malzemeye 4'er kez basmaktı (tam porsiyon ancak maşa 3'te, toplam $2.790).
+
+Değişenler:
+
+- **Tek tık = tam porsiyon** (et 4, turşu 4, yoğurt 4, patates 4, iskender eti 5, domates 3, biber 2). Dürüm ~20 → ~8 tık. Stok yetmezse kalan kadar konur.
+- **Servis Maşası** yeni görev (Geniş Tezgâh gerekli): 1. seviye tıklanan malzemeyi 2, 2. seviye 3 ürüne birden koyar (akıllı hedefle; siparişin istemediği malzeme gitmez). 3. seviye (porsiyon kepçesi): turşu / yoğurt / patates tıklaması üç yan malzemeyi birlikte koyar. `assembly_system.masa_yay`, test `tests/tek_tik.gd`.
+- **İlk seviye fiyatları 0.7.0'a döndü**, sonraki seviyeler birleşik sürümdeki gibi pahalı (bıçak 100 / 530 / 1450 / 3900 …).
+- **İlk günlerde müşteri daha sık:** `rate = max(2, min(6,8 − 0,22·gün, 4,6 − 0,08·gün)) / tabela`; ~16. günden sonra eski eğri. 1. gün 5 → 8 müşteri.
+- **Borç taksiti 6. günden başlar** (`session_system.TAKSIT_GUN`); gün sonunda "BORÇ TAKSİTİ — 6. günden başlar" yazar.
+
+Önce → sonra (tempo modeli, gelenlerin %70'ine yetişen, en ucuzdan alan oyuncu):
+
+| | Önce | Sonra |
+| --- | --- | --- |
+| 1. gün müşteri / net | 5 / $66 | 8 / $120 |
+| İlk 5 günde alım | 2 (boya, depo) | 6 (boya, bıçak, patates bıçağı, depo, fritöz, kâğıt) |
+| Bıçak / fritöz | 7. / 11. gün | 2. / 4. gün |
+| İlk yeni ürün (en ucuzdan alan) | 15. gün | 7. gün (paket patates), 8. gün içecek |
+| İçeceğe biriktiren | 6. gün | 2. gün |
+| Dürüm başına tık | ~20 | ~8 |
+
+Uzun vade (`tests/tempo.gd`): borç bitişi en ucuzdan alan 107 / 93 / 84 → 98 / 87 / 78. gün, şubeye biriktiren 93 / 85 / 78 → 86 / 79 / 73. gün (%55 / %70 / %85). İlk şube 35 / 26 / 24 → 27 / 22 / 19. gün. Oyun başı hızlandığı için hepsi 5-9 gün erkene kaydı.

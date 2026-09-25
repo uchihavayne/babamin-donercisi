@@ -83,7 +83,8 @@ func run() -> void:
 	game.j_G.meat=10; act("meat")
 	select("board:0"); act("bread")
 	game.j_G.boards[0].meat=4; act("meat")
-	check(game.j_G.boards[2].meat == 1,"full chosen board cannot receive ingredients on another board")
+	# BIRLESIK (8. tur): tek basis tam porsiyon
+	check(game.j_G.boards[2].meat == 4 and game.j_G.meat == 6,"full chosen board cannot receive ingredients on another board")
 	tap(JOY_BUTTON_RIGHT_SHOULDER)
 	check(game.stations.selected == "board:1","bumper cycles within preparation boards")
 	fresh()
@@ -134,8 +135,8 @@ func run() -> void:
 	game.controls.pause()
 	game.stations.press("roll","test"); step(5); game.controls.disconnected(0)
 	check(game.stations.holding.is_empty() and game.j_G.scene == "pause","controller disconnect cancels hold and pauses")
-	game.controls.pause(); game.overlay_open=true; act("meat")
-	check(game.j_G.boards[0].meat == 1,"overlay blocks cooking actions")
+	game.controls.pause(); game.overlay_open=true; game.j_G.boards[0].meat=0; game.j_G.meat=4; act("meat")
+	check(game.j_G.boards[0].meat == 0,"overlay blocks cooking actions")
 	game.overlay_open=false
 	var finger := InputEventScreenTouch.new()
 	finger.index=0; finger.pressed=true; finger.position=Vector2(137,220)
@@ -178,9 +179,10 @@ func run() -> void:
 	game.j_G.meat=16; select("meat"); tap(JOY_BUTTON_A)
 	tap(JOY_BUTTON_LEFT_SHOULDER)
 	check(game.j_G.act == 1 and game.stations.selected == "meat","bumper switches preparation board while keeping ingredient selected")
+	game.j_G.boards[2].meat = 1
 	tap(JOY_BUTTON_A)
 	# BIRLESIK (kullanici karari): malzeme secili bos bolmeye degil, ona ihtiyaci olan urune gider
-	check(game.j_G.boards[2].meat == 2 and game.j_G.act == 2,"ingredient with an empty active board goes to the wrap that needs it")
+	check(game.j_G.boards[2].meat == 4 and game.j_G.act == 2,"ingredient with an empty active board goes to the wrap that needs it")
 	select("board:2"); button(JOY_BUTTON_A,true); step(20); button(JOY_BUTTON_A,false)
 	select("grill"); tap(JOY_BUTTON_A)
 	check(game.j_G.grill.slots.size() == 1 and game.j_G.boards[2] == null,"actual grill fixture accepts active rolled wrap")

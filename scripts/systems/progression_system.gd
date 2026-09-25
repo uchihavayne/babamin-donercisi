@@ -41,7 +41,9 @@ func f_dayCfg(p_d: Variant = null, p_G: Variant = null) -> Variant:
 	var v_d: Variant = p_d
 	var v_G: Variant = p_G
 	v_len = min(210.0, J.add(J.add(60.0, (v_d * 2.0)), (game.equipment_system.f_upgTotalLv(v_G) * 2.0)))
-	v_rate = (float(max(2.0, (6.8 - (v_d * 0.22)))) / float(J.method(game.j_TUN, "custMul", [v_G])))
+	# BIRLESIK (8. tur): ilk gunler 5-6 musteriyle bos geciyordu ("en basit sey
+	# icin 7-8 tur"). Ilk gunlerde musteri daha sik; ~16. gunden sonra eski egri.
+	v_rate = (float(max(2.0, min(6.8 - (v_d * 0.22), 4.6 - (v_d * 0.08)))) / float(J.method(game.j_TUN, "custMul", [v_G])))
 	return {"len": v_len, "rate": v_rate, "slots": J.method(game.j_TUN, "slots", [v_G])}
 	return null
 

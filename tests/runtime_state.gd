@@ -56,9 +56,11 @@ func run() -> void:
 		var before: float = game.j_G.meat
 		game.advance(1.0/60)
 		check(game.stations.holding.is_empty() and game.j_G.meat == before, "incomplete ingredient hold cancels without extra stock use: " + missing)
+		# BIRLESIK (8. tur): ilk basis porsiyonu doldurdu; yeni basis bos lavasa tam porsiyon koyar
+		game.j_G.boards[int(game.j_G.act)].meat = 0
 		game.stations.accept(true, "test")
 		game.stations.accept(false, "test")
-		check(game.j_G.meat == before-1 and game.stations.holding.is_empty(), "a fresh press works after invalid hold: " + missing)
+		check(game.j_G.meat == before-game.j_MEAT_NEED and game.stations.holding.is_empty(), "a fresh press works after invalid hold: " + missing)
 	start_day()
 	var wrap: Dictionary = game.j_G.boards[0]
 	wrap.meat = 4

@@ -110,25 +110,27 @@ func run() -> void:
 	fresh({"board":1.0})
 	game.f_newWrap(0); game.f_newWrap(1); game.j_G.act=0
 	game.stations.select("meat"); game.stations.accept(true,"test"); step(4); game.j_G.act=1; step(40); game.stations.accept(false,"test")
-	check(game.j_G.boards[0].meat==1 and game.j_G.boards[1].meat==0,"changing active board cancels a hold rather than spilling onto another wrap")
-	game.j_G.act=0; hold("meat",150)
+	# BIRLESIK (8. tur): tek basis tam porsiyon koyar; basili tutmak fazlasini
+	# baska tahtaya tasimaz (tekrar, hedef dolunca biter)
+	check(game.j_G.boards[0].meat==4 and game.j_G.boards[1].meat==0,"one press fills the portion; changing active board never spills onto another wrap")
+	game.j_G.act=0; game.j_G.boards[0].meat=2; hold("meat",150)
 	check(game.j_G.boards[0].meat==4 and game.j_G.boards[1].meat==0,"holding a full ingredient never spills onto a second board")
 	fresh(); game.f_newWrap(); w=game.j_G.boards[0]
 	mouse(center("pickle"),true); step(40); mouse(center("pickle"),false)
 	check(w.pickleN==4 and game.j_G.stock.pickle==36,"mouse hold uses the same bounded portion repeat")
 	mouse(center("yogurt"),true); mouse(center("yogurt"),false); step(50)
-	check(w.yogurtN==1,"mouse tap adds one portion and releasing stops repeat")
+	check(w.yogurtN==4 and game.j_G.stock.yogurt==36,"mouse tap adds one full portion and releasing stops repeat")
 	mouse(center("friesT"),true)
 	var motion:=InputEventMouseMotion.new(); motion.position=Vector2(470,265); game._input(motion); step(50); mouse(motion.position,false)
-	check(w.friesN==1,"moving out of a tray cancels mouse repeat")
+	check(w.friesN==4 and game.j_G.friesTray==36,"moving out of a tray keeps the portion bounded")
 	touch(center("meat"),true); step(40); touch(center("meat"),false)
 	check(w.meat==4,"touch hold fills a portion through the same action")
 	touch(center("yogurt"),true)
 	var drag:=InputEventScreenDrag.new(); drag.index=0; drag.position=Vector2(470,265); game._input(drag); step(50); touch(drag.position,false)
-	check(w.yogurtN==2,"dragging out of a touch target cancels repeating")
+	check(w.yogurtN==4 and game.j_G.stock.yogurt==36,"dragging out of a touch target never over-fills")
 	fresh(); game.f_newWrap(); w=game.j_G.boards[0]
 	game.stations.select("meat"); game.stations.accept(true,"test"); step(5); game.controls.pause(); step(40)
-	check(w.meat==1 and game.stations.holding.is_empty(),"pause cancels ingredient repeats")
+	check(w.meat==4 and game.stations.holding.is_empty(),"pause cancels ingredient repeats")
 	fresh(); game.f_newWrap(); w=game.j_G.boards[0]; game.j_G.stock.pickle=2
 	hold("pickle",100)
 	check(w.pickleN==2 and game.j_G.stock.pickle==0,"repeat stops at stock exhaustion without fabricating portions")

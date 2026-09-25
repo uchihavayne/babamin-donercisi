@@ -116,6 +116,9 @@ func f_startDay() -> Variant:
 	J.setv(game.j_G, "sceneT", 0.0)
 	return null
 
+# BIRLESIK (8. tur): ilk 5 gun borc taksiti kesilmez; baslangic parasi yukseltmeye gider
+const TAKSIT_GUN := 6.0
+
 # game.js:134
 func f_endDay() -> Variant:
 	var v_served: Variant = null
@@ -138,7 +141,7 @@ func f_endDay() -> Variant:
 			J.setv(game.j_G, "money", J.add(J.getv(game.j_G, "money"), J.getv(J.getv(game.j_G, "stat"), "branch")))
 		J.setv(J.getv(game.j_G, "stat"), "earned", J.add(J.getv(J.getv(game.j_G, "stat"), "earned"), J.getv(J.getv(game.j_G, "stat"), "branch")))
 	v_pay = 0.0
-	if (J.gt(J.getv(game.j_G, "debt"), 0.0) and (not J.truth(game.progression_system.f_fermanSehri(game.j_G)))):
+	if (J.gt(J.getv(game.j_G, "debt"), 0.0) and (not J.truth(game.progression_system.f_fermanSehri(game.j_G))) and J.ge(J.getv(game.j_G, "day"), TAKSIT_GUN)):
 		v_pay = min(J.getv(game.j_G, "debt"), floor((J.getv(J.getv(game.j_G, "stat"), "earned") * game.j_DEBT_CUT) + 0.5))
 		J.setv(game.j_G, "debt", (J.getv(game.j_G, "debt") - v_pay))
 		J.setv(game.j_G, "money", max(0.0, (J.getv(game.j_G, "money") - v_pay)))

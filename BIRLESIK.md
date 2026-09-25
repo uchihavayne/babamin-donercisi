@@ -193,3 +193,9 @@ Kullanıcının sırası: **1, 2, 9 → 15, 18 → 10 → kalanlar**. Biten madd
 | Dürüm tahtaya geri konmuyor, bazen | Elde ürünle BOŞ tahtaya tıklamak hiçbir şey yapmıyordu; artık bırakır |
 | Hazır İskender teslim edilemiyor | Tabak ancak tamamen dolunca alınabiliyordu; seçili tahtada ikinci tıklamada eksik tabak da alınır |
 | Eksik malzemeyle verilebilsin, ücret ona göre | Müşteri ve paket eksik/fazla malzemeli dürümü kabul eder; en iyi uyan kaleme gider; ücret çarpanı et .40 + patates .28 + turşu .16 + yoğurt .16 (istenmeyen konmamışsa tam). Sarılmamış/kâğıtsız/ızgarasız/yanık yine verilmez (`tests/eksik_teslim.gd`; tabanın order_flow testi karara göre güncellendi) |
+
+## Sekizinci tur (2026-09-25)
+
+| Kullanıcı / oyuncu | Yapılan |
+| --- | --- |
+| "En basit şey için 7-8 tur; aynı şeye defalarca bastırarak keyif olmaz" | Tek tık tam porsiyon; maşa artık 2-3 ürüne birden koyar (son seviye yan malzeme seti); ilk seviye fiyatları 0.7.0; ilk günlerde müşteri daha sık; borç taksiti 6. günden. Önce/sonra tablosu ECONOMY.md. Taban testleri "tık başına 1 birim" varsayımından tam porsiyona güncellendi; anlık görüntüde yalnız rastgele sayı durumu kaydı (daha az parçacık), tahta/stok/para aynı (`tests/tek_tik.gd`) |

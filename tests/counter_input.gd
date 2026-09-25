@@ -46,7 +46,8 @@ func run() -> void:
 	var garnish: Dictionary=game.j_ST.garnish
 	for i in 2:
 		click(Vector2(garnish.x+(i+.5)*garnish.w/2,garnish.y+garnish.h/2))
-		check(game.j_G.stock[["tomato","pepper"][i]]==7,"mouse selects the correct garnish half: "+str(i))
+		# BIRLESIK (8. tur): tek tik tam porsiyon (domates 3, biber 2)
+		check(game.j_G.stock[["tomato","pepper"][i]]==8-[game.j_TOMATO_NEED,game.j_PEPPER_NEED][i],"mouse selects the correct garnish half: "+str(i))
 	var sauce: Dictionary=game.j_ST.sauce
 	click(Vector2(sauce.x+sauce.w*2.5/3,sauce.y+sauce.h/2))
 	check(game.j_G.boards[0].butter,"mouse applies butter from the third bottle")
