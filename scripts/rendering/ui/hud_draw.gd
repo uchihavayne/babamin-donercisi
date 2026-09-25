@@ -108,6 +108,7 @@ func f_drawHUD(p_t: Variant = null) -> Variant:
 		game.f_rrect(J.add(v_tx, 3.0), J.add(v_ty0, 3.0), 36.0, (v_th - 6.0), 2.0, "#241a14")
 	v_tl = (J.getv(game.j_G, "timeLeft") if J.eq(J.getv(game.j_G, "scene"), "play") else 0.0)
 	v_low = (J.gt(v_tl, 0.0) if J.lt(v_tl, 20.0) else J.lt(v_tl, 20.0))
+	if game.j_G.get("kapanis") is Dictionary: v_low = true # kapanis: 0:00 kirmizi yanip soner
 	v_tcol = (("#ff5a3a" if J.gt(sin((v_t * 10.0)), 0.0) else "#a03020") if J.truth(v_low) else "#ff9a4a")
 	game.text_draw.f_txt(game.math_utils.f_fmtTime(v_tl), J.add(v_tx, 21.0), J.add(v_ty0, (5.0 if J.truth(v_kompakt) else 6.0)), v_tcol, {"align": "c", "mono": true})
 	if (not J.truth(v_kompakt)):

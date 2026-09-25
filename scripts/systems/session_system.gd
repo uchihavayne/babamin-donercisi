@@ -57,9 +57,10 @@ func f_startDay() -> Variant:
 	J.setv(game.j_G, "coins", [])
 	J.setv(game.j_G, "customers", [])
 	J.setv(game.j_G, "spawnT", (999.0 if J.eq(J.getv(game.j_G, "day"), 1.0) else game.j_ILK_MUSTERI))
-	J.setv(game.j_G, "stat", {"wraps": 0.0, "drinks": 0.0, "boxes": 0.0, "sweets": 0.0, "isk": 0.0, "lost": 0.0, "earned": 0.0, "tips": 0.0, "debtPaid": 0.0, "branch": 0.0, "brPerf": 1.0})
+	J.setv(game.j_G, "stat", {"wraps": 0.0, "drinks": 0.0, "boxes": 0.0, "sweets": 0.0, "isk": 0.0, "lost": 0.0, "earned": 0.0, "tips": 0.0, "debtPaid": 0.0, "branch": 0.0, "brPerf": 1.0, "yerYok": 0.0})
 	J.setv(game.j_G, "sauceFx", {"hot": 0.0, "garlic": 0.0, "butter": 0.0})
 	J.setv(game.j_G, "shutT", 1.0)
+	J.setv(game.j_G, "kapanis", null)
 	J.setv(game.j_G, "shutSnd", 0.0)
 	J.setv(game.j_G, "flyCoins", [])
 	if (not J.truth(J.getv(game.j_G, "moto"))):

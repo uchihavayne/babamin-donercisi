@@ -46,6 +46,9 @@ func f_drawDayEnd(p_t: Variant = null) -> Variant:
 			if not game.f_hdIkon("lst_" + str(J.getv(J.getv(v_rows, v_i), 0.0)), ((float(game.j_W) / float(2.0)) - 86.0), J.add(v_ry, 4.0)):
 				game.icon_draw.f_icon(J.getv(J.getv(v_rows, v_i), 0.0), ((float(game.j_W) / float(2.0)) - 86.0), J.add(v_ry, 4.0), v_t)
 		game.text_draw.f_txt(J.getv(J.getv(v_rows, v_i), 1.0), ((float(game.j_W) / float(2.0)) - 74.0), v_ry, J.getv(game.j_P, "ui4"))
+		# BIRLESIK (9. tur): yer bulamayip kapidan donenler kacan satirinda (panel buyumez)
+		if J.eq(J.getv(J.getv(v_rows, v_i), 1.0), "Kaçan müşteri") and J.n(v_st.get("yerYok", 0.0)) > 0.0:
+			game.text_draw.f_txt(game.localization.f_T("kapıdan dönen") + " " + str(int(J.n(v_st.yerYok))), (float(game.j_W) / 2.0) + 76.0, v_ry, J.getv(game.j_P, "ui3"), {"align": "r"})
 		game.text_draw.f_txt(J.add("x", J.getv(J.getv(v_rows, v_i), 2.0)), J.add((float(game.j_W) / float(2.0)), 92.0), v_ry, (J.getv(game.j_P, "ink") if J.truth(J.getv(J.getv(v_rows, v_i), 0.0)) else J.getv(game.j_P, "ui3")), {"align": "r"})
 		J.setv(game.j_ctx, "globalAlpha", 0.28)
 		game.f_hl(((float(game.j_W) / float(2.0)) - 92.0), J.add(v_ry, 10.0), 184.0, J.getv(game.j_P, "ui2"))

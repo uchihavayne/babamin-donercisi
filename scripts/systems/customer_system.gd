@@ -1,6 +1,79 @@
 # Customer system. See CODE_MAP.md.
 extends "res://scripts/core/game_module.gd"
 
+# BIRLESIK (9. tur, genel test): yer doluyken gelen musteri eskiden hic
+# dogmuyordu (gelme denemelerinin %45-75'i sessizce kayboluyordu; Tabela
+# Dukkani Buyut olmadan etkisizdi, oyuncu kacirdigini gormuyordu). Artik
+# camin onundeki kaldirimda, kapinin (sag uc) onunde en fazla SIRA_MAX kisi
+# bekler (sokakta yaya olarak cizilir); yer acilinca kapidan girer, SIRA_SURE
+# dolunca "YER YOK" deyip kaldirimdan uzaklasir (kacan sayilmaz, gun sonunda
+# "kapidan donen").
+const SIRA_MAX := 3
+const SIRA_SURE := 10.0
+const SIRA_ARA := 11.0
+
+func sira_musterileri() -> Array:
+	var out: Array = []
+	for c in game.j_G.customers:
+		if c.get("state") == "sira": out.append(c)
+	return out
+
+# kaldirimda k. siradakinin yeri (0: kapiya en yakin, camin sag ucu)
+func sira_x(k: int) -> float:
+	var M: Dictionary = game.street_background.f_stM()
+	return J.n(M.gx) + J.n(M.gw) - 14.0 - k * SIRA_ARA
+
+func bos_yerler() -> Array:
+	var dolu := {}
+	for c in game.j_G.customers:
+		if not c.get("state") in ["leave", "sira", "sira_git"]: dolu[int(J.n(c.get("slot", -1)))] = true
+	var out: Array = []
+	for s in int(J.n(game.j_G.cfg.slots)):
+		if not dolu.has(s): out.append(s)
+	return out
+
+# yazi: ayni anda / art arda birden cok kisi giderse tek "YER YOK" (ust uste binmesin)
+var _yer_yok_t := -99.0
+func kapidan_don(c: Dictionary, yazi := true) -> void:
+	c.state = "sira_git"; c.mood = "angry"
+	game.j_G.stat.yerYok = J.n(game.j_G.stat.get("yerYok", 0.0)) + 1.0
+	if not yazi or J.n(game.j_G.t) - _yer_yok_t < 1.3: return
+	_yer_yok_t = J.n(game.j_G.t)
+	var M: Dictionary = game.street_background.f_stM()
+	game.effects.f_ftext(game.localization.f_T("YER YOK"), minf(float(c.x), J.n(M.gx) + J.n(M.gw) - 24.0), J.n(M.curb2) - 30.0, game.j_P.bad, {"life": 1.3})
+	J.method(game.j_SFX, "uiBack", [])
+
+func sira_guncelle(dt: float) -> void:
+	var M: Dictionary = game.street_background.f_stM()
+	var i: int = game.j_G.customers.size() - 1
+	while i >= 0:
+		var g: Dictionary = game.j_G.customers[i]
+		if g.get("state") == "sira_git":
+			g.x = float(g.x) - dt * 26.0
+			if float(g.x) < J.n(M.gx) - 12.0: game.j_G.customers.remove_at(i)
+		i -= 1
+	var sira := sira_musterileri()
+	if sira.is_empty(): return
+	var bekler: bool = not J.truth(game.gameplay_input.f_tutBusy())
+	for k in sira.size():
+		var c: Dictionary = sira[k]
+		c.x = game.math_utils.f_approach(c.x, sira_x(k), dt * 26.0)
+		if bekler: c.siraT = J.n(c.get("siraT", 0.0)) + dt
+	var ilk: Dictionary = sira[0]
+	var bos := bos_yerler()
+	if not bos.is_empty():
+		var yer: int = game.math_utils.f_pick(bos)
+		var ks: Dictionary = game.j_LAY.custSlots[yer]
+		ilk.slot = float(yer); ilk.tx = ks.x; ilk.y = ks.y; ilk.state = "walkin"; ilk.mood = "wait"
+		ilk.x = J.add(game.j_W, 24.0)
+		J.method(game.j_SFX, "door", [])
+		return
+	var yazildi := false
+	for c in sira:
+		if J.n(c.siraT) > J.n(c.siraMax):
+			kapidan_don(c, not yazildi)
+			yazildi = true
+
 # game.js:2085
 func f_spawnCustomer() -> Variant:
 	var v_used: Variant = null
@@ -26,9 +99,13 @@ func f_spawnCustomer() -> Variant:
 		if (not J.truth(J.getv(v_used, v_s))):
 			J.method(v_free, "push", [v_s])
 		v_s = J.add(v_s, 1.0)
-	if (not J.truth(J.getv(v_free, "length"))):
+	# yer yoksa ya da kapida sira varsa yeni gelen sirada bekler (siranin onune gecmez)
+	var sira_n: int = sira_musterileri().size()
+	var kapida: bool = (not J.truth(J.getv(v_free, "length"))) or sira_n > 0
+	if kapida and sira_n >= SIRA_MAX:
+		game.j_G.stat.yerYok = J.n(game.j_G.stat.get("yerYok", 0.0)) + 1.0
 		return null
-	v_slot = game.math_utils.f_pick(v_free)
+	v_slot = -1.0 if kapida else game.math_utils.f_pick(v_free)
 	J.setv(game.j_G, "macDalga", game.weather_system.f_macDalgada())
 	v_homeless = (game.f_chance((float(game.j_HOMELESS_CHANCE) / float(14.0))) if (J.ge(J.getv(game.j_G, "day"), game.j_HOMELESS_DAY) and (not J.truth(J.getv(game.j_G, "hadHomeless")))) else ((not J.truth(J.getv(game.j_G, "hadHomeless"))) if J.ge(J.getv(game.j_G, "day"), game.j_HOMELESS_DAY) else J.ge(J.getv(game.j_G, "day"), game.j_HOMELESS_DAY)))
 	v_items = ([{"kind": "wrap"}] if J.truth(v_homeless) else game.recipe_system.f_makeOrder(game.j_G))
@@ -46,7 +123,11 @@ func f_spawnCustomer() -> Variant:
 		J.setv(v_look, "hair", 2.0)
 		J.setv(v_look, "acc", "cap")
 	J.method(game.j_SFX, "door", [])
-	v_c = {"slot": v_slot, "homeless": v_homeless, "look": v_look, "mac": (not (not J.truth(J.getv(game.j_G, "macDalga")))), "items": v_items, "done": J.method(v_items, "map", [game.customer_system._closure_249.bind({})]), "patMax": v_pat, "patience": 1.0, "t": 0.0, "mood": "wait", "state": "walkin", "x": J.add(game.j_W, 24.0), "y": J.getv(J.getv(J.getv(game.j_LAY, "custSlots"), v_slot), "y"), "tx": J.getv(J.getv(J.getv(game.j_LAY, "custSlots"), v_slot), "x"), "bubble": 0.0, "line": "", "lineT": 0.0, "wrongT": 0.0, "earn": 0.0}
+	v_c = {"slot": v_slot, "homeless": v_homeless, "look": v_look, "mac": (not (not J.truth(J.getv(game.j_G, "macDalga")))), "items": v_items, "done": J.method(v_items, "map", [game.customer_system._closure_249.bind({})]), "patMax": v_pat, "patience": 1.0, "t": 0.0, "mood": "wait", "state": "walkin", "x": J.add(game.j_W, 24.0), "y": J.getv(J.getv(J.getv(game.j_LAY, "custSlots"), (0.0 if kapida else v_slot)), "y"), "tx": (0.0 if kapida else J.getv(J.getv(J.getv(game.j_LAY, "custSlots"), v_slot), "x")), "bubble": 0.0, "line": "", "lineT": 0.0, "wrongT": 0.0, "earn": 0.0}
+	if kapida:
+		v_c.state = "sira"; v_c.siraT = 0.0
+		v_c.x = sira_x(0) + 30.0 # kaldirimin sagindan yuruyerek siraya girer
+		v_c.siraMax = SIRA_SURE * J.n(J.method(game.j_TUN, "patience", [game.j_G]))
 	J.method(J.getv(game.j_G, "customers"), "push", [v_c])
 	if J.truth(v_homeless):
 		J.setv(v_c, "line", game.math_utils.f_pick(game.j_LINES_HOMELESS))
@@ -61,6 +142,7 @@ func f_updateCustomers(p_dt: Variant = null) -> Variant:
 	var v_kr: Variant = null
 	var v_sr: Variant = null
 	var v_dt: Variant = p_dt
+	sira_guncelle(float(v_dt))
 	v_i = (J.getv(J.getv(game.j_G, "customers"), "length") - 1.0)
 	while J.ge(v_i, 0.0):
 		v_c = J.getv(J.getv(game.j_G, "customers"), v_i)

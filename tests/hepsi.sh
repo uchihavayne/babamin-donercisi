@@ -6,7 +6,7 @@ kalan=""
 sh tests/kontrol.sh >/dev/null || kalan="$kalan kontrol"
 for t in order_flow cutting module_services stations counter_input ingredient_input bread_preparation \
          economy mouse_slicing platform_input runtime_state module_snapshot regression mouse_knife \
-         bahis_input akilli_hedef kapanis dil_cift toplu_siparis eksik_teslim dev_panel tek_tik fare_akisi; do
+         bahis_input akilli_hedef kapanis dil_cift toplu_siparis eksik_teslim dev_panel tek_tik fare_akisi kapanis_sira; do
 	timeout 300 "$GODOT" --headless --path . --script tests/$t.gd --quit-after 3000 -- --test >/tmp/t_$t.log 2>&1 || kalan="$kalan $t"
 	grep -q "SCRIPT ERROR" /tmp/t_$t.log && kalan="$kalan $t(hata)"
 done

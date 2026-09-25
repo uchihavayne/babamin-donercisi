@@ -156,6 +156,9 @@ func f_drawTestPanel(p_t: Variant = null) -> Variant:
 		J.method(game.j_SFX, "bell", [])
 	if J.truth(game.f_tinyBtn(J.add(v_bx, 394.0), v_by, 56.0, 14.0, "GÜN BİT", "#8a3a3a")):
 		J.setv(game.j_G, "timeLeft", 0.01)
+		# gelistirici: kapanisi bekleme, gun hemen bitsin
+		for c in game.j_G.customers:
+			if c.get("state") in ["walkin", "wait", "sira"]: c.state = "leave"
 		J.setv(game.j_G, "test", false)
 	v_dby = J.add(v_by, 16.0)
 	game.text_draw.f_txt(J.add(game.localization.f_T("BORÇ: $"), game.math_utils.f_fmtShort(J.getv(game.j_G, "debt"))), J.add(v_bx, 2.0), J.add(v_dby, 3.0), "#ff9a8a")

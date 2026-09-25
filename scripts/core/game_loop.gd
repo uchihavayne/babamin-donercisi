@@ -2,6 +2,29 @@
 extends "res://scripts/core/game_module.gd"
 
 # game.js:2525
+# BIRLESIK (9. tur, genel test): gun ani bitiyordu — musteri sure bitimine 2 sn
+# kalana kadar geliyor, sure dolunca sıradakiler sayilmadan kayboluyor ve
+# hazirlanan urun bosa gidiyordu. Artik son SON_MUSTERI sn yeni musteri gelmez;
+# sure dolunca kepenk iner, kapidaki sira gider, iceridekiler servis edilene ya
+# da sabri tukenene kadar (en fazla KAPANIS_SINIR sn) gun surer.
+const SON_MUSTERI := 15.0
+const KAPANIS_SINIR := 45.0
+
+func kapanis_bitti() -> bool:
+	for c in game.j_G.customers:
+		if c.get("state") in ["walkin", "wait"]: return false
+	return true
+
+func kapanis_basla() -> void:
+	game.j_G.kapanis = {"t": 0.0}
+	var ilk := true
+	for c in game.customer_system.sira_musterileri():
+		game.customer_system.kapidan_don(c, ilk)
+		ilk = false
+	game.session_system.f_say("Kepenk iniyor — içerideki müşterileri bitir")
+	game.effects.f_ftext(game.localization.f_T("SON MÜŞTERİLER"), float(game.j_W) / 2.0, 96.0, game.j_P.au0, {"sc": 2.0, "life": 2.0})
+	J.method(game.j_SFX, "warn", [])
+
 func f_updatePlay(p_dt: Variant = null) -> Variant:
 	var v_hedefA: Variant = null
 	var v_ogretimde: Variant = null
@@ -34,12 +57,19 @@ func f_updatePlay(p_dt: Variant = null) -> Variant:
 				J.method(game.j_SFX, "tick", [])
 		if J.le(J.getv(game.j_G, "timeLeft"), 0.0):
 			J.setv(game.j_G, "timeLeft", 0.0)
+			if kapanis_bitti():
+				game.session_system.f_endDay()
+				return null
+			kapanis_basla()
+	elif (not J.truth(v_ogretimde)) and game.j_G.get("kapanis") is Dictionary:
+		game.j_G.kapanis.t = J.n(game.j_G.kapanis.t) + J.n(v_dt)
+		if kapanis_bitti() or J.n(game.j_G.kapanis.t) >= KAPANIS_SINIR:
 			game.session_system.f_endDay()
 			return null
 	game.event_system.f_kesintiGuncelle(v_dt)
 	game.rival_system.f_rakipGuncelle(v_dt)
 	game.event_system.f_kediGuncelle(v_dt)
-	if ((not J.truth(v_ogretimde)) and J.gt(J.getv(game.j_G, "timeLeft"), 2.0)):
+	if ((not J.truth(v_ogretimde)) and J.gt(J.getv(game.j_G, "timeLeft"), SON_MUSTERI)):
 		J.setv(game.j_G, "spawnT", (J.getv(game.j_G, "spawnT") - v_dt))
 		if J.le(J.getv(game.j_G, "spawnT"), 0.0):
 			game.customer_system.f_spawnCustomer()

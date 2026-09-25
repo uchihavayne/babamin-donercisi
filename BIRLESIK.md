@@ -216,3 +216,12 @@ Bot ölçümleri (onay bekleyen tasarım konuları):
 | Izgara tek tahtayla | Tahtadaki dürüm patates beklerken pişen dürüm alınamaz, bekledikçe yanar (bot 9 gün kilitlendi; insan sarıp takas edebilir) |
 | Her sabah stok sıfır | İlk günlerde hamlelerin %26-35'i hazırlık (stok doldurma, et, patates) |
 | Bahis hedefleri | "Müşteri kaçırırsın" bahsi bedava kazanç; bahşiş hedefi (30+6·gün) orta/hızlı oyuncuda ulaşılamaz; ödül (200+34·gün) 2 günlük kazanç |
+
+Kullanıcının seçtiği 1 ve 2 yapıldı (`tests/kapanis_sira.gd`):
+
+| Konu | Çözüm |
+| --- | --- |
+| Gün ani bitiyor | Son 15 sn yeni müşteri gelmez (`game_loop.SON_MUSTERI`). Süre dolunca "SON MÜŞTERİLER", saat 0:00 kırmızı yanıp söner; içerideki müşteriler servis edilene ya da sabrı tükenene kadar gün sürer (en fazla 45 sn, `KAPANIS_SINIR`). Geliştirici "GÜN BİT" beklemez |
+| Yer yokken müşteri doğmuyordu | Camın önündeki yakın kaldırımda, kapı tarafında en fazla 3 kişilik sıra (sokak yayası olarak, kapıya dönük, başında sabır çubuğu). Yer açılınca sıranın ilki kapıdan (sağ kenar) girer; 10 sn (boya ile uzar) dolunca "YER YOK" deyip kaldırımdan uzaklaşır. Kaçan sayılmaz; gün sonunda "Kaçan müşteri" satırında "kapıdan dönen N" |
+
+Ayrıca bulundu (henüz yapılmadı): birleşik sürümün yeni sipariş balonu müşteri konuşma satırlarını (`line`/`lineT`: bekleme, kızgın, eksik, aç misafir sözleri) hiç çizmiyor; yalnız eski balonda (`legacy_order_draw`) vardı.

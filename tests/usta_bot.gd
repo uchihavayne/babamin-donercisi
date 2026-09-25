@@ -68,7 +68,7 @@ func denetle() -> void:
 	var slotlar := {}
 	for c in G.customers:
 		ihlal(c.done.size() == c.items.size(), "musteri done/items uyumsuz")
-		if c.state != "leave" and c.state != "served":
+		if not c.state in ["leave", "served", "sira", "sira_git"]:
 			ihlal(not slotlar.has(c.slot), "iki musteri ayni yerde")
 			slotlar[c.slot] = true
 	ihlal(G.hand == null or (G.hand is Dictionary and G.hand.has("kind")), "elde gecersiz nesne")
@@ -112,11 +112,12 @@ func step() -> void:
 			for c in G.customers: ist.append([c.state, c.items, c.done])
 			print("IZ t=%d son=%s el=%s tahta=%s izgara=%s et=%s pat=%s musteri=%s" % [int(t_gun), son_eylem, G.hand.kind if G.hand is Dictionary else "-", JSON.stringify(tah), G.grill.slots.size(), G.meat, G.friesTray, JSON.stringify(ist)])
 		for c in G.customers:
-			if not c.has("_bot_id"):
+			if not c.has("_bot_id") and not c.state in ["sira", "sira_git"]:
 				c._bot_id = goruldu.size()
 				goruldu[c._bot_id] = {"t": t_gun, "bitti": false}
 				say("gelen")
 				if c.get("homeless", false): say("evsiz")
+			if not c.has("_bot_id"): continue
 			var kay: Dictionary = goruldu[c._bot_id]
 			if not kay.bitti and not c.done.has(false):
 				kay.bitti = true
@@ -356,7 +357,7 @@ func gun_oyna() -> Dictionary:
 		"ort_servis_sn": snappedf(ort, 0.1), "eylem": int(gun_say.get("eylem", 0)),
 		"bos_%": snappedf(100.0 * float(gun_say.get("bos_kare", 0)) / maxf(1.0, float(kare)), 0.1),
 		"hazirlik_karar": int(gun_say.get("hazirlik", 0)), "gelme_denemesi": int(gun_say.get("deneme", 0)),
-		"eylem_siparis": int(gun_say.get("eylem_siparis", 0)), "eylem_hazirlik": int(gun_say.get("eylem_hazirlik", 0)), "eylem_diger": int(gun_say.get("eylem_diger", 0)), "yer": int(tun("slots")), "kapanista_bekleyen": kapanis.bekleyen, "kapanista_yarim_urun": kapanis.tahtada,
+		"eylem_siparis": int(gun_say.get("eylem_siparis", 0)), "eylem_hazirlik": int(gun_say.get("eylem_hazirlik", 0)), "eylem_diger": int(gun_say.get("eylem_diger", 0)), "kapidan_donen": int(G.stat.get("yerYok", 0)), "yer": int(tun("slots")), "kapanista_bekleyen": kapanis.bekleyen, "kapanista_yarim_urun": kapanis.tahtada,
 		"bekleme": {"et": int(gun_say.get("bekle_et", 0)), "patates": int(gun_say.get("bekle_patates", 0)), "stok": int(gun_say.get("bekle_stok", 0)),
 			"izgara": int(gun_say.get("bekle_izgara", 0)), "icecek": int(gun_say.get("bekle_icecek", 0))},
 		"diger": {"paket": int(gun_say.get("paket", 0)), "cope": int(gun_say.get("cope_atilan", 0)), "sahipsiz": int(gun_say.get("sahipsiz_durum", 0)),
