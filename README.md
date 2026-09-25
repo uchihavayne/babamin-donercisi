@@ -1,4 +1,29 @@
-# Babamın Dönercisi — Godot / GDScript
+# Babamın Dönercisi — Birleşik Sürüm (Godot 4)
+
+Babasından kalan döner dükkânını ve 5 milyon dolarlık borcu devralan birinin hikâyesi: döner kes, dürüm sar, müşteriyi doyur, dükkânı büyüt, borcu kapat. Piksel sanat + Blender'da hazırlanmış HD katman.
+
+## Godot ile açma
+
+1. **Godot 4.7** indir (standart sürüm yeterli, .NET gerekmez): https://godotengine.org/download
+2. Projeyi al:
+   ```sh
+   git clone https://github.com/uchihavayne/babamin-donercisi.git
+   ```
+   (ya da GitHub'da **Code → Download ZIP**)
+3. Godot Proje Yöneticisi → **Import** → klasördeki `project.godot` → **Import & Edit**. İlk açılışta görseller içe aktarılır (~30 sn).
+4. **F5** (Mac: **Cmd+B**) ile çalıştır.
+
+Güncellemeleri almak için klasörde `git pull`.
+
+**Kontroller:** fare / dokunmatik yeterli. Klavye: R döner kes · WASD/oklar nesne seç · Boşluk/Enter kullan · Tab/Q hazırlama tahtası değiştir · E al/geri bırak · P mola · M ses · F2 HD aç/kapa · T geliştirici paneli (editörden çalışırken).
+
+**Belgeler:** [BIRLESIK.md](BIRLESIK.md) (bu sürümde neler değişti, turlar), [ECONOMY.md](ECONOMY.md) (fiyatlar, tempo), [CODE_MAP.md](CODE_MAP.md) (hangi kod nerede), [PLATFORMLAR.md](PLATFORMLAR.md) (dışa aktarma).
+
+**Testler:** `GODOT=/godot/yolu sh tests/hepsi.sh` (tüm testler), `sh tests/kontrol.sh` (betik ayrıştırma). Oyunu insan hızında oynayan bot: `godot --headless --path . --script tests/usta_bot.gd -- --test --gun 12`.
+
+---
+
+## Taban proje notları (kebap-shop 0.7.x)
 
 `myfathersdonershop.html` dosyasındaki oyunun Godot projesi. Oyun çalışırken yalnızca GDScript ve Godot'un standart kaynakları kullanılır. Tarayıcı, WebView, JavaScript yorumlayıcısı, C#, GDExtension veya ek eklenti gerekmez.
 

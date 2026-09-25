@@ -1,7 +1,7 @@
 #!/bin/sh
 # Tum testler: ayristirma + tabanin mantik testleri + gorsel testler (GPU).
 # Kullanim (proje kokunden): sh tests/hepsi.sh   -> sonda "HEPSI GECTI" ya da kalanlar
-GODOT="/c/Users/uchih/Downloads/Godot_v4.7.2-stable_win64.exe/Godot_v4.7.2-stable_win64_console.exe"
+GODOT="${GODOT:-/c/Users/uchih/Downloads/Godot_v4.7.2-stable_win64.exe/Godot_v4.7.2-stable_win64_console.exe}"
 kalan=""
 sh tests/kontrol.sh >/dev/null || kalan="$kalan kontrol"
 for t in order_flow cutting module_services stations counter_input ingredient_input bread_preparation \
