@@ -199,3 +199,20 @@ Kullanıcının sırası: **1, 2, 9 → 15, 18 → 10 → kalanlar**. Biten madd
 | Kullanıcı / oyuncu | Yapılan |
 | --- | --- |
 | "En basit şey için 7-8 tur; aynı şeye defalarca bastırarak keyif olmaz" | Tek tık tam porsiyon; maşa artık 2-3 ürüne birden koyar (son seviye yan malzeme seti); ilk seviye fiyatları 0.7.0; ilk günlerde müşteri daha sık; borç taksiti 6. günden. Önce/sonra tablosu ECONOMY.md. Taban testleri "tık başına 1 birim" varsayımından tam porsiyona güncellendi; anlık görüntüde yalnız rastgele sayı durumu kaydı (daha az parçacık), tahta/stok/para aynı (`tests/tek_tik.gd`) |
+
+## Dokuzuncu tur: genel test (2026-09-25)
+
+Araçlar: `tests/usta_bot.gd` (oyunu 1. günden insan hızında oynayan bot; her karede durum denetimi, gün gün ölçüm; `--gecikme 0.4/0.6/0.9`, `--up`, `--ilk`, `--iz`), `tests/fare_akisi.gd` (öğreticinin yolu gerçek fare olaylarıyla + klavye kısayolları).
+
+Sonuç: ~70 bot günü + kaos + tüm testler: 0 betik hatası, 0 durum ihlali. Düzeltilen: öğretici "4 porsiyon" diyordu (tek tık sonrası), fare ipuçları DE/FR/ES/PT'de İngilizceydi, OKU_BENI'de Tab/Q yanlış anlatılmıştı (oyun içi yardım doğru: "tahta değiştir").
+
+Bot ölçümleri (onay bekleyen tasarım konuları):
+
+| Konu | Ölçüm |
+| --- | --- |
+| Gün sonu ani kapanış | Müşteri süre bitmeden 2 sn öncesine kadar gelir; süre dolunca sıradakiler sayılmadan kaybolur, yarım ürün boşa gider (her gün 1-2 müşteri) |
+| Yer dolunca müşteri doğmaz | Gelme denemelerinin %45-50si, Tabela sonrası %70-75i sessizce düşer; Tabela (daha çok müşteri) Dükkânı Büyüt olmadan etkisiz, oyuncu kaçırdığını görmez |
+| Kimse kızıp gitmez | 3 hızda ~70 günde kaçan müşteri yalnız elektrik kesintisi / ızgara sıkışması günlerinde |
+| Izgara tek tahtayla | Tahtadaki dürüm patates beklerken pişen dürüm alınamaz, bekledikçe yanar (bot 9 gün kilitlendi; insan sarıp takas edebilir) |
+| Her sabah stok sıfır | İlk günlerde hamlelerin %26-35'i hazırlık (stok doldurma, et, patates) |
+| Bahis hedefleri | "Müşteri kaçırırsın" bahsi bedava kazanç; bahşiş hedefi (30+6·gün) orta/hızlı oyuncuda ulaşılamaz; ödül (200+34·gün) 2 günlük kazanç |

@@ -20,6 +20,7 @@ var t_gun := 0.0
 var servis_sureleri: Array = []
 var kapanis := {"bekleyen": 0, "tahtada": 0}
 var iz := false
+var son_spawn := 0.0
 var son_eylem := ""
 
 func _initialize() -> void: call_deferred("run")
@@ -93,6 +94,9 @@ func step() -> void:
 	if str(G.scene) == "play":
 		t_gun += 1.0 / 60.0
 		denetle()
+		# musteri gelme denemesi: spawnT yeniden kuruldu (yer yoksa musteri dogmaz)
+		if float(G.spawnT) > son_spawn + 0.5: say("deneme")
+		son_spawn = float(G.spawnT)
 		var bk := 0
 		for c in G.customers:
 			if c.state == "wait" and c.done.has(false): bk += 1
@@ -131,6 +135,10 @@ func dene(target: String, action: String) -> bool:
 			st().press(action, "bot")
 			son_eylem = target + "/" + action
 			say("eylem")
+			var tur := "siparis"
+			if action in ["cut_meat", "potato", "chop", "fry", "crate"] or action.begins_with("refill:"): tur = "hazirlik"
+			elif action in ["collect", "trash", "cat", "return"]: tur = "diger"
+			say("eylem_" + tur)
 			if not st().holding.is_empty():
 				if st().holding.get("repeat", false): st().release("bot")
 				else: tutma = {"id": action, "t": 0.0}
@@ -347,7 +355,8 @@ func gun_oyna() -> Dictionary:
 		"kazanc": int(s.get("earned", 0)), "bahsis": int(s.get("tips", 0)), "taksit": int(s.get("debtPaid", 0)), "ceza": int(s.get("fine", 0)),
 		"ort_servis_sn": snappedf(ort, 0.1), "eylem": int(gun_say.get("eylem", 0)),
 		"bos_%": snappedf(100.0 * float(gun_say.get("bos_kare", 0)) / maxf(1.0, float(kare)), 0.1),
-		"hazirlik_karar": int(gun_say.get("hazirlik", 0)), "kapanista_bekleyen": kapanis.bekleyen, "kapanista_yarim_urun": kapanis.tahtada,
+		"hazirlik_karar": int(gun_say.get("hazirlik", 0)), "gelme_denemesi": int(gun_say.get("deneme", 0)),
+		"eylem_siparis": int(gun_say.get("eylem_siparis", 0)), "eylem_hazirlik": int(gun_say.get("eylem_hazirlik", 0)), "eylem_diger": int(gun_say.get("eylem_diger", 0)), "yer": int(tun("slots")), "kapanista_bekleyen": kapanis.bekleyen, "kapanista_yarim_urun": kapanis.tahtada,
 		"bekleme": {"et": int(gun_say.get("bekle_et", 0)), "patates": int(gun_say.get("bekle_patates", 0)), "stok": int(gun_say.get("bekle_stok", 0)),
 			"izgara": int(gun_say.get("bekle_izgara", 0)), "icecek": int(gun_say.get("bekle_icecek", 0))},
 		"diger": {"paket": int(gun_say.get("paket", 0)), "cope": int(gun_say.get("cope_atilan", 0)), "sahipsiz": int(gun_say.get("sahipsiz_durum", 0)),
