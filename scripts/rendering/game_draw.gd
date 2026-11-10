@@ -69,7 +69,7 @@ func f_drawPlay(p_t: Variant = null) -> Variant:
 	_v["i"] = 0.0
 	while J.lt(_v["i"], J.getv(J.getv(game.j_G, "customers"), "length")):
 		# kapida sira bekleyenler sokakta (street_draw) yaya olarak cizilir
-		if not J.getv(J.getv(J.getv(game.j_G, "customers"), _v["i"]), "state") in ["sira", "sira_git"]:
+		if not game.customer_system.sokakta(J.getv(J.getv(game.j_G, "customers"), _v["i"])):
 			game.f_drawCustomer(J.getv(J.getv(game.j_G, "customers"), _v["i"]), _cells["t"][0])
 		_v["i"] = J.add(_v["i"], 1.0)
 	# BIRLESIK: karsi dukkanin adami MUSTERI katmaninda (tezgah ve makinelerin

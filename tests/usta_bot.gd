@@ -112,7 +112,7 @@ func step() -> void:
 			for c in G.customers: ist.append([c.state, c.items, c.done])
 			print("IZ t=%d son=%s el=%s tahta=%s izgara=%s et=%s pat=%s musteri=%s" % [int(t_gun), son_eylem, G.hand.kind if G.hand is Dictionary else "-", JSON.stringify(tah), G.grill.slots.size(), G.meat, G.friesTray, JSON.stringify(ist)])
 		for c in G.customers:
-			if not c.has("_bot_id") and not c.state in ["sira", "sira_git"]:
+			if not c.has("_bot_id") and not c.state in ["sira", "sira_gir", "sira_git"]:
 				c._bot_id = goruldu.size()
 				goruldu[c._bot_id] = {"t": t_gun, "bitti": false}
 				say("gelen")

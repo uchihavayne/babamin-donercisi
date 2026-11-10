@@ -843,7 +843,6 @@ const VALUE = {
 	"Dürümü tekrar basılı tut; kağıtlansın": "Maintiens encore pour l'emballer",
 	"Kepenk iniyor — içerideki müşterileri bitir": "Le rideau descend — sers les clients à l'intérieur",
 	"SON MÜŞTERİLER": "DERNIERS CLIENTS",
-	"YER YOK": "PAS DE PLACE",
 	"kapıdan dönen": "refoulés",
 	"Et tepsisine tıkla — tek tık bir porsiyon": "Clique sur le plateau de viande — un clic, une portion",
 	"Kutuyu aç, turşu ve yoğurt doldur": "Ouvre la caisse, remplis cornichons et yaourt",

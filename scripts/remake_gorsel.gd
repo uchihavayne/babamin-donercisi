@@ -2183,12 +2183,15 @@ func f_hdYakinEsya() -> bool:
 	var G: Dictionary = get("j_LAY").glass
 	var gx: float = J.n(M.gx)
 	var pby: float = J.n(G.y) + J.n(G.h) - 1.0
+	# cop kutusu: street_draw.f_drawNearProps ile ayni yer (kapidaki sira icin
+	# son iki musteri yeri arasindaki bosluktan cekildi)
+	var kx: float = gx + J.n(get("street_draw").COP_X)
 	draw_context.globalAlpha = 0.28
 	f_ell(gx + 97.0, pby, 11.0, 2.0, "#000")
-	f_ell(gx + 241.0, pby, 8.0, 2.0, "#000")
+	f_ell(kx + 5.0, pby, 8.0, 2.0, "#000")
 	draw_context.globalAlpha = 1.0
 	hd_ciz(A, "bisiklet", gx + 90.0, pby)
-	hd_ciz(A, "cop", gx + 236.0, pby)
+	hd_ciz(A, "cop", kx, pby)
 	return true
 
 

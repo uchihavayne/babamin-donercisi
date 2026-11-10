@@ -843,7 +843,6 @@ const VALUE = {
 	"Dürümü tekrar basılı tut; kağıtlansın": "Hold again to wrap in paper",
 	"Kepenk iniyor — içerideki müşterileri bitir": "Shutters coming down — finish the customers inside",
 	"SON MÜŞTERİLER": "LAST CUSTOMERS",
-	"YER YOK": "NO ROOM",
 	"kapıdan dönen": "turned away",
 	"Et tepsisine tıkla — tek tık bir porsiyon": "Click the meat tray — one click, one portion",
 	"Kutuyu aç, turşu ve yoğurt doldur": "Open the crate, stock pickles and yogurt",

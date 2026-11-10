@@ -12,15 +12,15 @@ const KAPANIS_SINIR := 45.0
 
 func kapanis_bitti() -> bool:
 	for c in game.j_G.customers:
-		if c.get("state") in ["walkin", "wait"]: return false
+		# sira_gir: yeri ayrilmis, kapiya yuruyor (kapanis_basla onu da gonderir)
+		if c.get("state") in ["walkin", "wait", "sira_gir"]: return false
 	return true
 
 func kapanis_basla() -> void:
 	game.j_G.kapanis = {"t": 0.0}
-	var ilk := true
-	for c in game.customer_system.sira_musterileri():
-		game.customer_system.kapidan_don(c, ilk)
-		ilk = false
+	# disarida bekleyenler (kapiya yuruyen dahil) sessizce dagilir
+	for c in game.j_G.customers:
+		if c.get("state") in ["sira", "sira_gir"]: game.customer_system.kapidan_don(c)
 	game.session_system.f_say("Kepenk iniyor — içerideki müşterileri bitir")
 	game.effects.f_ftext(game.localization.f_T("SON MÜŞTERİLER"), float(game.j_W) / 2.0, 96.0, game.j_P.au0, {"sc": 2.0, "life": 2.0})
 	J.method(game.j_SFX, "warn", [])

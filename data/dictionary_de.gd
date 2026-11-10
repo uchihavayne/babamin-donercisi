@@ -843,7 +843,6 @@ const VALUE = {
 	"Dürümü tekrar basılı tut; kağıtlansın": "Nochmal gedrückt halten zum Einpacken",
 	"Kepenk iniyor — içerideki müşterileri bitir": "Rollladen geht runter — bediene die Gäste drinnen",
 	"SON MÜŞTERİLER": "LETZTE GÄSTE",
-	"YER YOK": "KEIN PLATZ",
 	"kapıdan dönen": "abgewiesen",
 	"Et tepsisine tıkla — tek tık bir porsiyon": "Klick aufs Fleischblech — ein Klick, eine Portion",
 	"Kutuyu aç, turşu ve yoğurt doldur": "Öffne die Kiste, fülle Gurken und Joghurt",

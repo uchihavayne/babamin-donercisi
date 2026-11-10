@@ -225,3 +225,16 @@ Kullanıcının seçtiği 1 ve 2 yapıldı (`tests/kapanis_sira.gd`):
 | Yer yokken müşteri doğmuyordu | Camın önündeki yakın kaldırımda, kapı tarafında en fazla 3 kişilik sıra (sokak yayası olarak, kapıya dönük, başında sabır çubuğu). Yer açılınca sıranın ilki kapıdan (sağ kenar) girer; 10 sn (boya ile uzar) dolunca "YER YOK" deyip kaldırımdan uzaklaşır. Kaçan sayılmaz; gün sonunda "Kaçan müşteri" satırında "kapıdan dönen N" |
 
 Ayrıca bulundu (henüz yapılmadı): birleşik sürümün yeni sipariş balonu müşteri konuşma satırlarını (`line`/`lineT`: bekleme, kızgın, eksik, aç misafir sözleri) hiç çizmiyor; yalnız eski balonda (`legacy_order_draw`) vardı.
+
+## Onuncu tur (2026-09-27)
+
+| Kullanıcı | Yapılan |
+| --- | --- |
+| "Müşteri kaçtı vs diye yazı çıkmasın ekrana" | Sıradan ayrılan müşteri için "YER YOK" yazısı ve sesi kaldırıldı (içeride sabrı biten müşteri zaten yazı çıkarmıyordu). Ayrılış yalnız görsel: sıranın arkasındaki kaldırım şeridine geçip sola yürür, camın dışına çıkınca silinir. Kapanışta ve lider gelince dağılan sıra da yazısız |
+| "Camın dışında yakında müşteriler sıralansın" | Sıra bordürden camın dibine alındı (bisiklet / çöp kutusuyla aynı hiza), kapıya dönük ayakta bekler (adım ortasında donmuş kare yerine bacaklar bitişik, arada bir ağırlık değiştirir). Gelen, sıradakilerin arkasındaki şeritten yürüyüp yerine geçer; sıra ilerleyince bir adım öne yürür; yer açılınca ilk sıradaki kapıya yürür ve kapıda içeri girer (kapı sesi o an çalar, sıraya girerken çalmaz) |
+| Dükkânı Büyüt son seviyesinde sıra görünmüyordu | 5. yerin müşterisi camın sağ ucunu örtüyordu; sıra tam doluyken gizliydi. Sıra artık son iki müşteri yerinin arasındaki, hiçbir yer düzeninde örtülmeyen boşlukta (`customer_system.sira_x`); oradaki sokak çöp kutusu orta bölmeye alındı (`street_draw.COP_X`, 236 → 170). Anlık görüntü referansında yalnız 5 sahnenin piksel özeti değişti (kutunun yeri), oyun durumu ve kayıt aynı |
+| "Yer yoksa ayrılsınlar" | Kural aynı: sıra (3 kişi) doluyken gelen girmez; sıradaki 10 sn (boya ile uzar) bekler, yer açılmazsa gider; gün sonunda "kapıdan dönen N" |
+| Lider gelince sıra içeri giriyordu | Lider gelince içeridekilerle birlikte kapıdaki sıra da dağılır (kapıdan dönen sayılmaz); lider varken boşalan yere kimse girmez |
+| Sırada bekleyen aç misafir | "Aç bir misafir geldi…" duyurusu kapıda beklerken değil, içeri girince çıkar |
+
+Durumlar: `sira` (bekliyor / yerine yürüyor), `sira_gir` (yeri ayrıldı, kapıya yürüyor; kapanış onu da bekler ya da gönderir), `sira_git` (sessizce gidiyor). Üçü de sokakta yaya olarak çizilir (`customer_system.sokakta`). Test: `tests/kapanis_sira.gd` (geliş şeridi, cam hizası, kapıya yürüyüp girme, yazısız ayrılış, kapanışta kapıya yürüyen, lider, 5 yerde görünürlük).

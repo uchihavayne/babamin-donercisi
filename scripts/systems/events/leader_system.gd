@@ -35,6 +35,10 @@ func f_updateLider(p_dt: Variant = null) -> Variant:
 					J.setv(v_cc, "state", "leave")
 					J.setv(v_cc, "leaveDir", (1.0 if J.gt(J.getv(v_cc, "x"), (float(game.j_W) / float(2.0))) else (-J.n(1.0))))
 					J.setv(v_cc, "mood", "wait")
+				# BIRLESIK (10. tur): kapidaki sira da dagilir (yoksa lider varken
+				# bosalan yere sira iceri giriyordu); kapidan donen sayilmaz
+				elif v_cc.get("state") in ["sira", "sira_gir"]:
+					game.customer_system.kapidan_don(v_cc, false)
 				v_ci = J.add(v_ci, 1.0)
 			J.setv(game.j_G, "spawnT", 999.0)
 			J.method(game.j_SFX, "bell", [])

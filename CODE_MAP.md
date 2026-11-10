@@ -8,7 +8,7 @@ Aşağıdaki yollar `scripts/` klasörüne göredir.
 
 | Düzenlemek istediğin bölüm | Dosya ve başlangıç noktası |
 | --- | --- |
-| Müşterinin gelişi, beklemesi, ayrılması ve ödeme | `systems/customer_system.gd`: `f_spawnCustomer`, `f_updateCustomers`, `f_deliver`, `f_payCustomer` |
+| Müşterinin gelişi, beklemesi, ayrılması ve ödeme | `systems/customer_system.gd`: `f_spawnCustomer`, `f_updateCustomers`, `f_deliver`, `f_payCustomer`; yer yokken camın dışındaki sıra: `sira_guncelle`, `sira_x`, `kapidan_don` (çizimi `rendering/street_draw.gd`: `sira_yaya`) |
 | Telefon siparişi ve kurye | `systems/customers/phone_system.gd`: `f_updatePhone`, `f_phoneClick`, `f_giveToCourier` |
 | Dayı ve motor yardımı | `systems/customers/helper_system.gd` |
 | Müşterinin rastgele yüz/kıyafet seçimi | `systems/customers/appearance_system.gd` |

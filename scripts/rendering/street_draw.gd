@@ -1,6 +1,12 @@
 # Street draw. See CODE_MAP.md.
 extends "res://scripts/core/game_module.gd"
 
+# Yakin kaldirimdaki cop kutusunun camin sol ucuna gore yeri. BIRLESIK (10.
+# tur): 236'daydi; kapidaki sira son iki musteri yerinin arasina (Dukkani
+# Buyut son seviyesinde de gorunen tek bosluk) dizildigi icin orta bolmeye
+# alindi. HD cizim (remake_gorsel.f_hdYakinEsya) ayni sabiti kullanir.
+const COP_X := 170.0
+
 # art.js:1094
 func f_drawStreetProps(p_t: Variant = null, p_lampOn: Variant = null) -> Variant:
 	var v_M: Variant = null
@@ -117,7 +123,7 @@ func f_drawNearProps(p_t: Variant = null) -> Variant:
 	game.f_fr(J.add(v_pbx, 4.0), (v_pby - 14.0), 4.0, 2.0, "#2b2018")
 	game.f_ln(J.add(v_pbx, 12.0), (v_pby - 13.0), J.add(v_pbx, 17.0), (v_pby - 13.0), "#5a636b")
 	game.f_vl(J.add(v_pbx, 14.0), (v_pby - 13.0), 8.0, "#5a636b")
-	v_kx = J.add(v_gx, 236.0)
+	v_kx = J.add(v_gx, COP_X)
 	J.setv(game.j_ctx, "globalAlpha", 0.28)
 	game.f_ell(J.add(v_kx, 5.0), v_pby, 8.0, 2.0, "#000")
 	J.setv(game.j_ctx, "globalAlpha", 1.0)
@@ -260,11 +266,12 @@ func f_drawStreet(p_t: Variant = null, p_dayK: Variant = null, p_rainOn: Variant
 		J.invoke(game.street_actors._closure_67.bind({"218:courier": _cells["courier"], "218:M": _cells["M"], "218:gx": _cells["gx"], "218:gw": _cells["gw"], "218:actors": _cells["actors"], "218:t": _cells["t"]}), [])
 	if ((not J.eq(J.kind(game.j_G), "undefined") and J.truth(J.getv(game.j_G, "kedi"))) and not J.eq(J.getv(J.getv(game.j_G, "kedi"), "faz"), "yok")):
 		J.method(_cells["actors"][0], "push", [{"y": J.add(J.getv(_cells["M"][0], "curb2"), 2.0), "f": game.street_actors._closure_69.bind({"218:t": _cells["t"]})}])
-	# BIRLESIK (9. tur): kapida sira bekleyen musteriler yakin kaldirimda
+	# BIRLESIK (9-10. tur): kapidaki sira camin dibinde; gelen / giden arkadaki seritte
 	if J.eq(J.getv(game.j_G, "scene"), "play") and game.j_G.get("customers") is Array:
 		for c in game.j_G.customers:
-			if c.get("state") in ["sira", "sira_git"]:
-				J.method(_cells["actors"][0], "push", [{"y": J.add(J.getv(_cells["M"][0], "curb2"), 1.0), "f": sira_yaya.bind({"c": c, "y": J.add(J.getv(_cells["M"][0], "curb2"), 1.0), "t": _cells["t"][0]})}])
+			if game.customer_system.sokakta(c):
+				var sy: float = J.n(c.get("sy", J.add(J.getv(_cells["M"][0], "curb2"), 1.0)))
+				J.method(_cells["actors"][0], "push", [{"y": sy, "f": sira_yaya.bind({"c": c, "y": sy, "t": _cells["t"][0]})}])
 	if (((not J.eq(J.kind(game.j_G), "undefined") and J.truth(J.getv(game.j_G, "gozcu"))) and J.truth(J.getv(game.j_G, "ferman"))) and (not J.truth(J.getv(J.getv(game.j_G, "ferman"), "kapandi")))):
 		J.invoke(game.street_actors._closure_70.bind({"218:actors": _cells["actors"], "218:M": _cells["M"], "218:t": _cells["t"]}), [J.getv(game.j_G, "gozcu")])
 	J.method(_cells["actors"][0], "sort", [game.street_actors._closure_72.bind({})])
@@ -329,23 +336,26 @@ func f_drawStreet(p_t: Variant = null, p_dayK: Variant = null, p_rainOn: Variant
 	J.method(game.j_ctx, "drawImage", [J.getv(game.j_WINOVER, "c"), (J.getv(J.getv(game.j_LAY, "win"), "x") - J.getv(game.j_WINOVER, "ox")), (J.getv(J.getv(game.j_LAY, "win"), "y") - J.getv(game.j_WINOVER, "oy"))])
 	return null
 
-# kapida sira: kapiya (saga) donuk duran yaya; sabri tukenen sola yurur gider
+# kapida sira: kapiya (saga) donuk ayakta bekleyen yaya. Yururken (siraya
+# gelis, one kayma, kapiya gidis, sessizce ayrilis) yuruyus kareleri.
 func sira_yaya(_args: Array, _captures: Dictionary = {}) -> Variant:
 	var c: Dictionary = _captures.c
 	var k := int(J.n(c.look.get("seed", 1.0))) % 997
-	var gidiyor: bool = c.get("state") == "sira_git"
 	var t: float = float(_captures.t)
-	if not gidiyor:
-		# duran kare: yuruyus fazi 0'a sabit (yayanin kendi temposuyla)
+	if not J.truth(c.get("yurur")):
+		# ayakta: bacaklari bitisik kare (faz 2); arada bir agirligini oteki
+		# bacagina verir (faz 6). Faz, yayanin kendi temposu ve k kaymasiyla
+		# pedestrian_draw'daki formule gore secilir.
 		var P0: Dictionary = game.pedestrian_draw.f_pedKimlik(k)
 		var tempo: float = maxf(0.01, J.n(P0.get("tempo", 1.0)))
-		t = (8.0 - fposmod(k * 1.7, 8.0) + 0.05) / tempo
+		var faz := 6.0 if fposmod(t + k * 0.37, 3.3) < 0.9 else 2.0
+		t = fposmod(faz + 0.5 - k * 1.7, 8.0) / tempo
 	var x := floorf(float(c.x) + 0.5)
-	game.pedestrian_draw.f_drawPed(x, _captures.y, k, -1.0 if gidiyor else 1.0, t, 1.0, false)
-	if not gidiyor:
+	game.pedestrian_draw.f_drawPed(x, _captures.y, k, J.n(c.get("yon", 1.0)), t, 1.0, false)
+	if c.get("state") == "sira":
 		# sabir cubugu: sira musterisini siradan yayadan ayirir, ne kadar bekleyecegini gosterir
 		var kalan := clampf(1.0 - J.n(c.get("siraT", 0.0)) / maxf(0.1, J.n(c.get("siraMax", 1.0))), 0.0, 1.0)
-		var y: float = float(_captures.y) - 22.0
+		var y: float = floorf(float(_captures.y) + 0.5) - 22.0
 		game.f_fr(x - 4.0, y, 8.0, 3.0, "#2a1e18")
 		game.f_fr(x - 3.0, y + 1.0, maxf(1.0, floorf(6.0 * kalan + 0.5)), 1.0, "#78c850" if kalan > 0.5 else ("#e8b453" if kalan > 0.25 else "#e2483a"))
 	return null

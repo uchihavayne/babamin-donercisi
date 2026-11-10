@@ -4,13 +4,24 @@ extends "res://scripts/core/game_module.gd"
 # BIRLESIK (9. tur, genel test): yer doluyken gelen musteri eskiden hic
 # dogmuyordu (gelme denemelerinin %45-75'i sessizce kayboluyordu; Tabela
 # Dukkani Buyut olmadan etkisizdi, oyuncu kacirdigini gormuyordu). Artik
-# camin onundeki kaldirimda, kapinin (sag uc) onunde en fazla SIRA_MAX kisi
-# bekler (sokakta yaya olarak cizilir); yer acilinca kapidan girer, SIRA_SURE
-# dolunca "YER YOK" deyip kaldirimdan uzaklasir (kacan sayilmaz, gun sonunda
+# camin disinda, kapinin (sag uc) onunde en fazla SIRA_MAX kisi bekler
+# (sokakta yaya olarak cizilir); yer acilinca kapiya yurur ve iceri girer,
+# SIRA_SURE dolunca kaldirimdan uzaklasir (kacan sayilmaz, gun sonunda
 # "kapidan donen").
+# 10. tur (kullanici: "musteri kacti vs diye yazi cikmasin; camin disinda
+# yakinda siralansinlar, yer yoksa ayrilsinlar"): giden icin yazi / ses yok;
+# sira camin dibinde (bisiklet ve cop kutusuyla ayni hizada) durur, gelen ve
+# giden onlarin arkasindan kaldirim seridinde yurur.
 const SIRA_MAX := 3
 const SIRA_SURE := 10.0
 const SIRA_ARA := 11.0
+const SIRA_HIZ := 26.0
+const GIRIS_HIZ := 40.0 # siranin ilki kapiya biraz daha hizli yurur
+# sokakta cizilen (henuz iceri girmemis ya da kapidan donen) musteri durumlari
+const SOKAK := ["sira", "sira_gir", "sira_git"]
+
+func sokakta(c: Dictionary) -> bool:
+	return c.get("state") in SOKAK
 
 func sira_musterileri() -> Array:
 	var out: Array = []
@@ -18,10 +29,29 @@ func sira_musterileri() -> Array:
 		if c.get("state") == "sira": out.append(c)
 	return out
 
-# kaldirimda k. siradakinin yeri (0: kapiya en yakin, camin sag ucu)
+# kaldirimda k. siradakinin yeri (0: kapiya en yakin). Camin sag ucu, Dukkani
+# Buyut son seviyesindeki 5. yerin musterisinin arkasinda kaliyordu (sira tam
+# doluyken hic gorunmuyordu); sira son iki musteri yerinin arasindaki, hicbir
+# yer duzeninde ortulmeyen bosluga dizilir.
 func sira_x(k: int) -> float:
+	var S: Array = game.j_LAY.custSlots
+	var orta: float = (J.n(S[S.size() - 2].x) + J.n(S[S.size() - 1].x)) / 2.0
+	return orta + SIRA_ARA - k * SIRA_ARA
+
+# siranin durdugu cizgi: camin dibi (yakin esyalarla ayni derinlik)
+func sira_y() -> float:
 	var M: Dictionary = game.street_background.f_stM()
-	return J.n(M.gx) + J.n(M.gw) - 14.0 - k * SIRA_ARA
+	return J.n(M.gy) + J.n(M.gh) - 1.0
+
+# gelenin / gidenin yurudugu serit: siranin arkasi, bordure yakin
+func yol_y() -> float:
+	var M: Dictionary = game.street_background.f_stM()
+	return J.n(M.curb2) + 3.0
+
+# kapi: camin sag ucunun ardi; siranin ilki buraya yuruyup iceri girer
+func kapi_x() -> float:
+	var M: Dictionary = game.street_background.f_stM()
+	return J.n(M.gx) + J.n(M.gw) + 8.0
 
 func bos_yerler() -> Array:
 	var dolu := {}
@@ -32,16 +62,35 @@ func bos_yerler() -> Array:
 		if not dolu.has(s): out.append(s)
 	return out
 
-# yazi: ayni anda / art arda birden cok kisi giderse tek "YER YOK" (ust uste binmesin)
-var _yer_yok_t := -99.0
-func kapidan_don(c: Dictionary, yazi := true) -> void:
-	c.state = "sira_git"; c.mood = "angry"
-	game.j_G.stat.yerYok = J.n(game.j_G.stat.get("yerYok", 0.0)) + 1.0
-	if not yazi or J.n(game.j_G.t) - _yer_yok_t < 1.3: return
-	_yer_yok_t = J.n(game.j_G.t)
-	var M: Dictionary = game.street_background.f_stM()
-	game.effects.f_ftext(game.localization.f_T("YER YOK"), minf(float(c.x), J.n(M.gx) + J.n(M.gw) - 24.0), J.n(M.curb2) - 30.0, game.j_P.bad, {"life": 1.3})
-	J.method(game.j_SFX, "uiBack", [])
+# sessizce siradan cikip gider (yazi / ses yok). sayilir: gun sonundaki
+# "kapidan donen" (lider gelince dagilan sira sayilmaz)
+func kapidan_don(c: Dictionary, sayilir := true) -> void:
+	c.state = "sira_git"; c.mood = "angry"; c.slot = -1.0
+	if sayilir: game.j_G.stat.yerYok = J.n(game.j_G.stat.get("yerYok", 0.0)) + 1.0
+
+# kapiya varan musteri iceri girer (sagdan, yerine yurur)
+func kapidan_gir(c: Dictionary) -> void:
+	var ks: Dictionary = game.j_LAY.custSlots[int(J.n(c.slot))]
+	c.tx = ks.x; c.y = ks.y; c.state = "walkin"; c.mood = "wait"
+	c.x = J.add(game.j_W, 24.0)
+	J.method(game.j_SFX, "door", [])
+	if J.truth(c.get("homeless")): evsiz_geldi(c)
+
+func evsiz_geldi(c: Dictionary) -> void:
+	c.line = game.math_utils.f_pick(game.j_LINES_HOMELESS)
+	c.lineT = 3.2
+	game.session_system.f_say("Aç bir misafir geldi — dürüm verirsen şansın açılır")
+
+# sokakta cizim icin: yurur (yuruyus karesi) ve yon (-1 sola, 1 saga)
+func _sokak_adim(c: Dictionary, hx: float, hy: float, dt: float, yuz: float) -> void:
+	var x0 := float(c.x)
+	var y0 := J.n(c.get("sy", hy))
+	c.x = game.math_utils.f_approach(x0, hx, dt * SIRA_HIZ)
+	c.sy = game.math_utils.f_approach(y0, hy, dt * 20.0)
+	var dx: float = float(c.x) - x0
+	c.yurur = absf(dx) > 0.0001 or absf(float(c.sy) - y0) > 0.0001
+	if absf(dx) > 0.0001: c.yon = signf(dx)
+	elif not c.yurur: c.yon = yuz
 
 func sira_guncelle(dt: float) -> void:
 	var M: Dictionary = game.street_background.f_stM()
@@ -49,30 +98,32 @@ func sira_guncelle(dt: float) -> void:
 	while i >= 0:
 		var g: Dictionary = game.j_G.customers[i]
 		if g.get("state") == "sira_git":
-			g.x = float(g.x) - dt * 26.0
+			# siranin arkasindaki seride gecip sola yurur, camin disina cikinca silinir
+			_sokak_adim(g, float(g.x) - 1000.0, yol_y(), dt, -1.0)
 			if float(g.x) < J.n(M.gx) - 12.0: game.j_G.customers.remove_at(i)
+		elif g.get("state") == "sira_gir":
+			_sokak_adim(g, kapi_x(), sira_y(), dt * GIRIS_HIZ / SIRA_HIZ, 1.0)
+			if absf(float(g.x) - kapi_x()) < 0.5: kapidan_gir(g)
 		i -= 1
 	var sira := sira_musterileri()
 	if sira.is_empty(): return
 	var bekler: bool = not J.truth(game.gameplay_input.f_tutBusy())
 	for k in sira.size():
 		var c: Dictionary = sira[k]
-		c.x = game.math_utils.f_approach(c.x, sira_x(k), dt * 26.0)
+		var hx := sira_x(k)
+		# yeni gelen siradakilerin arkasindan yurur, yerine varinca cama yanasir;
+		# sira ilerleyince camin dibinde bir adim one kayar
+		if absf(float(c.x) - hx) < 3.0: c.dizide = true
+		_sokak_adim(c, hx, sira_y() if J.truth(c.get("dizide")) else yol_y(), dt, 1.0)
 		if bekler: c.siraT = J.n(c.get("siraT", 0.0)) + dt
-	var ilk: Dictionary = sira[0]
 	var bos := bos_yerler()
 	if not bos.is_empty():
-		var yer: int = game.math_utils.f_pick(bos)
-		var ks: Dictionary = game.j_LAY.custSlots[yer]
-		ilk.slot = float(yer); ilk.tx = ks.x; ilk.y = ks.y; ilk.state = "walkin"; ilk.mood = "wait"
-		ilk.x = J.add(game.j_W, 24.0)
-		J.method(game.j_SFX, "door", [])
+		# yer ayrilir; siranin ilki kapiya yurur (sira_gir), kapida iceri girer
+		var ilk: Dictionary = sira[0]
+		ilk.slot = float(game.math_utils.f_pick(bos)); ilk.state = "sira_gir"
 		return
-	var yazildi := false
 	for c in sira:
-		if J.n(c.siraT) > J.n(c.siraMax):
-			kapidan_don(c, not yazildi)
-			yazildi = true
+		if J.n(c.siraT) > J.n(c.siraMax): kapidan_don(c)
 
 # game.js:2085
 func f_spawnCustomer() -> Variant:
@@ -122,17 +173,16 @@ func f_spawnCustomer() -> Variant:
 		J.setv(v_look, "shirt", 5.0)
 		J.setv(v_look, "hair", 2.0)
 		J.setv(v_look, "acc", "cap")
-	J.method(game.j_SFX, "door", [])
+	if not kapida: J.method(game.j_SFX, "door", []) # siradaki kapidan girince calar
 	v_c = {"slot": v_slot, "homeless": v_homeless, "look": v_look, "mac": (not (not J.truth(J.getv(game.j_G, "macDalga")))), "items": v_items, "done": J.method(v_items, "map", [game.customer_system._closure_249.bind({})]), "patMax": v_pat, "patience": 1.0, "t": 0.0, "mood": "wait", "state": "walkin", "x": J.add(game.j_W, 24.0), "y": J.getv(J.getv(J.getv(game.j_LAY, "custSlots"), (0.0 if kapida else v_slot)), "y"), "tx": (0.0 if kapida else J.getv(J.getv(J.getv(game.j_LAY, "custSlots"), v_slot), "x")), "bubble": 0.0, "line": "", "lineT": 0.0, "wrongT": 0.0, "earn": 0.0}
 	if kapida:
 		v_c.state = "sira"; v_c.siraT = 0.0
-		v_c.x = sira_x(0) + 30.0 # kaldirimin sagindan yuruyerek siraya girer
+		# kaldirimin sagindan (kapi tarafi) siranin arkasindaki seritten gelir
+		v_c.x = kapi_x() + 8.0; v_c.sy = yol_y()
 		v_c.siraMax = SIRA_SURE * J.n(J.method(game.j_TUN, "patience", [game.j_G]))
 	J.method(J.getv(game.j_G, "customers"), "push", [v_c])
-	if J.truth(v_homeless):
-		J.setv(v_c, "line", game.math_utils.f_pick(game.j_LINES_HOMELESS))
-		J.setv(v_c, "lineT", 3.2)
-		game.session_system.f_say("Aç bir misafir geldi — dürüm verirsen şansın açılır")
+	# ac misafir sirada beklerse duyuru iceri girince (kapidan_gir)
+	if J.truth(v_homeless) and not kapida: evsiz_geldi(v_c)
 	return null
 
 # game.js:2125
