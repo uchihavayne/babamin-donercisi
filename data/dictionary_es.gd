@@ -1130,5 +1130,9 @@ const VALUE = {
 	"YENİ": "NUEVO",
 	"TOPLU": "GRUPO",
 	"Toplu sipariş! Dürümleri Dayıya ver": "¡Pedido grande! Dale los dürüms al tío",
-	"TOPLU SİPARİŞ +%40": "PEDIDO GRANDE +40%"
+	"TOPLU SİPARİŞ +%40": "PEDIDO GRANDE +40%",
+	"Eldekini at": "Tirar lo que llevas",
+	"Çöpü boşalt": "Vaciar la basura",
+	"Yanmış dürümü at": "Tirar el durum quemado",
+	"Tezgâhtakini at": "Tirar lo de la tabla"
 }

@@ -69,7 +69,7 @@ func denetle() -> void:
 	var slotlar := {}
 	for c in G.customers:
 		ihlal(c.done.size() == c.items.size(), "musteri done/items uyumsuz")
-		if not c.state in ["leave", "served", "sira", "sira_git"]:
+		if not c.state in ["leave", "sorgu", "served", "sira", "sira_git"]:
 			ihlal(not slotlar.has(c.slot), "iki musteri ayni yerde")
 			slotlar[c.slot] = true
 	ihlal(G.hand == null or (G.hand is Dictionary and G.hand.has("kind")), "elde gecersiz nesne")

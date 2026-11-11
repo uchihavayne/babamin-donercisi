@@ -343,6 +343,7 @@ func f_drawPlay(p_t: Variant = null) -> Variant:
 			J.setv(game.j_ctx, "globalAlpha", 1.0)
 		game.f_drawOrderBubble(_v["cc"], _cells["t"][0])
 		_v["j"] = J.add(_v["j"], 1.0)
+	game.regulation_draw.f_drawInspectorEtiket(_cells["t"][0])
 	# HD'de burada yalniz konusma balonu (govde musteri katmaninda cizildi)
 	if game.hd_gpu(): game.rakip_kip = "balon"
 	game.incident_draw.f_drawRakip(_cells["t"][0])

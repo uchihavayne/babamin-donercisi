@@ -108,7 +108,7 @@ func f_startDay() -> Variant:
 	J.setv(game.j_G, "emptyT", 0.0)
 	J.setv(game.j_G, "inspect", null)
 	if (J.ge(J.getv(game.j_G, "day"), game.j_INSPECT_DAY) and J.truth(game.f_chance(game.j_INSPECT_CHANCE))):
-		J.setv(game.j_G, "inspect", {"state": "wait", "t": game.math_utils.f_rnd(25.0, max(30.0, (J.getv(J.getv(game.j_G, "cfg"), "len") - 40.0))), "x": J.add(game.j_W, 26.0), "y": 152.0, "tx": 250.0, "dirty": false, "fine": 0.0, "line": ""})
+		J.setv(game.j_G, "inspect", {"state": "wait", "t": game.math_utils.f_rnd(25.0, max(30.0, (J.getv(J.getv(game.j_G, "cfg"), "len") - 40.0))), "x": J.add(game.j_W, 26.0), "y": 152.0, "tx": game.event_system.mufettis_x(), "dirty": false, "fine": 0.0, "line": ""})
 	J.setv(game.j_G, "tut", (0.0 if J.eq(J.getv(game.j_G, "day"), 1.0) else 99.0))
 	if not J.eq(J.kind(game.j_TUTFX), "undefined"):
 		J.setv(game.j_TUTFX, "ilk", true)
@@ -206,6 +206,10 @@ func f_endDay() -> Variant:
 	game.save_system.f_saveAll()
 	return null
 
+# ilk acilistaki tabela / dukkan gorunumu (core/game_setup.gd ile ayni)
+func varsayilan_tabela() -> Dictionary:
+	return {"sign": "USTA DÖNER", "sub": "EFSANE LEZZET", "poster": 1.0, "counter": 0.0}
+
 # game.js:203
 func f_resetProgress() -> Variant:
 	J.setv(game.j_G, "day", 1.0)
@@ -231,7 +235,10 @@ func f_resetProgress() -> Variant:
 	J.setv(game.j_G, "luck", 0.0)
 	J.setv(game.j_G, "moto", {"broken": false, "cost": 0.0})
 	J.setv(game.j_G, "stats", {"wraps": 0.0, "drinks": 0.0, "boxes": 0.0, "sweets": 0.0, "isk": 0.0, "earned": 0.0, "best": 0.0, "days": 0.0, "debtPaid": 0.0, "phone": 0.0, "lost": 0.0, "fines": 0.0, "stolen": 0.0, "bahsis": 0.0, "enBahsis": 0.0, "gunEnCok": 0.0, "mukemmel": 0.0, "enSeri": 0.0, "temizSeri": 0.0, "depoTam": 0.0, "buyukSiparis": 0.0, "fgunEn": 0.0, "evEn": 0.0, "lider": 0.0, "temizGun": 0.0, "kacak": 0.0, "muhur": 0.0, "yanik": 0.0, "sifirGun": 0.0, "moto": 0.0, "dayi": 0.0, "fed": 0.0, "sehir": []})
-	J.setv(game.j_G, "custom", null)
+	# BIRLESIK (11. tur): eskiden null'di; Kisisellestir penceresi tabela adini
+	# "null" gosteriyor, oklar calismiyordu ve yeni oyunda alt yazi / duvar susu
+	# ilk acilistakinden farkli (bos) geliyordu. Yeni oyun ilk acilisla ayni baslar.
+	J.setv(game.j_G, "custom", varsayilan_tabela())
 	J.setv(game.j_G, "bs", {})
 	J.setv(game.j_G, "rakipHedef", 0.0)
 	J.setv(game.j_G, "rakipKapandi", false)

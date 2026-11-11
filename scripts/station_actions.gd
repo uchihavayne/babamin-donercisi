@@ -256,7 +256,12 @@ func actions() -> Array[Dictionary]:
 			"crate": list.append(action("crate","AÇ / KAPAT","OPEN / CLOSE",free))
 			"phone": list.append(action("phone","Telefonu aç","Answer phone",game.j_G.phone.state == "ring"))
 			"uncle": list.append(action("uncle","Kuryeye ver / yardım","Courier / help"))
-			"trash": list.append(action("trash","Eldekini at" if hand else "Çöpü boşalt","Discard held item" if hand else "Empty trash"))
+			"trash":
+				match game.event_system.cop_eylemi():
+					"el": list.append(action("trash","Eldekini at","Discard held item"))
+					"yanik": list.append(action("trash","Yanmış dürümü at","Discard burnt wrap"))
+					"tezgah": list.append(action("trash","Tezgâhtakini at","Discard board item"))
+					_: list.append(action("trash","Çöpü boşalt","Empty trash"))
 			"cat": list.append(action("cat","Kediyi besle","Feed cat",free and game.j_G.meat > 0))
 	if selected.begins_with("refill:"):
 		var key: String = selected.trim_prefix("refill:")

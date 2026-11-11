@@ -322,10 +322,6 @@ func f_drawInspector(p_t: Variant = null) -> Variant:
 	var v_by: Variant = null
 	var v_i: Variant = null
 	var v_pen: Variant = null
-	var v_lbl: Variant = null
-	var v_lw: Variant = null
-	var v_lx: Variant = null
-	var v_ly: Variant = null
 	var v_t: Variant = p_t
 	v_I = J.getv(game.j_G, "inspect")
 	if ((not J.truth(v_I)) or J.eq(J.getv(v_I, "state"), "wait")):
@@ -346,17 +342,26 @@ func f_drawInspector(p_t: Variant = null) -> Variant:
 	if J.eq(J.getv(v_I, "state"), "check"):
 		v_pen = (sin((v_t * 12.0)) * 2.0)
 		game.f_ln(J.add(J.add(v_bx, 8.0), v_pen), J.add(v_by, 4.0), J.add(J.add(v_bx, 11.0), v_pen), J.add(v_by, 9.0), "#2f3740")
-	v_lbl = ("DENETİM…" if J.eq(J.getv(v_I, "state"), "check") else (J.getv(v_I, "line") if J.truth(J.getv(v_I, "line")) else ""))
-	if J.truth(v_lbl):
-		v_lw = J.add(game.f_textW(v_lbl), 8.0)
-		v_lx = game.math_utils.f_clamp((J.getv(v_I, "x") - (float(v_lw) / float(2.0))), 2.0, ((game.j_W - v_lw) - 2.0))
-		v_ly = (J.getv(v_I, "y") - 66.0)
-		game.f_rrect(v_lx, v_ly, v_lw, 12.0, 3.0, (J.getv(game.j_P, "bad") if J.truth(J.getv(v_I, "dirty")) else J.getv(game.j_P, "white")))
-		game.f_rrectOut(v_lx, v_ly, v_lw, 12.0, 3.0, J.getv(game.j_P, "ui5"))
-		game.text_draw.f_txt(v_lbl, J.add(v_lx, 4.0), J.add(v_ly, 2.0), (J.getv(game.j_P, "white") if J.truth(J.getv(v_I, "dirty")) else J.getv(game.j_P, "ink")))
 	if (J.eq(J.getv(v_I, "state"), "check") and J.gt(J.getv(game.j_G, "trash"), 0.55)):
 		J.setv(game.j_ctx, "globalAlpha", J.add(0.4, (0.4 * sin((v_t * 8.0)))))
 		game.f_rrectOut((J.getv(J.getv(game.j_ST, "trash"), "x") - 2.0), (J.getv(J.getv(game.j_ST, "trash"), "y") - 2.0), J.add(J.getv(J.getv(game.j_ST, "trash"), "w"), 4.0), J.add(J.getv(J.getv(game.j_ST, "trash"), "h"), 4.0), 3.0, J.getv(game.j_P, "bad"))
 		J.setv(game.j_ctx, "globalAlpha", 1.0)
 	return null
 
+# Mufettisin etiketi ("DENETİM…" / sonuc sozu). BIRLESIK (11. tur): govdeyle
+# birlikte musteri katmaninda ciziliyor, dolu dukkanda siparis balonlarinin
+# altinda kaliyordu; ayri geciste, balonlardan sonra cizilir (game_draw).
+func f_drawInspectorEtiket(_p_t: Variant = null) -> Variant:
+	var v_I: Variant = J.getv(game.j_G, "inspect")
+	if ((not J.truth(v_I)) or J.eq(J.getv(v_I, "state"), "wait")):
+		return null
+	var v_lbl: Variant = ("DENETİM…" if J.eq(J.getv(v_I, "state"), "check") else (J.getv(v_I, "line") if J.truth(J.getv(v_I, "line")) else ""))
+	if not J.truth(v_lbl):
+		return null
+	var v_lw: Variant = J.add(game.f_textW(v_lbl), 8.0)
+	var v_lx: Variant = game.math_utils.f_clamp((J.getv(v_I, "x") - (float(v_lw) / float(2.0))), 2.0, ((game.j_W - v_lw) - 2.0))
+	var v_ly: Variant = (J.getv(v_I, "y") - 66.0)
+	game.f_rrect(v_lx, v_ly, v_lw, 12.0, 3.0, (J.getv(game.j_P, "bad") if J.truth(J.getv(v_I, "dirty")) else J.getv(game.j_P, "white")))
+	game.f_rrectOut(v_lx, v_ly, v_lw, 12.0, 3.0, J.getv(game.j_P, "ui5"))
+	game.text_draw.f_txt(v_lbl, J.add(v_lx, 4.0), J.add(v_ly, 2.0), (J.getv(game.j_P, "white") if J.truth(J.getv(v_I, "dirty")) else J.getv(game.j_P, "ink")))
+	return null

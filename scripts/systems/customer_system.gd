@@ -56,7 +56,8 @@ func kapi_x() -> float:
 func bos_yerler() -> Array:
 	var dolu := {}
 	for c in game.j_G.customers:
-		if not c.get("state") in ["leave", "sira", "sira_git"]: dolu[int(J.n(c.get("slot", -1)))] = true
+		# "sorgu": cikarken kapida gozcuye yakalanan musteri (Demirkent); yerini birakmistir
+		if not c.get("state") in ["leave", "sorgu", "sira", "sira_git"]: dolu[int(J.n(c.get("slot", -1)))] = true
 	var out: Array = []
 	for s in int(J.n(game.j_G.cfg.slots)):
 		if not dolu.has(s): out.append(s)
@@ -141,7 +142,7 @@ func f_spawnCustomer() -> Variant:
 	v_used = {}
 	v_i = 0.0
 	while J.lt(v_i, J.getv(J.getv(game.j_G, "customers"), "length")):
-		if not J.eq(J.getv(J.getv(J.getv(game.j_G, "customers"), v_i), "state"), "leave"):
+		if not J.getv(J.getv(J.getv(game.j_G, "customers"), v_i), "state") in ["leave", "sorgu"]:
 			J.setv(v_used, J.getv(J.getv(J.getv(game.j_G, "customers"), v_i), "slot"), 1.0)
 		v_i = J.add(v_i, 1.0)
 	v_free = []

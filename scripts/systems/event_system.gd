@@ -40,6 +40,20 @@ func f_copaAt(p_x0: Variant = null, p_y0: Variant = null, p_renkler: Variant = n
 		v_i = J.add(v_i, 1.0)
 	return null
 
+# Cop kutusuna basinca ne olur (f_trashClick ile ayni oncelik sirasi):
+#   "el": eldeki urun atilir, "yanik": izgaradaki yanmis durum atilir,
+#   "tezgah": tezgahtaki urun atilir, "bosalt": kova bosaltilir, "bos": kova bos.
+# BIRLESIK (11. tur): istasyon etiketi el bosken hep "Çöpü boşalt" diyordu,
+# oysa tezgahta urun varsa o atiliyor; etiket artik bu sonucu soyler.
+func cop_eylemi() -> String:
+	if J.truth(game.j_G.hand): return "el"
+	for s in game.j_G.grill.slots:
+		if J.truth(s.w.get("burnt")): return "yanik"
+	if J.truth(game.j_G.boards[int(J.n(game.j_G.act))]): return "tezgah"
+	for i in int(J.n(J.method(game.j_TUN, "boards", [game.j_G]))):
+		if J.truth(game.j_G.boards[i]): return "tezgah"
+	return "bosalt" if J.n(game.j_G.trash) > 0.02 else "bos"
+
 # game.js:4354
 func f_trashClick() -> Variant:
 	var v_gi: Variant = null
@@ -101,6 +115,15 @@ func f_trashClick() -> Variant:
 	game.session_system.f_say("Kova zaten boş")
 	return null
 
+# Mufettisin durdugu yer. BIRLESIK (11. tur): sabit 250'deydi; 3 ve ustu
+# yerli dukkanda 3. musterinin ustune biniyordu. Bos kalan ilk musteri yerinde
+# durur; dukkan 5 yerliyse (bos yer yok) iki yerin tam arasinda.
+func mufettis_x() -> float:
+	var S: Array = game.j_LAY.custSlots
+	var n := int(J.n(game.j_G.cfg.slots))
+	if n < S.size(): return J.n(S[n].x)
+	return (J.n(S[2].x) + J.n(S[3].x)) / 2.0
+
 # game.js:4413
 func f_maybeInspector(p_dt: Variant = null) -> Variant:
 	var v_I: Variant = null
@@ -142,12 +165,12 @@ func f_maybeInspector(p_dt: Variant = null) -> Variant:
 				J.method(game.j_SFX, "fine", [])
 				game.effects.f_shake(3.0)
 				game.effects.f_flash(0.2, "#ff6a4a")
-				game.effects.f_ftext(J.add(game.localization.f_T("CEZA +$"), J.getv(v_I, "fine")), J.getv(v_I, "x"), (J.getv(v_I, "y") - 62.0), J.getv(game.j_P, "bad"), {"sc": 1.0, "life": 2.0})
+				game.effects.f_ftext(J.add(game.localization.f_T("CEZA +$"), J.getv(v_I, "fine")), J.getv(v_I, "x"), (J.getv(v_I, "y") - 84.0), J.getv(game.j_P, "bad"), {"sc": 1.0, "life": 2.0})
 			else:
 				J.setv(v_I, "fine", 0.0)
 				J.setv(v_I, "line", game.math_utils.f_pick(game.j_LINES_INSPECT_OK))
 				J.method(game.j_SFX, "stamp", [])
-				game.effects.f_ftext("TEMİZ!", J.getv(v_I, "x"), (J.getv(v_I, "y") - 62.0), J.getv(game.j_P, "ok"), {"sc": 1.0, "life": 1.6})
+				game.effects.f_ftext("TEMİZ!", J.getv(v_I, "x"), (J.getv(v_I, "y") - 84.0), J.getv(game.j_P, "ok"), {"sc": 1.0, "life": 1.6})
 			J.setv(v_I, "state", "leave")
 			J.setv(v_I, "t", 0.0)
 			game.save_system.f_saveAll()
