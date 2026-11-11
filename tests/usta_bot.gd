@@ -6,6 +6,7 @@
 # ayni urun hem elde hem tahtada, takilan sahne...). Gun gun oynanabilirlik
 # olcumu basar: gelen / servis / kacan musteri, kazanc, bekleme nedenleri.
 #   godot --headless --path . --script tests/usta_bot.gd --quit-after 100000000 -- --test [--gun 12] [--gecikme 0.6] [--tohum 1]
+#       [--tam] (butun yukseltmeler) [--sehir N] (0-8; 8 Demirkent) [--ilk G] (baslangic gunu) [--up a,b] [--iz]
 extends SceneTree
 const J = preload("res://scripts/js_compat.gd")
 var game: Node
@@ -394,7 +395,11 @@ func run() -> void:
 	root.add_child(game); game.set_process(false); game.j_MUTED = true
 	game.localization.f_setLang("tr")
 	gecikme = float(arg("--gecikme", "0.6"))
-	seed(int(arg("--tohum", "1")))
+	var tohum := int(arg("--tohum", "1"))
+	seed(tohum)
+	# oyunun kendi rastgele ureteci test kipinde sabit baslar (123456); --tohum
+	# onu da kaydirir, yoksa her tur ayni olay dizisini oynar (tohum 1: eski dizi)
+	if tohum != 1: game.random_state = (123456 + tohum * 7919) & 0xffffffff
 	game.session_system.f_resetProgress()
 	G = game.j_G
 	game.controls.set_mode("controller")
@@ -403,6 +408,15 @@ func run() -> void:
 	if arg("--up", "") != "":
 		for u in arg("--up", "").split(","): G.up[u] = 1.0
 	G.day = float(arg("--ilk", "1"))
+	# --tam : butun yukseltmeler son seviyede (otomasyon, 5 yer, tum urunler)
+	if "--tam" in OS.get_cmdline_user_args():
+		for u in game.j_UPG: G.up[u.id] = float(u.lv.size())
+	# --sehir N : N. subeye kadar acilmis, o sehirde oynanir (8: Demirkent, ferman kurallari)
+	if arg("--sehir", "") != "":
+		var sehir := int(arg("--sehir", "0"))
+		G.branch = float(sehir + 1)
+		game.branch_draw.f_sehreGit(float(sehir))
+		ihlal(int(G.city) == sehir, "sehre gidilemedi: %s" % G.city)
 	iz = "--iz" in OS.get_cmdline_user_args()
 	print("USTA BOT gecikme %.2f sn, %d gun" % [gecikme, gunler])
 	for d in gunler:

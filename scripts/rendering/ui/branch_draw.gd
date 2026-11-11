@@ -166,8 +166,11 @@ func f_drawBranchPanel(p_t: Variant = null) -> Variant:
 	v_kk = game.interface_draw.f_panelKutu(10.0, 262.0)
 	v_y = J.getv(v_kk, 0.0)
 	v_h = J.getv(v_kk, 1.0)
-	v_x = 44.0
-	v_w = 392.0
+	# BIRLESIK (11. tur): aciklama (205-299 px) gelir yazisinin ustune biniyordu.
+	# Panel genisledi (392 -> 432); gelir ad satirinda, aciklama kendi satirinda
+	# ve eylem sutununa kadar olan genislige sigdirilir.
+	v_x = 24.0
+	v_w = 432.0
 	J.setv(game.j_ctx, "globalAlpha", 0.84)
 	game.f_fr(0.0, 0.0, game.j_W, game.j_H, "#0d0a08")
 	J.setv(game.j_ctx, "globalAlpha", 1.0)
@@ -210,8 +213,8 @@ func f_drawBranchPanel(p_t: Variant = null) -> Variant:
 		game.branch_draw.f_branchIcon(J.add(v_x, 30.0), J.add(v_ry, 10.0), v_have, J.add(v_k, v_i))
 		game.text_draw.f_txt(J.getv(v_b, "name"), J.add(v_x, 48.0), J.add(v_ry, (4.0 if J.truth(v_darP) else 2.0)), (J.getv(game.j_P, "ink") if J.truth(v_have) else (J.getv(game.j_P, "ink") if J.truth(v_isNext) else "#6a6058")))
 		if (not J.truth(v_darP)):
-			game.text_draw.f_txt((J.getv(v_b, "desc") if (J.truth(v_have) or J.truth(v_isNext)) else "???"), J.add(v_x, 48.0), J.add(v_ry, 12.0), (J.getv(game.j_P, "ui4") if J.truth(v_have) else "#5a5450"))
-		game.text_draw.f_txt(J.add(J.add("+$", game.math_utils.f_fmtShort(J.getv(v_b, "inc"))), game.localization.f_T("/gün")), J.add(v_x, 250.0), J.add(v_ry, 6.0), (J.getv(game.j_P, "au2") if J.truth(v_have) else "#6a6058"), {"align": "r"})
+			game.text_draw.f_txt((J.getv(v_b, "desc") if (J.truth(v_have) or J.truth(v_isNext)) else "???"), J.add(v_x, 48.0), J.add(v_ry, 12.0), (J.getv(game.j_P, "ui4") if J.truth(v_have) else "#5a5450"), {"maxw": (v_w - 156.0)})
+		game.text_draw.f_txt(J.add(J.add("+$", game.math_utils.f_fmtShort(J.getv(v_b, "inc"))), game.localization.f_T("/gün")), (J.add(v_x, v_w) - 104.0), J.add(v_ry, (6.0 if J.truth(v_darP) else 2.0)), (J.getv(game.j_P, "au2") if J.truth(v_have) else "#6a6058"), {"align": "r"})
 		if J.truth(v_have):
 			if J.eq(J.getv(game.j_G, "city"), v_i):
 				game.text_draw.f_txt(game.localization.f_T("BURADASIN"), (J.add(v_x, v_w) - 20.0), J.add(v_ry, 6.0), J.getv(game.j_P, "au0"), {"align": "r", "outline": true})

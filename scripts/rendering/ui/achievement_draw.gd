@@ -239,6 +239,10 @@ func f_drawBasarimToast(p_t: Variant = null, p_dt: Variant = null) -> Variant:
 		return null
 	if ((J.truth(J.getv(game.j_BSP, "open")) or J.truth(J.getv(game.j_STATS, "open"))) or J.truth(J.getv(game.j_SESP, "open"))):
 		return null
+	# BIRLESIK (11. tur): subeler / borc ode / kisisellestir / ev penceresi
+	# acikken de bekler (pencerenin alt yazisini ve KAPAT dugmesini ortuyordu)
+	if J.truth(game.j_BRP.open) or J.truth(game.j_PAYP.open) or J.truth(game.j_CUSTOM.open) or J.truth(game.j_EVP.open):
+		return null
 	v_it = J.getv(J.getv(game.j_BSQ, "kuyruk"), 0.0)
 	J.setv(v_it, "t", J.add(J.getv(v_it, "t"), v_dt))
 	v_sure = 3.4

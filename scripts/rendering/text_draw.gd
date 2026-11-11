@@ -45,6 +45,20 @@ func f_fontAtlas(p_col: Variant = null) -> Variant:
 	return J.getv(game.j__atlas, v_col)
 	return null
 
+# Metni en fazla maxw piksele sigdirir; sigmazsa sondan kirpip "…" ekler.
+var _kisa: Dictionary = {}
+func kisalt(metin: String, maxw: float, mono: Variant = null) -> String:
+	if J.n(game.f_textW(metin, 1.0, mono)) <= maxw: return metin
+	var anahtar := metin + "\u0001" + str(int(maxw)) + ("m" if J.truth(mono) else "")
+	var hazir: Variant = _kisa.get(anahtar)
+	if hazir != null: return hazir
+	var n := metin.length() - 1
+	while n > 1 and J.n(game.f_textW(metin.substr(0, n).strip_edges() + "…", 1.0, mono)) > maxw: n -= 1
+	var sonuc := metin.substr(0, n).strip_edges() + "…"
+	if _kisa.size() > 512: _kisa.clear()
+	_kisa[anahtar] = sonuc
+	return sonuc
+
 # core.js:456
 func f_txt(p_s: Variant = null, p_x: Variant = null, p_y: Variant = null, p_col: Variant = null, p_o: Variant = null) -> Variant:
 	var v_sc: Variant = null
@@ -64,6 +78,10 @@ func f_txt(p_s: Variant = null, p_x: Variant = null, p_y: Variant = null, p_col:
 	v_sc = (J.getv(v_o, "sc") if J.truth(J.getv(v_o, "sc")) else 1.0)
 	v_s = J.add("", v_s)
 	v_mono = J.getv(v_o, "mono")
+	# BIRLESIK (11. tur): "maxw" verilirse metin o genislige sigdirilir (uzun
+	# ceviriler komsu yaziya / panel disina tasmasin; tasan kisim "…" olur)
+	if J.truth(J.getv(v_o, "maxw")):
+		v_s = kisalt(v_s, J.n(J.getv(v_o, "maxw")) / J.n(v_sc), v_mono)
 	v_w = game.f_textW(v_s, 1.0, v_mono)
 	v_ax = v_x
 	if J.eq(J.getv(v_o, "align"), "c"):
