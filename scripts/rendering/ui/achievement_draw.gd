@@ -72,6 +72,20 @@ func f_drawStatsPanel(p_t: Variant = null) -> Variant:
 	return null
 
 # ui.js:2755
+# Rozet ikonu 14x14 yuvaya sigar. BIRLESIK (11. tur): HD ikonlarin bir kismi
+# yuvadan buyuktu (patates kutusu 21 px, bardak 19 px, tabak 19 px); rozetten
+# tasiyor, kilitli rozette karartma ortusunun disinda renkli kaliyordu. Kucuk
+# tek tip "lst_" varyanti varsa o cizilir, yoksa ikon yuvaya kirpilir.
+func rozet_ikon(ikon: Variant, x: Variant, y: Variant, t: Variant) -> void:
+	var ad: String = "fbox" if str(ikon) == "fries" else str(ikon)
+	if game.f_hdIkon("lst_" + ad, J.add(x, 8.0), J.add(y, 8.0)): return
+	J.method(game.j_ctx, "save", [])
+	J.method(game.j_ctx, "beginPath", [])
+	J.method(game.j_ctx, "rect", [J.add(x, 1.0), J.add(y, 1.0), 14.0, 14.0])
+	J.method(game.j_ctx, "clip", [])
+	game.icon_draw.f_icon(ikon, J.add(x, 8.0), J.add(y, 8.0), t)
+	J.method(game.j_ctx, "restore", [])
+
 func f_bsRozet(p_x: Variant = null, p_y: Variant = null, p_b: Variant = null, p_acik: Variant = null, p_sec: Variant = null, p_t: Variant = null) -> Variant:
 	var v_hlk: Variant = null
 	var v_o: Variant = null
@@ -88,7 +102,7 @@ func f_bsRozet(p_x: Variant = null, p_y: Variant = null, p_b: Variant = null, p_
 			game.f_rrect(v_x, v_y, 16.0, 16.0, 3.0, game.character_draw.f_shadeCol(v_hlk, 0.45))
 			game.f_rrect(J.add(v_x, 1.0), J.add(v_y, 1.0), 14.0, 14.0, 3.0, "#3a3026")
 			game.f_rrectOut(v_x, v_y, 16.0, 16.0, 3.0, v_hlk)
-		game.icon_draw.f_icon(J.getv(v_b, "ikon"), J.add(v_x, 8.0), J.add(v_y, 8.0), v_t)
+		rozet_ikon(J.getv(v_b, "ikon"), v_x, v_y, v_t)
 	else:
 		if not J.truth(game.f_hdRozet(v_x, v_y, "#4a4038")):
 			game.f_rrect(v_x, v_y, 16.0, 16.0, 3.0, "#171310")
@@ -97,7 +111,7 @@ func f_bsRozet(p_x: Variant = null, p_y: Variant = null, p_b: Variant = null, p_
 		if J.truth(J.getv(v_b, "gizli")):
 			game.text_draw.f_txt("?", J.add(v_x, 8.0), J.add(v_y, 5.0), "#8a7a64", {"align": "c"})
 		else:
-			game.icon_draw.f_icon(J.getv(v_b, "ikon"), J.add(v_x, 8.0), J.add(v_y, 8.0), v_t)
+			rozet_ikon(J.getv(v_b, "ikon"), v_x, v_y, v_t)
 			J.setv(game.j_ctx, "globalAlpha", 0.82)
 			game.f_fr(J.add(v_x, 1.0), J.add(v_y, 1.0), 14.0, 14.0, "#231d17")
 			J.setv(game.j_ctx, "globalAlpha", 1.0)
