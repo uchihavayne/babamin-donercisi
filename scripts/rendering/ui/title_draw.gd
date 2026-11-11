@@ -199,7 +199,19 @@ func f_drawIntro(p_t: Variant = null) -> Variant:
 	v_satir = J.add((1.0 if J.truth(v_havaVar) else 0.0), (1.0 if J.truth(J.getv(game.j_G, "macGun")) else 0.0))
 	v_ph = J.add(84.0, (v_satir * 24.0))
 	v_y = game.math_utils.f_lerp((-J.n(60.0)), ((68.0 - ((v_satir - 1.0) * 8.0)) if J.truth(v_satir) else 80.0), game.math_utils.f_easeOutBack(v_k))
-	game.interface_draw.f_panel(((float(game.j_W) / float(2.0)) - 96.0), v_y, 192.0, v_ph)
+	# BIRLESIK (11. tur): hava / mac aciklamasi (TR 250 px, cevirilerde daha
+	# uzun) 192 px'lik karttan disari tasiyordu; kart en genis satira gore
+	# genisler, yine de sigmayan metin kisaltilir
+	var v_acik: Array = []
+	if J.truth(v_yagmur): v_acik.append("az müşteri • bol paket sipariş")
+	elif J.eq(J.getv(game.j_G, "weather"), "kar"): v_acik.append("seyrek müşteri • sabırlı • bahşiş bol")
+	elif J.eq(J.getv(game.j_G, "weather"), "sicak"): v_acik.append("herkes içecek ister • sabır az • ızgara çabuk yakar")
+	if J.truth(J.getv(game.j_G, "macGun")): v_acik.append("gün ortasında taraftar akını — acele ederler, bahşiş bol")
+	var v_pw := 192.0
+	for v_a in v_acik: v_pw = maxf(v_pw, J.n(game.f_textW(v_a)) + 24.0)
+	v_pw = minf(v_pw, float(game.j_W) - 16.0)
+	var v_mw := {"align": "c", "maxw": v_pw - 16.0}
+	game.interface_draw.f_panel(((float(game.j_W) / float(2.0)) - v_pw / 2.0), v_y, v_pw, v_ph)
 	game.text_draw.f_txt(J.add(game.localization.f_T("GÜN "), J.getv(game.j_G, "day")), (float(game.j_W) / float(2.0)), J.add(v_y, 10.0), J.getv(game.j_P, "red1"), {"align": "c", "sc": 2.0})
 	v_cfg = game.progression_system.f_dayCfg(J.getv(game.j_G, "day"), game.j_G)
 	v_sy2 = J.add(v_y, 34.0)
@@ -213,24 +225,24 @@ func f_drawIntro(p_t: Variant = null) -> Variant:
 	if J.truth(v_yagmur):
 		game.text_draw.f_txt("☂ YAĞMURLU GÜN", (float(game.j_W) / float(2.0)), v_sy2, "#6b9ad8", {"align": "c"})
 		v_sy2 = J.add(v_sy2, 10.0)
-		game.text_draw.f_txt("az müşteri • bol paket sipariş", (float(game.j_W) / float(2.0)), v_sy2, J.getv(game.j_P, "ui3"), {"align": "c"})
+		game.text_draw.f_txt("az müşteri • bol paket sipariş", (float(game.j_W) / float(2.0)), v_sy2, J.getv(game.j_P, "ui3"), v_mw)
 		v_sy2 = J.add(v_sy2, 12.0)
 	else:
 		if J.eq(J.getv(game.j_G, "weather"), "kar"):
-			game.text_draw.f_txt("KARLI GÜN", (float(game.j_W) / float(2.0)), v_sy2, "#dbe7f2", {"align": "c"})
+			game.text_draw.f_txt("KARLI GÜN", (float(game.j_W) / float(2.0)), v_sy2, "#5f8fc0", {"align": "c"})
 			v_sy2 = J.add(v_sy2, 10.0)
-			game.text_draw.f_txt("seyrek müşteri • sabırlı • bahşiş bol", (float(game.j_W) / float(2.0)), v_sy2, J.getv(game.j_P, "ui3"), {"align": "c"})
+			game.text_draw.f_txt("seyrek müşteri • sabırlı • bahşiş bol", (float(game.j_W) / float(2.0)), v_sy2, J.getv(game.j_P, "ui3"), v_mw)
 			v_sy2 = J.add(v_sy2, 12.0)
 		else:
 			if J.eq(J.getv(game.j_G, "weather"), "sicak"):
 				game.text_draw.f_txt("SICAK DALGASI", (float(game.j_W) / float(2.0)), v_sy2, "#ffc86a", {"align": "c"})
 				v_sy2 = J.add(v_sy2, 10.0)
-				game.text_draw.f_txt("herkes içecek ister • sabır az • ızgara çabuk yakar", (float(game.j_W) / float(2.0)), v_sy2, J.getv(game.j_P, "ui3"), {"align": "c"})
+				game.text_draw.f_txt("herkes içecek ister • sabır az • ızgara çabuk yakar", (float(game.j_W) / float(2.0)), v_sy2, J.getv(game.j_P, "ui3"), v_mw)
 				v_sy2 = J.add(v_sy2, 12.0)
 	if J.truth(J.getv(game.j_G, "macGun")):
 		game.text_draw.f_txt("MAÇ GÜNÜ", (float(game.j_W) / float(2.0)), v_sy2, "#8ad86a", {"align": "c"})
 		v_sy2 = J.add(v_sy2, 10.0)
-		game.text_draw.f_txt("gün ortasında taraftar akını — acele ederler, bahşiş bol", (float(game.j_W) / float(2.0)), v_sy2, J.getv(game.j_P, "ui3"), {"align": "c"})
+		game.text_draw.f_txt("gün ortasında taraftar akını — acele ederler, bahşiş bol", (float(game.j_W) / float(2.0)), v_sy2, J.getv(game.j_P, "ui3"), v_mw)
 		v_sy2 = J.add(v_sy2, 12.0)
 	if (J.gt(J.getv(game.j_G, "sceneT"), 0.4) and J.truth(game.f_button(((float(game.j_W) / float(2.0)) - 46.0), J.add(v_sy2, 2.0), 92.0, 18.0, "DÜKKÂNI AÇ", "#3f8a4a", true))):
 		J.method(game.j_SFX, "bell", [])
