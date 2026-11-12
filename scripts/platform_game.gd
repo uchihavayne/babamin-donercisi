@@ -104,9 +104,9 @@ func f_drawPause(time: Variant = null) -> Variant:
 	interface_draw.f_panel(170,46,140,166,"MOLA")
 	if f_button(190,66,100,20,"DEVAM ET","#3f8a4a",true): j_G.scene = "play"
 	if f_button(190,90,100,20,"SES AYARLARI","#3f6fbd"): j_SESP.open = true
-	if f_button(190,114,100,20,"KONTROLLER" if j_LANG == "tr" else "CONTROLS","#86633e"):
+	if f_button(190,114,100,20,localization.cift("KONTROLLER","CONTROLS"),"#86633e"):
 		controls.help_requested.emit()
-	if f_button(190,138,100,20,"EKRAN" if j_LANG == "tr" else "DISPLAY","#7a5aa0"):
+	if f_button(190,138,100,20,localization.cift("EKRAN","DISPLAY"),"#7a5aa0"):
 		settings_requested.emit()
 	if f_button(190,162,48,20,"REKOR","#3f6fbd"): j_STATS.open = true
 	if f_button(242,162,48,20,"BAŞARIM","#b0862a"): j_BSP.open = true

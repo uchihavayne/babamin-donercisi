@@ -1134,5 +1134,16 @@ const VALUE = {
 	"Eldekini at": "Jogar fora o que segura",
 	"Çöpü boşalt": "Esvaziar o lixo",
 	"Yanmış dürümü at": "Jogar fora o durum queimado",
-	"Tezgâhtakini at": "Jogar fora o da tábua"
+	"Tezgâhtakini at": "Jogar fora o da tábua",
+	"Sarılmış ürüne malzeme eklenmez": "Durum enrolado não recebe mais ingredientes",
+	"Turşu yeterli": "Já tem picles suficiente",
+	"Turşu bitti — kutudan doldur!": "Acabaram os picles — reponha da caixa!",
+	"Kutuyu al": "Pegar a caixa",
+	"Kutuyu doldur": "Encher a caixa",
+	"Sarılmış": "Enrolado",
+	"Servise hazır": "Pronto para servir",
+	"Kağıtla": "Embrulhar",
+	"Kağıtla · basılı tut": "Embrulhar · segurar",
+	"KONTROLLER": "CONTROLES",
+	"EKRAN": "TELA"
 }

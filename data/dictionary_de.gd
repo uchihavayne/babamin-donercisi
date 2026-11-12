@@ -1134,5 +1134,16 @@ const VALUE = {
 	"Eldekini at": "Gehaltenes wegwerfen",
 	"Çöpü boşalt": "Müll leeren",
 	"Yanmış dürümü at": "Verbrannten Dürüm wegwerfen",
-	"Tezgâhtakini at": "Vom Brett wegwerfen"
+	"Tezgâhtakini at": "Vom Brett wegwerfen",
+	"Sarılmış ürüne malzeme eklenmez": "In einen gerollten Dürüm kommt nichts mehr",
+	"Turşu yeterli": "Genug Gurken",
+	"Turşu bitti — kutudan doldur!": "Gurken alle — aus der Kiste auffüllen!",
+	"Kutuyu al": "Box nehmen",
+	"Kutuyu doldur": "Box füllen",
+	"Sarılmış": "Gerollt",
+	"Servise hazır": "Servierbereit",
+	"Kağıtla": "Einwickeln",
+	"Kağıtla · basılı tut": "Einwickeln · halten",
+	"KONTROLLER": "STEUERUNG",
+	"EKRAN": "ANZEIGE"
 }

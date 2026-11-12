@@ -1037,5 +1037,8 @@ const VALUE = {
 	"YENİ": "NEW",
 	"TOPLU": "BULK",
 	"Toplu sipariş! Dürümleri Dayıya ver": "Bulk order! Hand the wraps to the uncle",
-	"TOPLU SİPARİŞ +%40": "BULK ORDER +40%"
+	"TOPLU SİPARİŞ +%40": "BULK ORDER +40%",
+	"Sarılmış ürüne malzeme eklenmez": "A rolled wrap takes no more ingredients",
+	"Turşu yeterli": "Enough pickles",
+	"Turşu bitti — kutudan doldur!": "Out of pickles — refill from the crate!"
 }

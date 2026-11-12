@@ -316,14 +316,39 @@ func secondary() -> void:
 	if game.J.truth(game.j_G.hand): return_hand()
 	elif target().get("group", "") == "board": press("take","secondary")
 
+# Kumanda / klavye ipucundaki kisa fiiller: [tr, en, de, fr, es, pt].
+# BIRLESIK (11. tur): Turkce disinda yalniz 12 eylemin Ingilizce karsiligi vardi,
+# geri kalani genel "USE" gorunuyordu; de / fr / es / pt'de hepsi Ingilizceydi.
+const FIIL := {
+	"al": ["AL", "TAKE", "NEHMEN", "PRENDRE", "COGER", "PEGAR"],
+	"ekle": ["EKLE", "ADD", "DAZU", "AJOUTER", "AÑADIR", "ADICIONAR"],
+	"sos": ["SOS", "SAUCE", "SOSSE", "SAUCE", "SALSA", "MOLHO"],
+	"sar": ["SAR", "ROLL", "ROLLEN", "ROULER", "ENROLLAR", "ENROLAR"],
+	"kagitla": ["KAĞITLA", "PAPER", "EINWICKELN", "EMBALLER", "ENVOLVER", "EMBRULHAR"],
+	"birak": ["BIRAK", "PUT", "ABLEGEN", "POSER", "DEJAR", "SOLTAR"],
+	"ver": ["VER", "SERVE", "GEBEN", "SERVIR", "SERVIR", "SERVIR"],
+	"topla": ["TOPLA", "COLLECT", "EINSAMMELN", "RAMASSER", "RECOGER", "RECOLHER"],
+	"doldur": ["DOLDUR", "FILL", "FÜLLEN", "REMPLIR", "LLENAR", "ENCHER"],
+	"izgara": ["IZGARA", "GRILL", "GRILLEN", "GRILLER", "PARRILLA", "GRELHAR"],
+	"sec": ["SEÇ", "SELECT", "WÄHLEN", "CHOISIR", "ELEGIR", "ESCOLHER"],
+	"dogra": ["DOĞRA", "CHOP", "HACKEN", "HACHER", "PICAR", "PICAR"],
+	"kizart": ["KIZART", "FRY", "FRITTIEREN", "FRIRE", "FREÍR", "FRITAR"],
+	"kapat": ["KAPAT", "CLOSE", "SCHLIESSEN", "FERMER", "CERRAR", "FECHAR"],
+	"ac": ["AÇ", "OPEN", "ÖFFNEN", "OUVRIR", "ABRIR", "ABRIR"],
+	"cevapla": ["AÇ", "ANSWER", "ABHEBEN", "RÉPONDRE", "CONTESTAR", "ATENDER"],
+	"at": ["AT", "TOSS", "WEG", "JETER", "TIRAR", "JOGAR"],
+	"besle": ["BESLE", "FEED", "FÜTTERN", "NOURRIR", "ALIMENTAR", "ALIMENTAR"],
+}
+const FIIL_DIL := {"tr": 0, "en": 1, "de": 2, "fr": 3, "es": 4, "pt": 5}
+
+func fiil(ad: String) -> String:
+	return FIIL[ad][FIIL_DIL.get(game.j_LANG, 1)]
+
 func prompt() -> String:
 	var a := primary()
 	if a.is_empty(): return ""
-	if a.id == "order": return text("SEÇ", "SELECT")
-	var labels := {"bread":"AL","pide":"AL","meat":"EKLE","pickle":"EKLE","yogurt":"EKLE","fries":"EKLE","tomato":"EKLE","pepper":"EKLE","hot":"SOS","garlic":"SOS","butter":"EKLE","roll":"SAR","paper":"KAĞITLA","take":"AL","put":"BIRAK","serve":"VER","collect":"TOPLA","pour":"DOLDUR","drink_take":"AL","grill_put":"IZGARA","grill_take":"AL","grill_open":"SEÇ","potato":"AL","chop":"DOĞRA","fry":"AL" if game.j_G.fryer.state == "done" else "KIZART","crate":"KAPAT" if game.j_G.crate.open else "AÇ","trash":"AT","cat":"BESLE","pide_chop":"DOĞRA","phone":"AÇ","uncle":"VER","sweet":"AL","fbox":"AL" if game.j_G.fbox.ready > 0 else "DOLDUR"}
-	if game.j_LANG != "tr":
-		labels = {"roll":"ROLL","paper":"PAPER","take":"TAKE","put":"PUT","serve":"SERVE","collect":"TAKE","chop":"CHOP","crate":"STOCK","grill_put":"GRILL","grill_take":"TAKE","pour":"FILL","drink_take":"TAKE"}
-	return labels.get(a.id,"DOLDUR" if a.id.begins_with("refill:") else "EKLE") if game.j_LANG == "tr" else labels.get(a.id,"USE")
+	var fiiller := {"order":"sec","bread":"al","pide":"al","meat":"ekle","pickle":"ekle","yogurt":"ekle","fries":"ekle","tomato":"ekle","pepper":"ekle","hot":"sos","garlic":"sos","butter":"ekle","roll":"sar","paper":"kagitla","take":"al","put":"birak","serve":"ver","collect":"topla","pour":"doldur","drink_take":"al","grill_put":"izgara","grill_take":"al","grill_open":"sec","potato":"al","chop":"dogra","fry":"al" if game.j_G.fryer.state == "done" else "kizart","crate":"kapat" if game.j_G.crate.open else "ac","trash":"at","cat":"besle","pide_chop":"dogra","phone":"cevapla","uncle":"ver","sweet":"al","fbox":"al" if game.j_G.fbox.ready > 0 else "doldur"}
+	return fiil(fiiller.get(a.id, "doldur" if a.id.begins_with("refill:") else "ekle"))
 
 func press(id: String, source := "world") -> void:
 	if not available() or not holding.is_empty() or game.controls.quick_cut_active: return

@@ -1134,5 +1134,16 @@ const VALUE = {
 	"Eldekini at": "Jeter l'objet tenu",
 	"Çöpü boşalt": "Vider la poubelle",
 	"Yanmış dürümü at": "Jeter le durum brûlé",
-	"Tezgâhtakini at": "Jeter ce qui est sur la planche"
+	"Tezgâhtakini at": "Jeter ce qui est sur la planche",
+	"Sarılmış ürüne malzeme eklenmez": "On n'ajoute rien à un durum roulé",
+	"Turşu yeterli": "Assez de cornichons",
+	"Turşu bitti — kutudan doldur!": "Plus de cornichons — remplis depuis la caisse !",
+	"Kutuyu al": "Prendre la boîte",
+	"Kutuyu doldur": "Remplir la boîte",
+	"Sarılmış": "Roulé",
+	"Servise hazır": "Prêt à servir",
+	"Kağıtla": "Emballer",
+	"Kağıtla · basılı tut": "Emballer · maintenir",
+	"KONTROLLER": "COMMANDES",
+	"EKRAN": "AFFICHAGE"
 }
