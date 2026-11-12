@@ -28,7 +28,9 @@ func run() -> void:
 	game.j_G.prologueSeen = true
 	game.j_G.custom.counter = 2
 	game.session_system.f_resetProgress()
-	check(game.j_G.custom == null, "new game clears prior customization")
+	# Birlesik 11. tur: Yeni Oyun artik null birakmaz (Kisisellestir penceresi
+	# "null" gosteriyordu); ilk acilistaki varsayilan tabelaya doner.
+	check(game.j_G.custom is Dictionary and game.j_G.custom.sign == "USTA DÖNER" and float(game.j_G.custom.counter) == 0.0, "new game resets prior customization to the default")
 	game.session_system.f_goIntro()
 	game.advance(1.0/60)
 	check(game.j_G.scene == "intro" and game.counter_theme() == 0, "new game intro renders the default counter without customization")
@@ -39,7 +41,11 @@ func run() -> void:
 	check(game.j_CLAYER != null, "procedural counter also renders after new game")
 	game.counter_base = atlas
 	start_day(); game.advance(1.0/60)
-	check(game.j_G.scene == "play" and game.j_G.custom == null, "first day runs without requiring customization")
+	check(game.j_G.scene == "play" and float(game.j_G.custom.counter) == 0.0, "first day runs with the default customization")
+	# Eski kayitlardaki bos / eksik ozellestirme de calismaya devam eder.
+	game.j_G.custom = null
+	game.advance(1.0/60)
+	check(game.j_G.scene == "play" and game.counter_theme() == 0, "a legacy null customization still renders the default counter")
 	game.j_G.custom = {}
 	check(game.counter_theme() == 0, "an unset counter choice uses the default")
 	game.j_G.erase("custom")
