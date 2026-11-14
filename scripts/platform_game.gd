@@ -213,8 +213,8 @@ func f_drawPlay(time: Variant = null) -> Variant:
 		text_draw.f_txt(glyph,x+7,y+3,color,{"align":"c"})
 		text_draw.f_txt(label,x+15,y+3,color)
 		if a.hold: f_fr(x+15,y+10,width-18,1,color)
-	if not stations.holding.is_empty() and stations.holding.id in ["roll","paper","chop"]:
-		var progress: float = j_G.cut.prog if stations.holding.id == "chop" else stations.holding.time / (0.28 if stations.holding.id == "roll" else float(stations.tun("paperTime")))
+	if not stations.holding.is_empty() and stations.holding.id in ["roll","paper","chop","discard"]:
+		var progress: float = j_G.cut.prog if stations.holding.id == "chop" else stations.holding.time / (stations.DISCARD_HOLD if stations.holding.id == "discard" else (0.28 if stations.holding.id == "roll" else float(stations.tun("paperTime"))))
 		counter_draw.f_bar(r.get_center().x-18,r.end.y-5,36,4,clampf(progress,0,1),"#ffe6a3")
 	j_ctx.restore()
 	return result

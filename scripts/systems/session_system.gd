@@ -16,7 +16,8 @@ const OGRETICI := ["Yeni lavaş — malzemeler buna gidiyor", "Tabağa geçti �
 	"Kızarıyor…", "Daha doluyor…", "Daha pişiyor…", "Kutu açık — tıklayarak doldur",
 	"Kutu kendi dolduruyor", "Çöpe atıldı", "Yanmış dürüm çöpe atıldı", "Çöp boşaltıldı — tertemiz!",
 	"Tereyağı sosu döküldü", "Sarmak için yukarı doğru sürükle", "Kağıdı tutup dürümün üstüne sürükle",
-	"Kutuyu patates tepsisine sürükle", "Pideyi doğra — tahtaya tıkla", "Ürünleri Dayıya ver"]
+	"Kutuyu patates tepsisine sürükle", "Pideyi doğra — tahtaya tıkla", "Ürünleri Dayıya ver",
+	"Ürünü atmak için çöp kutusuna sürükle", "Ürünü atmak için basılı tut"]
 const OGRETICI_EN_COK := 3
 var _ogretici_sayac: Dictionary = {}
 

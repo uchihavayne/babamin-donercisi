@@ -52,6 +52,13 @@ func f_returnItem(p_it: Variant = null) -> Variant:
 func f_updateDrag(p_dt: Variant = null) -> Variant:
 	var _v: Dictionary = {"d": null, "bi": null, "w": null, "w2": null, "dy": null, "bi2": null, "w3": null, "w4": null, "dt": p_dt}
 	_v["d"] = J.getv(game.j_G, "drag")
+	# BIRLESIK (11. tur, cop kutusu "ayri hedefler"): urunu tutup cop kutusuna surukleyip
+	# birakmak urunu atar. Basma anindaki eldeki durumu hatirla (basinca urun ele
+	# alindiysa atilan o urundur); birakma kutu ustundeyse tikla / surukle akisi yerine bu.
+	if J.truth(J.getv(game.j_IN, "pressed")): game.j_G.pressHandEmpty = not J.truth(J.getv(game.j_G, "hand"))
+	if J.truth(J.getv(game.j_IN, "released")) and game.event_system.f_dropOnTrash(Vector2(J.n(game.j_IN.downX), J.n(game.j_IN.downY)), Vector2(J.n(game.j_IN.x), J.n(game.j_IN.y)), bool(game.j_G.get("pressHandEmpty", true))):
+		J.setv(game.j_G, "drag", null)
+		return true
 	if (J.truth(J.getv(game.j_IN, "pressed")) and (not J.truth(_v["d"]))):
 		if J.truth(game.debug_draw.f_testHit(J.getv(game.j_IN, "x"), J.getv(game.j_IN, "y"))):
 			return false

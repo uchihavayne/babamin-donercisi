@@ -10,6 +10,9 @@ var game: Node
 var mode := "mouse"
 var device := -1
 var touch_id := -1
+# surukle-birak cop (BIRLESIK 11. tur): parmagin basildigi nokta ve o andaki elin durumu
+var touch_down_pos := Vector2.ZERO
+var touch_hand_empty := true
 var touch_select_only := false
 var mouse_station := false
 var pointer_position := Vector2.ZERO
@@ -129,10 +132,16 @@ func handle(event: InputEvent) -> void:
 		if event.pressed and touch_id == -1:
 			set_mode("touch")
 			touch_id = event.index
+			touch_down_pos = event.position
+			touch_hand_empty = not game.J.truth(game.j_G.hand)
 			route_pointer(event.position,true,"touch")
 		elif event.index == touch_id and not event.pressed:
 			if event.canceled: cancel_gesture()
-			else: route_pointer(event.position,false,"touch")
+			else:
+				# urunu parmakla cop kutusuna surukleyip biraktiysa urun atilir
+				if game.event_system.f_dropOnTrash(touch_down_pos, event.position, touch_hand_empty) and touch_select_only:
+					game.stations.release("world-touch")
+				route_pointer(event.position,false,"touch")
 			touch_id = -1
 		return
 	if event is InputEventScreenDrag:
@@ -198,6 +207,10 @@ func handle(event: InputEvent) -> void:
 			return
 		if action == "game_accept" and not down and game.stations != null and game.stations.holding.get("source", "") == "accept":
 			game.stations.release("accept")
+			held[action] = false
+			return
+		if action == "game_latch" and not down and game.stations != null and game.stations.holding.get("source", "") == "secondary":
+			game.stations.release("secondary")
 			held[action] = false
 			return
 		if quick_cut_active and action not in ["game_cut", "game_cancel", "game_pause", "game_help", "game_mute"]: return

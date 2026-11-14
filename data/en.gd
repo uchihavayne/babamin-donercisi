@@ -1062,4 +1062,9 @@ const VALUE = {
 	"Tek seferde 2-3 ürüne birden": "2-3 items at once",
 	"3 MALZEME TEK DOKUNUŞ": "3 SIDES, ONE TAP",
 	"3 MALZEME TEK SEFERDE": "3 SIDES AT ONCE",
+	"Ürünü atmak için çöp kutusuna sürükle": "Drag the item onto the trash bin to throw it away",
+	"Ürünü atmak için parmağınla çöp kutusuna sürükle": "Drag the item to the trash bin with your finger to throw it away",
+	"Ürünü atmak için ürüne gel, al tuşunu basılı tut (□ / X / E)": "To throw an item away, select it and hold the pick-up button (□ / X / E)",
+	"Ürünü atmak için basılı tut": "Hold to throw the item away",
+	"Tezgâhtakini at · basılı tut": "Discard · hold",
 }

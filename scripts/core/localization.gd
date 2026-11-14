@@ -44,6 +44,7 @@ const GIRDI_SOZ := {
 	"tıkla: +": ["dokun: +", "seç: +"],
 	"Tek tıkla 2-3 ürüne birden": ["Tek dokunuşla 2-3 ürüne birden", "Tek seferde 2-3 ürüne birden"],
 	"3 MALZEME TEK TIK": ["3 MALZEME TEK DOKUNUŞ", "3 MALZEME TEK SEFERDE"],
+	"Ürünü atmak için çöp kutusuna sürükle": ["Ürünü atmak için parmağınla çöp kutusuna sürükle", "Ürünü atmak için ürüne gel, al tuşunu basılı tut (□ / X / E)"],
 }
 
 func girdi(metin: Variant) -> Variant:

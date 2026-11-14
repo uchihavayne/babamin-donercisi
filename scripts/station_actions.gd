@@ -210,6 +210,8 @@ func board_actions(w: Variant) -> Array[Dictionary]:
 			list.append(action("garlic","Sarımsaklı sos","Garlic sauce",free))
 		list.append(action("take","Dürümü al","Take wrap",free))
 	else: list.append(action("take","Servis için al","Pick up to serve",free))
+	# her tahta urunu atilabilir: bas-tut (ikincil; birincil eylem hep yukaridakilerden biridir)
+	if w != null: list.append(action("discard","Tezgâhtakini at · basılı tut","Discard · hold",free,true))
 	return list
 
 func actions() -> Array[Dictionary]:
@@ -257,11 +259,10 @@ func actions() -> Array[Dictionary]:
 			"phone": list.append(action("phone","Telefonu aç","Answer phone",game.j_G.phone.state == "ring"))
 			"uncle": list.append(action("uncle","Kuryeye ver / yardım","Courier / help"))
 			"trash":
-				match game.event_system.cop_eylemi():
-					"el": list.append(action("trash","Eldekini at","Discard held item"))
-					"yanik": list.append(action("trash","Yanmış dürümü at","Discard burnt wrap"))
-					"tezgah": list.append(action("trash","Tezgâhtakini at","Discard board item"))
-					_: list.append(action("trash","Çöpü boşalt","Empty trash"))
+				# kutuya dokunmak HEP copu bosaltir (elde urun varsa onu atar); tezgahtaki
+				# urun surukle-birak ya da "discard" bas-tut ile atilir
+				if game.event_system.cop_eylemi() == "el": list.append(action("trash","Eldekini at","Discard held item"))
+				else: list.append(action("trash","Çöpü boşalt","Empty trash"))
 			"cat": list.append(action("cat","Kediyi besle","Feed cat",free and game.j_G.meat > 0))
 	if selected.begins_with("refill:"):
 		var key: String = selected.trim_prefix("refill:")
@@ -314,7 +315,17 @@ func action_feedback(id: String) -> void:
 
 func secondary() -> void:
 	if game.J.truth(game.j_G.hand): return_hand()
-	elif target().get("group", "") == "board": press("take","secondary")
+	elif target().get("group", "") == "board":
+		# BIRLESIK (11. tur): alinabilen urun ele alinir; alinamayan (acik durum, pide,
+		# bos tabak) icin ayni tus basili tutulunca urun cope atilir
+		for a in actions():
+			if a.id == "take" and a.enabled: press("take","secondary"); return
+		if board() != null:
+			hint_say("Ürünü atmak için basılı tut")
+			press("discard","secondary")
+
+func hint_say(tr_text: String) -> void:
+	game.session_system.f_say(tr_text)
 
 # Kumanda / klavye ipucundaki kisa fiiller: [tr, en, de, fr, es, pt].
 # BIRLESIK (11. tur): Turkce disinda yalniz 12 eylemin Ingilizce karsiligi vardi,
@@ -367,6 +378,9 @@ func press(id: String, source := "world") -> void:
 	if id in ["meat","pickle","yogurt","fries"] and board() is Dictionary:
 		holding = {"id":id,"source":source,"target":selected,"time":0.0,"board":board(),"index":int(game.j_G.act),"repeat":true,"next":0.24}
 
+# Tezgahtaki urunu "al" tusunu basili tutarak atma suresi (sn)
+const DISCARD_HOLD := 0.6
+
 const MALZEMELER := ["meat","pickle","yogurt","fries","tomato","pepper","hot","garlic","butter"]
 
 func execute(id: String, t: Dictionary) -> void:
@@ -411,6 +425,7 @@ func execute(id: String, t: Dictionary) -> void:
 			if not game.helper_system.f_motoClick() and not game.f_giveToCourier(): game.helper_system.f_uncleUse()
 		"crate": game.j_G.crate.open = not game.j_G.crate.open
 		"trash": game.event_system.f_trashClick()
+		"discard": game.event_system.f_discardBoard(idx)
 		"cat": game.event_system.f_kediBesle()
 		"return": return_hand()
 		_:
@@ -480,6 +495,12 @@ func tick(delta: float) -> void:
 		if not allowed: cancel(); return
 		holding.next = holding.time + 0.14
 		execute(holding.id, target())
+		return
+	if holding.id == "discard":
+		holding.time += delta
+		if holding.time >= DISCARD_HOLD:
+			holding.clear()
+			game.event_system.f_discardBoard(idx)
 		return
 	if (holding.id == "roll" and w.state != "open") or (holding.id == "paper" and not can_paper(w)): cancel(); return
 	holding.time += delta

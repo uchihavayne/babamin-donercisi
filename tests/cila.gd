@@ -3,7 +3,7 @@
 #  1) Yeni Oyun tabelayi ilk acilistaki varsayilana dondurur (eskiden null:
 #     Kisisellestir penceresi "null" gosteriyordu)
 #  2) mufettis musterilerin ustune binmez (bos yer / iki yerin arasi)
-#  3) cop kutusu etiketi gercekte olacak isi soyler; dort dilde cevirisi var
+#  3) cop kutusu etiketi gercekte olacak isi soyler (dokunmak hep copu bosaltir); dort dilde cevirisi var
 #  4) uzun metin "maxw" ile sigdirilir (sube aciklamalari, gun basi karti)
 #  5) kapida sorgulanan musteri (Demirkent) eski yerini tutmaz
 #  6) basarim bildirimi pencereler acikken bekler
@@ -62,23 +62,23 @@ func run() -> void:
 		for i in n: en_yakin = minf(en_yakin, absf(x - float(S[i].x)))
 		check(en_yakin >= 30.0 and x > float(S[0].x) and x < float(S[S.size() - 1].x) + 1.0,
 			"mufettis %d yerli dukkanda musteriye binmez (x %s, en yakin %s)" % [n, x, en_yakin])
-	# 3) cop kutusu etiketi = f_trashClick'in yapacagi is
+	# 3) cop kutusu etiketi = f_trashClick'in yapacagi is. Kutuya dokunmak HEP copu
+	#    bosaltir (elde urun varsa onu atar); tezgahtaki urunu atmak surukle-birak /
+	#    bas-tut ile olur (ayrintili test: tests/cop_kutusu.gd)
 	fresh()
 	check(game.event_system.cop_eylemi() == "bos" and cop_etiketi() == "Çöpü boşalt", "bos kova: Çöpü boşalt")
 	game.j_G.trash = 0.4
 	check(game.event_system.cop_eylemi() == "bosalt" and cop_etiketi() == "Çöpü boşalt", "dolu kova: Çöpü boşalt")
 	game.f_newWrap()
-	check(game.event_system.cop_eylemi() == "tezgah" and cop_etiketi() == "Tezgâhtakini at", "tezgahta urun: Tezgâhtakini at (%s)" % cop_etiketi())
+	check(game.event_system.cop_eylemi() == "bosalt" and cop_etiketi() == "Çöpü boşalt", "tezgahta urun varken de: Çöpü boşalt (%s)" % cop_etiketi())
 	game.event_system.f_trashClick()
-	check(game.j_G.boards[0] == null and float(game.j_G.trash) > 0.4, "etiketin dedigi olur: tezgahtaki atilir, kova bosalmaz")
+	check(game.j_G.boards[0] is Dictionary and is_zero_approx(float(game.j_G.trash)), "etiketin dedigi olur: cop bosalir, tezgahtaki yerinde")
 	game.j_G.hand = {"kind": "drink", "type": "cola"}
 	check(game.event_system.cop_eylemi() == "el" and cop_etiketi() == "Eldekini at", "elde urun: Eldekini at")
 	game.j_G.hand = null
-	game.j_G.grill.slots.append({"w": {"kind": "wrap", "state": "rolled", "burnt": true}, "t": 9.0, "dur": 8.0, "done": true, "yan": 9.0})
-	check(game.event_system.cop_eylemi() == "yanik", "izgarada yanmis durum: once o atilir")
 	for dil in ["de", "fr", "es", "pt"]:
 		var d: Dictionary = game.j_SOZLUK[dil]
-		for k in ["Eldekini at", "Çöpü boşalt", "Yanmış dürümü at", "Tezgâhtakini at"]:
+		for k in ["Eldekini at", "Çöpü boşalt"]:
 			check(d.has(k), "%s sozlugunde '%s' var" % [dil, k])
 	# 4) uzun metin sigdirilir
 	var TD = game.text_draw

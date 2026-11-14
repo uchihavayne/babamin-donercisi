@@ -40,71 +40,59 @@ func f_copaAt(p_x0: Variant = null, p_y0: Variant = null, p_renkler: Variant = n
 		v_i = J.add(v_i, 1.0)
 	return null
 
-# Cop kutusuna basinca ne olur (f_trashClick ile ayni oncelik sirasi):
-#   "el": eldeki urun atilir, "yanik": izgaradaki yanmis durum atilir,
-#   "tezgah": tezgahtaki urun atilir, "bosalt": kova bosaltilir, "bos": kova bos.
-# BIRLESIK (11. tur): istasyon etiketi el bosken hep "Çöpü boşalt" diyordu,
-# oysa tezgahta urun varsa o atiliyor; etiket artik bu sonucu soyler.
+# COP KUTUSU (BIRLESIK 11. tur, kullanici karari "ayri hedefler"):
+#   - Kutuya dokunmak / basmak HEP copu bosaltir; elde urun varsa onu atar
+#   - Tezgahtaki urunu atmak icin urunu TUTUP kutuya SURUKLE ve birak
+#     (f_dropOnTrash: fare, dokunma, kumandada kilitli imlec); kumanda / klavyede
+#     urunun uzerine gelip "al" tusunu basili tut (station_actions "discard")
+# Eskiden kutuya dokunmak sirayla eldekini, izgaradaki yanmisi, TEZGAHTAKI urunu
+# atip en sona copu bosaltiyordu: cop dolu iken (muftetis cezasi: 150-400 $) tezgahta
+# hazirlanan durum yanlislikla gidiyor, cop bosalmiyordu.
+#   cop_eylemi(): "el" (eldekini at) | "bosalt" (kova bosalir) | "bos" (kova bos)
 func cop_eylemi() -> String:
 	if J.truth(game.j_G.hand): return "el"
-	for s in game.j_G.grill.slots:
-		if J.truth(s.w.get("burnt")): return "yanik"
-	if J.truth(game.j_G.boards[int(J.n(game.j_G.act))]): return "tezgah"
-	for i in int(J.n(J.method(game.j_TUN, "boards", [game.j_G]))):
-		if J.truth(game.j_G.boards[i]): return "tezgah"
 	return "bosalt" if J.n(game.j_G.trash) > 0.02 else "bos"
+
+# Tezgahta (ya da izgarada yanmis) atilabilecek bir urun var mi?
+func f_atilabilirUrunVar() -> bool:
+	for i in int(J.n(J.method(game.j_TUN, "boards", [game.j_G]))):
+		if J.truth(game.j_G.boards[i]): return true
+	for sl in game.j_G.grill.slots:
+		if J.truth(sl.w.get("burnt")): return true
+	return false
 
 # game.js:4354
 func f_trashClick() -> Variant:
-	var v_gi: Variant = null
-	var v_aw: Variant = null
-	var v_ai: Variant = null
-	var v_etkin: Variant = null
-	var v_tur: Variant = null
-	var v_kirinti: Variant = null
 	if J.truth(J.getv(game.j_G, "hand")):
-		J.setv(game.j_G, "hand", null)
-		game.event_system.f_addTrash(game.j_TRASH_PER_ITEM)
-		J.method(game.j_SFX, "drop", [])
-		game.effects.f_burst(J.add(J.getv(J.getv(game.j_ST, "trash"), "x"), 11.0), J.add(J.getv(J.getv(game.j_ST, "trash"), "y"), 6.0), 8.0, ["#8a7a6a", "#5e5048"], {"spMax": 40.0, "up": 20.0})
-		game.session_system.f_say("Çöpe atıldı")
-		return null
-	v_gi = 0.0
-	while J.lt(v_gi, J.getv(J.getv(J.getv(game.j_G, "grill"), "slots"), "length")):
-		if J.truth(J.getv(J.getv(J.getv(J.getv(J.getv(game.j_G, "grill"), "slots"), v_gi), "w"), "burnt")):
-			J.method(J.getv(J.getv(game.j_G, "grill"), "slots"), "splice", [v_gi, 1.0])
-			game.event_system.f_addTrash(game.j_TRASH_PER_ITEM)
-			J.method(game.j_SFX, "drop", [])
-			game.event_system.f_copaAt(game.grill_system.f_grillSlotX(v_gi), game.grill_system.f_grillSlotY(v_gi), ["#3a2a1e", "#6b4a2a", "#1a1210"])
-			game.session_system.f_say("Yanmış dürüm çöpe atıldı")
-			game.equipment_system.f_checkAuto()
-			return null
-		v_gi = J.add(v_gi, 1.0)
-	v_aw = null
-	v_etkin = J.getv(J.getv(game.j_G, "boards"), J.getv(game.j_G, "act"))
-	if J.truth(v_etkin):
-		v_aw = v_etkin
-	else:
-		v_ai = 0.0
-		while J.lt(v_ai, J.method(game.j_TUN, "boards", [game.j_G])):
-			if J.truth(J.getv(J.getv(game.j_G, "boards"), v_ai)):
-				v_aw = J.getv(J.getv(game.j_G, "boards"), v_ai)
-				break
-			v_ai = J.add(v_ai, 1.0)
-	if J.truth(v_aw):
-		v_tur = ("tabak" if J.eq(J.getv(v_aw, "kind"), "plate") else ("pide" if J.eq(J.getv(v_aw, "kind"), "pide") else "durum"))
-		v_kirinti = {"tabak": ["#e2eaf0", "#c98436", "#d9a765"], "pide": ["#dcae55", "#a8762e", "#f4e6c2"], "durum": ["#f0d5a8", "#c98436", "#8a5f31"]}
-		v_ai = 0.0
-		while J.lt(v_ai, 3.0):
-			if J.eq(J.getv(J.getv(game.j_G, "boards"), v_ai), v_aw):
-				game.event_system.f_copaAt(game.wrap_system.f_boardCX(v_ai), J.add(J.getv(J.getv(game.j_ST, "board"), "y"), 10.0), J.getv(v_kirinti, v_tur))
-				J.setv(J.getv(game.j_G, "boards"), v_ai, null)
-			v_ai = J.add(v_ai, 1.0)
-		game.event_system.f_addTrash(game.j_TRASH_PER_ITEM)
-		J.method(game.j_SFX, "drop", [])
-		game.session_system.f_say(("Tabak çöpe atıldı" if J.eq(v_tur, "tabak") else ("Pide çöpe atıldı" if J.eq(v_tur, "pide") else "Dürüm çöpe atıldı")))
-		game.equipment_system.f_checkAuto()
-		return null
+		return f_discardHand()
+	return f_emptyTrash()
+
+func f_discardHand() -> Variant:
+	J.setv(game.j_G, "hand", null)
+	game.event_system.f_addTrash(game.j_TRASH_PER_ITEM)
+	J.method(game.j_SFX, "drop", [])
+	game.effects.f_burst(J.add(J.getv(J.getv(game.j_ST, "trash"), "x"), 11.0), J.add(J.getv(J.getv(game.j_ST, "trash"), "y"), 6.0), 8.0, ["#8a7a6a", "#5e5048"], {"spMax": 40.0, "up": 20.0})
+	game.session_system.f_say("Çöpe atıldı")
+	return null
+
+# Tahtadaki urunu (acik / sarili durum, pide, tabak, yanmis) cope atar.
+func f_discardBoard(idx: int) -> bool:
+	if idx < 0 or idx >= int(J.n(J.method(game.j_TUN, "boards", [game.j_G]))): return false
+	var w: Variant = game.j_G.boards[idx]
+	if not J.truth(w): return false
+	var tur: String = "tabak" if J.eq(J.getv(w, "kind"), "plate") else ("pide" if J.eq(J.getv(w, "kind"), "pide") else "durum")
+	var kirinti := {"tabak": ["#e2eaf0", "#c98436", "#d9a765"], "pide": ["#dcae55", "#a8762e", "#f4e6c2"], "durum": ["#f0d5a8", "#c98436", "#8a5f31"]}
+	if J.truth(J.getv(w, "burnt")): kirinti["durum"] = ["#3a2a1e", "#6b4a2a", "#1a1210"]
+	game.event_system.f_copaAt(game.wrap_system.f_boardCX(idx), J.add(J.getv(J.getv(game.j_ST, "board"), "y"), 10.0), kirinti[tur])
+	game.j_G.boards[idx] = null
+	game.event_system.f_addTrash(game.j_TRASH_PER_ITEM)
+	J.method(game.j_SFX, "drop", [])
+	if J.truth(J.getv(w, "burnt")): game.session_system.f_say("Yanmış dürüm çöpe atıldı")
+	else: game.session_system.f_say("Tabak çöpe atıldı" if tur == "tabak" else ("Pide çöpe atıldı" if tur == "pide" else "Dürüm çöpe atıldı"))
+	game.equipment_system.f_checkAuto()
+	return true
+
+func f_emptyTrash() -> Variant:
 	if J.gt(J.getv(game.j_G, "trash"), 0.02):
 		J.setv(game.j_G, "emptyT", 0.9)
 		J.setv(game.j_G, "trash", 0.0)
@@ -112,8 +100,28 @@ func f_trashClick() -> Variant:
 		game.effects.f_burst(J.add(J.getv(J.getv(game.j_ST, "trash"), "x"), 11.0), J.add(J.getv(J.getv(game.j_ST, "trash"), "y"), 4.0), 14.0, ["#6d6258", "#8a7a6a", "#4a423a"], {"spMax": 60.0, "up": 26.0})
 		game.session_system.f_say("Çöp boşaltıldı — tertemiz!")
 		return null
-	game.session_system.f_say("Kova zaten boş")
+	# Kova zaten bos: oyuncu muhtemelen tezgahtaki urunu atmaya calisti; nasil
+	# yapilacagini soyle (dokunma / kumandada metin aygita gore degisir)
+	game.session_system.f_say("Ürünü atmak için çöp kutusuna sürükle" if f_atilabilirUrunVar() else "Kova zaten boş")
 	return null
+
+# Surukle-birak: basildigi nokta bir tahta urunu, birakildigi nokta cop kutusu ise
+# o urun atilir. el_bostu: basma ani eldeki bos muydu (basinca urun ele alindiysa
+# atilan o urundur). 10 px'ten kisa hareket tiklamadir, atmaz.
+const SURUKLE_MIN := 10.0
+
+func f_copUstunde(p: Vector2) -> bool:
+	var s: Variant = game.j_ST.get("trash")
+	return s != null and Rect2(J.n(s.x), J.n(s.y), J.n(s.w), J.n(s.h)).grow(3.0).has_point(p)
+
+func f_dropOnTrash(down: Vector2, up: Vector2, el_bostu := true) -> bool:
+	if down.distance_to(up) < SURUKLE_MIN or not f_copUstunde(up): return false
+	var bi := int(game.drag_system.f_boardAt(down.x, down.y))
+	if bi < 0: return false
+	if el_bostu and J.truth(game.j_G.hand):
+		f_discardHand()
+		return true
+	return f_discardBoard(bi)
 
 # Mufettisin durdugu yer. BIRLESIK (11. tur): sabit 250'deydi; 3 ve ustu
 # yerli dukkanda 3. musterinin ustune biniyordu. Bos kalan ilk musteri yerinde
