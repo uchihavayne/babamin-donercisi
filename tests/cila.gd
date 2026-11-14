@@ -11,6 +11,7 @@
 #     alti dilde yerine sigar
 # 10) sayi bicimi dile gore (binlik / ondalik ayraci, yuzde isaretinin yeri)
 # 11) soz girdi aygitina gore: farede "tıkla", telefonda "dokun", kolda yalin
+# 12) cikis ayarlari (Windows/Android/iOS) proje surumuyle ayni
 #   godot --headless --path . --script tests/cila.gd --quit-after 3000 -- --test
 extends SceneTree
 var game: Node
@@ -185,5 +186,23 @@ func run() -> void:
 			check(fare_sozu.search(etiket) == null and not etiket.contains("TIK"), "%s / %s gelistirme etiketi fareden soz etmez: %s" % [kip, dil, etiket])
 	game.localization.f_setLang("tr")
 	game.controls.set_mode("mouse")
+	# 12) cikis ayarlari proje surumuyle ayni: Windows/Android/iOS paketleri eski
+	#     "0.2.0" ile cikmasin; Android surum kodu = ana*10000 + ara*100 + yama
+	var proje := FileAccess.get_file_as_string("res://project.godot")
+	var sm := RegEx.create_from_string("config/version=\"([^\"]+)\"").search(proje)
+	var surum: String = sm.get_string(1) if sm != null else ""
+	var parca := surum.split(".")
+	var kod_beklenen := int(parca[0]) * 10000 + int(parca[1]) * 100 + int(parca[2]) if parca.size() == 3 else -1
+	var cikis := FileAccess.get_file_as_string("res://export_presets.cfg")
+	check(surum != "" and kod_beklenen > 0, "proje surumu okunur (%s)" % surum)
+	for anahtar in ["application/short_version", "version/name"]:
+		var bulunan := RegEx.create_from_string(anahtar + "=\"([^\"]*)\"").search_all(cikis)
+		check(not bulunan.is_empty(), "cikis ayarinda %s var" % anahtar)
+		for m in bulunan: check(m.get_string(1) == surum, "%s = %s, proje surumu %s" % [anahtar, m.get_string(1), surum])
+	var kodlar := RegEx.create_from_string("version/code=(\\d+)").search_all(cikis)
+	check(not kodlar.is_empty(), "Android surum kodu var")
+	for m in kodlar: check(int(m.get_string(1)) == kod_beklenen, "Android surum kodu %s, beklenen %d" % [m.get_string(1), kod_beklenen])
+	for m in RegEx.create_from_string("application/version=\"(\\d+)\"").search_all(cikis):
+		check(int(m.get_string(1)) == kod_beklenen, "uygulama yapi numarasi %s, beklenen %d" % [m.get_string(1), kod_beklenen])
 	print("CILA ", JSON.stringify({"failures": failures}))
 	game.free(); quit(0 if failures.is_empty() else 1)

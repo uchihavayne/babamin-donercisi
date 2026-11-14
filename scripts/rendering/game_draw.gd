@@ -1,6 +1,17 @@
 # Game draw. See CODE_MAP.md.
 extends "res://scripts/core/game_module.gd"
 
+# "DAYI xN" etiketi. BIRLESIK (11. tur): eskiden donerden once cizilirdi; donerin
+# demir rayi etiketin ustunden gecip "DAYI +4" yazisinin ortasini kesiyordu.
+# Simdi doner / ray cizildikten sonra, hepsinin ustune cizilir.
+func dayi_etiketi() -> void:
+	if not (J.truth(game.helper_system.f_uncleReady()) and ((not J.truth(J.getv(game.j_G, "courier"))) or J.eq(J.getv(J.getv(game.j_G, "courier"), "state"), "in"))):
+		return
+	var u: Variant = J.getv(game.j_ST, "uncle")
+	game.f_rrect(J.add(J.getv(u, "x"), 2.0), (J.getv(u, "y") - 13.0), 42.0, 12.0, 3.0, J.getv(game.j_P, "red1"))
+	game.f_rrectOut(J.add(J.getv(u, "x"), 2.0), (J.getv(u, "y") - 13.0), 42.0, 12.0, 3.0, J.getv(game.j_P, "ui5"))
+	game.text_draw.f_txt(J.add(game.localization.f_T("DAYI x"), J.getv(J.getv(game.j_G, "uncle"), "left")), J.add(J.getv(u, "x"), 23.0), (J.getv(u, "y") - 11.0), J.getv(game.j_P, "au0"), {"align": "c"})
+
 # game.js:362
 func f_drawFlyMeat(p_t: Variant = null) -> Variant:
 	var v_i: Variant = null
@@ -86,9 +97,6 @@ func f_drawPlay(p_t: Variant = null) -> Variant:
 		J.setv(game.j_ctx, "globalAlpha", J.add(0.35, (0.3 * sin((_cells["t"][0] * 7.0)))))
 		game.f_rrectOut(J.getv(J.getv(game.j_ST, "uncle"), "x"), J.getv(J.getv(game.j_ST, "uncle"), "y"), J.getv(J.getv(game.j_ST, "uncle"), "w"), J.getv(J.getv(game.j_ST, "uncle"), "h"), 4.0, J.getv(game.j_P, "au0"))
 		J.setv(game.j_ctx, "globalAlpha", 1.0)
-		game.f_rrect(J.add(J.getv(J.getv(game.j_ST, "uncle"), "x"), 2.0), (J.getv(J.getv(game.j_ST, "uncle"), "y") - 13.0), 42.0, 12.0, 3.0, J.getv(game.j_P, "red1"))
-		game.f_rrectOut(J.add(J.getv(J.getv(game.j_ST, "uncle"), "x"), 2.0), (J.getv(J.getv(game.j_ST, "uncle"), "y") - 13.0), 42.0, 12.0, 3.0, J.getv(game.j_P, "ui5"))
-		game.text_draw.f_txt(J.add(game.localization.f_T("DAYI x"), J.getv(J.getv(game.j_G, "uncle"), "left")), J.add(J.getv(J.getv(game.j_ST, "uncle"), "x"), 23.0), (J.getv(J.getv(game.j_ST, "uncle"), "y") - 11.0), J.getv(game.j_P, "au0"), {"align": "c"})
 	game.f_drawCounter()
 	game.f_drawCounterProps(_cells["t"][0])
 	_v["c"] = 0.0
@@ -102,6 +110,7 @@ func f_drawPlay(p_t: Variant = null) -> Variant:
 		_v["c"] = J.add(_v["c"], 1.0)
 	game.f_drawSpit(J.getv(game.j_G, "spit"), _cells["t"][0])
 	game.f_drawShaveHint(_cells["t"][0])
+	dayi_etiketi()
 	game.phone_draw.f_drawPhone(_cells["t"][0])
 	game.regulation_draw.f_drawFerman(_cells["t"][0])
 	game.regulation_draw.f_drawLider(_cells["t"][0])

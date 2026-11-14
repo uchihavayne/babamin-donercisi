@@ -1,6 +1,28 @@
 # Hud draw. See CODE_MAP.md.
 extends "res://scripts/core/game_module.gd"
 
+# BIRLESIK (11. tur, "sureye karsi yaris" hissi): son 10 saniyede (ve kapanista, saat
+# 0:00 iken icerideki musteriler bitirilirken) saat kutusundan her saniye disa
+# dogru kirmizi bir halka yayilir (kalp atisi). Yalniz gorsel; kurala, sureye,
+# sese dokunmaz. Mola / ders / hesap ekraninda cizilmez.
+const HALKA_SN := 10.0
+
+func son_saniye_halkasi(x: Variant, y: Variant, h: Variant, kalan: Variant) -> void:
+	if J.getv(game.j_G, "scene") != "play": return
+	var k: float = J.n(kalan)
+	var faz := -1.0
+	if game.j_G.get("kapanis") is Dictionary:
+		faz = fposmod(J.n(game.j_G.kapanis.t), 1.0)
+	elif k > 0.0 and k <= HALKA_SN:
+		faz = 1.0 - (k - floorf(k))
+	if faz < 0.0: return
+	var g: float = floorf(faz * 8.0)
+	J.setv(game.j_ctx, "globalAlpha", (1.0 - faz * faz) * 0.95)
+	for kalinlik in 2:   # 2 px kalin halka
+		var e: float = g + float(kalinlik)
+		game.f_rrectOut(J.n(x) - e, J.n(y) - e, 42.0 + 2.0 * e, J.n(h) + 2.0 * e, 3.0 + e, "#ff6a4a")
+	J.setv(game.j_ctx, "globalAlpha", 1.0)
+
 # ui.js:48
 # BIRLESIK: hava rozeti ust satirda, borc kutusunun saginda (eskiden (8, 32):
 # yeni tezgahta telefonun ustune biniyor, yazi panelin disina tasiyordu).
@@ -112,6 +134,7 @@ func f_drawHUD(p_t: Variant = null) -> Variant:
 	if game.j_G.get("kapanis") is Dictionary: v_low = true # kapanis: 0:00 kirmizi yanip soner
 	v_tcol = (("#ff5a3a" if J.gt(sin((v_t * 10.0)), 0.0) else "#a03020") if J.truth(v_low) else "#ff9a4a")
 	game.text_draw.f_txt(game.math_utils.f_fmtTime(v_tl), J.add(v_tx, 21.0), J.add(v_ty0, (5.0 if J.truth(v_kompakt) else 6.0)), v_tcol, {"align": "c", "mono": true})
+	son_saniye_halkasi(v_tx, v_ty0, v_th, v_tl)
 	if (not J.truth(v_kompakt)):
 		game.f_vl(J.add(v_tx, 8.0), (v_cy - 3.0), 4.0, "#8a8a90")
 		game.f_vl(J.add(v_tx, 33.0), (v_cy - 3.0), 4.0, "#8a8a90")

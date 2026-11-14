@@ -4,6 +4,7 @@
 #  K2) dugme yazisi dugmesine sigar
 #  K3) pencere icindeki yazi pencerenin kenarlarini asmaz
 #  K4) ayni satirdaki iki yazi birbirinin ustune binmez (etiket / deger)
+#  K5) Turkce'ye ozgu harf Turkce disi dilde gorunmez (cevrilmemis metin)
 # Olcum text_draw.izle kayitlarindan yapilir (cizim koduyla ayni konum ve
 # genislik); goruntu gerekmez, basliksiz calisir.
 #   godot --headless --path . --script tests/yazi_tasma.gd --quit-after 3000 -- --test
@@ -30,6 +31,17 @@ func hata(dil: String, ekran: String, mesaj: String) -> void:
 	if gorulen.has(anahtar): return
 	gorulen[anahtar] = true
 	failures.append("%s / %s: %s" % [dil, ekran, mesaj])
+
+# K5) Turkce'ye ozgu harfler (ğ ı İ ş Ş) baska dilde gorunuyorsa o metin
+# cevrilmemis demektir; Ingilizcede bunlara ç ö ü â î û da girer (de/fr/es/pt'de
+# ö ü ç gibi harfler yasal). "TR" disindaki her dilde calisir.
+func tr_harf_kontrol(dil: String, ekran: String, yazi: String) -> void:
+	if dil == "tr": return
+	var yasak := "ğĞıİşŞ" + ("çÇöÖüÜâÂîÎûÛ" if dil == "en" else "")
+	for ch in yazi:
+		if yasak.contains(ch):
+			hata(dil, ekran, "cevrilmemis (Turkce harf '%s'): '%s'" % [ch, yazi])
+			return
 
 func pencereler_kapali() -> void:
 	for p in [game.j_CUSTOM, game.j_PAYP, game.j_BRP, game.j_SESP, game.j_STATS, game.j_BSP, game.j_EVP]:
@@ -81,6 +93,7 @@ func olc(dil: String, ekran: String, once: int = 1) -> void:
 		if k.has("dugme"):
 			olculen += 1
 			var gen: float = float(game.f_textW(k.s))
+			tr_harf_kontrol(dil, ekran, k.s)
 			if gen > k.dugme.size.x - 2.0:
 				hata(dil, ekran, "dugme yazisi sigmiyor: '%s' %d px > %d px" % [k.s, int(gen), int(k.dugme.size.x)])
 			dugme_yazisi = true
@@ -90,6 +103,7 @@ func olc(dil: String, ekran: String, once: int = 1) -> void:
 			continue
 		if k.s == "$": continue     # hirsizin cantasi: ekran disindan girip cikar
 		olculen += 1
+		tr_harf_kontrol(dil, ekran, k.s)
 		var x0: float = float(k.x)
 		var x1: float = x0 + float(k.w)
 		if dok: print("   %4d..%4d y%4d  %s" % [int(x0), int(x1), int(k.y), k.s])
@@ -220,6 +234,6 @@ func gun_sonu_ve_gece(dil: String) -> void:
 			kur(20.0, 1)
 			G = game.j_G
 			G.money = 900.0
-			G.night = {"t": 5.0, "phase": 2.0, "stole": caldi, "amount": 12345.0, "sec": float(guvenlik), "line": "Kasadan aldığını götürdü…" if caldi else "Hırsız eli boş döndü!", "paid": true}
+			G.night = {"t": 5.0, "phase": 2.0, "stole": caldi, "amount": 12345.0, "sec": float(guvenlik), "line": game.j_LINES_THIEF_WIN[0] if caldi else game.j_LINES_THIEF_LOSE[0], "paid": true}
 			G.scene = "night"; G.sceneT = 5.0
 			olc(dil, "gece %s guvenlik %d" % ["caldi" if caldi else "kurtuldu", guvenlik])

@@ -14,6 +14,7 @@ var modal: ColorRect
 var modal_panel: PanelContainer
 var modal_scroll: ScrollContainer
 var modal_body: VBoxContainer
+var modal_footer: HBoxContainer   # BIRLESIK (11. tur): dugmeler kaydirma alaninin disinda, hep gorunur
 var name_entry: LineEdit
 var game_rect := Rect2()
 var safe_rect := Rect2()
@@ -112,6 +113,12 @@ func make_button(label: String, callback: Callable, focusable := false) -> Butto
 	button.pressed.connect(callback)
 	return button
 
+# Alt serit dugmesi: odaklanabilir, serit genisligini esit paylasir
+func footer_button(label: String, callback: Callable) -> Button:
+	var b := make_button(label, callback, true)
+	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	return b
+
 func build_modal() -> void:
 	modal = ColorRect.new()
 	modal.color = Color(0.025, 0.018, 0.012, 0.92)
@@ -130,14 +137,24 @@ func build_modal() -> void:
 	style.content_margin_top = 16
 	style.content_margin_bottom = 16
 	modal_panel.add_theme_stylebox_override("panel", style)
+	# BIRLESIK (11. tur): eskiden butun icerik (dugmeler dahil) tek kaydirma alanindaydi;
+	# kisa telefon ekraninda "Anladim / Kapat" kaydirmadan gorunmuyordu. Simdi icerik
+	# kaydirilir, dugmeler altta sabit kalir.
+	var kok := VBoxContainer.new()
+	kok.add_theme_constant_override("separation", 10)
+	modal_panel.add_child(kok)
 	modal_scroll = ScrollContainer.new()
 	modal_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	modal_scroll.follow_focus = true
-	modal_panel.add_child(modal_scroll)
+	modal_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	kok.add_child(modal_scroll)
 	modal_body = VBoxContainer.new()
 	modal_body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	modal_body.add_theme_constant_override("separation", 10)
 	modal_scroll.add_child(modal_body)
+	modal_footer = HBoxContainer.new()
+	modal_footer.add_theme_constant_override("separation", 10)
+	kok.add_child(modal_footer)
 
 static func fit_game(area: Rect2, whole_pixels: bool, physical_scale := 1.0) -> Rect2:
 	var scale_factor := minf(area.size.x / GAME_SIZE.x, area.size.y / GAME_SIZE.y)
@@ -179,7 +196,8 @@ func layout_modal() -> void:
 	var area := safe_rect.grow(-12)
 	var keyboard_height := DisplayServer.virtual_keyboard_get_height() if OS.has_feature("mobile") else 0
 	if keyboard_height > 0: area.size.y = maxf(140, area.size.y - keyboard_height * size.y / get_window().size.y)
-	var wanted := Vector2(minf(680 * ui_scale, area.size.x), minf(modal_body.get_combined_minimum_size().y + 32, area.size.y))
+	var footer_h := modal_footer.get_combined_minimum_size().y + 10.0 if modal_footer.get_child_count() > 0 else 0.0
+	var wanted := Vector2(minf(680 * ui_scale, area.size.x), minf(modal_body.get_combined_minimum_size().y + footer_h + 32, area.size.y))
 	modal_panel.size = wanted
 	modal_panel.position = area.position + (area.size - wanted) / 2
 
@@ -303,6 +321,9 @@ func start_modal(kind: String, heading: String) -> void:
 	for child in modal_body.get_children():
 		modal_body.remove_child(child)
 		child.queue_free()
+	for child in modal_footer.get_children():
+		modal_footer.remove_child(child)
+		child.queue_free()
 	name_entry = null
 	var title := Label.new()
 	title.text = heading
@@ -333,11 +354,9 @@ func show_help() -> void:
 		"TEZGÂHTA OYNA\nMalzemeyi kendi tepsisinden seç. Sarma, kağıtlama ve servis doğrudan ürünün üzerinde yapılır.\n\nDOKUNMATİK\nLavaşa ve malzemelere dokun. Dürümü basılı tutarak sar; yeniden basılı tutarak kağıtla. Hazır ürüne, ardından müşteriye dokunarak servis et. Döneri ve doğrama tahtasını basılı tut.\n\nOYUN KOLU\nSol çubuk / yön tuşları: nesne seç\n× / A: seçili nesneyi kullan; sarma / kağıt / doğrama için basılı tut\nL1–R1 / LB–RB: hazırlama tahtası / müşteri / ızgara gözü değiştir\n□ / X: ürünü al / eldeki ürünü geri bırak\n○ / B: iptal / geri / mola\nR2 / RT: döner kes; bırakınca önceki hedefe dön\nL2 / LT basılı: hassas imleç\nOptions / Start: mola · △ / Y: yardım\n\nKLAVYE VE FARE\nFare: özgün tıklama ve sürükleme\nWASD / oklar: nesne seç · Enter / Boşluk: kullan / tut\nQ / Tab: tahta değiştir · E: al / geri bırak\nR: döner kes · Shift: hassas imleç · P: mola\n\nGeliştirmeler açıldığında ızgara, sos, içecek ve diğer ürünler de kendi görsellerinden kullanılır.",
 		"PLAY ON THE COUNTER\nUse the actual ingredients, food and machines in the scene.\n\nTOUCH\nTap bread and ingredients. Hold the wrap to roll; hold again to paper. Tap finished food, then its customer to serve. Hold the spit or chopping board to cut.\n\nCONTROLLER\nStick / D-pad: select an object\n× / A: use; hold to roll, paper or chop\nLB / RB: switch preparation board, customer or grill slot\nX: pick up / return held item · B: cancel / back\nRT: slice meat · Hold LT: precision pointer\nStart: pause · Y: help\n\nKEYBOARD AND MOUSE\nMouse: original click and drag\nWASD / arrows: select · Enter / Space: use / hold\nQ / Tab: switch board · E: pick up / return\nR: slice · Shift: precision pointer · P: pause\n\nUnlocked grills, sauces, drinks and other items are also used directly in the scene.")
 	modal_body.add_child(info)
-	var row := HBoxContainer.new()
-	modal_body.add_child(row)
-	row.add_child(make_button(text("Ekran ayarları", "Display settings"), show_settings, true))
-	var close := make_button(text("Anladım", "Got it"), close_modal, true)
-	row.add_child(close)
+	modal_footer.add_child(footer_button(text("Ekran ayarları", "Display settings"), show_settings))
+	var close := footer_button(text("Anladım", "Got it"), close_modal)
+	modal_footer.add_child(close)
 	close.grab_focus()
 	finish_modal()
 
@@ -379,8 +398,7 @@ func show_settings() -> void:
 	perf.toggled.connect(func(value: bool) -> void: show_perf = value; perf_label.visible = value; save_preferences())
 	modal_body.add_child(perf)
 	if not mobile: modal_body.add_child(make_button(text("Tam ekran / pencere", "Fullscreen / window"), func() -> void: game.f_fsToggle(), true))
-	var close := make_button(text("Kapat", "Close"), close_modal, true)
-	modal_body.add_child(close)
+	modal_footer.add_child(footer_button(text("Kapat", "Close"), close_modal))
 	pixel.grab_focus()
 	finish_modal()
 
@@ -405,11 +423,9 @@ func show_name_entry() -> void:
 			key.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			grid.add_child(key)
 		grid.get_child(0).grab_focus()
-	var row := HBoxContainer.new()
-	modal_body.add_child(row)
-	row.add_child(make_button(text("Sil", "Delete"), func() -> void: name_entry.text = name_entry.text.left(-1), true))
-	row.add_child(make_button(text("Vazgeç", "Cancel"), func() -> void: game.j_TEXTIN.cancel = true; close_modal(), true))
-	row.add_child(make_button(text("Tamam", "Done"), submit_name, true))
+	modal_footer.add_child(footer_button(text("Sil", "Delete"), func() -> void: name_entry.text = name_entry.text.left(-1)))
+	modal_footer.add_child(footer_button(text("Vazgeç", "Cancel"), func() -> void: game.j_TEXTIN.cancel = true; close_modal()))
+	modal_footer.add_child(footer_button(text("Tamam", "Done"), submit_name))
 	if game.controls.mode != "controller": name_entry.grab_focus(); name_entry.caret_column = name_entry.text.length()
 	finish_modal()
 
