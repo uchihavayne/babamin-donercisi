@@ -238,3 +238,50 @@ Ayrıca bulundu (henüz yapılmadı): birleşik sürümün yeni sipariş balonu 
 | Sırada bekleyen aç misafir | "Aç bir misafir geldi…" duyurusu kapıda beklerken değil, içeri girince çıkar |
 
 Durumlar: `sira` (bekliyor / yerine yürüyor), `sira_gir` (yeri ayrıldı, kapıya yürüyor; kapanış onu da bekler ya da gönderir), `sira_git` (sessizce gidiyor). Üçü de sokakta yaya olarak çizilir (`customer_system.sokakta`). Test: `tests/kapanis_sira.gd` (geliş şeridi, cam hizası, kapıya yürüyüp girme, yazısız ayrılış, kapanışta kapıya yürüyen, lider, 5 yerde görünürlük).
+
+## On birinci tur (2026-11-10 → 2026-11-14): yayın öncesi tarama
+
+Kullanıcının yönü: oyun **cozy olmayacak** — biraz zorlayıcı, süreye karşı yarış ("bir dürüm daha yetişir mi?"); hedef **önce mobil, sonra Steam**, kalite "gold+"; **büyük değişikliklerde önce danışılacak**. Bu tur kurallara dokunmadı; ekran/dil/cihaz taraması yapıldı, bulunan her kusur teste bağlandı. Başlıca bulgular ve düzeltmeler:
+
+| Bulgu | Düzeltme |
+| --- | --- |
+| Şubeler penceresinde açıklama gelir yazısına biniyordu; Fransızca'da üst satırdaki iki yazı üst üste (8 şube açıkken) | Panel 392 → 432 px; açıklama `maxw` ile sığar; gelir yan yana sığmazsa kısa biçim ($1,62M) |
+| Başarım bildirimi pencerelerin düğmesini ve alttaki ipucu satırını örtüyordu | Şubeler/Borç/Kişisel/Ev pencereleri açıkken bekler; ipucu satırının üstünde durur |
+| Gün başı kartında hava/maç satırı karttan taşıyordu; KARLI GÜN okunmuyordu | Kart genişliği en uzun satıra göre; `maxw`; renk |
+| Başarım rozetleri: HD simgeler 14×14 hücreden taşıyordu; Almanca "MEISTERSCHAFT" ilk rozete biniyordu | `rozet_ikon` hücreye kırpar / küçük simge; rozet sütunu en geniş grup etiketine göre kayar |
+| Rekorlar: günlük kaçan ortalaması tam sayıya yuvarlanıyordu (29 günde 12 kaçan → "0"); etiket değere değiyordu | Tek ondalık ("0,4"); etiket `maxw` ile değerin soluna sığar |
+| Telefon fişi başlığı Almanca/Fransızca'da fişten taşıyordu | KURIER / LIVREUR + `maxw` |
+| Müfettiş bazı dükkân boylarında müşterinin üstüne biniyordu | `event_system.mufettis_x` (iki yer arası / boş yer) |
+| Yeni Oyun tabelayı `null` bırakıyordu (Kişiselleştir "null" gösterdi) | İlk açılış varsayılanı (`varsayilan_tabela`) |
+| Çöp kutusu etiketi gerçek işi söylemiyordu | Etiket `cop_eylemi()` ile aynı sırayı izler (Eldekini at / Yanmış dürümü at / Tezgâhtakini at / Çöpü boşalt) |
+| Molada saat 0:00 görünüyordu | Kalan süre görünür |
+| Demirkent'te kapıdaki sorgulanan müşteri eski yerini tutuyordu | Sorgudaki müşteri yer tutmaz |
+| Sayı biçimi her dilde Türkçeydi ("$5.000.000" İngilizce'de, "5.00M") | Dile göre binlik/ondalık ayracı; yüzde işareti Türkçe'de önce, diğerlerinde sonra |
+| Öğretici/ipuçları telefonda bile "Turşuya tıkla" diyordu | `localization.girdi`: fare "tıkla", dokunmatik "dokun", kol/klavye yalın söz; 6 dilde |
+| Yardım/ayar penceresinde düğmeler kaydırma alanının içindeydi (kısa telefon ekranında görünmüyordu) | Düğmeler alt şeritte sabit |
+| Yardım metni de/fr/es/pt'de İngilizce kalıyordu | 4 dile çevrildi |
+| Ses panelinde etiket hoparlör çarpısına yapışıyordu; gece başlığı tabela yazısıyla karışıyordu; "DAYI x4" etiketini döner rayı kesiyordu; Rekorlar borç çubuğu yazısı okunmuyordu | Etiketler kaydırıldı; şerit koyulaştı; etiket ray çizildikten sonra çizilir; beyaz + gölge |
+| Windows/Android/iOS dışa aktarma ayarları eski "0.2.0" sürümüyle çıkacaktı | Proje sürümü 0.7.2 (Android kodu 702); `cila` testi eşitliği kilitler |
+
+**Süreye karşı yarış (küçük dokunuş, yalnız görsel):** son 10 saniyede ve kapanışta (saat 0:00 iken içerideki müşteriler bitirilirken) saat kutusundan her saniye dışa doğru kırmızı halka yayılır (`hud_draw.son_saniye_halkasi`). Süre, kural ve ses aynı. Zaten vardı: 20 sn altında kırmızı yanıp sönen saat, son 10 sn tik, son 5 sn uyarı sesi, "SON MÜŞTERİLER" yazısı.
+
+**Yeni testler / araçlar**
+
+- `tests/cila.gd`: yukarıdaki kusurların geri gelmemesi (12 madde: tabela varsayılanı, müfettiş konumu, çöp etiketi, `maxw`, sorgu, bildirim, fiş başlığı, rozet sütunu, rekor satırı, sayı biçimi, girdi sözü, sürüm eşitliği)
+- `tests/ceviri_tarama.gd`: koddaki 78 (tr, en) çifti ve 501 oyun verisi metni 4 dilde çevrili mi
+- `tests/yazi_tasma.gd`: 6 dilde ~7.400 yazı ölçülür (ekran, pencere, düğme, üst üste binme, çevrilmemiş harf); kasıtlı bozuk çeviriyle denendi
+- `tests/kapanis_sira.gd` baştan yazıldı (kapıdaki sıra, yazısız ayrılma, kapanış, lider, yerleşim)
+- `tests/usta_bot.gd`: `--tam` (tüm geliştirmeler), `--sehir N`, `--tohum`
+- `tools/ekran_senaryo.gd`: istenen ekranı istenen dilde / telefon boyunda PNG olarak kaydeder; `tools/snapshot_tabanini_guncelle.py`: anlık görüntü tabanını yalnız piksel farkı varsa günceller
+- [REHBER.md](REHBER.md): kısa yol haritası
+
+**Ölçüm:** tam yükseltmeli oyun karesi (debug, llvmpipe) bu turdan önceki ağaç 10,21 ms, sonraki 10,17 ms (5'er ölçüm, fark −%0,4). Bot taramaları (taze 24 gün, tam geliştirme, İstanbul/Berlin/Demirkent, kaos tohumu 7): betik hatası 0, kural ihlali 0.
+
+**Kullanıcıya danışılmak üzere bekleyen (kural değiştirdiği için yapılmadı):**
+
+1. Çöp kutusuna boş elle tıklayınca tahtadaki ürün atılıyor, çöp boşalmıyor (etiket artık söylüyor; çöp %55 üstündeyken öncelik değişsin mi?)
+2. "Kapıdan dönen" sayısı hiç sıraya girmemiş gelenleri de sayıyor (tam geliştirmede günde 60–230); yalnız sıraya girip giden mi sayılsın?
+3. Bot hızında hiç müşteri kaçmıyor (sabır dişsiz); insan oyuncu testi olmadan zorluk ayarı yapılmadı
+4. Rakip bahsi: "müşteri kaçırırsın" koşulu bedava kazanç, bahşiş hedefi ulaşılamaz — denge
+5. Tek tahta + dolu ızgara sıkışması
+6. Uygulama işletim sistemince kapatılırsa devam eden günün içi geri yüklenmiyor (gün baştan başlar)

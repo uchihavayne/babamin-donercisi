@@ -35,6 +35,8 @@ Aşağıdaki yollar `scripts/` klasörüne göredir.
 | Hava, rakip, aile giderleri, lider ve denetim | `systems/events/`: `weather_system`, `rival_system`, `household_system`, `leader_system`, `regulation_system` |
 | Çöp, kedi, elektrik kesintisi ve gece olayı | `systems/event_system.gd` |
 | Başarım açma ve koşulları | `systems/achievement_system.gd`, `achievement_conditions.gd` |
+| Dile göre sayı/para/yüzde biçimi | `core/math_utils.gd`: `f_fmtMoney`, `f_fmtShort`, `f_fmtOndalik`, `f_yuzde`, `binlik_ayraci` |
+| Girdi aygıtına göre söz ("tıkla" / "dokun") | `core/localization.gd`: `GIRDI_SOZ`, `girdi` |
 | Şehir renkleri ve sokak trafiği | `systems/city_system.gd`, `traffic_system.gd` |
 
 ## Görseller
@@ -62,7 +64,10 @@ Aşağıdaki yollar `scripts/` klasörüne göredir.
 | Ortak panel/düğme ve mola çizimi | `rendering/interface_draw.gd` |
 | Geliştirme mağazası ve gün sonu | `rendering/shop_draw.gd`, `day_end_draw.gd` |
 | Hikâyenin her sahnesi | `rendering/story/`; sahne geçişleri: `rendering/story_draw.gd` |
-| Logo ve piksel yazı | `rendering/logo_draw.gd`, `text_draw.gd` |
+| Logo ve piksel yazı (uzun metni sığdırma: `{"maxw": N}`, `kisalt`; test izleme kancası `izle`) | `rendering/logo_draw.gd`, `text_draw.gd` |
+| Son 10 sn saat halkası | `rendering/ui/hud_draw.gd`: `son_saniye_halkasi` |
+| Telefon fişi başlığı | `rendering/order_draw.gd`: `fis_basligi`, `FIS_BASLIK_W` |
+| Başarım rozet sütunu, rekor satırları | `rendering/ui/achievement_draw.gd`: `rozet_sutunu`, `gunluk_kacan`, `REKOR_HUCRE_W` |
 | PNG atlasları, pozlar ve önbellekler | `game_sprites.gd`, `sprite_library.gd`, `rendering/sprite_draw.gd` |
 
 `rendering/ui/legacy_order_draw.gd` özgün sipariş balonunun temel çizimidir. Güncel oyunda `order_flow.gd` üzerinden `rendering/order_draw.gd` kullanılır. Benzer şekilde `rendering/stations/` temel çizimleri, `counter_design.gd` yeni tezgâh yerleşimindeki özelleştirmeleri içerir. Bir nesne için çalışan sürümün özelleştirmesini kontrol et.
@@ -111,7 +116,7 @@ flowchart TD
 
 ## Doğrulama
 
-Godot'ta eski oturumu **F8** ile kapatıp **F5** ile başlat. Kayıt yolu ve şeması korunur.
+Yeni başlayanlar için kısa yol haritası: [REHBER.md](REHBER.md). Godot'ta eski oturumu **F8** ile kapatıp **F5** ile başlat. Kayıt yolu ve şeması korunur.
 
 ```sh
 godot --headless --path . --script tests/order_flow.gd --quit-after 600 -- --test

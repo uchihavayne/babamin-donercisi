@@ -17,6 +17,8 @@ Güncellemeleri almak için klasörde `git pull`.
 
 **Kontroller:** fare / dokunmatik yeterli. Klavye: R döner kes · WASD/oklar nesne seç · Boşluk/Enter kullan · Tab/Q hazırlama tahtası değiştir · E al/geri bırak · P mola · M ses · F2 HD aç/kapa · T geliştirici paneli (editörden çalışırken).
 
+**Kaybolduysan önce:** [REHBER.md](REHBER.md) (ne nerede, nasıl test edilir, yayın listesi).
+
 **Belgeler:** [BIRLESIK.md](BIRLESIK.md) (bu sürümde neler değişti, turlar), [ECONOMY.md](ECONOMY.md) (fiyatlar, tempo), [CODE_MAP.md](CODE_MAP.md) (hangi kod nerede), [PLATFORMLAR.md](PLATFORMLAR.md) (dışa aktarma).
 
 **Testler:** `GODOT=/godot/yolu sh tests/hepsi.sh` (tüm testler), `sh tests/kontrol.sh` (betik ayrıştırma). Oyunu insan hızında oynayan bot: `godot --headless --path . --script tests/usta_bot.gd -- --test --gun 12`.
