@@ -7,6 +7,10 @@
 #  4) uzun metin "maxw" ile sigdirilir (sube aciklamalari, gun basi karti)
 #  5) kapida sorgulanan musteri (Demirkent) eski yerini tutmaz
 #  6) basarim bildirimi pencereler acikken bekler
+#  7) telefon fisinin basligi, 8) basarim grubu etiketleri, 9) rekor satirlari
+#     alti dilde yerine sigar
+# 10) sayi bicimi dile gore (binlik / ondalik ayraci, yuzde isaretinin yeri)
+# 11) soz girdi aygitina gore: farede "tıkla", telefonda "dokun", kolda yalin
 #   godot --headless --path . --script tests/cila.gd --quit-after 3000 -- --test
 extends SceneTree
 var game: Node
@@ -110,5 +114,76 @@ func run() -> void:
 	game.achievement_draw.f_drawBasarimToast(0.0, 0.5)
 	check(float(bildirim.t) > 0.0, "pencere kapaninca bildirim ilerler")
 	game.j_BSQ.kuyruk = []
+	# 7) telefon fisinin basligi her dilde fise sigar (Almanca "LIEFERUNG" tasiyordu)
+	var DILLER := ["tr", "en", "de", "fr", "es", "pt"]
+	for dil in DILLER:
+		game.localization.f_setLang(dil)
+		for toplu in [false, true]:
+			var baslik: String = game.order_draw.fis_basligi(toplu)
+			check(float(game.f_textW(baslik)) <= game.order_draw.FIS_BASLIK_W, "%s fis basligi sigar: %s (%s px)" % [dil, baslik, game.f_textW(baslik)])
+	# 8) basarim penceresi: rozetler en genis grup etiketinden sonra baslar, panele sigar
+	var en_kalabalik := 0
+	var say := {}
+	for b in game.j_BASARIM:
+		say[b.grup] = int(say.get(b.grup, 0)) + 1
+		en_kalabalik = maxi(en_kalabalik, say[b.grup])
+	for dil in DILLER:
+		game.localization.f_setLang(dil)
+		var sutun: float = game.achievement_draw.rozet_sutunu()
+		for grup in game.j_BS_GRUP:
+			check(10.0 + float(game.f_textW(grup[1])) + 4.0 <= sutun, "%s basarim grubu etiketi rozete binmez: %s" % [dil, game.localization.f_T(grup[1])])
+		check(sutun + en_kalabalik * 19.0 <= (float(game.j_W) - 52.0) - 10.0, "%s rozet satiri panele sigar (%s)" % [dil, sutun])
+	# 9) rekorlar tablosu: etiket degere degmez (en genis deger: 5 hane / "12,5")
+	var AD: RefCounted = game.achievement_draw
+	for dil in DILLER:
+		game.localization.f_setLang(dil)
+		for etiket in ["Toplam dürüm", "İskender", "Toplam içecek", "Patates porsiyon", "Tatlı", "Oynanan gün", "Kaçan müşteri"]:
+			check(16.0 + float(game.f_textW(etiket)) + AD.REKOR_BOSLUK + float(game.f_textW("99999")) <= AD.REKOR_HUCRE_W, "%s rekor etiketi sigar: %s" % [dil, game.localization.f_T(etiket)])
+		var ort: String = AD.gunluk_kacan({"lost": 365.0, "days": 29.0})
+		check(16.0 + float(game.f_textW("Kaçan (günlük ort.)")) + AD.REKOR_BOSLUK + float(game.f_textW(ort)) <= AD.REKOR_HUCRE_W, "%s gunluk kacan etiketi sigar (%s)" % [dil, ort])
+	# 10) sayi bicimi dile gore; gunluk ortalama tek ondalik
+	var MU: RefCounted = game.math_utils
+	var beklenen := {"tr": ["5.000.000", "5,00M", "%42", "0,4"], "en": ["5,000,000", "5.00M", "42%", "0.4"], "de": ["5.000.000", "5,00M", "42%", "0,4"],
+		"fr": ["5 000 000", "5,00M", "42%", "0,4"], "es": ["5.000.000", "5,00M", "42%", "0,4"], "pt": ["5.000.000", "5,00M", "42%", "0,4"]}
+	for dil in DILLER:
+		game.localization.f_setLang(dil)
+		var b: Array = beklenen[dil]
+		check(str(MU.f_fmtMoney(5000000.0)) == b[0], "%s binlik ayraci: %s" % [dil, MU.f_fmtMoney(5000000.0)])
+		check(str(MU.f_fmtShort(5000000.0)) == b[1], "%s kisa bicim: %s" % [dil, MU.f_fmtShort(5000000.0)])
+		check(MU.f_yuzde(42.0) == b[2], "%s yuzde: %s" % [dil, MU.f_yuzde(42.0)])
+		check(AD.gunluk_kacan({"lost": 12.0, "days": 29.0}) == b[3], "%s gunluk kacan: %s" % [dil, AD.gunluk_kacan({"lost": 12.0, "days": 29.0})])
+	game.localization.f_setLang("tr")
+	check(str(MU.f_fmtMoney(950.0)) == "950" and str(MU.f_fmtMoney(-1200.0)) == "-1.200" and str(MU.f_fmtShort(12500.0)) == "13K", "kucuk / eksi / K bicimi degismedi")
+	check(AD.gunluk_kacan({}) == "0,0" and AD.gunluk_kacan({"lost": 3.0, "days": 0.0}) == "0,0", "hic gun oynanmadiysa ortalama 0,0")
+	# 11) soz girdi aygitina gore: farede "tıkla", telefonda "dokun", kolda yalin
+	var L: RefCounted = game.localization
+	game.controls.set_mode("mouse")
+	check(L.f_T("Turşuya tıkla") == "Turşuya tıkla", "farede: tıkla")
+	game.controls.set_mode("touch")
+	check(L.f_T("Turşuya tıkla") == "Turşuya dokun" and L.cift("3 MALZEME TEK TIK", "3 SIDES, ONE CLICK") == "3 MALZEME TEK DOKUNUŞ", "telefonda: dokun")
+	game.controls.set_mode("controller")
+	check(L.f_T("Turşuya tıkla") == "Turşu ekle" and L.f_T("Tahtaya tıklayarak doğra") == "Tahtayı basılı tutarak doğra", "kolda: yalin soz, tahta basili tutulur")
+	for dil in ["en", "de", "fr", "es", "pt"]:
+		var d: Dictionary = game.j_SOZLUK[dil]
+		for anahtar in L.GIRDI_SOZ:
+			check(d.has(anahtar), "%s sozlugunde fare sozu var: %s" % [dil, anahtar])
+			for soz in L.GIRDI_SOZ[anahtar]:
+				check(d.has(soz), "%s sozlugunde aygit sozu var: %s" % [dil, soz])
+	# ogreticinin hicbir adimi telefonda / kolda fareden soz etmez (6 dil)
+	var fare_sozu := RegEx.new()
+	fare_sozu.compile("(?i)tıkla|tık\\b|fare|click|mouse|klick|maus|clic|clique|souris|ratón|rato\\b")
+	for kip in ["touch", "controller", "keyboard"]:
+		for dil in DILLER:
+			game.localization.f_setLang(dil)
+			game.controls.set_mode("mouse"); game.controls.set_mode(kip)
+			for adim in game.j_TUT:
+				var yazi: String = str(L.f_T(adim.s))
+				check(fare_sozu.search(yazi) == null, "%s / %s ogretici adimi fareden soz etmez: %s" % [kip, dil, yazi])
+			for ipucu in ["Kutu açık — tıklayarak doldur", "Pideyi doğra — tahtaya tıkla", " (tekrar tıkla)", "tıkla: +", "Tek tıkla 2-3 ürüne birden"]:
+				check(fare_sozu.search(str(L.f_T(ipucu))) == null, "%s / %s ipucu fareden soz etmez: %s" % [kip, dil, L.f_T(ipucu)])
+			var etiket: String = L.cift("3 MALZEME TEK TIK", "3 SIDES, ONE CLICK")
+			check(fare_sozu.search(etiket) == null and not etiket.contains("TIK"), "%s / %s gelistirme etiketi fareden soz etmez: %s" % [kip, dil, etiket])
+	game.localization.f_setLang("tr")
+	game.controls.set_mode("mouse")
 	print("CILA ", JSON.stringify({"failures": failures}))
 	game.free(); quit(0 if failures.is_empty() else 1)

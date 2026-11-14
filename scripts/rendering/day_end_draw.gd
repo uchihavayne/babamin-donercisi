@@ -64,7 +64,7 @@ func f_drawDayEnd(p_t: Variant = null) -> Variant:
 	if (J.gt(J.getv(v_st, "branch"), 0.0) and J.gt(J.getv(game.j_G, "sceneT"), 1.65)):
 		game.text_draw.f_txt(J.add((J.getv(game.j_G, "branch") if J.truth(J.getv(game.j_G, "branch")) else 0.0), game.localization.f_T(" ŞUBE GELİRİ")), ((float(game.j_W) / float(2.0)) - 92.0), J.add(v_ly, 26.0), J.getv(game.j_P, "au2"))
 		game.text_draw.f_txt(J.add("+$", game.math_utils.f_fmtMoney(J.getv(v_st, "branch"))), J.add((float(game.j_W) / float(2.0)), 92.0), J.add(v_ly, 26.0), J.getv(game.j_P, "au2"), {"align": "r"})
-		game.text_draw.f_txt(J.add(game.localization.f_T("performans %"), floor(((J.getv(v_st, "brPerf") if J.truth(J.getv(v_st, "brPerf")) else 1.0) * 100.0) + 0.5)), J.add((float(game.j_W) / float(2.0)), 92.0), J.add(v_ly, 36.0), J.getv(game.j_P, "ui3"), {"align": "r"})
+		game.text_draw.f_txt(J.add(J.add(game.localization.f_T("performans %"), floor(((J.getv(v_st, "brPerf") if J.truth(J.getv(v_st, "brPerf")) else 1.0) * 100.0) + 0.5)), game.math_utils.yuzde_sonu()), J.add((float(game.j_W) / float(2.0)), 92.0), J.add(v_ly, 36.0), J.getv(game.j_P, "ui3"), {"align": "r"})
 		v_dy2 = 24.0
 	if (J.gt(J.getv(game.j_G, "sceneT"), 1.68) and J.gt(J.getv(v_st, "fine"), 0.0)):
 		game.text_draw.f_txt(game.localization.f_T("KESİLEN CEZA"), ((float(game.j_W) / float(2.0)) - 92.0), J.add(J.add(v_ly, 26.0), v_dy2), "#e2483a")

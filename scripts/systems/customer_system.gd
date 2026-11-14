@@ -386,7 +386,7 @@ func f_deliver(p_c: Variant = null) -> Variant:
 			J.setv(v_c, "line", game.math_utils.f_pick(game.j_LINES_CHEAP))
 			J.setv(v_c, "lineT", 1.8)
 			J.setv(v_c, "patience", max(0.05, (J.getv(v_c, "patience") - ((1.0 - v_q) * 0.35))))
-			game.effects.f_ftext(J.add(game.localization.f_T("EKSİK! -%"), floor(((1.0 - v_q) * 100.0) + 0.5)), J.getv(v_c, "x"), (J.getv(v_c, "y") - 60.0), J.getv(game.j_P, "bad"), {"life": 1.3})
+			game.effects.f_ftext(J.add(J.add(game.localization.f_T("EKSİK! -%"), floor(((1.0 - v_q) * 100.0) + 0.5)), game.math_utils.yuzde_sonu()), J.getv(v_c, "x"), (J.getv(v_c, "y") - 60.0), J.getv(game.j_P, "bad"), {"life": 1.3})
 			J.method(game.j_SFX, "bad", [])
 	v_secimOk = (not J.eq(J.getv(v_it, "kind"), "wrap") if not J.eq(J.getv(v_it, "kind"), "wrap") else game.f_secimUyuyor(v_it, v_ord))
 	if (not J.truth(v_secimOk)):

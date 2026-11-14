@@ -159,20 +159,48 @@ func f_fmtMoney(p_n: Variant = null) -> Variant:
 	v_s = J.add("", v_n)
 	v_out = ""
 	v_i = 0.0
+	var v_ayrac: String = binlik_ayraci()
 	while J.lt(v_i, J.getv(v_s, "length")):
 		if (J.gt(v_i, 0.0) and J.eq(fmod(J.n((J.getv(v_s, "length") - v_i)), J.n(3.0)), 0.0)):
-			v_out = J.add(v_out, ".")
+			v_out = J.add(v_out, v_ayrac)
 		v_out = J.add(v_out, J.getv(v_s, v_i))
 		v_i = J.add(v_i, 1.0)
 	return J.add(("-" if J.truth(v_neg) else ""), v_out)
 	return null
+
+# BIRLESIK (11. tur): sayi bicimi dile gore. Eskiden her dilde Turkce bicim
+# ciziliyordu: Ingilizce'de "$5.000.000" (bes nokta sifir gibi okunur), kisa
+# bicimde "5.00M" (Turkce'de virgul olmali). Binlik ayraci Ingilizce'de virgul,
+# Fransizca'da bosluk, digerlerinde nokta; ondalik isareti Ingilizce'de nokta,
+# digerlerinde virgul. Yuzde isareti Turkce'de sayidan once, digerlerinde sonra.
+func binlik_ayraci() -> String:
+	match str(game.j_LANG):
+		"en": return ","
+		"fr": return " "
+	return "."
+
+func ondalik_ayraci() -> String:
+	return "." if str(game.j_LANG) == "en" else ","
+
+func f_fmtOndalik(sayi: float, hane: int = 1) -> String:
+	return (("%." + str(hane) + "f") % sayi).replace(".", ondalik_ayraci())
+
+# "%42" (tr) / "42%" (digerleri); sayi metin de olabilir ("12,5")
+func f_yuzde(sayi: Variant) -> String:
+	var metin: String = J.s(sayi)
+	return ("%" + metin) if str(game.j_LANG) == "tr" else (metin + "%")
+
+# Turkce anahtari "%" ile biten etiketin ("borç ödeme: %") sayidan SONRA gelen
+# eki: Turkce'de isaret anahtarda (sayidan once), ceviride sayinin arkasinda.
+func yuzde_sonu() -> String:
+	return "" if str(game.j_LANG) == "tr" else "%"
 
 # core.js:129
 func f_fmtShort(p_n: Variant = null) -> Variant:
 	var v_n: Variant = p_n
 	v_n = floor((v_n if J.truth(v_n) else 0.0) + 0.5)
 	if J.ge(v_n, 1000000.0):
-		return J.add(J.method((float(v_n) / float(1000000.0)), "toFixed", [(1.0 if J.ge(v_n, 10000000.0) else 2.0)]), "M")
+		return f_fmtOndalik(float(v_n) / 1000000.0, 1 if J.ge(v_n, 10000000.0) else 2) + "M"
 	if J.ge(v_n, 10000.0):
 		return J.add(floor((float(v_n) / float(1000.0)) + 0.5), "K")
 	return game.math_utils.f_fmtMoney(v_n)

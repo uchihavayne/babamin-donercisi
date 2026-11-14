@@ -53,7 +53,7 @@ func f_drawPayPanel(p_t: Variant = null) -> Variant:
 	game.text_draw.f_txt(J.add("$", game.math_utils.f_fmtMoney(J.getv(game.j_G, "debt"))), (J.add(v_x, v_w) - 16.0), J.add(v_y, 37.0), "#a83a2a", {"align": "r", "sc": 1.0})
 	v_pr = (1.0 - game.math_utils.f_clamp((float(J.getv(game.j_G, "debt")) / float(game.j_DEBT_START)), 0.0, 1.0))
 	game.counter_draw.f_bar(J.add(v_x, 16.0), J.add(v_y, 58.0), (v_w - 32.0), 9.0, v_pr, J.getv(game.j_P, "ok"))
-	game.text_draw.f_txt(J.add("%", J.method((v_pr * 100.0), "toFixed", [(2.0 if (J.gt(v_pr, 0.0) and J.lt(v_pr, 0.01)) else 1.0)])), J.add(v_x, (float(v_w) / float(2.0))), J.add(v_y, 59.0), "#ffffff", {"align": "c", "shadow": 1.0})
+	game.text_draw.f_txt(game.math_utils.f_yuzde(game.math_utils.f_fmtOndalik(v_pr * 100.0, 2 if (J.gt(v_pr, 0.0) and J.lt(v_pr, 0.01)) else 1)), J.add(v_x, (float(v_w) / float(2.0))), J.add(v_y, 59.0), "#ffffff", {"align": "c", "shadow": 1.0})
 	J.setv(game.j_ctx, "globalAlpha", 0.3)
 	game.f_hl(J.add(v_x, 14.0), J.add(v_y, 76.0), (v_w - 28.0), J.getv(game.j_P, "ui2"))
 	J.setv(game.j_ctx, "globalAlpha", 1.0)

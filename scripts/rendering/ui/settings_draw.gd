@@ -265,11 +265,13 @@ func f_drawSesPanel(p_t: Variant = null) -> Variant:
 	J.setv(game.j_ctx, "globalAlpha", 1.0)
 	game.interface_draw.f_panel(v_x, v_y, v_w, v_h, "SES")
 	game.settings_draw.f_simgeNota(J.add(v_x, 20.0), J.add(v_y, 26.0), ((not J.truth(game.j_MUTED)) if J.gt(J.getv(game.j_VOL, "mus"), 0.0) else J.gt(J.getv(game.j_VOL, "mus"), 0.0)))
-	game.text_draw.f_txt("MÜZİK", J.add(v_x, 32.0), J.add(v_y, 22.0), J.getv(game.j_P, "ink"))
+	# BIRLESIK (11. tur): etiketler 3 px saga alindi; ses kapaliyken hoparlorun
+	# kirmizi carpisi (x+25..30) "SES EFEKTLERİ" yazisina yapisiyordu
+	game.text_draw.f_txt("MÜZİK", J.add(v_x, 35.0), J.add(v_y, 22.0), J.getv(game.j_P, "ink"))
 	game.text_draw.f_txt(J.add("", J.getv(game.j_VOL, "mus")), (J.add(v_x, v_w) - 18.0), J.add(v_y, 22.0), ("#2f6a9a" if J.gt(J.getv(game.j_VOL, "mus"), 0.0) else "#9a9288"), {"align": "r"})
 	game.f_volSlider(J.add(v_x, 18.0), J.add(v_y, 34.0), (v_w - 36.0), J.getv(game.j_VOL, "mus"), "mus", "#3f8ac0", v_t)
 	game.settings_draw.f_simgeHoparlor(J.add(v_x, 22.0), J.add(v_y, 74.0), (0.0 if J.truth(game.j_MUTED) else J.getv(game.j_VOL, "sfx")))
-	game.text_draw.f_txt("SES EFEKTLERİ", J.add(v_x, 32.0), J.add(v_y, 70.0), J.getv(game.j_P, "ink"))
+	game.text_draw.f_txt("SES EFEKTLERİ", J.add(v_x, 35.0), J.add(v_y, 70.0), J.getv(game.j_P, "ink"))
 	game.text_draw.f_txt(J.add("", J.getv(game.j_VOL, "sfx")), (J.add(v_x, v_w) - 18.0), J.add(v_y, 70.0), ("#8a6210" if J.gt(J.getv(game.j_VOL, "sfx"), 0.0) else "#9a9288"), {"align": "r"})
 	game.f_volSlider(J.add(v_x, 18.0), J.add(v_y, 82.0), (v_w - 36.0), J.getv(game.j_VOL, "sfx"), "sfx", "#c08a2a", v_t)
 	if J.truth(game.f_button(J.add(v_x, 18.0), J.add(v_y, 104.0), (v_w - 36.0), 20.0, ("SESİ AÇ" if J.truth(game.j_MUTED) else "HEPSİNİ SUSTUR"), ("#3f8a4a" if J.truth(game.j_MUTED) else "#8a4a4a"))):

@@ -9,6 +9,7 @@ func f_panel(p_x: Variant = null, p_y: Variant = null, p_w: Variant = null, p_h:
 	var v_w: Variant = p_w
 	var v_h: Variant = p_h
 	var v_title: Variant = p_title
+	if game.text_draw.izle != null: game.text_draw.izle.append({"panel": Rect2(J.n(v_x), J.n(v_y), J.n(v_w), J.n(v_h))})
 	# REMAKE kancasi: HD panel (9 dilim cerceve + kagit dolgu + baslik levhasi)
 	if J.truth(game.f_hdPanel(v_x, v_y, v_w, v_h, v_title)): return null
 	J.setv(game.j_ctx, "globalAlpha", 0.35)
@@ -40,6 +41,7 @@ func f_button(p_x: Variant = null, p_y: Variant = null, p_w: Variant = null, p_h
 	var v_label: Variant = p_label
 	var v_col: Variant = p_col
 	var v_hot: Variant = p_hot
+	if game.text_draw.izle != null: game.text_draw.izle.append({"dugme": Rect2(J.n(v_x), J.n(v_y), J.n(v_w), J.n(v_h)), "s": J.s(game.localization.f_T(v_label))})
 	v_over = game.math_utils.f_inRect(J.getv(game.j_IN, "x"), J.getv(game.j_IN, "y"), v_x, v_y, v_w, v_h)
 	v_c0 = (v_col if J.truth(v_col) else J.getv(game.j_P, "red1"))
 	v_c1 = game.character_draw.f_shadeCol(v_c0, (1.22 if J.truth(v_over) else 1.0))

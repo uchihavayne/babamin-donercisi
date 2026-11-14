@@ -501,8 +501,8 @@ func status() -> String:
 			return text("Et %d/%d · Yoğurt %d/%d","Meat %d/%d · Yogurt %d/%d") % [w.meat,tun("iskMeat"),w.yogurtN,game.j_PLATE_YOGURT]
 		return text("Yanmış · çöpe at","Burnt · discard") if w.get("burnt",false) else text("Sarılmış" if w.state == "rolled" else "Servise hazır","Rolled" if w.state == "rolled" else "Ready to serve")
 	if selected == "spit": return text("Tepside %d / %d dilim","Tray: %d / %d slices") % [game.j_G.meat,tun("meatCap")]
-	if selected == "cut": return text("Doğrama %d%% · Çiğ patates %d","Chopping %d%% · Raw fries %d") % [game.j_G.cut.prog*100,game.j_G.cut.raw]
-	if selected == "fryer": return text("Kızarıyor… %d%%","Frying… %d%%") % [game.j_G.fryer.prog*100] if game.j_G.fryer.state == "fry" else text("Pişmiş patates: ","Cooked fries: ")+str(int(game.j_G.friesTray))
+	if selected == "cut": return text("Doğrama %%%d · Çiğ patates %d","Chopping %d%% · Raw fries %d") % [game.j_G.cut.prog*100,game.j_G.cut.raw]
+	if selected == "fryer": return text("Kızarıyor… %%%d","Frying… %d%%") % [game.j_G.fryer.prog*100] if game.j_G.fryer.state == "fry" else text("Pişmiş patates: ","Cooked fries: ")+str(int(game.j_G.friesTray))
 	if t.get("group","") == "customer":
 		var order: Array[String] = []
 		for i in t.object.items.size():

@@ -59,6 +59,12 @@ func kisalt(metin: String, maxw: float, mono: Variant = null) -> String:
 	_kisa[anahtar] = sonuc
 	return sonuc
 
+# Yazi izleme (tests/yazi_tasma.gd): null degilken cizilen her yazi {s,x,y,w},
+# her pencere {panel} ve her dugme {dugme,s} sirasiyla buraya eklenir. Test,
+# alti dilde hicbir yazinin ekrandan / penceresinden / dugmesinden tasmadigini
+# bu kayitlardan olcer. Oyunda hep null (tek karsilastirma, maliyeti yok).
+var izle: Variant = null
+
 # core.js:456
 func f_txt(p_s: Variant = null, p_x: Variant = null, p_y: Variant = null, p_col: Variant = null, p_o: Variant = null) -> Variant:
 	var v_sc: Variant = null
@@ -91,6 +97,7 @@ func f_txt(p_s: Variant = null, p_x: Variant = null, p_y: Variant = null, p_col:
 			v_ax = (v_x - (v_w * v_sc))
 	v_ax = floor(v_ax + 0.5)
 	v_y = floor(v_y + 0.5)
+	if izle != null and v_s != "": izle.append({"s": v_s, "x": v_ax, "y": v_y, "w": J.n(v_w) * J.n(v_sc)})
 	# BIRLESIK (6. tur performans): cerceve / golge + yazi tek pisirilmis doku
 	if J.truth(J.getv(v_o, "outline")):
 		v_oc = (J.getv(game.j_P, "ui5") if J.eq(J.getv(v_o, "outline"), true) else J.getv(v_o, "outline"))

@@ -1,6 +1,18 @@
 # Achievement draw. See CODE_MAP.md.
 extends "res://scripts/core/game_module.gd"
 
+# Rekorlar penceresinin ust tablosu: hucre 140 px; ikon 16 px, sonra etiket,
+# sagda deger. Etiketle deger arasinda en az REKOR_BOSLUK px kalir.
+const REKOR_HUCRE_W := 140.0
+const REKOR_BOSLUK := 4.0
+
+# Gun basina kacan musteri ortalamasi, tek ondalik ("0,4"). BIRLESIK (11. tur):
+# eskiden tam sayiya yuvarlaniyordu; 29 gunde 12 kacan "0" gorunuyordu.
+func gunluk_kacan(S: Variant) -> String:
+	var gun: float = J.n(J.getv(S, "days")) if J.truth(J.getv(S, "days")) else 0.0
+	var kacan: float = J.n(J.getv(S, "lost")) if J.truth(J.getv(S, "lost")) else 0.0
+	return game.math_utils.f_fmtOndalik(kacan / gun if gun > 0.0 else 0.0, 1)
+
 # ui.js:2481
 func f_drawStatsPanel(p_t: Variant = null) -> Variant:
 	var v_S: Variant = null
@@ -34,7 +46,7 @@ func f_drawStatsPanel(p_t: Variant = null) -> Variant:
 	game.f_fr(0.0, 0.0, game.j_W, game.j_H, "#0d0a08")
 	J.setv(game.j_ctx, "globalAlpha", 1.0)
 	game.interface_draw.f_panel(v_x, v_y, v_w, v_h, "REKORLAR")
-	v_rows = [["wrap", "Toplam dürüm", (J.getv(v_S, "wraps") if J.truth(J.getv(v_S, "wraps")) else 0.0)], ["iskender", "İskender", (J.getv(v_S, "isk") if J.truth(J.getv(v_S, "isk")) else 0.0)], ["cola", "Toplam içecek", (J.getv(v_S, "drinks") if J.truth(J.getv(v_S, "drinks")) else 0.0)], ["fbox", "Patates porsiyon", (J.getv(v_S, "boxes") if J.truth(J.getv(v_S, "boxes")) else 0.0)], ["sweet", "Tatlı", (J.getv(v_S, "sweets") if J.truth(J.getv(v_S, "sweets")) else 0.0)], [null, "Oynanan gün", (J.getv(v_S, "days") if J.truth(J.getv(v_S, "days")) else 0.0)], [null, "Kaçan müşteri", (J.getv(v_S, "lost") if J.truth(J.getv(v_S, "lost")) else 0.0)], [null, "Kaçan müşteri (gün ort.)", (floor((float((J.getv(v_S, "lost") if J.truth(J.getv(v_S, "lost")) else 0.0)) / float(J.getv(v_S, "days"))) + 0.5) if J.truth(J.getv(v_S, "days")) else 0.0)]]
+	v_rows = [["wrap", "Toplam dürüm", (J.getv(v_S, "wraps") if J.truth(J.getv(v_S, "wraps")) else 0.0)], ["iskender", "İskender", (J.getv(v_S, "isk") if J.truth(J.getv(v_S, "isk")) else 0.0)], ["cola", "Toplam içecek", (J.getv(v_S, "drinks") if J.truth(J.getv(v_S, "drinks")) else 0.0)], ["fbox", "Patates porsiyon", (J.getv(v_S, "boxes") if J.truth(J.getv(v_S, "boxes")) else 0.0)], ["sweet", "Tatlı", (J.getv(v_S, "sweets") if J.truth(J.getv(v_S, "sweets")) else 0.0)], [null, "Oynanan gün", (J.getv(v_S, "days") if J.truth(J.getv(v_S, "days")) else 0.0)], [null, "Kaçan müşteri", (J.getv(v_S, "lost") if J.truth(J.getv(v_S, "lost")) else 0.0)], [null, "Kaçan (günlük ort.)", gunluk_kacan(v_S)]]
 	v_i = 0.0
 	while J.lt(v_i, J.getv(v_rows, "length")):
 		v_col = fmod(J.n(v_i), J.n(2.0))
@@ -44,8 +56,10 @@ func f_drawStatsPanel(p_t: Variant = null) -> Variant:
 		if J.truth(J.getv(J.getv(v_rows, v_i), 0.0)):
 			if not game.f_hdIkon("lst_" + str(J.getv(J.getv(v_rows, v_i), 0.0)), J.add(v_rx, 6.0), J.add(v_ry, 5.0)):
 				game.icon_draw.f_icon(J.getv(J.getv(v_rows, v_i), 0.0), J.add(v_rx, 6.0), J.add(v_ry, 5.0), v_t)
-		game.text_draw.f_txt(J.getv(J.getv(v_rows, v_i), 1.0), J.add(v_rx, 16.0), J.add(v_ry, 2.0), J.getv(game.j_P, "ui4"))
-		game.text_draw.f_txt(J.add("", J.getv(J.getv(v_rows, v_i), 2.0)), J.add(v_rx, 140.0), J.add(v_ry, 2.0), J.getv(game.j_P, "ink"), {"align": "r"})
+		# BIRLESIK (11. tur): etiket degerin soluna sigdirilir (uzun ceviri degere degmesin)
+		var v_deger: String = J.s(J.getv(J.getv(v_rows, v_i), 2.0))
+		game.text_draw.f_txt(J.getv(J.getv(v_rows, v_i), 1.0), J.add(v_rx, 16.0), J.add(v_ry, 2.0), J.getv(game.j_P, "ui4"), {"maxw": REKOR_HUCRE_W - 16.0 - float(game.f_textW(v_deger)) - REKOR_BOSLUK})
+		game.text_draw.f_txt(v_deger, J.add(v_rx, REKOR_HUCRE_W), J.add(v_ry, 2.0), J.getv(game.j_P, "ink"), {"align": "r"})
 		J.setv(game.j_ctx, "globalAlpha", 0.25)
 		game.f_hl(v_rx, J.add(v_ry, 12.0), 140.0, J.getv(game.j_P, "ui2"))
 		J.setv(game.j_ctx, "globalAlpha", 1.0)
@@ -64,8 +78,10 @@ func f_drawStatsPanel(p_t: Variant = null) -> Variant:
 	game.text_draw.f_txt("Hırsıza kaptırılan", J.add(v_x, 20.0), J.add(v_by, (v_satSp * 5.0)), J.getv(game.j_P, "ui4"))
 	game.text_draw.f_txt(J.add("$", game.math_utils.f_fmtMoney((J.getv(v_S, "stolen") if J.truth(J.getv(v_S, "stolen")) else 0.0))), (J.add(v_x, v_w) - 20.0), J.add(v_by, (v_satSp * 5.0)), "#a83a2a", {"align": "r"})
 	v_pr = (1.0 - game.math_utils.f_clamp((float(J.getv(game.j_G, "debt")) / float(game.j_DEBT_START)), 0.0, 1.0))
-	game.counter_draw.f_bar(J.add(v_x, 20.0), J.add(v_by, (v_satSp * 6.0)), (v_w - 40.0), 8.0, v_pr, J.getv(game.j_P, "ok"))
-	game.text_draw.f_txt(J.add(game.localization.f_T("borç ödeme: %"), floor((v_pr * 100.0) + 0.5)), J.add(v_x, (float(v_w) / float(2.0))), J.add(J.add(v_by, (v_satSp * 6.0)), 1.0), J.getv(game.j_P, "ui5"), {"align": "c"})
+	# BIRLESIK (11. tur): cubuk yazisi Borc Ode penceresindeki gibi beyaz + golgeli
+	# (koyu yazi bos cubugun koyu zemininde okunmuyordu)
+	game.counter_draw.f_bar(J.add(v_x, 20.0), J.add(v_by, (v_satSp * 6.0)), (v_w - 40.0), 9.0, v_pr, J.getv(game.j_P, "ok"))
+	game.text_draw.f_txt(J.add(J.add(game.localization.f_T("borç ödeme: %"), floor((v_pr * 100.0) + 0.5)), game.math_utils.yuzde_sonu()), J.add(v_x, (float(v_w) / float(2.0))), J.add(J.add(v_by, (v_satSp * 6.0)), 1.0), "#ffffff", {"align": "c", "shadow": 1.0})
 	if J.truth(game.f_button((J.add(v_x, (float(v_w) / float(2.0))) - 40.0), (J.add(v_y, v_h) - 22.0), 80.0, 18.0, "KAPAT", J.getv(game.j_P, "red1"), true)):
 		J.setv(game.j_STATS, "open", false)
 		J.method(game.j_SFX, "uiBack", [])
@@ -128,6 +144,16 @@ func f_bsRozet(p_x: Variant = null, p_y: Variant = null, p_b: Variant = null, p_
 		J.setv(game.j_ctx, "globalAlpha", 1.0)
 	return null
 
+# Rozetlerin panel icindeki baslangici (panel x'ine gore). BIRLESIK (11. tur):
+# sabit 78 px'ti; Almanca "MEISTERSCHAFT" (75 px) etiketi 68 px'lik sutundan
+# tasip ilk rozetin ustune biniyordu. Artik o dilin en genis grup etiketinden
+# 6 px sonra baslar (en kalabalik grup 10 rozet = 190 px; panelde yer bol).
+func rozet_sutunu() -> float:
+	var en_genis := 0.0
+	for grup in game.j_BS_GRUP:
+		en_genis = maxf(en_genis, float(game.f_textW(grup[1])))
+	return maxf(78.0, 10.0 + en_genis + 6.0)
+
 # ui.js:2790
 func f_drawBasarimPanel(p_t: Variant = null) -> Variant:
 	var v_kk: Variant = null
@@ -178,10 +204,11 @@ func f_drawBasarimPanel(p_t: Variant = null) -> Variant:
 	v_hoverB = null
 	v_ry = v_basY
 	v_g = 0.0
+	var v_rozetX: float = rozet_sutunu()
 	while J.lt(v_g, J.getv(game.j_BS_GRUP, "length")):
 		v_gid = J.getv(J.getv(game.j_BS_GRUP, v_g), 0.0)
 		game.text_draw.f_txt(J.getv(J.getv(game.j_BS_GRUP, v_g), 1.0), J.add(v_x, 10.0), (J.add(v_ry, (float((v_rowH - 8.0)) / float(2.0))) - 1.0), J.getv(game.j_P, "ui3"))
-		v_bx = J.add(v_x, 78.0)
+		v_bx = J.add(v_x, v_rozetX)
 		v_n = 0.0
 		v_i = 0.0
 		while J.lt(v_i, J.getv(game.j_BASARIM, "length")):
@@ -236,6 +263,9 @@ func f_drawBasarimPanel(p_t: Variant = null) -> Variant:
 		J.method(game.j_SFX, "uiBack", [])
 	return null
 
+# Basarim bildiriminin alt kenari ile ekranin alti arasi (ipucu satiri 20 px + 2 px bosluk)
+const BILDIRIM_ALT := 22.0
+
 # ui.js:2854
 func f_drawBasarimToast(p_t: Variant = null, p_dt: Variant = null) -> Variant:
 	var v_it: Variant = null
@@ -269,7 +299,9 @@ func f_drawBasarimToast(p_t: Variant = null, p_dt: Variant = null) -> Variant:
 	v_w = 176.0
 	v_h = 30.0
 	v_bx = floor(((float(game.j_W) / float(2.0)) - (float(v_w) / float(2.0))) + 0.5)
-	v_by = floor((((game.j_H - J.getv(game.j_VIEW, "bot")) - 12.0) - (v_h * v_k)) + 0.5)
+	# BIRLESIK (11. tur): bildirim alttaki ipucu satirinin (y H-20, 13 px) ustunde
+	# durur; eskiden 8 px ustune binip 3 saniye boyunca ipucunu okunmaz yapiyordu
+	v_by = floor((((game.j_H - J.getv(game.j_VIEW, "bot")) - BILDIRIM_ALT) - (v_h * v_k)) + 0.5)
 	J.setv(game.j_ctx, "globalAlpha", v_k)
 	J.setv(game.j_ctx, "globalAlpha", (v_k * 0.4))
 	game.f_rrect(J.add(v_bx, 2.0), J.add(v_by, 3.0), v_w, v_h, 4.0, "#000")

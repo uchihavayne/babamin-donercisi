@@ -231,7 +231,9 @@ func f_drawNight(p_t: Variant = null) -> Variant:
 	if ((J.eq(J.getv(v_N, "phase"), 2.0) and J.truth(J.getv(v_N, "stole"))) and J.truth(game.f_chance(0.35))):
 		game.effects.f_part({"x": v_tx, "y": (v_TY - 20.0), "vx": game.math_utils.f_rnd((-J.n(24.0)), 24.0), "vy": game.math_utils.f_rnd((-J.n(44.0)), (-J.n(14.0))), "life": 0.9, "col": J.getv(game.j_P, "au0"), "g": 90.0, "sz": 2.0})
 	game.effects.f_psDraw()
-	J.setv(game.j_ctx, "globalAlpha", 0.55)
+	# BIRLESIK (11. tur): baslik seridi koyulasti (0.55 -> 0.88); tabelanin yazisi
+	# seridin altindan secilip "GECE — GÜN 19 BİTTİ" basligina karisiyordu
+	J.setv(game.j_ctx, "globalAlpha", 0.88)
 	game.f_fr(0.0, 0.0, game.j_W, 34.0, "#0a0a12")
 	J.setv(game.j_ctx, "globalAlpha", 1.0)
 	game.text_draw.f_txt(J.add(J.add(game.localization.f_T("GECE — GÜN "), (J.getv(game.j_G, "day") - 1.0)), game.localization.f_T(" BİTTİ")), (float(game.j_W) / float(2.0)), 6.0, J.getv(game.j_P, "ui1"), {"align": "c"})
@@ -250,10 +252,10 @@ func f_drawNight(p_t: Variant = null) -> Variant:
 		game.text_draw.f_txt(J.getv(v_N, "line"), (float(game.j_W) / float(2.0)), J.add(v_by2, 8.0), J.getv(game.j_P, "ink"), {"align": "c"})
 		if J.truth(J.getv(v_N, "stole")):
 			game.text_draw.f_txt(J.add("-$", game.math_utils.f_fmtMoney(J.getv(v_N, "amount"))), (float(game.j_W) / float(2.0)), J.add(v_by2, 20.0), J.getv(game.j_P, "bad"), {"align": "c", "sc": 1.0})
-			game.text_draw.f_txt((game.localization.f_T("Dükkânda hiç güvenlik yok.") if J.eq(J.getv(v_N, "sec"), 0.0) else J.add(game.localization.f_T(J.method(game.j_TUN, "secName", [game.j_G])), game.localization.f_T(" yetmedi."))), (float(game.j_W) / float(2.0)), J.add(v_by2, 34.0), J.getv(game.j_P, "ui3"), {"align": "c"})
+			game.text_draw.f_txt((game.localization.f_T("Dükkânda hiç güvenlik yok.") if J.eq(J.getv(v_N, "sec"), 0.0) else J.add(game.localization.f_T(J.method(game.j_TUN, "secName", [game.j_G])), game.localization.f_T(" yetmedi."))), (float(game.j_W) / float(2.0)), J.add(v_by2, 31.0), J.getv(game.j_P, "ui3"), {"align": "c"})
 		else:
 			game.text_draw.f_txt((game.localization.f_T("Şansın varmış!") if J.eq(J.getv(v_N, "sec"), 0.0) else J.add(game.localization.f_T(J.method(game.j_TUN, "secName", [game.j_G])), game.localization.f_T(" işe yaradı."))), (float(game.j_W) / float(2.0)), J.add(v_by2, 22.0), J.getv(game.j_P, "ok"), {"align": "c"})
-			game.text_draw.f_txt("Kasada tek kuruş eksilmedi.", (float(game.j_W) / float(2.0)), J.add(v_by2, 34.0), J.getv(game.j_P, "ui3"), {"align": "c"})
+			game.text_draw.f_txt("Kasada tek kuruş eksilmedi.", (float(game.j_W) / float(2.0)), J.add(v_by2, 31.0), J.getv(game.j_P, "ui3"), {"align": "c"})
 		if J.truth(game.f_button(((float(game.j_W) / float(2.0)) - 46.0), J.add(v_by2, 42.0), 92.0, 16.0, J.add(game.localization.f_T("GÜN "), J.getv(game.j_G, "day")), "#3f8a4a", true)):
 			J.method(game.j_SFX, "ui", [])
 			J.setv(game.j_G, "night", null)

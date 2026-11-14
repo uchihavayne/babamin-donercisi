@@ -180,6 +180,13 @@ func draw_preparation_overlay(time: Variant = null) -> Variant:
 		game.text_draw.f_txt(label, x, y, "#f8d880", {"align":"c"})
 	return null
 
+# Telefon fisinin basligi: fis 47 px (ic 45 px), baslik ortali; iki yanda 1'er px
+# bosluk kalsin diye en fazla 43 px.
+const FIS_BASLIK_W := 43.0
+
+func fis_basligi(toplu: bool) -> String:
+	return game.order_text("TOPLU","BULK") if toplu else game.order_text("PAKET","TO GO")
+
 func draw_order_receipt(time: float) -> void:
 	var p: Dictionary = game.j_G.phone
 	if p.state != "order": return
@@ -197,7 +204,9 @@ func draw_order_receipt(time: float) -> void:
 	var height := 14 + wrap_h + 17*int(ceil(sides.size()/3.0))
 	game.f_rrect(2,top,47,height,2,"#6a8a3a" if toplu else "#b39663")
 	game.f_rrect(3,top+1,45,height-2,1,"#fff1cf")
-	game.text_draw.f_txt(game.order_text("TOPLU","BULK") if toplu else game.order_text("PAKET","TO GO"),25,top+3,"#4a6a1e" if toplu else "#963d2e",{"align":"c"})
+	# BIRLESIK (11. tur): baslik fisin icinde kalir (Almanca "LIEFERUNG" 51 px'ti,
+	# 45 px'lik fisten iki yana tasiyordu; sozlukte kisa karsilik + guvenlik siniri)
+	game.text_draw.f_txt(fis_basligi(toplu),25,top+3,"#4a6a1e" if toplu else "#963d2e",{"align":"c","maxw":FIS_BASLIK_W})
 	var y := top+21
 	if toplu:
 		for n in wraps.size():
