@@ -110,7 +110,9 @@ func f_drawPause(time: Variant = null) -> Variant:
 		settings_requested.emit()
 	if f_button(190,162,48,20,"REKOR","#3f6fbd"): j_STATS.open = true
 	if f_button(242,162,48,20,"BAŞARIM","#b0862a"): j_BSP.open = true
-	if f_button(190,186,100,20,"ANA MENÜ","#8a4a4a"): j_G.scene = "title"
+	if f_button(190,186,100,20,"ANA MENÜ","#8a4a4a"):
+		save_system.gunici_kaydet()   # Ana Menu'den Devam Et: gun kalinan yerden surer
+		j_G.scene = "title"
 	return null
 
 func f_drawHoverHint(time: Variant = null) -> Variant:
@@ -368,6 +370,8 @@ func _input(event: InputEvent) -> void:
 		return
 	if controls != null and not suspended: controls.handle(event)
 
+var gunici_t := 0.0
+
 func advance(delta: float) -> void:
 	if stations != null:
 		stations.refresh()
@@ -376,6 +380,12 @@ func advance(delta: float) -> void:
 		if not overlay_open: controls.tick(delta)
 		controls.begin_targets()
 	super.advance(delta)
+	# oynarken belirli aralikla gun ici kayit (test kipinde kapali: testler kendi kaydini yonetir)
+	if not test_mode and j_G != null and j_G.scene == "play":
+		gunici_t += delta
+		if gunici_t >= save_system.GUNICI_ARALIK:
+			gunici_t = 0.0
+			save_system.gunici_kaydet()
 	if stations != null and stations.available() and controls.mode == "mouse":
 		var selected_target: Dictionary = stations.target()
 		if selected_target.get("group", "") == "board" and selected_target.index != int(j_G.act): stations.select("board:"+str(int(j_G.act)),false)
@@ -416,4 +426,7 @@ func f_appPause() -> Variant:
 	# Preserve the original progression save schema; a suspended in-memory day
 	# stays paused. A terminated app reloads the last progression checkpoint.
 	if j_G != null and j_G.scene in ["play", "pause", "shop", "dayend", "night"]: save_system.f_saveAll()
+	# BIRLESIK (11. tur): devam eden gunun anlik goruntusu de saklanir (Devam Et'te
+	# gun kalinan yerden surer); uygulama sistemce kapatilirsa gun kaybolmaz
+	if j_G != null: save_system.gunici_kaydet()
 	return super.f_appPause()

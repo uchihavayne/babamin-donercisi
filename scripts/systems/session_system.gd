@@ -133,6 +133,7 @@ func f_endDay() -> Variant:
 		game.payment_system.f_collectCoin(0.0, true)
 	J.setv(game.j_G, "best", max(J.getv(game.j_G, "best"), J.getv(game.j_G, "day")))
 	game.rival_system.f_bahisCoz()
+	game.save_system.gunici_sil()   # gun bitti: gun ici anlik goruntu artik gecersiz
 	v_served = J.add(J.add((J.getv(J.getv(game.j_G, "stat"), "wraps") if J.truth(J.getv(J.getv(game.j_G, "stat"), "wraps")) else 0.0), (J.getv(J.getv(game.j_G, "stat"), "boxes") if J.truth(J.getv(J.getv(game.j_G, "stat"), "boxes")) else 0.0)), (J.getv(J.getv(game.j_G, "stat"), "isk") if J.truth(J.getv(J.getv(game.j_G, "stat"), "isk")) else 0.0))
 	J.setv(J.getv(game.j_G, "stat"), "brPerf", game.progression_system.f_branchPerf(v_served, (J.getv(J.getv(game.j_G, "stat"), "lost") if J.truth(J.getv(J.getv(game.j_G, "stat"), "lost")) else 0.0), J.getv(game.j_G, "day"), game.j_G))
 	J.setv(J.getv(game.j_G, "stat"), "branch", floor((game.progression_system.f_branchBase(game.j_G) * J.getv(J.getv(game.j_G, "stat"), "brPerf")) + 0.5))
@@ -213,6 +214,7 @@ func varsayilan_tabela() -> Dictionary:
 
 # game.js:203
 func f_resetProgress() -> Variant:
+	game.save_system.gunici_sil()   # yeni oyun: eski gunun anlik goruntusu kalmaz
 	J.setv(game.j_G, "day", 1.0)
 	J.setv(game.j_G, "money", 0.0)
 	J.setv(game.j_G, "tips", 0.0)
