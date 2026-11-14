@@ -64,7 +64,8 @@ func bos_yerler() -> Array:
 	return out
 
 # sessizce siradan cikip gider (yazi / ses yok). sayilir: gun sonundaki
-# "kapidan donen" (lider gelince dagilan sira sayilmaz)
+# "kapidan donen" = sirada bekleyip giden (sabri biten ya da kapanista dagilan);
+# lider gelince dagilan sira sayilmaz, siraya hic girmeyen de sayilmaz
 func kapidan_don(c: Dictionary, sayilir := true) -> void:
 	c.state = "sira_git"; c.mood = "angry"; c.slot = -1.0
 	if sayilir: game.j_G.stat.yerYok = J.n(game.j_G.stat.get("yerYok", 0.0)) + 1.0
@@ -155,7 +156,10 @@ func f_spawnCustomer() -> Variant:
 	var sira_n: int = sira_musterileri().size()
 	var kapida: bool = (not J.truth(J.getv(v_free, "length"))) or sira_n > 0
 	if kapida and sira_n >= SIRA_MAX:
-		game.j_G.stat.yerYok = J.n(game.j_G.stat.get("yerYok", 0.0)) + 1.0
+		# BIRLESIK (11. tur, kullanici karari): sira doluyken gelen HIC girmez ve
+		# sayilmaz; "kapidan donen" yalniz sirada bekleyip giden musteridir (oyuncunun
+		# gordugu kayip). Eskiden gorunmeyen gelenler de sayiliyordu (tam gelistirmede
+		# gunde 60-230).
 		return null
 	v_slot = -1.0 if kapida else game.math_utils.f_pick(v_free)
 	J.setv(game.j_G, "macDalga", game.weather_system.f_macDalgada())

@@ -5,7 +5,8 @@
 #  2) yer yokken gelen musteri camin disinda bekler (en fazla 3): siranin
 #     arkasindaki seritten gelir, camin dibinde durur; yer acilinca kapiya
 #     yuruyup girer, beklemekten sikilinca yazisiz / sessizce gider; gun
-#     sonunda "kapidan donen". Lider gelince sira dagilir (sayilmaz).
+#     sonunda "kapidan donen" (yalniz SIRADA bekleyip giden; siraya hic girmeyen
+#     sayilmaz: kullanici karari, 11. tur). Lider gelince sira dagilir (sayilmaz).
 #   godot --headless --path . --script tests/kapanis_sira.gd --quit-after 3000 -- --test
 extends SceneTree
 var game: Node
@@ -95,11 +96,11 @@ func run() -> void:
 	check(absf(float(s1.x) - CS.sira_x(0)) < 1.0 and is_equal_approx(float(s1.sy), CS.sira_y()) and float(s1.bubble) == 0.0,
 		"sira camin dibinde bekler, siparis balonu yok (x %s, y %s)" % [s1.x, s1.sy])
 	check(not s1.yurur and float(s1.yon) > 0.0, "sirada ayakta, kapiya donuk durur")
-	# 2b) sira en fazla 3; dorduncu gelen hic girmez, kapidan donen sayilir
+	# 2b) sira en fazla 3; dorduncu gelen hic girmez ve sayilmaz
 	game.customer_system.f_spawnCustomer(); game.customer_system.f_spawnCustomer()
 	var n: int = game.j_G.customers.size()
 	game.customer_system.f_spawnCustomer()
-	check(sira().size() == 3 and game.j_G.customers.size() == n and float(game.j_G.stat.yerYok) == 1.0, "sira 3 kisi; fazlasi kapidan doner (%s)" % game.j_G.stat.yerYok)
+	check(sira().size() == 3 and game.j_G.customers.size() == n and float(game.j_G.stat.yerYok) == 0.0, "sira 3 kisi; fazlasi hic girmez ve SAYILMAZ (%s)" % game.j_G.stat.yerYok)
 	# 2c) bir yer bosalinca siranin ilki kapiya yurur (yeri ayrilir), kapida girer
 	var giden: Dictionary = game.j_G.customers[0]
 	var yer := int(giden.slot)
@@ -121,7 +122,7 @@ func run() -> void:
 		step()
 		for g in game.j_G.customers:
 			if g.state == "sira_git" and is_equal_approx(float(g.sy), CS.yol_y()): git_serit = true
-	check(sira().is_empty() and float(game.j_G.stat.yerYok) == 3.0, "sabirsiz sira gider (kapidan donen %s)" % game.j_G.stat.yerYok)
+	check(sira().is_empty() and float(game.j_G.stat.yerYok) == 2.0, "sabirsiz sira gider; yalniz siradakiler sayilir (kapidan donen %s)" % game.j_G.stat.yerYok)
 	check(yazilar().is_empty(), "siradan ayrilan icin ekrana yazi cikmaz (%s)" % [yazilar()])
 	check(git_serit, "giden siranin arkasindaki seride gecip yurur")
 	step(60 * 12)
