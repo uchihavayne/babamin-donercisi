@@ -1,6 +1,71 @@
 # Rival system. See CODE_MAP.md.
 extends "res://scripts/core/game_module.gd"
 
+# --- Bahis hedefleri: oyuncunun SON 3 GUNUNE gore (kullanici karari, tests/bahis_hedef.gd) ---
+# Eskiden hedefler yalnizca gun sayisina bagliydi (6+0,22·gun durum, 160+26·gun $, 30+6·gun
+# bahsis): gec oyunda oyuncu hedefin cok ustunde kazandigindan bahis bedava para, bahsis
+# hedefi ise erken oyunda ulasilamazdi. Simdi hedef, oyuncunun son 3 gundeki ortalamasinin
+# ~%110'u: bahis her asamada gercek bir meydan okuma. Kazanc/ceza miktari (f_bahisPara) ayni.
+# Gecmis yoksa (yeni oyun ya da bu surumden onceki kayit) eski gun formulleri kullanilir.
+const BAHIS_KAT := 1.10
+const BAHIS_GECMIS_GUN := 3
+
+# G.bahisGecmis: en eski -> en yeni, en cok BAHIS_GECMIS_GUN kayit:
+# {"wraps": satilan durum, "kazanc": kasaya giren (sube haric), "bahsis": bahsis, "kacan": kacan musteri}
+func f_bahisGecmisi() -> Array:
+	var g: Variant = J.getv(game.j_G, "bahisGecmis")
+	return g if g is Array else []
+
+# Gun sonunda (f_endDay, bahis cozuldukten HEMEN sonra) cagrilir: stat henuz sifirlanmamistir
+# ve "kazanc" bahsin olctugu degerle ayni (earned - branch) olur.
+func f_bahisGunuKaydet() -> void:
+	var st: Variant = J.getv(game.j_G, "stat")
+	if not (st is Dictionary):
+		return
+	var g: Array = f_bahisGecmisi().duplicate()
+	g.append({
+		"wraps": J.n(st.get("wraps", 0.0)),
+		"kazanc": J.n(st.get("earned", 0.0)) - J.n(st.get("branch", 0.0)),
+		"bahsis": J.n(st.get("tips", 0.0)),
+		"kacan": J.n(st.get("lost", 0.0)),
+	})
+	while g.size() > BAHIS_GECMIS_GUN:
+		g.pop_front()
+	J.setv(game.j_G, "bahisGecmis", g)
+
+func f_bahisOrtalama(alan: String) -> float:
+	var g := f_bahisGecmisi()
+	if g.is_empty():
+		return 0.0
+	var top := 0.0
+	for e in g:
+		top += J.n(J.getv(e, alan))
+	return top / float(g.size())
+
+# alan: gecmis kaydindaki anahtar; eski: gecmis yokken eski gun formulunun degeri;
+# taban: en dusuk hedef; adim: yuvarlama adimi (dürüm 1, para 10, bahsis 5).
+func f_bahisHedefi(alan: String, eski: float, taban: float, adim: float) -> float:
+	if f_bahisGecmisi().is_empty():
+		return eski
+	return maxf(taban, floorf(f_bahisOrtalama(alan) * BAHIS_KAT / adim + 0.5) * adim)
+
+# "Musteri kacirirsin" bahsi, oyuncu son gunlerde hic musteri kacirmadiysa bedava para olur
+# (hedef 0 = hic kacirmamak). O durumda sira listedeki sonraki ture kayar; rastgele sayi
+# tuketmez, boylece diger bahislerin akisi degismez. Gecmis yoksa bilgi yok: tur degismez.
+func f_bahisTuruSec(p_t: Variant) -> Variant:
+	if not J.eq(J.getv(p_t, "id"), "kacan"):
+		return p_t
+	var g := f_bahisGecmisi()
+	if g.is_empty() or f_bahisOrtalama("kacan") > 0.0:
+		return p_t
+	var liste: Array = game.j_BAHIS
+	var i: int = liste.find(p_t)
+	for k in range(1, liste.size()):
+		var aday: Variant = liste[(i + k) % liste.size()]
+		if not J.eq(J.getv(aday, "id"), "kacan"):
+			return aday
+	return p_t
+
 # game.js:4747
 func f_rakipGunBasi() -> Variant:
 	var v_t: Variant = null
@@ -19,7 +84,7 @@ func f_rakipGunBasi() -> Variant:
 		J.setv(game.j_G, "rakip", null)
 		return null
 	J.setv(game.j_G, "rakipHedef", J.add(J.add(J.getv(game.j_G, "day"), game.j_RAKIP_ARA_MIN), floor((game.random_unit() * J.add((game.j_RAKIP_ARA_MAK - game.j_RAKIP_ARA_MIN), 1.0)))))
-	v_t = J.getv(game.j_BAHIS, floor((game.random_unit() * J.getv(game.j_BAHIS, "length"))))
+	v_t = f_bahisTuruSec(J.getv(game.j_BAHIS, floor((game.random_unit() * J.getv(game.j_BAHIS, "length")))))
 	v_ilk = (not J.truth(J.getv(game.j_G, "rakipTanisti")))
 	J.setv(game.j_G, "rakip", {"faz": "yok", "t": 0.0, "girisT": game.math_utils.f_rnd(14.0, 34.0), "x": J.add(game.j_W, 24.0), "tip": J.getv(v_t, "id"), "hedef": J.method(v_t, "hedef", [game.j_G]), "para": game.progression_system.f_bahisPara(game.j_G), "selam": game.math_utils.f_pick((game.j_RAKIP_SELAM_ILK if J.truth(v_ilk) else game.j_RAKIP_SELAM)), "ilk": v_ilk})
 	J.setv(game.j_G, "rakipTanisti", true)
@@ -147,7 +212,7 @@ func f_bahisCoz() -> Variant:
 func _closure_87(_args: Array, _captures: Dictionary = {}) -> Variant:
 	var v_G: Variant = null
 	v_G = J.arg(_args, 0)
-	return max(4.0, floor(J.add(6.0, (J.getv(v_G, "day") * 0.22)) + 0.5))
+	return f_bahisHedefi("wraps", max(4.0, floor(J.add(6.0, (J.getv(v_G, "day") * 0.22)) + 0.5)), 4.0, 1.0)
 	return null
 
 func _closure_88(_args: Array, _captures: Dictionary = {}) -> Variant:
@@ -159,7 +224,7 @@ func _closure_88(_args: Array, _captures: Dictionary = {}) -> Variant:
 func _closure_89(_args: Array, _captures: Dictionary = {}) -> Variant:
 	var v_G: Variant = null
 	v_G = J.arg(_args, 0)
-	return (floor((float(J.add(160.0, (J.getv(v_G, "day") * 26.0))) / float(10.0)) + 0.5) * 10.0)
+	return f_bahisHedefi("kazanc", (floor((float(J.add(160.0, (J.getv(v_G, "day") * 26.0))) / float(10.0)) + 0.5) * 10.0), 100.0, 10.0)
 	return null
 
 func _closure_90(_args: Array, _captures: Dictionary = {}) -> Variant:
@@ -181,7 +246,7 @@ func _closure_92(_args: Array, _captures: Dictionary = {}) -> Variant:
 func _closure_93(_args: Array, _captures: Dictionary = {}) -> Variant:
 	var v_G: Variant = null
 	v_G = J.arg(_args, 0)
-	return (floor((float(J.add(30.0, (J.getv(v_G, "day") * 6.0))) / float(5.0)) + 0.5) * 5.0)
+	return f_bahisHedefi("bahsis", (floor((float(J.add(30.0, (J.getv(v_G, "day") * 6.0))) / float(5.0)) + 0.5) * 5.0), 10.0, 5.0)
 	return null
 
 func _closure_94(_args: Array, _captures: Dictionary = {}) -> Variant:

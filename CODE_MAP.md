@@ -29,11 +29,14 @@ Aşağıdaki yollar `scripts/` klasörüne göredir.
 | Satın alma doğrulaması ve sonraki seviye önizlemesi | `systems/upgrade_system.gd`; fiyat dengesi: proje kökündeki `ECONOMY.md` |
 | Geliştirmelerin isimleri ve fiyatları | `data/upg.gd` (proje kökünde) |
 | Kayıt içeriği, yükleme ve devam etme | `systems/save_system.gd`; diske atomik yazma: `save_store.gd` |
+| Gün içi anlık görüntü (mobilde uygulama kapanırsa) | `systems/save_system.gd`: `gunici_kaydet / gunici_yukle / gunici_sil`, `GUNICI_ARALIK`, `GUNICI_ATLA`; tetikleyen: `platform_game.gd` (`advance`, `f_appPause`, ana menü) |
 | Gün başlangıcı/sonu ve sıfırlama | `systems/session_system.gd` |
 | Gün zorluğu, şube ve ekonomi ayarları | `systems/progression_system.gd` |
 | Para toplama ve para animasyonunun güncellemesi | `systems/payment_system.gd` |
 | Hava, rakip, aile giderleri, lider ve denetim | `systems/events/`: `weather_system`, `rival_system`, `household_system`, `leader_system`, `regulation_system` |
+| Rakip bahislerinin hedefi (son 3 gün ortalaması) | `systems/events/rival_system.gd`: `BAHIS_KAT`, `f_bahisHedefi`, `f_bahisGunuKaydet`, `f_bahisTuruSec`; gün sonu çağrısı `session_system.f_endDay` |
 | Çöp, kedi, elektrik kesintisi ve gece olayı | `systems/event_system.gd` |
+| Çöp kutusu davranışı (boşalt / ürünü at) | `systems/event_system.gd`: `cop_eylemi`, `f_trashClick`, `f_dropOnTrash`, `f_discardBoard`; sürükleme: `orders/drag_system.gd`, `device_input.gd`; kumanda: `station_actions.gd` |
 | Başarım açma ve koşulları | `systems/achievement_system.gd`, `achievement_conditions.gd` |
 | Dile göre sayı/para/yüzde biçimi | `core/math_utils.gd`: `f_fmtMoney`, `f_fmtShort`, `f_fmtOndalik`, `f_yuzde`, `binlik_ayraci` |
 | Girdi aygıtına göre söz ("tıkla" / "dokun") | `core/localization.gd`: `GIRDI_SOZ`, `girdi` |

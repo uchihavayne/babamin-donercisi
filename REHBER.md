@@ -36,17 +36,21 @@ Oyun nesnesine her yerden `game.<modül>.<fonksiyon>` ile erişilir (örn. `game
 | Fiyatlar ve geliştirmeler | `data/upg.gd`, `systems/upgrade_system.gd`, [ECONOMY.md](ECONOMY.md) |
 | Bir ekranın görünümü | `rendering/ui/<ekran>_draw.gd` (dosya adı ekranı söyler) |
 | Yeni görünür yazı | Kodda Türkçe yaz + **5 sözlüğe ekle** (bölüm 7) |
-| Kayıt alanı eklemek | `systems/save_system.gd` (`f_saveAll`, `f_loadAndGo`) |
+| Kayıt alanı eklemek | `systems/save_system.gd` (`f_saveAll`, `f_loadAndGo`) + `session_system.f_resetProgress` |
+| Gün içi kayıt (mobilde uygulama kapanırsa) | `systems/save_system.gd` (`gunici_*`, `GUNICI_ARALIK`, `GUNICI_ATLA`) |
+| Rakip bahisleri (hedef, ödül, süzgeç) | `systems/events/rival_system.gd` (`BAHIS_KAT`, `f_bahisHedefi`, `f_bahisGunuKaydet`), ödül: `progression_system.f_bahisPara` |
+| Çöp kutusu / ürün atma | `systems/event_system.gd` (`cop_eylemi`, `f_trashClick`, `f_dropOnTrash`), kumanda: `station_actions.gd` ("discard") |
 | Telefon / pencere / dokunma | `platform_shell.gd`, `device_input.gd`, `station_actions.gd` |
 
 ## 4. Kural cetveli (kodla doğrulanmış)
 
 - **Gün süresi:** `min(210, 60 + 2·gün + 2·toplam_geliştirme_seviyesi)` saniye. Süre bitince **son 15 sn** yeni müşteri gelmez; içerideki müşteriler bitene dek (en çok 45 sn) gün sürer.
 - **Müşteri aralığı:** `max(2; min(6.8 − 0.22·gün; 4.6 − 0.08·gün)) / yoğunluk çarpanı` sn (bu değerin 0.75–1.2 katı rastgele).
-- **Yer yoksa:** kapıda camın önünde en çok 3 kişilik sıra; sıradaki 10 sn bekler, yer açılmazsa **yazısız, sessizce** gider. Lider gelince sıra dağılır.
+- **Yer yoksa:** kapıda camın önünde en çok 3 kişilik sıra; sıradaki 10 sn bekler, yer açılmazsa **yazısız, sessizce** gider. Lider gelince sıra dağılır. Gün sonundaki "kapıdan dönen" yalnız sıraya girip gidenleri sayar.
 - **Borç:** 5.000.000 $; **6. günden** her günün kazancının %18'i otomatik ödenir (Demirkent hariç).
 - **Olay eşikleri (gün):** müfettiş 4 (%28), kedi 4 (%30), lider 4, evsiz 5 (%30), kesinti 8 (%16, 34 sn), motor arızası 8, rakip/bahis 10, hırsız 12.
-- **Çöp:** müfettiş kontrol ettiği anda çöp %55'in üstündeyse ceza yazar (150–400 $, **borca eklenir**); temizse ceza yok.
+- **Çöp:** müfettiş kontrol ettiği anda çöp %55'in üstündeyse ceza yazar (150–400 $, **borca eklenir**); temizse ceza yok. Kutuya dokunmak **hep çöpü boşaltır**; ürünü atmak için tutup kutuya sürüklenir (kumanda/klavyede "al" basılı).
+- **Rakip bahsi (10. günden):** hedef oyuncunun **son 3 gündeki ortalamasının %110'u** (dürüm / kasaya giren para / bahşiş), kazanç ve ceza `200 + 34·gün`. Geçmiş yoksa eski gün formülleri. Reddetmek serbest; "müşteri kaçırırsın" yalnız son günlerde müşteri kaçmışsa çıkar.
 
 ## 5. Testler
 
@@ -65,7 +69,9 @@ Kural: **bir hata bulursan önce onu yakalayan bir test (ya da mevcut teste kont
 | `stations`, `counter_input`, `ingredient_input`, `bread_preparation`, `akilli_hedef`, `tek_tik`, `fare_akisi` | Tezgâhta nesne seçimi, malzeme ekleme, öğretici yolu |
 | `economy`, `tempo` | Fiyat ve ilerleme dengesi |
 | `kapanis`, `kapanis_sira` | Oyun sonu hikâyesi; gün sonu ve kapıdaki sıra kuralları |
-| `bahis_input`, `dev_panel` | Bahis paneli, geliştirici paneli girdileri |
+| `bahis_input`, `bahis_hedef`, `dev_panel` | Bahis paneli girdisi, bahis hedefleri (son 3 gün ortalaması), geliştirici paneli |
+| `cop_kutusu` | Çöp kutusu: dokunmak boşaltır, sürükleyip bırakmak / basılı tutmak ürünü atar (fare, dokunma, kumanda) |
+| `gun_ici_kayit` | Mobilde uygulama kapanırsa devam eden günün kalınan yerden açılması |
 | `platform_input`, `runtime_state`, `module_services`, `regression` | Cihaz girdisi, durum/kayıt, modüller |
 | `module_snapshot` | 5 sahnenin **piksel + durum + kayıt** referansı (bölüm 7) |
 | `dil_cift`, `ceviri_tarama` | Çeviri kapsamı: koddaki her (tr, en) çifti ve oyun verisi 5 sözlükte var mı |
@@ -91,7 +97,7 @@ godot --path . --resolution 960x540 --script tools/ekran_senaryo.gd -- --test --
 
 **Fare "tıkla" sözü.** Telefonda "dokun", kolda yalın söz çıksın diye girdiye göre değişen metinler `core/localization.gd` içindeki `GIRDI_SOZ` tablosundadır.
 
-**Çizim değişirse** `module_snapshot` piksel farkı verebilir. Fark yalnız piksel ise ve bilinçli bir görsel değişiklikse: `python3 tools/snapshot_tabanini_guncelle.py` (neyin değiştiğini söyler), onaylarsan `--yaz`. Oyun durumu ya da kayıt farkı varsa araç durur: bu bir hatadır, tabanı değiştirme.
+**Çizim değişirse** `module_snapshot` piksel farkı verebilir. Fark yalnız piksel ise ve bilinçli bir görsel değişiklikse: `python3 tools/snapshot_tabanini_guncelle.py` (neyin değiştiğini söyler), onaylarsan `--yaz`. Oyun durumu farkı varsa araç durur: bu bir hatadır, tabanı değiştirme. Kayıt (`save`) farkı da durdurur; ama **yeni bir ilerleme kaydı alanı eklediysen** o fark bilinçlidir: araç hangi alanların eklendiğini yazar, doğruysa `python3 tools/snapshot_tabanini_guncelle.py --kayit --yaz`.
 
 ## 8. Başa dert açmış tuzaklar
 
@@ -99,6 +105,7 @@ godot --path . --resolution 960x540 --script tools/ekran_senaryo.gd -- --test --
 - Oyunun rastgelesi kendi sayacıdır (`game.random_state`); `--test` kipinde sabittir. Testte "rastgele" davranış görmek için tohumu değiştir.
 - Bir sahne `scene` alanıyla yönetilir (`title`, `intro`, `play`, `pause`, `dayend`, `shop`, `night`); yeni pencere ekliyorsan `platform_game.gd` içindeki pencere listelerine (`j_CUSTOM, j_PAYP, …`) ve `device_input.gd` hedef bağlamına eklemeyi unutma.
 - Piksel yazı genişliği dile göre çok değişir (Almanca ~%30 uzun). Etiketle değer yan yanaysa `maxw` ver.
+- Yeni bir **oyun durumu alanı** (`G.alan`) eklersen: ilerleme kaydı için `f_saveAll` + `f_loadAndGo` + `f_resetProgress` üçünü de güncelle. Gün içi anlık görüntü `G`'nin tamamını (`GUNICI_ATLA` hariç) yazar, orada ek iş gerekmez; ama `G`'ye düz sayı/yazı/dizi/sözlük dışında bir değer (Callable, Vector2…) koyarsan anlık görüntü yazılamaz — `gun_ici_kayit` testi bunu yakalar; alanı düz veriyle tut ya da `GUNICI_ATLA`'ya ekle.
 - Godot 4.7; `.godot/` klasörü git'e girmez. İlk açılışta içe aktarma ~30 sn sürer.
 
 ## 9. Yayın kontrol listesi (mobil → Steam)
@@ -107,5 +114,5 @@ godot --path . --resolution 960x540 --script tools/ekran_senaryo.gd -- --test --
 2. **Paket kimliği:** `com.myfathersdoner.game` örnektir; mağazaya çıkmadan kendi benzersiz kimliğinle değiştir.
 3. **Android:** dışa aktarma şablonları + SDK + kendi imza anahtarın; Play Store için Gradle/AAB. Gerçek telefonda: kare süresi (Ayarlar → "Kare süresini göster"), pil, çentik, geri tuşu.
 4. **Steam:** Windows/Linux/macOS profilleri hazır. Steamworks (GodotSteam) bu pakette **yok**; başarım (64 adet) ve bulut kaydı sonradan bağlanır. Kol desteği ve 16:9 sığdırma hazır.
-5. **Bilinen sınır:** uygulama işletim sistemi tarafından kapatılırsa **o günün içi** geri yüklenmez, son ilerleme noktası yüklenir (arka plana alma güvenli, gün durur).
+5. **Gün içi kayıt:** uygulama işletim sistemi tarafından kapatılırsa gün molada, kalınan yerden geri gelir (anlık görüntü her 12 sn'de bir, arka plana alırken ve ana menüye dönerken yazılır; en çok son 12 sn kaybolur). Gerçek telefonda dene: oyunun ortasında uygulamayı kapat, yeniden aç, Devam Et.
 6. **Mağaza görselleri:** `tools/ekran_senaryo.gd` ile her dilde ekran görüntüsü al.

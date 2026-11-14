@@ -215,7 +215,7 @@ Bot ölçümleri (onay bekleyen tasarım konuları):
 | Kimse kızıp gitmez | 3 hızda ~70 günde kaçan müşteri yalnız elektrik kesintisi / ızgara sıkışması günlerinde |
 | Izgara tek tahtayla | Tahtadaki dürüm patates beklerken pişen dürüm alınamaz, bekledikçe yanar (bot 9 gün kilitlendi; insan sarıp takas edebilir) |
 | Her sabah stok sıfır | İlk günlerde hamlelerin %26-35'i hazırlık (stok doldurma, et, patates) |
-| Bahis hedefleri | "Müşteri kaçırırsın" bahsi bedava kazanç; bahşiş hedefi (30+6·gün) orta/hızlı oyuncuda ulaşılamaz; ödül (200+34·gün) 2 günlük kazanç |
+| Bahis hedefleri | "Müşteri kaçırırsın" bahsi bedava kazanç; bahşiş hedefi (30+6·gün) orta/hızlı oyuncuda ulaşılamaz; ödül (200+34·gün) 2 günlük kazanç. **11. turda çözüldü:** hedefler oyuncunun son 3 gününe bağlandı |
 
 Kullanıcının seçtiği 1 ve 2 yapıldı (`tests/kapanis_sira.gd`):
 
@@ -271,17 +271,23 @@ Kullanıcının yönü: oyun **cozy olmayacak** — biraz zorlayıcı, süreye k
 - `tests/ceviri_tarama.gd`: koddaki 78 (tr, en) çifti ve 501 oyun verisi metni 4 dilde çevrili mi
 - `tests/yazi_tasma.gd`: 6 dilde ~7.400 yazı ölçülür (ekran, pencere, düğme, üst üste binme, çevrilmemiş harf); kasıtlı bozuk çeviriyle denendi
 - `tests/kapanis_sira.gd` baştan yazıldı (kapıdaki sıra, yazısız ayrılma, kapanış, lider, yerleşim)
+- `tests/cop_kutusu.gd` (çöp kutusu: dokun / sürükle / basılı tut; fare, dokunma, kumanda), `tests/gun_ici_kayit.gd` (gün içi anlık görüntü, 14 kontrol grubu), `tests/bahis_hedef.gd` (bahis hedefleri: son 3 gün ortalaması, tabanlar, kayıt/yükleme, "kaçırırsın" süzgeci)
 - `tests/usta_bot.gd`: `--tam` (tüm geliştirmeler), `--sehir N`, `--tohum`
-- `tools/ekran_senaryo.gd`: istenen ekranı istenen dilde / telefon boyunda PNG olarak kaydeder; `tools/snapshot_tabanini_guncelle.py`: anlık görüntü tabanını yalnız piksel farkı varsa günceller
+- `tools/ekran_senaryo.gd`: istenen ekranı istenen dilde / telefon boyunda PNG olarak kaydeder; `tools/snapshot_tabanini_guncelle.py`: anlık görüntü tabanını yalnız piksel farkı varsa (bilinçli yeni kayıt alanında `--kayit` ile kayıt referansını da) günceller
 - [REHBER.md](REHBER.md): kısa yol haritası
 
 **Ölçüm:** tam yükseltmeli oyun karesi (debug, llvmpipe) bu turdan önceki ağaç 10,21 ms, sonraki 10,17 ms (5'er ölçüm, fark −%0,4). Bot taramaları (taze 24 gün, tam geliştirme, İstanbul/Berlin/Demirkent, kaos tohumu 7): betik hatası 0, kural ihlali 0.
 
-**Kullanıcıya danışılmak üzere bekleyen (kural değiştirdiği için yapılmadı):**
+**Kullanıcıya danışılıp yapılanlar** (kuralı değiştirdikleri için önce soruldu; kullanıcının seçimi → yapılan):
 
-1. Çöp kutusuna boş elle tıklayınca tahtadaki ürün atılıyor, çöp boşalmıyor (etiket artık söylüyor; çöp %55 üstündeyken öncelik değişsin mi?)
-2. "Kapıdan dönen" sayısı hiç sıraya girmemiş gelenleri de sayıyor (tam geliştirmede günde 60–230); yalnız sıraya girip giden mi sayılsın?
-3. Bot hızında hiç müşteri kaçmıyor (sabır dişsiz); insan oyuncu testi olmadan zorluk ayarı yapılmadı
-4. Rakip bahsi: "müşteri kaçırırsın" koşulu bedava kazanç, bahşiş hedefi ulaşılamaz — denge
-5. Tek tahta + dolu ızgara sıkışması
-6. Uygulama işletim sistemince kapatılırsa devam eden günün içi geri yüklenmiyor (gün baştan başlar)
+| Konu | Seçim | Yapılan |
+| --- | --- | --- |
+| Çöp kutusu | "Ayrı hedefler" | Kutuya dokunmak **hep çöpü boşaltır**; ürünü atmak için tutup kutuya sürükle (fare / dokunma). Kumanda ve klavyede "al" tuşunu 0,6 sn basılı tutmak tezgâhtakini atar. 10 px'ten kısa hareket, kutu dışında bırakma ve erken bırakma atmaz. Boş kovaya dokununca ipucu: "Ürünü atmak için çöp kutusuna sürükle". `event_system.f_trashClick / f_dropOnTrash`, `station_actions`; `tests/cop_kutusu.gd` |
+| "Kapıdan dönen" | "Yalnız sıraya girip giden" | Sıra doluyken kapıdan dönen sayılmaz (tam geliştirmede günde 60–230 görünmeyen "kayıp" yazıyordu). Sayılanlar: sırada bekleyip sabrı biten ya da kapanışta dağılan müşteri; lider gelince dağılan sıra yine sayılmaz. `customer_system`; `tests/kapanis_sira.gd` |
+| Rakip bahisleri | "Hedefler son 3 güne göre" | Hedef = oyuncunun **son 3 gündeki ortalamasının %110'u**; kazanç/ceza miktarı aynı (200 + 34·gün). Dürüm 1, para 10, bahşiş 5'lik adıma yuvarlanır; en düşük hedef 4 dürüm / $100 / $10. Gün sonunda `rival_system.f_bahisGunuKaydet` günün sayılarını `G.bahisGecmis`'e yazar (ilerleme kaydında saklanır, Yeni Oyun siler). Geçmiş yoksa (yeni oyun, eski kayıt) eski gün formülleri geçerli. "Müşteri kaçırırsın" bahsi, son günlerde hiç müşteri kaçmadıysa (bedava para olurdu) listedeki sonraki türe kayar; rastgele sayı tüketmez. `tests/bahis_hedef.gd` |
+| Mobil: gün içi kayıt | "Gün içini de kaydet" | Oyun sürerken her 12 sn'de, arka plana alırken ve ana menüye dönerken gün içi anlık görüntü ayrı bir anahtara (`doner_efsanesi_v1_gunici`) yazılır. Uygulama işletim sistemince kapatılırsa Devam Et günü **molada, kalınan yerden** açar (para, süre, müşteriler, tahtadaki ürün, izgara, el, telefon siparişi; sipariş sahibi aynı müşteri nesnesidir). Gün bitince, Yeni Oyun'da, öğreticide silinir; bozuk, başka güne ya da eski sürüme ait kayıt yok sayılır. İlerleme kaydı şeması değişmez. `save_system.gunici_*`; `tests/gun_ici_kayit.gd` |
+
+**Hâlâ açık (insan oyuncu testi gerekir; sayı ayarı yapılmadı):**
+
+1. Bot hızında hiç müşteri kaçmıyor (sabır dişsiz): "bir dürüm daha yetişir mi" gerilimi şimdilik süreden ve sıra sınırından geliyor; sabır / yoğunluk ayarı gerçek oyuncuyla denenmeli. (Bahsin "müşteri kaçırırsın" türü de bu yüzden yalnız müşteri kaçmış oyuncuya çıkar.)
+2. Tek tahta + dolu ızgara sıkışması: tahtadaki dürüm patates beklerken pişen dürüm alınamıyor, bekledikçe yanıyor; insan sarıp takas edebilir, kural olarak bırakıldı.

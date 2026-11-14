@@ -352,7 +352,9 @@ func gun_oyna() -> Dictionary:
 	var ort := 0.0
 	for x in servis_sureleri: ort += float(x)
 	if not servis_sureleri.is_empty(): ort /= servis_sureleri.size()
+	var bs: Variant = G.get("bahisSonuc")   # o gun cozulen rakip bahsi (yoksa null): hedef / deger / kazandi
 	return {"gun": int(G.day), "sure": int(t_gun), "gelen": int(gun_say.get("gelen", 0)), "kacan": int(s.get("lost", 0)),
+		"bahis_sonuc": ({"tip": str(bs.tip), "hedef": bs.hedef, "deger": bs.deger, "kazandi": bool(bs.kazandi)} if bs is Dictionary else null),
 		"durum": int(s.get("wraps", 0)), "iskender": int(s.get("isk", 0)), "icecek": int(s.get("drinks", 0)),
 		"kazanc": int(s.get("earned", 0)), "bahsis": int(s.get("tips", 0)), "taksit": int(s.get("debtPaid", 0)), "ceza": int(s.get("fine", 0)),
 		"ort_servis_sn": snappedf(ort, 0.1), "eylem": int(gun_say.get("eylem", 0)),

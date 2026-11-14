@@ -48,7 +48,7 @@ Malzemeye tek basış bir porsiyon ekler; basılı tutmak aynı tahtayı kapasit
 - Grafikler aynı düşük çözünürlükte işlendiği için 4K ekran oyun içi çizim çözünürlüğünü artırmaz. Dokular nearest filtreyle büyütülür.
 - Bilgisayarda varsayılan hedef 60 FPS, mobilde 30 FPS'tir. Ekran menüsünden değiştirilebilir. Bunlar kare sınırıdır; her donanımda bu hızın sağlanacağını garanti etmez. Yoğun sahnelerin CPU yükü için önceki ölçümler `VALIDATION.md` içindedir.
 - Odak/arka plan kaybında tutulan girişler temizlenir, gün duraklar ve mevcut kalıcı ilerleme kayıt biçimi yazılır. Geri dönünce devam kararı oyuncudadır. Android sistem geri tuşu önce açık dış pencereyi kapatır.
-- `user://records.json` mevcut ilerlemeyi, `user://device_settings.cfg` ekran tercihlerini tutar. **Uygulama işletim sistemi tarafından kapatılırsa devam eden günün bütün geçici durumu geri yüklenmez:** mevcut oyunun ilerleme kaydı yüklenir. Bulut kaydı veya cihazlar arasında kayıt eşitleme eklenmedi.
+- `user://records.json` mevcut ilerlemeyi, `user://device_settings.cfg` ekran tercihlerini tutar. **Gün içi kayıt:** oyun sürerken her 12 saniyede, arka plana alırken ve ana menüye dönerken devam eden günün anlık görüntüsü aynı depoda ayrı bir anahtara (`doner_efsanesi_v1_gunici`) yazılır. Uygulama işletim sistemi tarafından kapatılırsa Devam Et günü molada, kalınan yerden açar; en çok son 12 saniyelik ilerleme kaybolur. Gün bitince, Yeni Oyun'da ve öğretici sürerken anlık görüntü yazılmaz/silinir; bozuk, başka güne ya da eski sürüme ait olan yok sayılır ve mevcut ilerleme kaydı yüklenir. Bulut kaydı veya cihazlar arasında kayıt eşitleme eklenmedi.
 
 ## Dışa aktarma
 

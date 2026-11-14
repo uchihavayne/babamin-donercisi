@@ -161,3 +161,7 @@ Değişenler:
 | Dürüm başına tık | ~20 | ~8 |
 
 Uzun vade (`tests/tempo.gd`): borç bitişi en ucuzdan alan 107 / 93 / 84 → 98 / 87 / 78. gün, şubeye biriktiren 93 / 85 / 78 → 86 / 79 / 73. gün (%55 / %70 / %85). İlk şube 35 / 26 / 24 → 27 / 22 / 19. gün. Oyun başı hızlandığı için hepsi 5-9 gün erkene kaydı.
+
+## Rakip bahisleri (11. tur, kullanıcı kararı)
+
+10. günden itibaren rakip bahis önerir; kabul etmek serbest. Hedef artık gün sayısına değil, **oyuncunun son 3 gündeki ortalamasının %110'una** bağlıdır (dürüm / kasaya giren para / bahşiş); böylece bahis geç oyunda bedava para, erken oyunda ulaşılmaz olmaz. Kazanç ve ceza değişmedi: `200 + 34·gün` ($10'a yuvarlı). En düşük hedefler 4 dürüm, $100, $10 bahşiş. Geçmişi olmayan oyunda (yeni oyun / eski kayıt) eski formüller (`6 + 0,22·gün` dürüm, `160 + 26·gün` $, `30 + 6·gün` bahşiş) geçerli. Test: `tests/bahis_hedef.gd`.
