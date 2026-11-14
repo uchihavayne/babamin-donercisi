@@ -181,8 +181,17 @@ func f_drawBranchPanel(p_t: Variant = null) -> Variant:
 	v_k = floor((v_t * 4.0))
 	v_nList = (J.getv(game.j_BRANCH, "length") - (1.0 if J.truth(J.getv(J.getv(game.j_BRANCH, (J.getv(game.j_BRANCH, "length") - 1.0)), "ferman")) else 0.0))
 	v_modBandi = (22.0 if J.truth(J.getv(J.getv(game.j_BRANCH, (J.getv(game.j_BRANCH, "length") - 1.0)), "ferman")) else 0.0)
-	game.text_draw.f_txt(J.add(J.add(J.add(J.add(J.add(game.localization.f_T("Açık şube: "), min(v_owned, v_nList)), "/"), v_nList), game.localization.f_T("    Dükkân seviyesi: ")), v_seviye), J.add(v_x, 14.0), J.add(v_y, 16.0), J.getv(game.j_P, "ui4"))
-	game.text_draw.f_txt(J.add(game.localization.f_T("Günlük şube geliri: $"), game.math_utils.f_fmtMoney(v_base)), (J.add(v_x, v_w) - 14.0), J.add(v_y, 16.0), (J.getv(game.j_P, "au2") if J.gt(v_base, 0.0) else J.getv(game.j_P, "ui3")), {"align": "r"})
+	# BIRLESIK (11. tur): ust satirdaki iki yazi (acik sube / gunluk gelir) Fransizca'da
+	# 8 sube acikken 6 px ust uste biniyordu. Gelir once tam yazilir; iki yazi
+	# yan yana sigmazsa gelir kisa biciminde ("$1,62M"), o da yetmezse soldaki kisalir.
+	var v_solMetin: String = J.s(J.add(J.add(J.add(J.add(J.add(game.localization.f_T("Açık şube: "), min(v_owned, v_nList)), "/"), v_nList), game.localization.f_T("    Dükkân seviyesi: ")), v_seviye))
+	var v_sagEtiket: String = J.s(game.localization.f_T("Günlük şube geliri: $"))
+	var v_sagMetin: String = v_sagEtiket + J.s(game.math_utils.f_fmtMoney(v_base))
+	var v_satirW: float = (v_w - 28.0) - 12.0
+	if float(game.f_textW(v_solMetin)) + float(game.f_textW(v_sagMetin)) > v_satirW:
+		v_sagMetin = v_sagEtiket + J.s(game.math_utils.f_fmtShort(v_base))
+	game.text_draw.f_txt(v_solMetin, J.add(v_x, 14.0), J.add(v_y, 16.0), J.getv(game.j_P, "ui4"), {"maxw": v_satirW - float(game.f_textW(v_sagMetin))})
+	game.text_draw.f_txt(v_sagMetin, (J.add(v_x, v_w) - 14.0), J.add(v_y, 16.0), (J.getv(game.j_P, "au2") if J.gt(v_base, 0.0) else J.getv(game.j_P, "ui3")), {"align": "r"})
 	J.setv(game.j_ctx, "globalAlpha", 0.3)
 	game.f_hl(J.add(v_x, 12.0), J.add(v_y, 26.0), (v_w - 24.0), J.getv(game.j_P, "ui2"))
 	J.setv(game.j_ctx, "globalAlpha", 1.0)

@@ -10,6 +10,11 @@ for t in order_flow cutting module_services stations counter_input ingredient_in
 	timeout 300 "$GODOT" --headless --path . --script tests/$t.gd --quit-after 3000 -- --test >/tmp/t_$t.log 2>&1 || kalan="$kalan $t"
 	grep -q "SCRIPT ERROR" /tmp/t_$t.log && kalan="$kalan $t(hata)"
 done
+# yazi tasmasi: her dil ayri calisir (her biri ~20 sn)
+for d in tr en de fr es pt; do
+	timeout 300 "$GODOT" --headless --path . --script tests/yazi_tasma.gd --quit-after 3000 -- --test --dil $d >/tmp/t_yazi_$d.log 2>&1 || kalan="$kalan yazi_tasma($d)"
+	grep -q "SCRIPT ERROR" /tmp/t_yazi_$d.log && kalan="$kalan yazi_tasma($d)(hata)"
+done
 for t in counter_design_visual economy_visual mouse_slicing_visual order_flow_visual stations_visual \
          platform_visual ingredient_input_visual; do
 	timeout 300 "$GODOT" --path . --script tests/$t.gd --quit-after 3000 -- --test --gpu-test >/tmp/t_$t.log 2>&1 || kalan="$kalan $t"
