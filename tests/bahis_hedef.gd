@@ -5,8 +5,9 @@
 #  3) f_bahisGunuKaydet: yalniz son 3 gun tutulur, "kazanc" = earned - branch
 #  4) gun sonu (f_endDay) gecmise TAM BIR kayit ekler; kayit / yukleme / sifirlama
 #     gecmisi korur (eski kayitta alan yoksa bos)
-#  5) "musteri kacirirsin" bahsi: son gunlerde hic musteri kacmadiysa baska tur secilir
-#     (rastgele sayi tuketmeden); kacmissa ya da gecmis yoksa secilebilir
+#  5) "musteri kacirirsin" bahsi: son gunlerde hic musteri kacmadiysa diger uc turden
+#     biri esit sansla secilir (rastgele sayinin kesriyle, yeni sayi tuketmeden);
+#     kacmissa ya da gecmis yoksa secilebilir
 #  6) rakip teklifi (f_rakipGunBasi) hedefi gecmisten alir; kabul edilen bahsin hedefi
 #     sabittir (gunun icinde degismez) ve f_bahisCoz onunla karsilastirir
 #   godot --headless --path . --script tests/bahis_hedef.gd --quit-after 3000 -- --test
@@ -175,8 +176,10 @@ func run() -> void:
 	game.j_G.bahisGecmis = []
 	check(RS.f_bahisTuruSec(kacan).id == "kacan", "gecmis yok: kacan bahsi secilebilir")
 	game.j_G.bahisGecmis = [kayit(10, 300, 20, 0), kayit(12, 340, 25, 0), kayit(14, 380, 30, 0)]
-	var yerine: Dictionary = RS.f_bahisTuruSec(kacan)
-	check(yerine.id != "kacan" and yerine.id == "bahsis", "hic musteri kacmadi: bedava para olur, siradaki tur secilir (%s)" % yerine.id)
+	var yerine: Dictionary = RS.f_bahisTuruSec(kacan, 0.1)
+	check(yerine.id == "durum" and RS.f_bahisTuruSec(kacan, 0.5).id == "para" and RS.f_bahisTuruSec(kacan, 0.9).id == "bahsis",
+		"hic musteri kacmadi: bedava para olur, kesire gore digerlerinden biri (%s / %s / %s)" % [yerine.id, RS.f_bahisTuruSec(kacan, 0.5).id, RS.f_bahisTuruSec(kacan, 0.9).id])
+	check(RS.f_bahisTuruSec(kacan, 1.0).id == "bahsis" and RS.f_bahisTuruSec(kacan, 0.0).id == "durum", "kesir sinirlari tasmaz")
 	check(RS.f_bahisTuruSec(tip("durum")).id == "durum" and RS.f_bahisTuruSec(tip("para")).id == "para", "diger turler degismez")
 	check(game.random_state == rnd0, "filtre rastgele sayi tuketmez")
 	game.j_G.bahisGecmis = [kayit(10, 300, 20, 0), kayit(12, 340, 25, 1), kayit(14, 380, 30, 0)]
@@ -199,6 +202,14 @@ func run() -> void:
 			check(float(R.hedef) == float(beklenen[R.tip]), "teklif hedefi gecmisten: %s %s (beklenen %s)" % [R.tip, R.hedef, beklenen[R.tip]])
 		check(float(R.para) == float(game.progression_system.f_bahisPara(G)), "kazanc/ceza miktari degismedi")
 	check(gorulen.has("durum") and gorulen.has("para") and gorulen.has("bahsis"), "80 teklifte uc sayisal tur de goruldu (%s)" % str(gorulen.keys()))
+	# dagilim: her tur ~1/3 (kacan suzuldugunde bahsis tek basina %50 olmaz)
+	var sayim := {"durum": 0, "para": 0, "bahsis": 0}
+	for i in 600:
+		G.rakipHedef = 1.0; G.rakip = null
+		RS.f_rakipGunBasi()
+		sayim[G.rakip.tip] = int(sayim[G.rakip.tip]) + 1
+	for k in sayim:
+		check(int(sayim[k]) > 140 and int(sayim[k]) < 260, "600 tekliften '%s' payi ~1/3 olmali (%d)" % [k, sayim[k]])
 	G.bahisGecmis = [kayit(10, 300, 20, 0), kayit(12, 340, 25, 2), kayit(14, 380, 30, 0)]
 	gorulen = {}
 	for i in 80:

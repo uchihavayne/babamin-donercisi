@@ -52,21 +52,22 @@ func f_bahisHedefi(alan: String, eski: float, taban: float, adim: float) -> floa
 	return maxf(taban, floorf(f_bahisOrtalama(alan) * BAHIS_KAT / adim + 0.5) * adim)
 
 # "Musteri kacirirsin" bahsi, oyuncu son gunlerde hic musteri kacirmadiysa bedava para olur
-# (hedef 0 = hic kacirmamak). O durumda sira listedeki sonraki ture kayar; rastgele sayi
-# tuketmez, boylece diger bahislerin akisi degismez. Gecmis yoksa bilgi yok: tur degismez.
-func f_bahisTuruSec(p_t: Variant) -> Variant:
+# (hedef 0 = hic kacirmamak). O durumda tur diger uc turden birine kayar. Secim, ayni
+# rastgele sayinin KESIRLI kismiyla yapilir (p_kesir, 0..1): yeni rastgele sayi tuketilmez
+# (diger bahislerin akisi degismez) ve uc tur esit sansla (1/3) cikar. Gecmis yoksa bilgi
+# yok: tur degismez.
+func f_bahisTuruSec(p_t: Variant, p_kesir: float = 0.0) -> Variant:
 	if not J.eq(J.getv(p_t, "id"), "kacan"):
 		return p_t
-	var g := f_bahisGecmisi()
-	if g.is_empty() or f_bahisOrtalama("kacan") > 0.0:
+	if f_bahisGecmisi().is_empty() or f_bahisOrtalama("kacan") > 0.0:
 		return p_t
-	var liste: Array = game.j_BAHIS
-	var i: int = liste.find(p_t)
-	for k in range(1, liste.size()):
-		var aday: Variant = liste[(i + k) % liste.size()]
+	var digerleri: Array = []
+	for aday in game.j_BAHIS:
 		if not J.eq(J.getv(aday, "id"), "kacan"):
-			return aday
-	return p_t
+			digerleri.append(aday)
+	if digerleri.is_empty():
+		return p_t
+	return digerleri[clampi(int(floorf(p_kesir * float(digerleri.size()))), 0, digerleri.size() - 1)]
 
 # game.js:4747
 func f_rakipGunBasi() -> Variant:
@@ -86,7 +87,8 @@ func f_rakipGunBasi() -> Variant:
 		J.setv(game.j_G, "rakip", null)
 		return null
 	J.setv(game.j_G, "rakipHedef", J.add(J.add(J.getv(game.j_G, "day"), game.j_RAKIP_ARA_MIN), floor((game.random_unit() * J.add((game.j_RAKIP_ARA_MAK - game.j_RAKIP_ARA_MIN), 1.0)))))
-	v_t = f_bahisTuruSec(J.getv(game.j_BAHIS, floor((game.random_unit() * J.getv(game.j_BAHIS, "length")))))
+	var v_u: float = game.random_unit() * J.n(J.getv(game.j_BAHIS, "length"))
+	v_t = f_bahisTuruSec(J.getv(game.j_BAHIS, floor(v_u)), v_u - floorf(v_u))
 	v_ilk = (not J.truth(J.getv(game.j_G, "rakipTanisti")))
 	J.setv(game.j_G, "rakip", {"faz": "yok", "t": 0.0, "girisT": game.math_utils.f_rnd(14.0, 34.0), "x": J.add(game.j_W, 24.0), "tip": J.getv(v_t, "id"), "hedef": J.method(v_t, "hedef", [game.j_G]), "para": game.progression_system.f_bahisPara(game.j_G), "selam": game.math_utils.f_pick((game.j_RAKIP_SELAM_ILK if J.truth(v_ilk) else game.j_RAKIP_SELAM)), "ilk": v_ilk})
 	J.setv(game.j_G, "rakipTanisti", true)
