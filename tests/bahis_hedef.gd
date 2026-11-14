@@ -76,6 +76,10 @@ func run() -> void:
 	game.j_G.bahisGecmis = [kayit(30, 1500, 80, 0), kayit(32, 1600, 90, 0), kayit(34, 1700, 100, 0)]
 	check(hedef("durum") == 35.0 and hedef("para") == 1760.0 and hedef("bahsis") == 100.0,
 		"hizli oyuncu: 35 / 1760 / 100 (%s / %s / %s)" % [hedef("durum"), hedef("para"), hedef("bahsis")])
+	# kayit 3 gunden uzunsa yalniz en yeni 3 gun sayilir
+	game.j_G.bahisGecmis = [kayit(100, 5000, 90, 0), kayit(10, 300, 20, 0), kayit(12, 340, 25, 0), kayit(14, 380, 30, 0)]
+	check(hedef("durum") == 13.0 and hedef("para") == 370.0 and hedef("bahsis") == 30.0,
+		"4 kayit: en eskisi sayilmaz (%s / %s / %s)" % [hedef("durum"), hedef("para"), hedef("bahsis")])
 	# tabanlar
 	game.j_G.bahisGecmis = [kayit(0, 0, 0, 0), kayit(1, 20, 0, 0), kayit(0, 0, 1, 0)]
 	check(hedef("durum") == 4.0 and hedef("para") == 100.0 and hedef("bahsis") == 10.0,
@@ -124,6 +128,9 @@ func run() -> void:
 	var son: Dictionary = RS.f_bahisGecmisi()[0]
 	check(float(son.wraps) == 17.0 and float(son.kazanc) == 456.0 and float(son.bahsis) == 35.0 and float(son.kacan) == 2.0,
 		"gun sonu kaydi gunun sayilari (%s)" % str(son))
+	var diskte: Variant = game.f_loadGame()
+	check(diskte is Dictionary and diskte.get("bahisGecmis") is Array and diskte.bahisGecmis.size() == 1 and float(diskte.bahisGecmis[0].wraps) == 17.0,
+		"gun sonu kaydi diske de yazilir (%s)" % str(diskte.get("bahisGecmis") if diskte is Dictionary else null))
 	# sonraki gun: gecmis surer, 3 gunden fazla birikmez
 	for d in 4:
 		G.day = 13.0 + d

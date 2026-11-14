@@ -35,6 +35,8 @@ func f_bahisGunuKaydet() -> void:
 
 func f_bahisOrtalama(alan: String) -> float:
 	var g := f_bahisGecmisi()
+	if g.size() > BAHIS_GECMIS_GUN:   # elle uzatilmis kayit: yalniz en yeni 3 gun
+		g = g.slice(g.size() - BAHIS_GECMIS_GUN)
 	if g.is_empty():
 		return 0.0
 	var top := 0.0

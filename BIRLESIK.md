@@ -276,7 +276,7 @@ Kullanıcının yönü: oyun **cozy olmayacak** — biraz zorlayıcı, süreye k
 - `tools/ekran_senaryo.gd`: istenen ekranı istenen dilde / telefon boyunda PNG olarak kaydeder; `tools/snapshot_tabanini_guncelle.py`: anlık görüntü tabanını yalnız piksel farkı varsa (bilinçli yeni kayıt alanında `--kayit` ile kayıt referansını da) günceller
 - [REHBER.md](REHBER.md): kısa yol haritası
 
-**Ölçüm:** tam yükseltmeli oyun karesi (debug, llvmpipe) bu turdan önceki ağaç 10,21 ms, sonraki 10,17 ms (5'er ölçüm, fark −%0,4). Bot taramaları (taze 24 gün, tam geliştirme, İstanbul/Berlin/Demirkent, kaos tohumu 7): betik hatası 0, kural ihlali 0.
+**Ölçüm:** tam yükseltmeli oyun karesi (debug, llvmpipe) bu turdan önceki ağaç 10,21 ms, sonraki 10,17 ms (5'er ölçüm, fark −%0,4). Gün içi anlık görüntü (40. gün, tüm geliştirmeler, 7 müşteri): ~19 KB, yazma dahil ortalama 3,5 ms (20 ölçüm) ve 12 sn'de bir yazılır; 30 FPS kare bütçesinin (33 ms) çok altında. Bot taramaları (taze 24 gün, tam geliştirme, İstanbul/Berlin/Demirkent, kaos tohumu 7): betik hatası 0, kural ihlali 0.
 
 **Kullanıcıya danışılıp yapılanlar** (kuralı değiştirdikleri için önce soruldu; kullanıcının seçimi → yapılan):
 
