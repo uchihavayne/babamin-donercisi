@@ -14,10 +14,27 @@ const SIS_SHADER := preload("res://shaders/sis.gdshader")
 
 # HD acik/kapali (F2). Degisince pisirilmis katmanlar atilir: GPU pisirme
 # dokusu CPU tuvaline kopyalanamaz, eski yol yeniden pisirsin.
-var hd_acik := true:
+# BIRLESIK (12. tur): hd_acik = istek VE dokular yuklu. Proje Godot'ta HIC ice aktarilmadiysa (taze ZIP /
+# git clone + "godot --path ." dogrudan; Oyna.cmd artik once ice aktarir) HD dokulari yuklenemez. Eskiden
+# her HD kanca ayri ayri null doku hatasi verir ya da sessizce eski cizime duserdi ("HD kapali, nasil
+# aciliyor, olmuyor"). Simdi tek kontrol: dokular yoksa hd_acik hep false, konsola bir kez acik uyari
+# yazilir, debug'da ekranda neden yazar (hd_durum_metni).
+var _hd_istek := true
+var _dokular_durum := 0   # 0 bilinmiyor, 1 var, 2 eksik
+func _dokular_var() -> bool:
+	if _dokular_durum == 0:
+		var yol := "res://assets/remake/zemin/ahsap.png"
+		var tex: Variant = load(yol) if ResourceLoader.exists(yol) else null
+		_dokular_durum = 1 if (tex != null and not atlas("tezgah2").is_empty()) else 2
+		if _dokular_durum == 2:
+			print("UYARI: HD dokulari yuklenemedi (proje Godot'ta ice aktarilmamis olabilir). Oyna.cmd'yi kullanin ya da projeyi Godot'ta acin; eski cizimle devam ediliyor.")
+	return _dokular_durum == 1
+
+var hd_acik: bool:
+	get: return _hd_istek and _dokular_var()
 	set(v):
-		if hd_acik == v: return
-		hd_acik = v
+		if _hd_istek == v: return
+		_hd_istek = v
 		if get("screen_canvas") is GpuCanvas: get("screen_canvas").olcek_hd = v
 		for ad in ["j_BG", "j_WINOVER", "j_STONEFG", "j_CLAYER"]:
 			set(ad, null)
@@ -32,7 +49,7 @@ func hd_tus(event: InputEvent) -> bool:
 		# gelistirme (debug) derlemesinde. Eski cizimde patatesler fritozun onune biniyordu ve
 		# oyun "yetersiz gorunuyor" izlenimi veriyordu.
 		if not OS.is_debug_build(): return false
-		hd_acik = not hd_acik
+		hd_acik = not _hd_istek
 		print("REMAKE gorseller: ", "ACIK" if hd_acik else "KAPALI (eski cizim)")
 		return true
 	return false
@@ -103,9 +120,13 @@ func hd_gpu() -> bool:
 # Gelistirme (debug) derlemesinde ekrana basilir: HD cizim neden kapali? Bos metin = HD tam acik.
 # ("oyun kotu gorunuyor" derken sessizce eski cizime dusulmus olmasin diye)
 func hd_durum_metni() -> String:
-	if not hd_acik: return "ESKİ ÇİZİM · F2: yeni çizim"
+	if not _hd_istek: return "ESKİ ÇİZİM · F2: yeni çizim"
 	if not (draw_context is GpuCanvas): return "HD KAPALI: GPU tuvali yok"
-	if get("counter_design_enabled") and atlas("tezgah2").is_empty(): return "HD KAPALI: dokular yüklenemedi"
+	if not _dokular_var():
+		# Kaynak klasorden calisirken .godot/imported yoksa proje HIC ice aktarilmamistir
+		if not DirAccess.dir_exists_absolute("res://.godot/imported"):
+			return "HD KAPALI: proje içe aktarılmamış · Oyna.cmd kullan"
+		return "HD KAPALI: dokular yüklenemedi · projeyi Godot'ta aç"
 	return ""
 
 # Hata ayiklama: HD_KAPALI=patates,et ortam degiskeniyle tek tek kancalar kapanir
@@ -3646,6 +3667,7 @@ func f_hdZemin(tema: Variant) -> bool:
 	var yol := "res://assets/remake/zemin/%s.png" % tip
 	if not ResourceLoader.exists(yol): return false
 	var tex: Texture2D = load(yol)
+	if tex == null: return false
 	var Z: Array = tema.zemin
 	var anah := "%s|%s|%s" % [tip, Z[0], Z[3]]
 	var m: ShaderMaterial = _zemin_mat.get(anah)

@@ -11,7 +11,9 @@ Babasından kalan döner dükkânını ve 5 milyon dolarlık borcu devralan biri
    ```
    (ya da GitHub'da **Code → Download ZIP**)
 3. Godot Proje Yöneticisi → **Import** → klasördeki `project.godot` → **Import & Edit**. İlk açılışta görseller içe aktarılır (~30 sn).
-4. **F5** (Mac: **Cmd+B**) ile çalıştır.
+4. **F5** (Mac: **Cmd+B**) ile çalıştır. İçe aktarma bitmeden (alt çubuk dolana kadar) F5'e basma.
+
+**Windows'ta tek tık:** `Oyna.cmd` (içindeki `GODOT=` yolunu kendi Godot 4.7.2 yoluna göre düzenle). Her açılışta **önce görselleri içe aktarır** (ilk seferde 10-60 sn, sonra ~5 sn), sonra oyunu açar. İçe aktarma yapılmadan `godot --path .` ile açılırsa HD görseller yüklenemez ve oyun eski çizimle açılır (debug'da üstte kırmızı etiket nedenini yazar).
 
 Güncellemeleri almak için klasörde `git pull`.
 

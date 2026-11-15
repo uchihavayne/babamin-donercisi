@@ -18,6 +18,11 @@ func get_sprite(key: String) -> Variant:
 		var canvas := Canvas.new()
 		canvas.src = "res://assets/sprites/" + sheet
 		sheets[sheet] = canvas
+	# Dokular yuklenemediyse (proje ice aktarilmamis) null don: cagiranlar kaynak (procedural) cizime duser.
+	# Hata onbellege alinir; ayni sayfa icin her karede yeniden yukleme denenmez.
+	if sheets[sheet].image == null:
+		sprites[key] = null
+		return null
 	var sprite := Canvas.new()
 	var r: Array = entry.region
 	var rect := Rect2i(int(r[0]), int(r[1]), int(r[2]), int(r[3]))

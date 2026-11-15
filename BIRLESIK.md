@@ -299,6 +299,7 @@ Kullanıcı: "görsel anlamda yetersiz; fritöze patates atıyorsun, patates her
 | Bulgu | Düzeltme |
 | --- | --- |
 | Eski çizimde (HD kapalı) kızaran/pişmiş patates çubukları yağ penceresinin dışına taşıp fritözün çerçevesini ve kapağını ortuyordu (`counter_design.f_drawFryer`) | Çubuklar yalnız yağ penceresinin içine kırpılır (`j_ctx.clip`); aynı kırpma HD tezgâhın yedek yoluna da eklendi. `tests/fritoz_katman.gd` eski kodda 42 taşan piksel yakalar |
+| **Asıl neden (kullanıcıda HD kapalıydı):** proje Godot'ta hiç içe aktarılmamıştı (taze ZIP); `Oyna.cmd` oyunu doğrudan açınca HD dokuları yüklenemiyor, oyun sessizce eski çizime düşüyor (721 script hatası). Temiz klasörde doğrulandı: içe aktarma yok → HD kapalı, var → açık | `Oyna.cmd` her açılışta önce `--headless --path . --import` çalıştırır; `hd_acik` = istek VE dokular (`remake_gorsel._dokular_var`): dokular yoksa HD tek merkezden kapalı, konsola bir kez uyarı, debug'da ekranda neden; yüklenemeyen sprite sayfası/zemin dokusu script hatası vermez (`tests/ice_aktarma.gd`) |
 | Oyuncu F2 ile (ya da bir arızayla) sessizce eski çizime düşebiliyordu | F2 yalnız debug derlemesinde; debug'da HD kapalıyken üst ortada kırmızı etiket nedenini yazar (`remake_gorsel.hd_durum_metni`, `interface_draw.hd_uyari`) |
 
 Açık: HD açıkken uçan patatesin (çuvaldan tahtaya) düz bir disk gibi görünmesi ve "fritöze koy"un anlık geçmesi (animasyonsuz) — akıcılık işi; görsel dil seçimi (iki örnek yön) kullanıcıya danışılmak üzere.
