@@ -21,7 +21,7 @@ func tun(key: String) -> Variant: return game.J.method(game.j_TUN, key, [game.j_
 func available() -> bool:
 	if not enabled or game.j_G == null or game.j_G.scene != "play" or game.suspended or game.overlay_open: return false
 	if game.j_TEXTIN.active or game.debug_draw.f_testPanelOpen(): return false
-	for panel in [game.j_CUSTOM, game.j_PAYP, game.j_BRP, game.j_SESP, game.j_STATS, game.j_BSP]:
+	for panel in [game.j_CUSTOM, game.j_PAYP, game.j_BRP, game.j_SESP, game.j_STATS, game.j_BSP, game.j_TARIFP]:
 		if panel.get("open", false): return false
 	return true
 
@@ -535,6 +535,7 @@ func status() -> String:
 func order_label(item: Dictionary) -> String:
 	var names := {"wrap":text("Dürüm","Wrap"),"plate":text("İskender","Iskender"),"fbox":text("Patates kutusu","Fries box"),"sweet":text("Tatlı","Dessert"),"pickle":text("turşu","pickles"),"yogurt":text("yoğurt","yogurt"),"fries":text("patates","fries")}
 	var label: String = str(item.get("type","")) if item.kind == "drink" else names.get(item.kind,item.kind)
+	if item.has("tarif"): label = str(game.localization.f_T(str(game.tarif_system.f_tarif(str(item.tarif)).get("ad", label))))   # Baba'nin tarifi adiyla
 	if item.get("sauce","") == "hot": label += text(" · acı sos"," · hot sauce")
 	if item.get("sauce","") == "garlic": label += text(" · sarımsaklı"," · garlic sauce")
 	for ingredient in item.get("yok",[]): label += text(" · "," · no ")+names.get(ingredient,ingredient)+text(" olmasın","")

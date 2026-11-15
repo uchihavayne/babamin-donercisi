@@ -413,6 +413,9 @@ func f_deliver(p_c: Variant = null) -> Variant:
 		J.setv(v_c, "patience", max(0.05, (J.getv(v_c, "patience") - 0.18)))
 		game.effects.f_ftext("SOS YANLIŞ!", J.getv(v_c, "x"), (J.getv(v_c, "y") - 60.0), J.getv(game.j_P, "bad"), {"life": 1.3})
 		J.method(game.j_SFX, "bad", [])
+	# Baba'nin Defteri: adiyla istenen tarif dogru sos + dogru malzeme + tam kalite teslim edilirse prim, ustalik sayaci
+	if J.eq(J.getv(v_it, "kind"), "wrap") and v_ord is Dictionary and v_ord.has("tarif") and J.truth(v_sauceOk) and J.truth(v_secimOk) and J.ge(v_q, 0.99) and not J.truth(J.getv(v_c, "homeless")):
+		v_price = game.tarif_system.f_odul(str(v_ord.tarif), J.n(v_price), v_c)
 	if J.truth(J.getv(v_c, "homeless")):
 		v_price = 0.0
 	J.setv(v_c, "earn", J.add((J.getv(v_c, "earn") if J.truth(J.getv(v_c, "earn")) else 0.0), v_price))
@@ -469,6 +472,12 @@ func f_payCustomer(p_c: Variant = null) -> Variant:
 		game.save_system.f_saveAll()
 		return null
 	v_val = (J.getv(v_c, "earn") if J.truth(J.getv(v_c, "earn")) else 0.0)
+	# Baba'nin Defteri: menu tarifi (dürüm + yan urunler) tam teslim edilince menu bonusu
+	var v_mb: float = game.tarif_system.f_menuBonusu(v_c)
+	if v_mb > 0.0 and J.n(v_val) > 0.0:
+		var v_bonus: float = floor(J.n(v_val) * v_mb + 0.5)
+		v_val = J.n(v_val) + v_bonus
+		game.effects.f_ftext(str(game.localization.f_T("MENÜ BONUSU +$")) + str(game.math_utils.f_fmtMoney(v_bonus)), J.getv(v_c, "x"), (J.getv(v_c, "y") - 74.0), J.getv(game.j_P, "ok"), {"life": 1.7})
 	v_tip = floor(((((v_val * 0.22) * game.math_utils.f_clamp(J.getv(v_c, "patience"), 0.0, 1.0)) * J.method(game.j_TUN, "havaBahsis", [game.j_G])) * (1.55 if J.truth(J.getv(v_c, "mac")) else 1.0)) + 0.5)
 	J.setv(v_c, "state", "served")
 	J.setv(v_c, "servedAt", J.getv(v_c, "t"))

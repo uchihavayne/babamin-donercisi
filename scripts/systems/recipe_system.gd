@@ -67,7 +67,8 @@ func f_makeOrder(p_G: Variant = null) -> Variant:
 		J.method(v_items, "push", [{"kind": "fbox"}])
 	if ((J.truth(J.method(game.j_TUN, "sweetOn", [v_G])) and J.truth(game.f_chance(0.26))) and J.lt(J.getv(v_items, "length"), 3.0)):
 		J.method(v_items, "push", [{"kind": "sweet"}])
-	return v_items
+	# Baba'nin Defteri: bulunmus tarif varsa dürüm adiyla istenen tarife donusebilir
+	return game.tarif_system.f_siparisKarisitir(v_items)
 	return null
 
 # data.js:495

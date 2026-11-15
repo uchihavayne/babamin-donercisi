@@ -212,6 +212,7 @@ func initialize_game() -> void:
 	game.j_DEBT_START = 5000000.0
 	game.j_DEBT_CUT = 0.18
 	game.j_UPG = preload("res://data/upg.gd").VALUE.duplicate(true)
+	game.j_TARIF = preload("res://data/tarif.gd").VALUE.duplicate(true)
 	game.j_TUN = {
 		"meatPerClick": game.equipment_tuning.meat_per_click.bind({}),
 		"tongsTargets": game.equipment_tuning.tongs_targets.bind({}),
@@ -359,6 +360,7 @@ func initialize_game() -> void:
 	game.j_titleSpit = {"rot": 0.0, "roast": 0.85, "mass": 1.0, "sliceT": 0.0, "cutDepth": 0.0}
 	game.j_DILUI = {"anim": (-J.n(1.0)), "hedef": 0.0, "hiz": 0.0, "parla": 0.0, "son": (-J.n(1.0))}
 	game.j_EVP = {"open": false}
+	game.j_TARIFP = {"open": false, "sec": 0}
 	game.j_SHOP = {"bake": null, "sel": null, "buyT": 0.0, "sec": null}
 	game.j_KART_ZEMIN = "#2b2119"
 	game.j_KART_YAZI = "#c9b48c"

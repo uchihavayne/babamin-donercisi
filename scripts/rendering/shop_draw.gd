@@ -98,13 +98,16 @@ func f_drawShop(p_t: Variant = null) -> Variant:
 		if (not J.truth(J.getv(game.j_SHOP, "bake"))):
 			game.shop_draw.f_bakeShop()
 		J.method(game.j_ctx, "drawImage", [J.getv(game.j_SHOP, "bake"), 0.0, 0.0])
-	if (((((((((not J.truth(J.getv(game.j_G, "dersGorulmus"))) and (not J.truth(J.getv(game.j_G, "ders")))) and J.le(J.getv(game.j_G, "day"), 2.0)) and (not J.truth(J.getv(game.j_CUSTOM, "open")))) and (not J.truth(J.getv(game.j_STATS, "open")))) and (not J.truth(J.getv(game.j_BSP, "open")))) and (not J.truth(J.getv(game.j_SESP, "open")))) and (not J.truth(J.getv(game.j_BRP, "open")))) and (not J.truth(J.getv(game.j_PAYP, "open")))):
+	if (((((((((not J.truth(J.getv(game.j_G, "dersGorulmus"))) and (not J.truth(J.getv(game.j_G, "ders")))) and J.le(J.getv(game.j_G, "day"), 2.0)) and (not J.truth(J.getv(game.j_CUSTOM, "open")))) and (not J.truth(J.getv(game.j_STATS, "open")))) and (not J.truth(J.getv(game.j_BSP, "open")))) and (not J.truth(J.getv(game.j_SESP, "open")))) and (not J.truth(J.getv(game.j_BRP, "open")))) and (not J.truth(J.getv(game.j_PAYP, "open")))) and (not J.truth(J.getv(game.j_TARIFP, "open"))):
 		J.setv(game.j_G, "ders", {"adim": 0.0, "t": 0.0, "verildi": false})
 	if J.truth(J.getv(game.j_CUSTOM, "open")):
 		game.settings_draw.f_drawCustomPanel(v_t)
 		return null
 	if J.truth(J.getv(game.j_BSP, "open")):
 		game.achievement_draw.f_drawBasarimPanel(v_t)
+		return null
+	if J.truth(J.getv(game.j_TARIFP, "open")):
+		game.tarif_draw.f_drawDefter(v_t)
 		return null
 	if J.truth(J.getv(game.j_STATS, "open")):
 		game.achievement_draw.f_drawStatsPanel(v_t)
@@ -228,6 +231,9 @@ func f_drawShop(p_t: Variant = null) -> Variant:
 	v_ms = J.add("$", (game.math_utils.f_fmtShort(J.getv(game.j_G, "money")) if J.ge(J.getv(game.j_G, "money"), 1000000.0) else game.math_utils.f_fmtMoney(J.getv(game.j_G, "money"))))
 	game.icon_draw.f_icon("coin", 14.0, J.add(v_ub, 12.0), v_t)
 	game.text_draw.f_txt(v_ms, 24.0, J.add(v_ub, 8.0), J.getv(game.j_P, "au0"), {"sc": 1.0})
+	if game.tarif_system.f_bulunanSayi() > 0 and J.truth(game.tarif_draw.f_dugme(80.0, J.add(v_ub, 4.0), v_t)):
+		game.tarif_draw.ac()
+		J.method(game.j_SFX, "ui", [])
 	if (J.gt(J.getv(game.j_G, "debt"), 0.0) and J.truth(game.f_button(104.0, J.add(v_ub, 4.0), 56.0, 17.0, "BORÇ ÖDE", "#a83a2a", J.ge(J.getv(game.j_G, "money"), 100.0)))):
 		J.setv(game.j_PAYP, "open", true)
 		J.method(game.j_SFX, "ui", [])

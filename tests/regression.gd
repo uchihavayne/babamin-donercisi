@@ -93,7 +93,7 @@ func run() -> void:
 	game.j_G.dersGorulmus = true
 	game.advance(1.0 / 60)
 	snap("upgrades")
-	for panel in ["SESP", "STATS", "BSP", "CUSTOM", "BRP", "PAYP"]:
+	for panel in ["SESP", "STATS", "BSP", "CUSTOM", "BRP", "PAYP", "TARIFP"]:
 		game.get("j_" + panel).open = true
 		game.advance(1.0 / 60)
 		snap("panel-" + panel.to_lower())

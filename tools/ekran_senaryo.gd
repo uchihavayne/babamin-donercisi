@@ -13,7 +13,8 @@
 #   --cikti KLASOR   PNG'lerin yazilacagi klasor (varsayilan res://artifacts)
 # Senaryolar: kalabalik mufettis5 mufettis2 lider ferman hesap gunsonu dukkan subeler
 #   kisisel rekor borc ses_dukkan basarim ses rekor_baslik mola giris ogretici telefon
-#   gece_caldi son_saniye kapanis yardim ayarlar
+#   gece_caldi son_saniye kapanis yardim ayarlar defter yeni_sayfa dukkan_defter tarif_balon
+#   (defter: --sayfa 1-8, --gun N bulunan sayfalarin gunu; yeni_sayfa: --gun N, --sayfa 1-8, --kare N)
 # Linux'ta ekransiz sunucuda: xvfb-run -a -s "-screen 0 1280x720x24" godot --rendering-driver opengl3 ...
 extends SceneTree
 
@@ -231,6 +232,51 @@ func calis() -> void:
 			await kaydet("_a")
 			await adim(150)
 			await kaydet("_b")
+		"defter", "dukkan_defter":
+			# Baba'nin Defteri: bulunmus sayfalar, farkli ustalik seviyeleri; --sayfa N secili sekme
+			kur(float(arg("--gun", "80")), ad == "defter", -1, 2)
+			G.money = 61000.0 if ad == "defter" else 3200.0
+			G.scene = "shop"; G.sceneT = 5.0
+			var dd: Dictionary = g.tarif_system.f_durum()
+			for t in g.j_TARIF:
+				if int(t.gun) <= int(G.day): dd.bulunan.append(str(t.id))
+			dd.servis = {"acili": 27, "sarimsakli": 6, "tursusuz": 45}
+			dd.gorulen = ["acili"] if ad == "defter" else []
+			if ad == "defter":
+				g.j_TARIFP.open = true
+				g.j_TARIFP.sec = int(arg("--sayfa", "1")) - 1
+			await adim(40)
+			await kaydet()
+		"yeni_sayfa":
+			# gun sonunda bulunan sayfa karti; --gun N, --sayfa N (gosterilecek sayfa)
+			kur(float(arg("--gun", "30")), false, -1, 2)
+			G.stat.wraps = 21.0; G.stat.earned = 1840.0; G.stat.tips = 212.0; G.money = 1840.0
+			g.session_system.f_endDay()
+			var yd: Dictionary = g.tarif_system.f_durum()
+			if arg("--sayfa") != "":
+				var yid: String = str(g.j_TARIF[int(arg("--sayfa")) - 1].id)
+				yd.bulunan = [yid]; yd.yeni = [yid]
+			await adim(int(arg("--kare", "60")))
+			await kaydet()
+		"tarif_balon":
+			# siparis balonlarinda altin yildiz + hazirlik seridinde yildiz (secili tarif siparisi)
+			kur(60.0, true)
+			var tb: Dictionary = g.tarif_system.f_durum()
+			for t in g.j_TARIF: tb.bulunan.append(str(t.id))
+			doldur(4)
+			var idler := ["acili", "tursusuz", "menu", "gece"]
+			for i in G.customers.size():
+				var c: Dictionary = G.customers[i]
+				var kalemler: Array = [g.tarif_system.f_siparisKalemi(idler[i])]
+				kalemler.append_array(g.tarif_system.f_ekKalemler(idler[i]))
+				c.items = kalemler; c.done = []
+				for _k in kalemler: c.done.append(false)
+			g.order_system.f_newWrap(0)
+			G.act = 0.0
+			await adim(int(arg("--kare", "120")))
+			g.j_BSQ.kuyruk = []   # basarim bildirimi hazirlik seridini ortmesin
+			await adim(3)
+			await kaydet()
 		"kalabalik":
 			# en yogun an: 5 musteri + sira + telefon fisi + kedi + rakip + mufettis
 			kur(25.0, true)

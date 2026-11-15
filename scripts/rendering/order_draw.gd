@@ -33,6 +33,8 @@ func order_icon(item: Dictionary, x: float, y: float, time: float) -> void:
 	# tek tip boyda HD siparis ikonu (ikon_hd sip_*); yoksa eski ikon
 	if not game.f_hdIkon("sip_" + id, x, y):
 		game.icon_draw.f_icon(id, x, y, time)
+	# Baba'nin Defteri: adiyla istenen tarif altin yildizla isaretlenir (sos rozetinden once: HD rozet erken doner)
+	if item.get("tarif") != null: game.tarif_draw.f_yildiz(maxf(2.0, x - 12.0), y - 11.0)
 	if item.get("sauce") != null:
 		var hot: bool = item.sauce == "hot"
 		# REMAKE kancasi: "!" / "G" yerine HD sos rozeti (aci biber / sarimsak)
@@ -160,6 +162,9 @@ func draw_preparation_overlay(time: Variant = null) -> Variant:
 	if w.has("_order_mark") and w._order_mark == "P":
 		game.f_rrect(x-40, y-3, 9, 10, 2, "#e8b453")
 		game.text_draw.f_txt(w._order_mark, x-36, y-2, "#493222", {"align":"c"})
+	if recipe.get("tarif") != null:
+		game.f_rrect(x+31, y-3, 9, 10, 2, "#493222")
+		game.tarif_draw.f_yildiz(x+32, y-1)
 	if w.state == "open":
 		for i in 4:
 			var ingredient: String = game.ORDER_FIELDS.keys()[i]

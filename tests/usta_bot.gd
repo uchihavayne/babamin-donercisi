@@ -118,6 +118,8 @@ func step() -> void:
 				goruldu[c._bot_id] = {"t": t_gun, "bitti": false}
 				say("gelen")
 				if c.get("homeless", false): say("evsiz")
+				for it in c.items:
+					if it is Dictionary and it.has("tarif"): say("tarif_gelen")   # Baba'nin Defteri: adiyla istenen tarif
 			if not c.has("_bot_id"): continue
 			var kay: Dictionary = goruldu[c._bot_id]
 			if not kay.bitti and not c.done.has(false):
@@ -353,7 +355,10 @@ func gun_oyna() -> Dictionary:
 	for x in servis_sureleri: ort += float(x)
 	if not servis_sureleri.is_empty(): ort /= servis_sureleri.size()
 	var bs: Variant = G.get("bahisSonuc")   # o gun cozulen rakip bahsi (yoksa null): hedef / deger / kazandi
+	var tarif_servis := 0
+	for k in game.tarif_system.f_durum().servis: tarif_servis += int(game.tarif_system.f_durum().servis[k])
 	return {"gun": int(G.day), "sure": int(t_gun), "gelen": int(gun_say.get("gelen", 0)), "kacan": int(s.get("lost", 0)),
+		"tarif": {"bulunan": game.tarif_system.f_bulunanSayi(), "gelen": int(gun_say.get("tarif_gelen", 0)), "servis_toplam": tarif_servis},
 		"bahis_sonuc": ({"tip": str(bs.tip), "hedef": bs.hedef, "deger": bs.deger, "kazandi": bool(bs.kazandi)} if bs is Dictionary else null),
 		"durum": int(s.get("wraps", 0)), "iskender": int(s.get("isk", 0)), "icecek": int(s.get("drinks", 0)),
 		"kazanc": int(s.get("earned", 0)), "bahsis": int(s.get("tips", 0)), "taksit": int(s.get("debtPaid", 0)), "ceza": int(s.get("fine", 0)),

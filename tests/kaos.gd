@@ -47,6 +47,10 @@ func stoklar() -> void:
 func gun_basla() -> void:
 	tam_yukselt()
 	g.j_G.day = float(rng.randi_range(2, 14))
+	# Baba'nin Defteri: rastgele sayida sayfa bulunmus (tarifli siparisler, defter dugmesi, yeni sayfa karti)
+	var tarif_d: Dictionary = g.tarif_system.f_durum()
+	tarif_d.bulunan = []; tarif_d.yeni = []; tarif_d.gorulen = []
+	for i in rng.randi_range(0, g.j_TARIF.size()): tarif_d.bulunan.append(str(g.j_TARIF[i].id))
 	g.f_startDay()
 	g.j_G.tut = 99; g.j_G.shutT = 0
 	stoklar()
@@ -119,6 +123,10 @@ func calis() -> void:
 		var sahne: String = str(g.j_G.scene)
 		if sahne != "play":
 			say("sahne_" + sahne)
+			if sahne == "shop" and rng.randf() < 0.2 and g.tarif_system.f_bulunanSayi() > 0:
+				g.j_TARIFP.open = not g.j_TARIFP.open; g.j_TARIFP.sec = rng.randi_range(0, g.j_TARIF.size() - 1); say("defter")
+			if sahne == "dayend" and rng.randf() < 0.2 and g.tarif_system.f_bulunanSayi() > 0:
+				g.tarif_system.f_durum().yeni = [str(g.j_TARIF[rng.randi_range(0, g.j_TARIF.size() - 1)].id)]; say("yeni_sayfa")
 			# gun sonu / dukkan / gece / duraklat: birkac kare goster, sonra yeni gun
 			if rng.randf() < 0.02:
 				if sahne == "dayend" and rng.randf() < 0.5:

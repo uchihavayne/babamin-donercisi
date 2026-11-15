@@ -375,7 +375,7 @@ func back() -> void:
 	if game.j_TEXTIN.active:
 		game.j_TEXTIN.cancel = true
 		return
-	for panel in ["CUSTOM", "PAYP", "BRP", "SESP", "STATS", "BSP"]:
+	for panel in ["CUSTOM", "PAYP", "BRP", "SESP", "STATS", "BSP", "TARIFP"]:
 		var state: Dictionary = game.get("j_" + panel)
 		if state.get("open", false):
 			state.open = false
@@ -391,7 +391,7 @@ func pause() -> void:
 	if game.j_G.scene == "play": game.j_G.scene = "pause"
 	elif game.j_G.scene == "pause":
 		# Close an overlaid panel before returning to a running day.
-		for panel in ["SESP", "STATS", "BSP"]: game.get("j_" + panel).open = false
+		for panel in ["SESP", "STATS", "BSP", "TARIFP"]: game.get("j_" + panel).open = false
 		game.j_G.scene = "play"
 
 func begin_targets() -> void:
@@ -405,7 +405,7 @@ func add_target(rect: Rect2, label: String) -> void:
 
 func end_targets() -> void:
 	var new_context: String = game.j_G.scene
-	for panel in ["CUSTOM", "PAYP", "BRP", "SESP", "STATS", "BSP"]:
+	for panel in ["CUSTOM", "PAYP", "BRP", "SESP", "STATS", "BSP", "TARIFP"]:
 		if game.get("j_" + panel).get("open", false): new_context += panel
 	if new_context == "play" and not game.j_G.crate.open:
 		add_stations()

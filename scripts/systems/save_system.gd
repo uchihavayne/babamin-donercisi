@@ -33,7 +33,7 @@ func f_saveUyar() -> Variant:
 
 # game.js:233
 func f_saveAll() -> Variant:
-	game.f_saveGame({"day": J.getv(game.j_G, "day"), "money": J.getv(game.j_G, "money"), "up": J.getv(game.j_G, "up"), "best": J.getv(game.j_G, "best"), "totalSold": J.getv(game.j_G, "totalSold"), "debt": J.getv(game.j_G, "debt"), "stats": J.getv(game.j_G, "stats"), "custom": J.getv(game.j_G, "custom"), "moto": J.getv(game.j_G, "moto"), "prologueSeen": J.getv(game.j_G, "prologueSeen"), "luck": J.getv(game.j_G, "luck"), "branch": J.getv(game.j_G, "branch"), "city": J.getv(game.j_G, "city"), "dersGorulmus": J.getv(game.j_G, "dersGorulmus"), "fpara": J.getv(game.j_G, "fpara"), "fgun": J.getv(game.j_G, "fgun"), "hane": J.getv(game.j_G, "hane"), "fbatik": J.getv(game.j_G, "fbatik"), "ev": J.getv(game.j_G, "ev"), "bs": J.getv(game.j_G, "bs"), "ozelHedef": J.getv(game.j_G, "ozelHedef"), "ozelGecmis": J.getv(game.j_G, "ozelGecmis"), "bahisGecmis": J.getv(game.j_G, "bahisGecmis"), "rakipHedef": J.getv(game.j_G, "rakipHedef"), "rakipKapandi": J.getv(game.j_G, "rakipKapandi"), "rakipSeri": J.getv(game.j_G, "rakipSeri"), "macHedef": J.getv(game.j_G, "macHedef")})
+	game.f_saveGame({"day": J.getv(game.j_G, "day"), "money": J.getv(game.j_G, "money"), "up": J.getv(game.j_G, "up"), "best": J.getv(game.j_G, "best"), "totalSold": J.getv(game.j_G, "totalSold"), "debt": J.getv(game.j_G, "debt"), "stats": J.getv(game.j_G, "stats"), "custom": J.getv(game.j_G, "custom"), "moto": J.getv(game.j_G, "moto"), "prologueSeen": J.getv(game.j_G, "prologueSeen"), "luck": J.getv(game.j_G, "luck"), "branch": J.getv(game.j_G, "branch"), "city": J.getv(game.j_G, "city"), "dersGorulmus": J.getv(game.j_G, "dersGorulmus"), "fpara": J.getv(game.j_G, "fpara"), "fgun": J.getv(game.j_G, "fgun"), "hane": J.getv(game.j_G, "hane"), "fbatik": J.getv(game.j_G, "fbatik"), "ev": J.getv(game.j_G, "ev"), "bs": J.getv(game.j_G, "bs"), "ozelHedef": J.getv(game.j_G, "ozelHedef"), "ozelGecmis": J.getv(game.j_G, "ozelGecmis"), "bahisGecmis": J.getv(game.j_G, "bahisGecmis"), "tarif": J.getv(game.j_G, "tarif"), "rakipHedef": J.getv(game.j_G, "rakipHedef"), "rakipKapandi": J.getv(game.j_G, "rakipKapandi"), "rakipSeri": J.getv(game.j_G, "rakipSeri"), "macHedef": J.getv(game.j_G, "macHedef")})
 	if J.eq(J.kind(J.ref(game.save_system.f_saveUyar, 0)), "function"):
 		game.save_system.f_saveUyar()
 	return null
@@ -68,6 +68,7 @@ func f_loadAndGo() -> Variant:
 		J.setv(game.j_G, "ozelGecmis", (J.getv(v_s, "ozelGecmis") if J.truth(J.getv(v_s, "ozelGecmis")) else {}))
 		var v_bg: Variant = J.getv(v_s, "bahisGecmis")
 		J.setv(game.j_G, "bahisGecmis", (v_bg if v_bg is Array else []))
+		game.tarif_system.f_yukle(J.getv(v_s, "tarif"))   # Baba'nin Defteri (eski / bozuk kayitta bos defter)
 		J.setv(game.j_G, "ozelHedef", (J.getv(v_s, "ozelHedef") if J.truth(J.getv(v_s, "ozelHedef")) else J.add(J.add((J.getv(v_s, "day") if J.truth(J.getv(v_s, "day")) else 1.0), game.j_OZEL_ILK_MIN), floor((game.random_unit() * J.add((game.j_OZEL_ILK_MAK - game.j_OZEL_ILK_MIN), 1.0))))))
 		J.setv(game.j_G, "bs", (J.getv(v_s, "bs") if J.truth(J.getv(v_s, "bs")) else null))
 	if J.eq(J.kind(J.ref(game.achievement_system.f_basarimBaslat, 1)), "function"):

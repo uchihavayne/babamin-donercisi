@@ -44,7 +44,7 @@ func tr_harf_kontrol(dil: String, ekran: String, yazi: String) -> void:
 			return
 
 func pencereler_kapali() -> void:
-	for p in [game.j_CUSTOM, game.j_PAYP, game.j_BRP, game.j_SESP, game.j_STATS, game.j_BSP, game.j_EVP]:
+	for p in [game.j_CUSTOM, game.j_PAYP, game.j_BRP, game.j_SESP, game.j_STATS, game.j_BSP, game.j_EVP, game.j_TARIFP]:
 		p.open = false
 	game.j_BSP.sec = null
 	game.j_SHOP.sec = null
@@ -190,6 +190,25 @@ func dukkan_ekrani(dil: String) -> void:
 	G.stats.best = 98765.0; G.stats.debtPaid = 1234567.0; G.stats.fines = 12345.0; G.stats.stolen = 23456.0
 	G.scene = "shop"; G.sceneT = 5.0
 	olc(dil, "dukkan")
+	# Baba'nin Defteri: cubuktaki dugme; panel her sekmede, kismi / tam bulunmus, ekipmansiz (uzun "Gerekli")
+	# ve tam ekipmanli ("Hazir"), farkli ustalik seviyeleriyle
+	var tarif_d: Dictionary = game.tarif_system.f_durum()
+	tarif_d.bulunan = [str(game.j_TARIF[0].id)]
+	olc(dil, "dukkan defter dugmesi")
+	tarif_d.servis = {"acili": 7, "sarimsakli": 20, "tursusuz": 45}
+	for tam_ekipman in [false, true]:
+		if tam_ekipman:
+			for k in game.j_UPG: G.up[k.id] = float(k.lv.size())
+		for kismi in [3, 8]:
+			tarif_d.bulunan = []
+			for i in kismi: tarif_d.bulunan.append(str(game.j_TARIF[i].id))
+			game.j_TARIFP.open = true
+			for i in game.j_TARIF.size():
+				game.j_TARIFP.sec = i
+				olc(dil, "defter %d sayfa bulunmus%s, sekme %d" % [kismi, " (tam ekipman)" if tam_ekipman else "", i + 1], 0)
+			game.j_TARIFP.open = false
+	tarif_d.bulunan = []; tarif_d.servis = {}
+	for k in game.j_UPG: G.up[k.id] = 0.0
 	# gelistirme kartlari: her gelistirme, her seviye (kilitli / alinir / tam)
 	for u in game.j_UPG:
 		for lv in range(0, u.lv.size() + 1):
@@ -227,7 +246,20 @@ func gun_sonu_ve_gece(dil: String) -> void:
 	G.money = 18400.0
 	game.session_system.f_endDay()
 	game.j_G.sceneT = 5.0
+	game.tarif_system.f_durum().yeni = []    # yeni sayfa karti ayri olculur (asagida)
 	olc(dil, "gun sonu")
+	# Baba'nin Defteri: gun sonunda bulunan her yeni sayfanin karti (TAMAM dugmesi yarim saniye sonra gelir)
+	var tarif_g: Dictionary = game.tarif_system.f_durum()
+	for tf in game.j_TARIF:
+		tarif_g.bulunan = [str(tf.id)]; tarif_g.yeni = [str(tf.id)]
+		game.j_TARIFP["kart_id"] = ""
+		for k in game.j_UPG: G.up[k.id] = 0.0
+		olc(dil, "gun sonu yeni sayfa %s" % tf.id, 40)
+		for k in game.j_UPG: G.up[k.id] = float(k.lv.size())
+		game.j_TARIFP["kart_id"] = ""
+		olc(dil, "gun sonu yeni sayfa %s (tam ekipman)" % tf.id, 40)
+	tarif_g.bulunan = []; tarif_g.yeni = []
+	for k in game.j_UPG: G.up[k.id] = 0.0
 	# gece: hirsiz caldi / calamadi, guvenlik seviyeleri
 	for caldi in [true, false]:
 		for guvenlik in 4:

@@ -62,7 +62,7 @@ func f_hitST(key: Variant = null) -> Variant:
 func can_manual_cut() -> bool:
 	if j_G == null or j_G.scene != "play" or suspended or overlay_open: return false
 	if J.truth(j_G.get("hand")) or J.truth(j_G.get("drag")) or j_G.crate.open or J.truth(debug_draw.f_testPanelOpen()): return false
-	for panel in [j_CUSTOM, j_PAYP, j_BRP, j_SESP, j_STATS, j_BSP]:
+	for panel in [j_CUSTOM, j_PAYP, j_BRP, j_SESP, j_STATS, j_BSP, j_TARIFP]:
 		if panel.get("open", false): return false
 	return j_G.shave is Dictionary
 
@@ -373,6 +373,8 @@ func _input(event: InputEvent) -> void:
 var gunici_t := 0.0
 
 func advance(delta: float) -> void:
+	# Baba'nin Defteri yalniz dukkanda acik kalabilir: sahne degisince (gun baslar, gun biter, mola) kapanir
+	if j_TARIFP != null and j_TARIFP.open and j_G != null and j_G.scene != "shop": j_TARIFP.open = false
 	if stations != null:
 		stations.refresh()
 		stations.tick(delta)
