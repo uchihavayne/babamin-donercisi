@@ -35,6 +35,7 @@ Aşağıdaki yollar `scripts/` klasörüne göredir.
 | Para toplama ve para animasyonunun güncellemesi | `systems/payment_system.gd` |
 | Hava, rakip, aile giderleri, lider ve denetim | `systems/events/`: `weather_system`, `rival_system`, `household_system`, `leader_system`, `regulation_system` |
 | Rakip bahislerinin hedefi (son 3 gün ortalaması) | `systems/events/rival_system.gd`: `BAHIS_KAT`, `f_bahisHedefi`, `f_bahisGunuKaydet`, `f_bahisTuruSec`; gün sonu çağrısı `session_system.f_endDay` |
+| Baba'nın Defteri (kayıp tarifler) | veri `data/tarif.gd`; `systems/events/tarif_system.gd` (`f_sayfaBul`, `f_siparisKarisitir`, `f_odul`, `f_menuBonusu`, `f_yukle`); ekran `rendering/ui/tarif_draw.gd` (`f_drawDefter`, `f_drawYeniSayfa`, `f_dugme`, `f_yildiz`); durum `G.tarif`, panel `j_TARIFP` |
 | Çöp, kedi, elektrik kesintisi ve gece olayı | `systems/event_system.gd` |
 | Çöp kutusu davranışı (boşalt / ürünü at) | `systems/event_system.gd`: `cop_eylemi`, `f_trashClick`, `f_dropOnTrash`, `f_discardBoard`; sürükleme: `orders/drag_system.gd`, `device_input.gd`; kumanda: `station_actions.gd` |
 | Başarım açma ve koşulları | `systems/achievement_system.gd`, `achievement_conditions.gd` |

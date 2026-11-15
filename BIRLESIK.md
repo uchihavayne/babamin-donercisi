@@ -304,3 +304,30 @@ Kullanıcı: "görsel anlamda yetersiz; fritöze patates atıyorsun, patates her
 
 Açık: HD açıkken uçan patatesin (çuvaldan tahtaya) düz bir disk gibi görünmesi ve "fritöze koy"un anlık geçmesi (animasyonsuz) — akıcılık işi; görsel dil seçimi (iki örnek yön) kullanıcıya danışılmak üzere.
 
+### Kayıp tarifler — "Baba'nın Defteri" (kullanıcı kararı: "kayıp tarifler olsun, sadece")
+
+"Bir dürüm daha yetişir mi" döngüsüne uzun vadeli bir hedef: babanın defterinin kayıp sayfaları. Her sayfa, müşterinin **adıyla** istediği bir sipariş şablonudur (sos × istenmeyen malzeme × ek ürün). Yeni bir makine ya da tuş yok; mevcut hazırlık akışı aynen çalışır, yalnız doğru yapılınca daha çok ödenir.
+
+| # | Tarif | Bulunduğu gün (gün sonu) | Gereken geliştirme | Çarpan | Menü bonusu |
+| --- | --- | --- | --- | --- | --- |
+| 1 | Baba'nın Acılısı | 3 | Sos Standı | ×1,6 | — |
+| 2 | Annenin Sarımsaklısı | 8 | Sos Standı | ×1,6 | — |
+| 3 | Turşusuz Sade | 14 | Malzeme Seçimi | ×1,7 | — |
+| 4 | Yoğurtsuz Acı | 21 | Sos + Malzeme Seçimi | ×1,8 | — |
+| 5 | Hafif Dürüm (sarımsaklı, patatessiz) | 30 | Sos + Malzeme Seçimi | ×1,8 | — |
+| 6 | Efsane Menü (dürüm + patates porsiyon + ayran) | 42 | Sos + Patates Porsiyon + Ayran Kazanı | ×1,5 | +%20 |
+| 7 | Çifte Sade (turşusuz + yoğurtsuz) | 56 | Sos + Malzeme Seçimi 2 | ×2,0 | — |
+| 8 | Gece Menüsü (dürüm + porsiyon + ayran + tatlı) | 72 | Sos + Porsiyon + Ayran + Tatlı Tepsisi | ×1,6 | +%25 |
+
+- **Bulma:** `session_system.f_endDay` → `tarif_system.f_sayfaBul`. Gün sonu ekranında "Yeni sayfa bulundu!" kartı çıkar; **TAMAM'a basılana kadar "DÜKKÂNA GİT" yok**. Eski kayıtla açılan oyun atlanan sayfaları ilk gün sonunda sırayla (kart ardına kart) alır.
+- **Sipariş:** `recipe_system.f_makeOrder` sonunda `tarif_system.f_siparisKarisitir`: bulunmuş **ve ekipmanı olan** tariflerden biri, normal müşterinin dürümünü %14 olasılıkla adıyla ister (iskender tabağı olan ilk kalemde karışmaz). Menü tarifinde rastgele eklemeler yerine tarifin kendi kalemleri gelir. Ekipmanı olmayan tarif hiç istenmez ve bu durumda rastgele sayı **tüketilmez** (eski akışlar, testler, referans görüntüler değişmez). Balonda ve hazırlık şeridinde altın yıldız, kumanda etiketinde tarif adı.
+- **Ödül:** doğru sos + doğru malzeme + tam kalite teslimde dürüm fiyatı × çarpan (`customer_system.f_deliver` → `tarif_system.f_odul`). Her tarifin kendi servis sayacı vardır: **5 / 15 / 40 serviste usta seviyesi, her seviye +%10**. Menü tarifleri tüm sipariş **kızdırmadan** bitince toplama bonus verir (`f_payCustomer`). Eksik / yanlış teslimde prim yok, mevcut indirim ve kızma kuralları aynen; evsiz misafir tarif istemez.
+- **Arayüz:** dükkân çubuğunda (para yazısı ile BORÇ ÖDE arası) defter simgesi; ilk sayfa bulunana kadar yok, okunmamış sayfa varken kırmızı "!" . Panel: 8 sekme (numara + usta yıldızları, kilit), seçili sayfada ad, kalemler, Baba'nın notu, "Hazır / Gerekli: …", fiyat, servis, usta çubuğu; kilitli sayfada "Bulunacağı gün: N". Geri tuşu / kumanda paneli kapatır.
+- **Kayıt:** `G.tarif = {bulunan, yeni, gorulen, servis}` ilerleme kaydında ve gün içi anlık görüntüde. Yükleme `tarif_system.f_yukle` ile ayıklanır: bilinmeyen / tekrarlı kimlik, bozuk tür, eksi sayaç atılır; eski kayıtta alan yoksa boş defter.
+- **Veri:** `data/tarif.gd` (kimlik değişmez; gün, çarpan, gerekenler düzenlenebilir). **Kod:** `systems/events/tarif_system.gd`, `rendering/ui/tarif_draw.gd`. **Çeviri:** 8 ad + 8 not + 14 arayüz metni × 5 sözlük (30 girdi).
+- **Test:** `tests/tarif.gd` (veri, sayfa bulma, ekipman, sipariş dağılımı, eşleşme, fiyat / usta / menü bonusu, kayıt-yükleme-bozuk kayıt, düğme / panel / kart tıklama akışı; kasıtlı bozmalarla doğrulandı); `tests/yazi_tasma.gd` defteri ve yeni sayfa kartını 6 dilde ölçer; ekran görüntüsü senaryoları: `tools/ekran_senaryo.gd --senaryo defter | yeni_sayfa | dukkan_defter | tarif_balon`.
+- **Doğrulama:** tam test seti 41/41; usta bot: doğal ilerleme 14 gün (sayfalar 3 / 8 / 14. gün sonunda geldi, ilk tarifli sipariş Sos alınınca 13. günde, 5 servis) ve geç oyun 45-52. gün tam geliştirmeli (23 tarif servisi) — ikisinde de `IHLAL {}`, betik hatası yok; kaos turu defter paneli ve yeni sayfa kartını rastgele durumlara sokar.
+- **Elle deneme (Windows, `Oyna.cmd`):** oyunda **T** (geliştirici paneli) → HEPSİ MAX → **GÜN +1** ile 3. güne gel → **GÜN BİT**: gün sonunda ilk sayfa kartı çıkar. Daha çok sayfa için GÜN +1'e basarak 8 / 14 / 21 … günlerine ilerle.
+- **Sahne kuralı:** defter yalnız dükkânda açık kalabilir (`platform_game.advance`): gün sonuna / güne / mola geçilirse kapanır; geri tuşu da kapatır.
+- **Ekonomi:** sipariş başına gelir ~%9-12 artar (hepsi bulunmuş, ustalıksız); tüm tarifler usta olunca ~%13-20. Ayrıntı: [ECONOMY.md](ECONOMY.md).
+

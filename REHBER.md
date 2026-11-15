@@ -38,6 +38,7 @@ Oyun nesnesine her yerden `game.<modül>.<fonksiyon>` ile erişilir (örn. `game
 | Yeni görünür yazı | Kodda Türkçe yaz + **5 sözlüğe ekle** (bölüm 7) |
 | Kayıt alanı eklemek | `systems/save_system.gd` (`f_saveAll`, `f_loadAndGo`) + `session_system.f_resetProgress` |
 | Gün içi kayıt (mobilde uygulama kapanırsa) | `systems/save_system.gd` (`gunici_*`, `GUNICI_ARALIK`, `GUNICI_ATLA`) |
+| Baba'nın Defteri (kayıp tarifler: sayfa bulma, sipariş, prim, usta) | veri: `data/tarif.gd`; mantık: `systems/events/tarif_system.gd`; ekran: `rendering/ui/tarif_draw.gd`; kancalar: `recipe_system.f_makeOrder`, `customer_system.f_deliver` / `f_payCustomer`, `session_system.f_endDay`, `shop_draw`, `day_end_draw`, `order_draw` |
 | Rakip bahisleri (hedef, ödül, süzgeç) | `systems/events/rival_system.gd` (`BAHIS_KAT`, `f_bahisHedefi`, `f_bahisGunuKaydet`), ödül: `progression_system.f_bahisPara` |
 | Çöp kutusu / ürün atma | `systems/event_system.gd` (`cop_eylemi`, `f_trashClick`, `f_dropOnTrash`), kumanda: `station_actions.gd` ("discard") |
 | Telefon / pencere / dokunma | `platform_shell.gd`, `device_input.gd`, `station_actions.gd` |
@@ -69,6 +70,7 @@ Kural: **bir hata bulursan önce onu yakalayan bir test (ya da mevcut teste kont
 | `stations`, `counter_input`, `ingredient_input`, `bread_preparation`, `akilli_hedef`, `tek_tik`, `fare_akisi` | Tezgâhta nesne seçimi, malzeme ekleme, öğretici yolu |
 | `economy`, `tempo` | Fiyat ve ilerleme dengesi |
 | `kapanis`, `kapanis_sira` | Oyun sonu hikâyesi; gün sonu ve kapıdaki sıra kuralları |
+| `tarif` | Baba'nın Defteri: sayfa bulma, ekipman, sipariş dağılımı, fiyat / usta / menü bonusu, kayıt, düğme-panel-kart akışı |
 | `bahis_input`, `bahis_hedef`, `dev_panel` | Bahis paneli girdisi, bahis hedefleri (son 3 gün ortalaması), geliştirici paneli |
 | `cop_kutusu` | Çöp kutusu: dokunmak boşaltır, sürükleyip bırakmak / basılı tutmak ürünü atar (fare, dokunma, kumanda) |
 | `fritoz_katman` | Eski (HD kapalı) fritöz çiziminde patates çubukları yağ penceresinin dışına taşmaz; F2 yalnız debug'da; HD durum etiketi |

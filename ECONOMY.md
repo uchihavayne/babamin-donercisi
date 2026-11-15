@@ -165,3 +165,18 @@ Uzun vade (`tests/tempo.gd`): borç bitişi en ucuzdan alan 107 / 93 / 84 → 98
 ## Rakip bahisleri (11. tur, kullanıcı kararı)
 
 10. günden itibaren rakip bahis önerir; kabul etmek serbest. Hedef artık gün sayısına değil, **oyuncunun son 3 gündeki ortalamasının %110'una** bağlıdır (dürüm / kasaya giren para / bahşiş); böylece bahis geç oyunda bedava para, erken oyunda ulaşılmaz olmaz. Kazanç ve ceza değişmedi: `200 + 34·gün` ($10'a yuvarlı). En düşük hedefler 4 dürüm, $100, $10 bahşiş. Geçmişi olmayan oyunda (yeni oyun / eski kayıt) eski formüller (`6 + 0,22·gün` dürüm, `160 + 26·gün` $, `30 + 6·gün` bahşiş) geçerli. Test: `tests/bahis_hedef.gd`.
+
+## Baba'nın Defteri — kayıp tarifler (12. tur, kullanıcı kararı)
+
+Bulunmuş ve ekipmanı olan tarifler normal müşterinin dürümünü **%14** olasılıkla adıyla ister (iskender tabağı varken ilk kalem tabak olunca karışmaz: ~%10,5). Doğru sos + doğru malzeme + tam kalite teslimde dürüm fiyatı tarifin çarpanıyla (×1,5 – ×2,0) çarpılır; her tarifin 5 / 15 / 40. servisinde usta seviyesi gelir (+%10 / seviye); menü tarifleri tüm sipariş kızdırmadan bitince toplama +%20 / +%25 ekler. Bahşiş toplam üzerinden hesaplandığı için aynı oranda artar.
+
+Sipariş başına ortalama gelir (30 000 sipariş, aynı rastgele akış; hepsi bulunmuş, tam ekipman — `tests` dışı tek seferlik ölçüm):
+
+| Durum | Tarifsiz | Tarifli, usta 0 | Tarifli, hepsi usta 3 |
+| --- | --- | --- | --- |
+| Tam ekipman, iskendersiz | $50,91 | $56,73 (**+%11,4**) | $59,71 (+%17,3) |
+| Tam ekipman + iskender | $50,87 | $55,18 (+%8,5) | $57,40 (+%12,9) |
+| Yalnız Sos + Malzeme Seçimi 2 | $37,25 | $41,67 (+%11,9) | $44,55 (+%19,6) |
+
+Yorum: artış, tarif sayfaları gün 3 – 72 arasında açıldığı ve usta seviyesi tarif başına 40 doğru servis gerektirdiği için kademelidir; erken oyunda (yalnız Acılı / Sarımsaklı) etki küçük, tam kadroda ~%9-12'dir. Prim yalnız **kusursuz** teslimde alınır; yanlış sos, eksik malzeme ya da kızgın müşteri primi sıfırlar ve ek hazırlık / dikkat ister (sert kural yumuşatılmadı). Ayar noktaları: `data/tarif.gd` (`carpan`, `menu`, `gun`), `tarif_system.gd` (`SANS`, `USTA_ESIK`, `USTA_ARTIS`).
+

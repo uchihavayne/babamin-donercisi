@@ -21,6 +21,8 @@ Güncellemeleri almak için klasörde `git pull`.
 
 **Kaybolduysan önce:** [REHBER.md](REHBER.md) (ne nerede, nasıl test edilir, yayın listesi).
 
+**Yeni (12. tur): Baba'nın Defteri** — 8 kayıp tarif sayfası gün sonlarında bulunur; müşteriler tarifleri adıyla ister (altın yıldız), kusursuz yapınca prim ve usta seviyesi verir. Ayrıntı: [BIRLESIK.md](BIRLESIK.md).
+
 **Belgeler:** [BIRLESIK.md](BIRLESIK.md) (bu sürümde neler değişti, turlar), [ECONOMY.md](ECONOMY.md) (fiyatlar, tempo), [CODE_MAP.md](CODE_MAP.md) (hangi kod nerede), [PLATFORMLAR.md](PLATFORMLAR.md) (dışa aktarma).
 
 **Testler:** `GODOT=/godot/yolu sh tests/hepsi.sh` (tüm testler), `sh tests/kontrol.sh` (betik ayrıştırma). Oyunu insan hızında oynayan bot: `godot --headless --path . --script tests/usta_bot.gd -- --test --gun 12`.
