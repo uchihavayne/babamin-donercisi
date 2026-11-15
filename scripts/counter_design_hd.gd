@@ -140,10 +140,14 @@ func f_drawFryer(x: Variant = null, y: Variant = null, w: Variant = null, h: Var
 	var A := _t2()
 	hd_ciz(A, "fritoz_govde", x, y)
 	if state.state != "idle":
+		# patatesler yalniz yag penceresinin icinde (kirpilir); bkz. counter_design.f_drawFryer
+		j_ctx.save()
+		j_ctx.beginPath(); j_ctx.rect(x + 8, y + 13, w - 16, h - 26); j_ctx.clip()
 		for i in 14:
-			var px: float = x + 10 + fmod(i * 7.0, w - 22)
+			var px: float = x + 13 + fmod(i * 7.0, w - 26)
 			var py: float = y + 15 + fmod(i * 3.0, maxf(1, h - 31))
 			f_fryStick(px, py, 1.0, float(i), 1.0)
+		j_ctx.restore()
 	if state.state == "fry":
 		# kabarcik: yarim piksel, yukselip sonen parlak nokta
 		for i in 5:

@@ -28,6 +28,10 @@ var _sis_mat: ShaderMaterial
 # platform_game._input bunu ilk is cagirir (super zinciri yok); true = tuketildi
 func hd_tus(event: InputEvent) -> bool:
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F2:
+		# BIRLESIK (12. tur): yayin surumunde oyuncu yanlislikla eski cizime dusmesin; F2 yalniz
+		# gelistirme (debug) derlemesinde. Eski cizimde patatesler fritozun onune biniyordu ve
+		# oyun "yetersiz gorunuyor" izlenimi veriyordu.
+		if not OS.is_debug_build(): return false
 		hd_acik = not hd_acik
 		print("REMAKE gorseller: ", "ACIK" if hd_acik else "KAPALI (eski cizim)")
 		return true
@@ -95,6 +99,14 @@ func hd_ciz(A: Dictionary, ad: String, x: float, y: float, alpha: float = 1.0, a
 
 func hd_gpu() -> bool:
 	return hd_acik and draw_context is GpuCanvas
+
+# Gelistirme (debug) derlemesinde ekrana basilir: HD cizim neden kapali? Bos metin = HD tam acik.
+# ("oyun kotu gorunuyor" derken sessizce eski cizime dusulmus olmasin diye)
+func hd_durum_metni() -> String:
+	if not hd_acik: return "ESKİ ÇİZİM · F2: yeni çizim"
+	if not (draw_context is GpuCanvas): return "HD KAPALI: GPU tuvali yok"
+	if get("counter_design_enabled") and atlas("tezgah2").is_empty(): return "HD KAPALI: dokular yüklenemedi"
+	return ""
 
 # Hata ayiklama: HD_KAPALI=patates,et ortam degiskeniyle tek tek kancalar kapanir
 var _hd_kapali: PackedStringArray = OS.get_environment("HD_KAPALI").split(",", false)

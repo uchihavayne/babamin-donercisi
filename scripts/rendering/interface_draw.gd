@@ -171,7 +171,18 @@ func f_drawDevDugme(p_t: Variant = null) -> Variant:
 	J.setv(game.j_ctx, "globalAlpha", 1.0)
 	game.f_rrectOut(J.getv(v_k, 0.0), J.getv(v_k, 1.0), J.getv(v_k, 2.0), J.getv(v_k, 3.0), 2.0, (J.getv(game.j_P, "au0") if J.truth(J.getv(game.j_G, "test")) else "#6a7078"))
 	game.text_draw.f_txt("DEV", J.add(J.getv(v_k, 0.0), (float(J.getv(v_k, 2.0)) / float(2.0))), J.add(J.getv(v_k, 1.0), 3.0), ("#ffffff" if J.truth(J.getv(game.j_G, "test")) else "#c8ccd0"), {"align": "c"})
+	hd_uyari()
 	return null
+
+# BIRLESIK (12. tur, yalniz gelistirme derlemesi): HD cizim kapaliysa ust ortada kirmizi etiket.
+func hd_uyari() -> void:
+	var m: String = game.hd_durum_metni()
+	if m == "": return
+	var w: float = float(game.f_textW(m)) + 10.0
+	var x0: float = floorf(float(game.j_W) / 2.0 - w / 2.0)
+	game.f_rrect(x0, 1.0, w, 11.0, 2.0, "#b02a22")
+	game.f_rrectOut(x0, 1.0, w, 11.0, 2.0, "#ffb4a8")
+	game.text_draw.f_txt(m, float(game.j_W) / 2.0, 3.0, "#ffffff", {"align": "c"})
 
 # ui.js:1729
 func f_devDugmeTik(p_mx: Variant = null, p_my: Variant = null) -> Variant:

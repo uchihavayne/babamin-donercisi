@@ -71,6 +71,7 @@ Kural: **bir hata bulursan önce onu yakalayan bir test (ya da mevcut teste kont
 | `kapanis`, `kapanis_sira` | Oyun sonu hikâyesi; gün sonu ve kapıdaki sıra kuralları |
 | `bahis_input`, `bahis_hedef`, `dev_panel` | Bahis paneli girdisi, bahis hedefleri (son 3 gün ortalaması), geliştirici paneli |
 | `cop_kutusu` | Çöp kutusu: dokunmak boşaltır, sürükleyip bırakmak / basılı tutmak ürünü atar (fare, dokunma, kumanda) |
+| `fritoz_katman` | Eski (HD kapalı) fritöz çiziminde patates çubukları yağ penceresinin dışına taşmaz; F2 yalnız debug'da; HD durum etiketi |
 | `gun_ici_kayit` | Mobilde uygulama kapanırsa devam eden günün kalınan yerden açılması |
 | `platform_input`, `runtime_state`, `module_services`, `regression` | Cihaz girdisi, durum/kayıt, modüller |
 | `module_snapshot` | 5 sahnenin **piksel + durum + kayıt** referansı (bölüm 7) |
@@ -106,6 +107,7 @@ godot --path . --resolution 960x540 --script tools/ekran_senaryo.gd -- --test --
 - Bir sahne `scene` alanıyla yönetilir (`title`, `intro`, `play`, `pause`, `dayend`, `shop`, `night`); yeni pencere ekliyorsan `platform_game.gd` içindeki pencere listelerine (`j_CUSTOM, j_PAYP, …`) ve `device_input.gd` hedef bağlamına eklemeyi unutma.
 - Piksel yazı genişliği dile göre çok değişir (Almanca ~%30 uzun). Etiketle değer yan yanaysa `maxw` ver.
 - Yeni bir **oyun durumu alanı** (`G.alan`) eklersen: ilerleme kaydı için `f_saveAll` + `f_loadAndGo` + `f_resetProgress` üçünü de güncelle. Gün içi anlık görüntü `G`'nin tamamını (`GUNICI_ATLA` hariç) yazar, orada ek iş gerekmez; ama `G`'ye düz sayı/yazı/dizi/sözlük dışında bir değer (Callable, Vector2…) koyarsan anlık görüntü yazılamaz — `gun_ici_kayit` testi bunu yakalar; alanı düz veriyle tut ya da `GUNICI_ATLA`'ya ekle.
+- **İki çizim kipi var:** HD (varsayılan; Blender atlasları + shader) ve "eski çizim" (piksel). Eski çizim yalnız karşılaştırma içindir; **F2 yalnız debug derlemesinde** çalışır. Oyun eski çizimde kalmışsa debug derlemesinde ekranın üst ortasında kırmızı etiket ("ESKİ ÇİZİM · F2", "HD KAPALI: dokular yüklenemedi") görünür. "Oyun kötü görünüyor" şikâyetinde önce bunu kontrol et.
 - Godot 4.7; `.godot/` klasörü git'e girmez. İlk açılışta içe aktarma ~30 sn sürer.
 
 ## 9. Yayın kontrol listesi (mobil → Steam)

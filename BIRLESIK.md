@@ -291,3 +291,15 @@ Kullanıcının yönü: oyun **cozy olmayacak** — biraz zorlayıcı, süreye k
 
 1. Bot hızında hiç müşteri kaçmıyor (sabır dişsiz): "bir dürüm daha yetişir mi" gerilimi şimdilik süreden ve sıra sınırından geliyor; sabır / yoğunluk ayarı gerçek oyuncuyla denenmeli. (Bahsin "müşteri kaçırırsın" türü de bu yüzden yalnız müşteri kaçmış oyuncuya çıkar.)
 2. Tek tahta + dolu ızgara sıkışması: tahtadaki dürüm patates beklerken pişen dürüm alınamıyor, bekledikçe yanıyor; insan sarıp takas edebilir, kural olarak bırakıldı.
+
+## On ikinci tur (2026-11-15): görsel geri bildirimi
+
+Kullanıcı: "görsel anlamda yetersiz; fritöze patates atıyorsun, patates her şeyin layer olarak önünde kalıyor; smooth güzel bir oyun değil." Gönderdiği ekran görüntüsü 1. günü **HD kapalı (eski çizim)** kipinde gösteriyordu (gri fritöz, çizgili döner, gürültülü duvar); benim görüntülerim HD açıktı ve 22. gündü, bu yüzden "aynı oyun değil" dedi.
+
+| Bulgu | Düzeltme |
+| --- | --- |
+| Eski çizimde (HD kapalı) kızaran/pişmiş patates çubukları yağ penceresinin dışına taşıp fritözün çerçevesini ve kapağını ortuyordu (`counter_design.f_drawFryer`) | Çubuklar yalnız yağ penceresinin içine kırpılır (`j_ctx.clip`); aynı kırpma HD tezgâhın yedek yoluna da eklendi. `tests/fritoz_katman.gd` eski kodda 42 taşan piksel yakalar |
+| Oyuncu F2 ile (ya da bir arızayla) sessizce eski çizime düşebiliyordu | F2 yalnız debug derlemesinde; debug'da HD kapalıyken üst ortada kırmızı etiket nedenini yazar (`remake_gorsel.hd_durum_metni`, `interface_draw.hd_uyari`) |
+
+Açık: HD açıkken uçan patatesin (çuvaldan tahtaya) düz bir disk gibi görünmesi ve "fritöze koy"un anlık geçmesi (animasyonsuz) — akıcılık işi; görsel dil seçimi (iki örnek yön) kullanıcıya danışılmak üzere.
+

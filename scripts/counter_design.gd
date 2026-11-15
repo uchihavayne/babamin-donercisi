@@ -210,11 +210,17 @@ func f_drawFryer(x: Variant = null,y: Variant = null,w: Variant = null,h: Varian
 		f_hl(x+7,y+row,w-14,"#ada782")
 	for col in range(8,int(w)-7,5):
 		f_vl(x+col,y+12,h-25,"#b5b7a2")
+	# BIRLESIK (12. tur, kullanici: "fritoze patates atiyorsun, patates her seyin layer olarak
+	# onunde kaliyor"): cubuklar eskiden kirpilmadan cizilirdi; sepetin cercevesini, ust kapagini
+	# ve govdeyi ortuyordu. Simdi yalniz yag penceresinin ICINDE cizilir (kirpilir).
 	if state.state != "idle":
+		j_ctx.save()
+		j_ctx.beginPath(); j_ctx.rect(x+8,y+13,w-16,h-26); j_ctx.clip()
 		for i in 14:
-			var px: float=x+10+fmod(i*7.0,w-22)
+			var px: float=x+13+fmod(i*7.0,w-26)
 			var py: float=y+15+fmod(i*3.0,maxf(1,h-31))
 			f_fryStick(px,py,1.0,float(i),1.0)
+		j_ctx.restore()
 	if state.state == "fry":
 		for i in 5: f_px(x+12+i*6,y+15+fmod(float(time)*12+i*5,9),"#f6dc80")
 	f_fr(x+w/2-2,y+5,4,12,"#343d40")
