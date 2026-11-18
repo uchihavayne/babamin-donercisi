@@ -309,6 +309,19 @@ func f_drawPlay(p_t: Variant = null) -> Variant:
 			game.f_ell(_v["fx"], _v["fy"], _v["rx"], _v["ry"], "#b98b46")
 			game.f_ell((_v["fx"] - 1.0), (_v["fy"] - 1.0), _v["rx"] - 2.0, _v["ry"] - 2.0, "#d8ab63")
 			game.f_px(J.add(_v["fx"], cos(_v["fa"]) * 2.0), J.add(_v["fy"], sin(_v["fa"]) * 1.5), "#6d4d24")
+	# fritoze koyma: ham cubuklar tahtadan sepete ucar (HD: cig_cubuk sprite'lari donerek; eski cizim: piksel cubuklar)
+	if J.truth(J.getv(game.j_G, "flyF")):
+		_v["ff"] = J.getv(game.j_G, "flyF")
+		if not J.truth(game.f_hdUcanCubuk(_v["ff"])):
+			for i in mini(10, 3 + int(J.n(J.getv(_v["ff"], "n"))) * 2):
+				var ph: float = game.f_hash1(i * 3.7)
+				var ki: float = clampf((float(J.getv(_v["ff"], "t")) - ph * 0.18) / 0.82, 0.0, 1.0)
+				var es: float = ki * ki * (3.0 - 2.0 * ki)
+				var cx: float = lerpf(float(J.getv(_v["ff"], "x0")), float(J.getv(_v["ff"], "x1")), es) + (float(i % 4) - 1.5) * 1.8 * (1.0 - ki) + sin(ki * PI) * 8.0
+				var cy: float = lerpf(float(J.getv(_v["ff"], "y0")), float(J.getv(_v["ff"], "y1")), es) - sin(ki * PI) * (10.0 + ph * 8.0)
+				J.setv(game.j_ctx, "globalAlpha", 1.0 - clampf((ki - 0.92) / 0.08, 0.0, 1.0))
+				game.ingredient_pixels.f_fryBar(floor(cx), floor(cy), 7.0, sin(ph * TAU + ki * (5.0 + ph * 4.0) * (1.0 if i % 2 == 0 else -1.0)) * 1.6, 0.2, "#fff6d0", "#f2e0a8", "#dcc681", "#e8d59a")
+			J.setv(game.j_ctx, "globalAlpha", 1.0)
 	game.phone_draw.f_drawCourier(_cells["t"][0])
 	game.phone_draw.f_drawMotoBadge(_cells["t"][0])
 	if J.gt(J.getv(game.j_G, "luckMsg"), 0.0):

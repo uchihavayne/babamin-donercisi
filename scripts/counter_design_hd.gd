@@ -139,10 +139,11 @@ func f_drawFryer(x: Variant = null, y: Variant = null, w: Variant = null, h: Var
 	if f_hdFritoz(x, y, w, h, state, time): return null
 	var A := _t2()
 	hd_ciz(A, "fritoz_govde", x, y)
-	if state.state != "idle":
+	if state.state != "idle" and j_G.get("flyF") == null:   # cubuklar ucuyorsa sepette henuz yok
 		# patatesler yalniz yag penceresinin icinde (kirpilir); bkz. counter_design.f_drawFryer
 		j_ctx.save()
 		j_ctx.beginPath(); j_ctx.rect(x + 8, y + 13, w - 16, h - 26); j_ctx.clip()
+		j_ctx.globalAlpha = 1.0 - 0.9 * clampf(J.n(state.get("gir", 0.0)), 0.0, 1.0)   # inisten hemen sonra belirginlesir
 		for i in 14:
 			var px: float = x + 13 + fmod(i * 7.0, w - 26)
 			var py: float = y + 15 + fmod(i * 3.0, maxf(1, h - 31))

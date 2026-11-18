@@ -213,9 +213,10 @@ func f_drawFryer(x: Variant = null,y: Variant = null,w: Variant = null,h: Varian
 	# BIRLESIK (12. tur, kullanici: "fritoze patates atiyorsun, patates her seyin layer olarak
 	# onunde kaliyor"): cubuklar eskiden kirpilmadan cizilirdi; sepetin cercevesini, ust kapagini
 	# ve govdeyi ortuyordu. Simdi yalniz yag penceresinin ICINDE cizilir (kirpilir).
-	if state.state != "idle":
+	if state.state != "idle" and j_G.get("flyF") == null:   # cubuklar ucuyorsa sepette henuz yok
 		j_ctx.save()
 		j_ctx.beginPath(); j_ctx.rect(x+8,y+13,w-16,h-26); j_ctx.clip()
+		j_ctx.globalAlpha = 1.0 - 0.9 * clampf(J.n(state.get("gir", 0.0)), 0.0, 1.0)   # inisten hemen sonra belirginlesir
 		for i in 14:
 			var px: float=x+13+fmod(i*7.0,w-26)
 			var py: float=y+15+fmod(i*3.0,maxf(1,h-31))

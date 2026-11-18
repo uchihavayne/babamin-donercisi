@@ -103,6 +103,7 @@ func f_startDay() -> Variant:
 	J.setv(game.j_G, "flyIng", [])
 	J.setv(game.j_G, "flyMeat", [])
 	J.setv(game.j_G, "flyP", null)
+	J.setv(game.j_G, "flyF", null)
 	game.phone_system.f_phoneReset()
 	game.weather_system.f_rollWeather()
 	J.setv(game.j_G, "trash", 0.0)

@@ -163,7 +163,7 @@ func f_drawFryer(p_x: Variant = null, p_y: Variant = null, p_w: Variant = null, 
 		game.f_hl(v_bskX, v_bskY, v_bskW, "#e2e8ee")
 		game.f_vl(v_bskX, v_bskY, v_bskH, "#b9c2ca")
 		game.f_vl((J.add(v_bskX, v_bskW) - 1.0), v_bskY, v_bskH, "#8e97a0")
-		if J.gt(J.getv(v_F, "load"), 0.0):
+		if J.gt(J.getv(v_F, "load"), 0.0) and game.j_G.get("flyF") == null:   # cubuklar ucuyorsa sepette henuz yok
 			v_golden = (J.eq(J.getv(v_F, "state"), "done") if J.eq(J.getv(v_F, "state"), "done") else J.gt(J.getv(v_F, "prog"), 0.6))
 			v_fcol = ([J.getv(game.j_P, "p0"), J.getv(game.j_P, "p1"), J.getv(game.j_P, "p2")] if J.truth(v_golden) else ["#f5e3b0", "#e8d59a", "#cbb87e"])
 			v_kont = ("#5a3f10" if J.truth(v_golden) else "#8d7c52")

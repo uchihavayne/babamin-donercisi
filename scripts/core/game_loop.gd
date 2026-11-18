@@ -148,6 +148,14 @@ func f_updatePlay(p_dt: Variant = null) -> Variant:
 			game.effects.f_burst(game.potato_system.f_inisNoktasi().x, game.potato_system.f_inisNoktasi().y + 5.0, 4.0, ["#efe2b4", "#d7c48c"], {"spMax": 26.0, "up": 5.0, "sz": 1.0})
 			J.setv(game.j_G, "flyP", null)
 			J.method(game.j_SFX, "drop", [])
+	# fritoze koyma ucusu (akicilik cilasi): cubuklar sepete inince sicrama + cizirti; kizartma zamani etkilenmez
+	if J.gt(J.getv(J.getv(game.j_G, "fryer"), "gir"), 0.0):
+		J.setv(J.getv(game.j_G, "fryer"), "gir", max(0.0, (J.n(J.getv(J.getv(game.j_G, "fryer"), "gir")) - (float(v_dt) / float(0.14)))))
+	if J.truth(J.getv(game.j_G, "flyF")):
+		J.setv(J.getv(game.j_G, "flyF"), "t", J.add(J.getv(J.getv(game.j_G, "flyF"), "t"), (float(v_dt) / float(game.potato_system.FRITOZ_UCUS))))
+		if J.ge(J.getv(J.getv(game.j_G, "flyF"), "t"), 1.0):
+			game.potato_system.f_fritozInis()
+			J.setv(game.j_G, "flyF", null)
 	if (not J.truth(v_dragged)):
 		game.gameplay_input.f_handleInput()
 	game.wrap_system.f_actTakip()

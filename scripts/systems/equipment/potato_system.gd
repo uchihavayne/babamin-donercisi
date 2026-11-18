@@ -9,6 +9,34 @@ func f_inisNoktasi() -> Vector2:
 	if game.hd_ucan_acik(): return Vector2(float(c.x) + 17.0, float(c.y) + 19.0)
 	return Vector2(float(c.x) + float(c.w) / 2.0, float(c.y) + float(c.h) / 2.0)
 
+# ---------------------------------------------------------------- fritoze koyma ucusu
+# Kullanici: "fritoze koy gecisi anlik". MANTIK AYNEN: f_fryerClick cubuklari alir, kizartma t=0'da baslar.
+# Yalniz GORUNTU: ham cubuklar tahtadan sepete FRITOZ_UCUS sn ucar; inene kadar sepette patates gorunmez
+# (G.flyF dolu); inince yag sicrar ve cizirdar. Oyun zamani / dengesi degismez.
+const FRITOZ_UCUS := 0.30
+
+# cubuklarin kalktigi nokta (tahtadaki ham yigin) ve sepet agzi; HD ile eski cizim biraz farkli yerlestirir
+func f_cubukBaslangic() -> Vector2:
+	var c: Dictionary = game.j_ST.cut
+	if game.hd_ucan_acik(): return Vector2(float(c.x) + 40.0, float(c.y) + 20.0)   # HD: tahtanin sagindaki cig_cubuk yigini
+	return Vector2(float(c.x) + 20.0, float(c.y) + 22.0)                           # eski cizim: tahtaya serpili cubuklar
+
+func f_sepetNoktasi() -> Vector2:
+	var f: Dictionary = game.j_ST.fryer
+	if game.hd_ucan_acik(): return Vector2(float(f.x) + float(f.w) / 2.0, float(f.y) + 15.0)
+	return Vector2(float(f.x) + float(f.w) / 2.0, float(f.y) + 20.0)
+
+# sepete inis: yag sicramasi (sabit desen: rastgele sayi tuketmez) + cizirti
+func f_fritozInis() -> void:
+	var b: Vector2 = f_sepetNoktasi()
+	for i in 9:
+		var a: float = -PI / 2.0 + (float(i) - 4.0) * 0.28
+		var hiz: float = 26.0 + float((i * 7) % 5) * 7.0
+		game.effects.f_part({"x": b.x + (float(i) - 4.0) * 1.6, "y": b.y, "vx": cos(a) * hiz * 0.7, "vy": sin(a) * hiz - 14.0,
+			"life": 0.55, "col": "#ffe9a3" if i % 2 == 0 else "#e6c463", "g": 120.0, "sz": 1.0})
+	J.setv(game.j_G.fryer, "gir", 1.0)   # sepetteki patates 0.14 sn'de belirginlesir (ani "pat" diye belirmesin)
+	J.method(game.j_SFX, "sizzle", [])
+
 # game.js:1556
 func f_potatoTake() -> Variant:
 	if (J.truth(J.getv(J.getv(game.j_G, "cut"), "potato")) or J.truth(J.getv(game.j_G, "flyP"))):
@@ -137,6 +165,9 @@ func f_fryerClick() -> Variant:
 	J.setv(v_f, "load", v_n)
 	J.setv(v_f, "prog", 0.0)
 	J.method(game.j_SFX, "basket", [])
+	var b0: Vector2 = f_cubukBaslangic()
+	var b1: Vector2 = f_sepetNoktasi()
+	J.setv(game.j_G, "flyF", {"t": 0.0, "n": v_n, "x0": b0.x, "y0": b0.y, "x1": b1.x, "y1": b1.y})
 	return null
 
 # game.js:1667

@@ -970,6 +970,7 @@ func f_hdFritoz(x: Variant, y: Variant, w: Variant, h: Variant, F: Variant, t: V
 	var yarim := float(int(vatW) >> 1)
 	var sepetler: Array = [[vatX + 3, yarim - 5], [vatX + yarim + 2, yarim - 5]] if fkd >= 3 else [[vatX + 4, vatW - 8]]
 	var load: float = J.n(J.getv(F, "load"))
+	if get("j_G").get("flyF") != null: load = 0.0   # cubuklar hala ucuyor: sepette patates inince gorunur
 	var bskX := 0.0
 	var bskW := 0.0
 	for s in sepetler:
@@ -986,6 +987,7 @@ func f_hdFritoz(x: Variant, y: Variant, w: Variant, h: Variant, F: Variant, t: V
 			var kont := "#5a3f10" if golden else "#8d7c52"
 			var adet := minf(16.0, 3.0 + load * 2.0)
 			var i2 := 0
+			draw_context.globalAlpha = 1.0 - 0.9 * clampf(J.n(J.getv(F, "gir")), 0.0, 1.0)   # inisten hemen sonra belirginlesir
 			while i2 < adet:
 				var yat := J.n(f_hash1(i2 * 9.1)) > .45
 				var fw := 6.0 if yat else 2.0
@@ -997,6 +999,7 @@ func f_hdFritoz(x: Variant, y: Variant, w: Variant, h: Variant, F: Variant, t: V
 				f_fr(fx, fy, fw - (1.0 if yat else 0.0), fh - (0.0 if yat else 1.0), fcol[1])
 				f_px(fx, fy, fcol[0])
 				i2 += 1
+			draw_context.globalAlpha = 1.0
 		if load > 0 and bskY + bskH < oilY and J.truth(_c("f_chance", .1)):
 			_c("f_part", {"x": bskX + J.n(_c("f_rnd", 2.0, bskW - 2)), "y": bskY + bskH, "vx": 0.0, "vy": J.n(_c("f_rnd", 4.0, 12.0)),
 				"life": .35, "col": "#c9a03a", "g": 90.0, "sz": 1.0})
@@ -4152,6 +4155,32 @@ func f_hdUcanPatates(fp: Variant) -> bool:
 		var aci := ucan_aci(kk)
 		var ol := ucan_olcek(kk)
 		ctx.texture_hd_donuk(TZ.tex, src, cx, cy, aci, ol, ol, 1.0 if iz == 0 else (0.22 if iz == 1 else 0.12))
+	return true
+
+# FRITOZE KOYMA UCUSU (kullanici: "fritoze koy gecisi anlik"): tahtadaki ham cubuklar (atlas "tezgah" cig_cubuk) bir
+# deste olarak yayla fritoz sepetine ucar: her cubuk biraz farkli zamanda kalkar (deste dagilir), donerek gider,
+# sepete yaklasirken birbirine toplanir ve solar. Sepette patates ancak inince gorunur (f_hdFritoz).
+func f_hdUcanCubuk(ff: Variant) -> bool:
+	if not hd("ucan_patates"): return false
+	var TZ := atlas("tezgah")
+	if TZ.is_empty() or not TZ.parca.has("cig_cubuk"): return false
+	var p: Array = TZ.parca["cig_cubuk"]
+	var src := Rect2(p[0], p[1], p[2], p[3])
+	var k: float = clampf(J.n(J.getv(ff, "t")), 0.0, 1.0)
+	var x0 := J.n(J.getv(ff, "x0"))
+	var y0 := J.n(J.getv(ff, "y0"))
+	var x1 := J.n(J.getv(ff, "x1"))
+	var y1 := J.n(J.getv(ff, "y1"))
+	var n := mini(10, 3 + int(J.n(J.getv(ff, "n"))) * 2)
+	for i in n:
+		var ph: float = J.n(f_hash1(i * 3.7))
+		var ki := clampf((k - ph * 0.18) / 0.82, 0.0, 1.0)
+		var es := ki * ki * (3.0 - 2.0 * ki)
+		var cx := lerpf(x0, x1, es) + (float(i % 4) - 1.5) * 1.8 * (1.0 - ki) + sin(ki * PI) * 8.0
+		var cy := lerpf(y0, y1, es) - sin(ki * PI) * (10.0 + ph * 8.0)
+		var aci := ph * TAU + ki * (5.0 + ph * 4.0) * (1.0 if i % 2 == 0 else -1.0)
+		var al := 1.0 - clampf((ki - 0.92) / 0.08, 0.0, 1.0)
+		if al > 0.0: draw_context.texture_hd_donuk(TZ.tex, src, cx, cy, aci, 1.4, 1.4, al)
 	return true
 
 # Hareketli karakter konumu: HD acik ve GPU tuvalinde yarim piksel (2x izgara)

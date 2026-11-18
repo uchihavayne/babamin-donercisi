@@ -291,6 +291,17 @@ func calis() -> void:
 				await adim(int(arg("--adim", "3")))
 				g.j_BSQ.kuyruk = []
 				await kaydet("_%02d" % i)
+		"fritoze_koy":
+			# ham cubuklar tahtadan fritoze: tikla -> --say goruntu, --adim kare araliginda (varsayilan 2 karede bir, 12 goruntu)
+			kur(12.0, false, -1, 0)
+			G.cut.potato = false; G.cut.raw = 3.0
+			g.j_BSQ.kuyruk = []
+			await adim(10)
+			g.potato_system.f_fryerClick()
+			for i in int(arg("--say", "12")):
+				await adim(int(arg("--adim", "2")))
+				g.j_BSQ.kuyruk = []
+				await kaydet("_%02d" % i)
 		"kalabalik":
 			# en yogun an: 5 musteri + sira + telefon fisi + kedi + rakip + mufettis
 			kur(25.0, true)
