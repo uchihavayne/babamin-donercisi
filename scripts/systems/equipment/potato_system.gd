@@ -1,6 +1,14 @@
 # Potato system. See CODE_MAP.md.
 extends "res://scripts/core/game_module.gd"
 
+# Patatesin tahtada OTURDUGU nokta (merkez, mantik pikseli). Ucus tam buraya iner, boylece inis aninda
+# statik cizime "sicrama" olmaz: HD'de sprite capasi (counter_design_hd.f_drawCutBoard: x+17, y+19), eski
+# cizimde elipsin merkezi (counter_design.f_drawCutBoard: x+w/2, y+h/2). (flyP.x1/y1 eski cizgi icin kalir.)
+func f_inisNoktasi() -> Vector2:
+	var c: Dictionary = game.j_ST.cut
+	if game.hd_ucan_acik(): return Vector2(float(c.x) + 17.0, float(c.y) + 19.0)
+	return Vector2(float(c.x) + float(c.w) / 2.0, float(c.y) + float(c.h) / 2.0)
+
 # game.js:1556
 func f_potatoTake() -> Variant:
 	if (J.truth(J.getv(J.getv(game.j_G, "cut"), "potato")) or J.truth(J.getv(game.j_G, "flyP"))):

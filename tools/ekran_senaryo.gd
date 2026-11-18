@@ -10,10 +10,12 @@
 #   --dil KOD        tr en de fr es pt
 #   --boyut GxY      pencere boyutu, orn. 1200x540 (20:9 telefon), 720x540 (4:3 tablet)
 #   --touch-preview  dokunmatik kip (telefon gibi)
+#   --eski 1         eski (HD kapali) cizim
 #   --cikti KLASOR   PNG'lerin yazilacagi klasor (varsayilan res://artifacts)
 # Senaryolar: kalabalik mufettis5 mufettis2 lider ferman hesap gunsonu dukkan subeler
 #   kisisel rekor borc ses_dukkan basarim ses rekor_baslik mola giris ogretici telefon
 #   gece_caldi son_saniye kapanis yardim ayarlar defter yeni_sayfa dukkan_defter tarif_balon
+#   patates_ucus fritoze_koy (akicilik: ucan patates / fritoze koyma kareleri; --adim N kare araligi, --say N goruntu)
 #   (defter: --sayfa 1-8, --gun N bulunan sayfalarin gunu; yeni_sayfa: --gun N, --sayfa 1-8, --kare N)
 # Linux'ta ekransiz sunucuda: xvfb-run -a -s "-screen 0 1280x720x24" godot --rendering-driver opengl3 ...
 extends SceneTree
@@ -83,6 +85,7 @@ func calis() -> void:
 	g = shell.game
 	g.j_MUTED = true
 	g.localization.f_setLang(arg("--dil", "tr"))
+	if arg("--eski") == "1": g.hd_acik = false   # eski (HD kapali) cizimi goster
 	klasor = arg("--cikti", "res://artifacts")
 	ad = arg("--senaryo", "bos")
 	G = g.j_G
@@ -277,6 +280,17 @@ func calis() -> void:
 			g.j_BSQ.kuyruk = []   # basarim bildirimi hazirlik seridini ortmesin
 			await adim(3)
 			await kaydet()
+		"patates_ucus":
+			# cuvaldan tahtaya ucan patates: --adim kare araliginda --say goruntu (varsayilan 3 karede bir, 10 goruntu)
+			kur(12.0, false, -1, 0)   # gelistirme yok: otomatik patates yok
+			G.cut.potato = false; G.cut.raw = 0.0
+			g.j_BSQ.kuyruk = []
+			await adim(10)
+			g.potato_system.f_potatoTake()
+			for i in int(arg("--say", "10")):
+				await adim(int(arg("--adim", "3")))
+				g.j_BSQ.kuyruk = []
+				await kaydet("_%02d" % i)
 		"kalabalik":
 			# en yogun an: 5 musteri + sira + telefon fisi + kedi + rakip + mufettis
 			kur(25.0, true)

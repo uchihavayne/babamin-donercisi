@@ -289,16 +289,26 @@ func f_drawPlay(p_t: Variant = null) -> Variant:
 		_v["fi2"] = J.add(_v["fi2"], 1.0)
 	if J.truth(J.getv(game.j_G, "flyP")):
 		_v["fp"] = J.getv(game.j_G, "flyP")
-		_v["k"] = J.getv(_v["fp"], "t")
-		_v["fx"] = game.math_utils.f_lerp(J.getv(_v["fp"], "x0"), J.getv(_v["fp"], "x1"), _v["k"])
-		_v["fy"] = (game.math_utils.f_lerp(J.getv(_v["fp"], "y0"), J.getv(_v["fp"], "y1"), _v["k"]) - (sin((_v["k"] * J.getv({"PI": PI}, "PI"))) * 26.0))
-		J.setv(game.j_ctx, "globalAlpha", 0.25)
-		game.f_ell(_v["fx"], J.add(J.getv(_v["fp"], "y1"), 4.0), 6.0, 2.0, "#000")
-		J.setv(game.j_ctx, "globalAlpha", 1.0)
-		game.f_ell(_v["fx"], J.add(_v["fy"], 1.0), 6.0, 4.0, "#8a6432")
-		game.f_ell(_v["fx"], _v["fy"], 6.0, 4.0, "#b98b46")
-		game.f_ell((_v["fx"] - 1.0), (_v["fy"] - 1.0), 4.0, 2.0, "#d8ab63")
-		game.f_px(J.add(_v["fx"], 2.0), _v["fy"], "#6d4d24")
+		# REMAKE kancasi: HD'de tahtadaki patatesin ayni parcasi donerek ucar (gercek patates, golgeli);
+		# HD kapaliyken ya da parca yokken eski piksel cizim (artik o da donerek ucar)
+		if not J.truth(game.f_hdUcanPatates(_v["fp"])):
+			_v["k"] = J.getv(_v["fp"], "t")
+			_v["ip"] = game.potato_system.f_inisNoktasi()   # tahtadaki patatesin oturdugu nokta (inis aninda sicrama olmasin)
+			_v["fx"] = game.math_utils.f_lerp(J.getv(_v["fp"], "x0"), _v["ip"].x, _v["k"])
+			_v["fy"] = (game.math_utils.f_lerp(J.getv(_v["fp"], "y0"), _v["ip"].y, _v["k"]) - (sin((_v["k"] * J.getv({"PI": PI}, "PI"))) * 26.0))
+			# yerdeki golge tahtaya yaklastikca buyur; dondukce elips yatik <-> dik doner (duz disk gibi gorunmesin)
+			_v["gk"] = float(_v["k"]) * float(_v["k"])
+			J.setv(game.j_ctx, "globalAlpha", 0.1 + 0.18 * _v["gk"])
+			game.f_ell(_v["fx"], J.add(_v["ip"].y, 4.0), 3.0 + 3.0 * _v["gk"], 1.0 + 1.0 * _v["gk"], "#000")
+			J.setv(game.j_ctx, "globalAlpha", 1.0)
+			_v["fa"] = -7.0 * pow(1.0 - float(_v["k"]), 1.5)
+			_v["cs"] = absf(cos(_v["fa"]))
+			_v["rx"] = 4.0 + 2.0 * _v["cs"]
+			_v["ry"] = 6.0 - 2.0 * _v["cs"]
+			game.f_ell(_v["fx"], J.add(_v["fy"], 1.0), _v["rx"], _v["ry"], "#8a6432")
+			game.f_ell(_v["fx"], _v["fy"], _v["rx"], _v["ry"], "#b98b46")
+			game.f_ell((_v["fx"] - 1.0), (_v["fy"] - 1.0), _v["rx"] - 2.0, _v["ry"] - 2.0, "#d8ab63")
+			game.f_px(J.add(_v["fx"], cos(_v["fa"]) * 2.0), J.add(_v["fy"], sin(_v["fa"]) * 1.5), "#6d4d24")
 	game.phone_draw.f_drawCourier(_cells["t"][0])
 	game.phone_draw.f_drawMotoBadge(_cells["t"][0])
 	if J.gt(J.getv(game.j_G, "luckMsg"), 0.0):

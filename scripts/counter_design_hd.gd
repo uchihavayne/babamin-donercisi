@@ -190,7 +190,17 @@ func f_drawCutBoard(x: Variant = null, y: Variant = null, w: Variant = null, h: 
 		var pw := clampi(int(maxf(2.0, floorf(11.0 * (1.0 - prog) + .5))), 2, 11)
 		var ax: float = x + 17.0
 		var ay: float = y + 19.0
-		hd_ciz(TZ, "patates_%d" % pw, ax, ay)
+		# inis ezilmesi (akicilik cilasi): patates tahtaya inince alt kenari sabit kalip kisaca ezilir, hafif yaylanir
+		var ln: float = clampf(J.n(state.get("land", 0.0)), 0.0, 1.0)
+		if ln > 0.0 and pw == 11 and TZ.parca.has("patates_11"):
+			var u := 1.0 - ln
+			var sy: float = 1.0 - 0.2 * exp(-5.0 * u) * cos(10.0 * u)
+			var pp: Array = TZ.parca["patates_11"]
+			var yuk: float = float(pp[3]) / float(TZ.hd)          # parca yuksekligi (mantik px)
+			var alt: float = ay + float(pp[5]) + yuk               # alt kenar (tahtada sabit)
+			hd_ciz(TZ, "patates_11", ax, (alt - yuk * sy) / sy - float(pp[5]), 1.0, false, Color.WHITE, sy)
+		else:
+			hd_ciz(TZ, "patates_%d" % pw, ax, ay)
 		var kesik: float = ax - 11.0 + 2.0 * pw
 		# dogranmis dilimler: kesik yuzun saginda, hafif egik dizilir
 		for i in int(floorf(prog * 7.0)):

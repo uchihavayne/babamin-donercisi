@@ -136,11 +136,16 @@ func f_updatePlay(p_dt: Variant = null) -> Variant:
 			if J.gt(J.getv(v_bw, "paperT"), 0.0):
 				J.setv(v_bw, "paperT", (J.getv(v_bw, "paperT") - (v_dt * 2.0)))
 		v_i = J.add(v_i, 1.0)
+	# akicilik cilasi: patates tahtaya inince hafif ezilip toparlanir (counter_design_hd.f_drawCutBoard)
+	if J.gt(J.getv(J.getv(game.j_G, "cut"), "land"), 0.0):
+		J.setv(J.getv(game.j_G, "cut"), "land", max(0.0, (J.n(J.getv(J.getv(game.j_G, "cut"), "land")) - (float(v_dt) / float(0.2)))))
 	if J.truth(J.getv(game.j_G, "flyP")):
 		J.setv(J.getv(game.j_G, "flyP"), "t", J.add(J.getv(J.getv(game.j_G, "flyP"), "t"), (float(v_dt) / float(0.38))))
 		if J.ge(J.getv(J.getv(game.j_G, "flyP"), "t"), 1.0):
 			J.setv(J.getv(game.j_G, "cut"), "potato", true)
 			J.setv(J.getv(game.j_G, "cut"), "prog", 0.0)
+			J.setv(J.getv(game.j_G, "cut"), "land", 1.0)
+			game.effects.f_burst(game.potato_system.f_inisNoktasi().x, game.potato_system.f_inisNoktasi().y + 5.0, 4.0, ["#efe2b4", "#d7c48c"], {"spMax": 26.0, "up": 5.0, "sz": 1.0})
 			J.setv(game.j_G, "flyP", null)
 			J.method(game.j_SFX, "drop", [])
 	if (not J.truth(v_dragged)):

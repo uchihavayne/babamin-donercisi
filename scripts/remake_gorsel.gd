@@ -4107,6 +4107,53 @@ func f_hdPsDraw(PS: Variant) -> bool:
 	return true
 
 
+# ---------------------------------------------------------------- ucan patates
+# Kullanici: "fritoze patates atiyorsun ... duz disk". HD'de cuvaldan tahtaya giden patates 6x4'luk
+# duz bir elipsti. Artik tahtadaki patatesin AYNI parcasi (atlas "tezgah" patates_11) donerek ucar:
+# yayin tepesinde biraz iri (kameraya yakin), iki silik iz, yerdeki golgesi tahtaya yaklastikca
+# buyur ve koyulasir. Inisinde (k = 1) aci 0 / olcek 1 / merkez = tahtadaki patatesin capasi:
+# statik cizime kayipsiz oturur (counter_design_hd.f_drawCutBoard).
+const UCAN_YAY := 26.0          # yay yuksekligi (mantik piksel; eski cizimle ayni)
+const UCAN_DONUS := -7.0        # baslangic acisi (rad); inise dogru 0'a yavaslar
+# k (0..1) -> dönüş açısı (rad, inişe doğru 0'a yavaşlar) ve boyut çarpanı (başta küçük, yayın tepesinde iri, inişte 1)
+static func ucan_aci(k: float) -> float:
+	return UCAN_DONUS * pow(1.0 - clampf(k, 0.0, 1.0), 1.5)
+
+static func ucan_olcek(k: float) -> float:
+	var kk := clampf(k, 0.0, 1.0)
+	return lerpf(0.78, 1.0, kk) + 0.14 * sin(kk * PI)
+
+func hd_ucan_acik() -> bool:   # guncelleme yolunda da (ctx donusumsuz) sorulabilir
+	return hd_gpu() and not _hd_kapali.has("ucan_patates")
+
+func f_hdUcanPatates(fp: Variant) -> bool:
+	if not hd("ucan_patates"): return false
+	var TZ := atlas("tezgah")
+	if TZ.is_empty() or not TZ.parca.has("patates_11"): return false
+	var p: Array = TZ.parca["patates_11"]
+	var src := Rect2(p[0], p[1], p[2], p[3])
+	var k: float = clampf(J.n(J.getv(fp, "t")), 0.0, 1.0)
+	var inis: Vector2 = _c("f_inisNoktasi")   # game.potato_system (taban sinifta dogrudan gorunmez)
+	var x1 := inis.x
+	var y1 := inis.y
+	var ctx = draw_context
+	# yerdeki golge: yukseldikce kuculur, tahtaya yaklasinca buyuyup koyulasir
+	var gk := k * k
+	ctx.globalAlpha = 0.08 + 0.2 * gk
+	f_ell(lerpf(J.n(J.getv(fp, "x0")), x1, k), y1 + 4.0, 3.0 + 4.0 * gk, 1.0 + 1.5 * gk, "#000")
+	ctx.globalAlpha = 1.0
+	# silik izler (daha eski konumlar), sonra asil parca
+	for iz in [2, 1, 0]:
+		var kk: float = k - 0.07 * iz
+		if kk < 0.0: continue
+		var yay := sin(kk * PI) * UCAN_YAY
+		var cx := lerpf(J.n(J.getv(fp, "x0")), x1, kk)
+		var cy := lerpf(J.n(J.getv(fp, "y0")), y1, kk) - yay
+		var aci := ucan_aci(kk)
+		var ol := ucan_olcek(kk)
+		ctx.texture_hd_donuk(TZ.tex, src, cx, cy, aci, ol, ol, 1.0 if iz == 0 else (0.22 if iz == 1 else 0.12))
+	return true
+
 # Hareketli karakter konumu: HD acik ve GPU tuvalinde yarim piksel (2x izgara)
 # adimla yuvarlanir -> nefes/salinim daha akici. Eski yolda tam piksel.
 func f_hdYarimPx(v: Variant) -> float:

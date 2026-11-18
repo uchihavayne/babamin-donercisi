@@ -663,6 +663,34 @@ func texture_hd_y(tex: Texture2D, src: Rect2, lx: float, ly: float, sy: float, a
 	if _kayitta: _kayit.append([1, tex.get_rid(), d, s, Color(renk.r, renk.g, renk.b, a), item_mat, tex])
 	stat_images += 1
 
+# DONEN / OLCEKLI HD DOKU (akicilik cilasi: ucan patates): parcanin MERKEZI (cx, cy)
+# mantik pikseli, aci radyan (saat yonu, ekran koordinati), sx / sy yerel eksen olcegi.
+# Dogrusal ornekleme (atlasta parcalar arasi 2 px bosluk var); yalniz ctx ofseti uygulanir.
+# Kaydedilen (baked) katmanlara girmez: yalniz hareketli nesneler icindir.
+func texture_hd_donuk(tex: Texture2D, src: Rect2, cx: float, cy: float, aci: float, sx: float = 1.0, sy: float = 1.0, alpha: float = 1.0, renk: Color = Color.WHITE) -> void:
+	var a: float = clampf(float(globalAlpha), 0, 1) * alpha
+	if a <= 0.0: return
+	var yw := src.size.x * 0.25 * sx   # HD piksel -> mantik piksel (x0.5) -> yarim genislik (x0.5)
+	var yh := src.size.y * 0.25 * sy
+	var c := cos(aci)
+	var s := sin(aci)
+	var m := Vector2(cx, cy) + transform.origin
+	var p := PackedVector2Array([
+		m + Vector2(-yw * c + yh * s, -yw * s - yh * c),
+		m + Vector2(yw * c + yh * s, yw * s - yh * c),
+		m + Vector2(yw * c - yh * s, yw * s + yh * c),
+		m + Vector2(-yw * c - yh * s, -yw * s + yh * c)])
+	var tw := float(tex.get_width())
+	var th := float(tex.get_height())
+	var uv := PackedVector2Array([
+		Vector2(src.position.x / tw, src.position.y / th), Vector2(src.end.x / tw, src.position.y / th),
+		Vector2(src.end.x / tw, src.end.y / th), Vector2(src.position.x / tw, src.end.y / th)])
+	var cl := Color(renk.r, renk.g, renk.b, a)
+	if item_mat != _varsayilan(): _segment(_varsayilan())
+	_flush()
+	RenderingServer.canvas_item_add_triangle_array(item, PackedInt32Array([0, 1, 2, 0, 2, 3]), p, PackedColorArray([cl, cl, cl, cl]), uv, PackedInt32Array(), PackedFloat32Array(), tex.get_rid())
+	stat_images += 1
+
 # MALZEMELI HD DOKU (remake): texture_hd ile ayni yerlesim, cizim bir
 # malzemeyle (ton shader'i) yapilir; renk modulate'den shader'a gider.
 func texture_hd_mat(tex: Texture2D, src: Rect2, lx: float, ly: float, mat: RID, renk: Color, alpha: float = 1.0, ayna: bool = false) -> void:
