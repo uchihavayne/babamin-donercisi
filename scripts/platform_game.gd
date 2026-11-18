@@ -373,6 +373,7 @@ func _input(event: InputEvent) -> void:
 var gunici_t := 0.0
 
 func advance(delta: float) -> void:
+	haptics.tick(delta)   # cok darbeli titresim desenleri (core/haptics.gd)
 	# Baba'nin Defteri yalniz dukkanda acik kalabilir: sahne degisince (gun baslar, gun biter, mola) kapanir
 	if j_TARIFP != null and j_TARIFP.open and j_G != null and j_G.scene != "shop": j_TARIFP.open = false
 	if stations != null:
@@ -424,6 +425,7 @@ func _notification(what: int) -> void:
 		NOTIFICATION_WM_CLOSE_REQUEST: f_appPause()
 
 func f_appPause() -> Variant:
+	haptics.sustur()   # arka plana giderken bekleyen titresimler iptal
 	if controls != null: controls.release_all()
 	# Preserve the original progression save schema; a suspended in-memory day
 	# stays paused. A terminated app reloads the last progression checkpoint.

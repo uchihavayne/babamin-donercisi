@@ -7,6 +7,7 @@ const MEAT_PER_CUT = preload("res://scripts/systems/equipment/cutting_system.gd"
 # Core
 var audio_cues = preload("res://scripts/core/audio_cues.gd").new(self)
 var effects = preload("res://scripts/core/effects.gd").new(self)
+var haptics = preload("res://scripts/core/haptics.gd").new(self)
 var game_loop = preload("res://scripts/core/game_loop.gd").new(self)
 var game_setup = preload("res://scripts/core/game_setup.gd").new(self)
 var localization = preload("res://scripts/core/localization.gd").new(self)

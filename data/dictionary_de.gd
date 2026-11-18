@@ -1202,4 +1202,6 @@ const VALUE = {
 	"Dürüm, patates, ayran: üçü gelirse bayram. — Baba": "Dürüm, Pommes, Ayran: alle drei, und es ist ein Fest. — Papa",
 	"Yalnız et ve sos. Ustalık ister, değer. — Baba": "Nur Fleisch und Soße. Es braucht Können, es lohnt sich. — Papa",
 	"Gece gelenin hakkı tatlıdır. Hepsi hazır olsun. — Baba": "Wer nachts kommt, hat Nachtisch verdient. Alles bereit! — Papa",
+	# Haptik / titresim ayari (birlesik surum, 12. tur)
+	"Titreşim (telefon ve oyun kolu)": "Vibration (Handy und Controller)",
 }

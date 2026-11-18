@@ -384,6 +384,15 @@ func show_settings() -> void:
 	safe.custom_minimum_size.y = 48 * ui_scale
 	safe.toggled.connect(func(value: bool) -> void: tv_margin = value; save_preferences(); update_layout())
 	modal_body.add_child(safe)
+	var haptik := CheckButton.new()
+	haptik.text = text("Titreşim (telefon ve oyun kolu)", "Vibration (phone and controller)")
+	haptik.button_pressed = game.haptics.acik
+	haptik.custom_minimum_size.y = 48 * ui_scale
+	haptik.toggled.connect(func(value: bool) -> void:
+		game.haptics.acik = value
+		if value: game.haptics.darbe("cash")   # acilinca algilanir bir deneme darbesi (cift vurus)
+		save_preferences())
+	modal_body.add_child(haptik)
 	var fps := OptionButton.new()
 	fps.add_item(text("60 FPS hedefi", "60 FPS target"), 60)
 	fps.add_item(text("30 FPS / daha az güç tüketimi", "30 FPS / lower power use"), 30)
@@ -441,6 +450,7 @@ func load_preferences() -> void:
 	var config := ConfigFile.new()
 	if config.load(settings_path) == OK:
 		game.stations.enabled = config.get_value("controls","stations",true)
+		game.haptics.acik = bool(config.get_value("controls", "haptics", true))
 		integer_scale = config.get_value("display", "integer_scale", false)
 		tv_margin = config.get_value("display", "tv_margin", false)
 		fps_limit = config.get_value("display", "fps_limit", 30 if mobile else 60)
@@ -452,6 +462,7 @@ func load_preferences() -> void:
 func save_preferences() -> void:
 	var config := ConfigFile.new()
 	config.set_value("controls","stations",game.stations.enabled)
+	config.set_value("controls", "haptics", game.haptics.acik)
 	config.set_value("display", "integer_scale", integer_scale)
 	config.set_value("display", "tv_margin", tv_margin)
 	config.set_value("display", "fps_limit", fps_limit)

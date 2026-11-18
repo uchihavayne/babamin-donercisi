@@ -39,6 +39,8 @@ Oyun nesnesine her yerden `game.<modül>.<fonksiyon>` ile erişilir (örn. `game
 | Kayıt alanı eklemek | `systems/save_system.gd` (`f_saveAll`, `f_loadAndGo`) + `session_system.f_resetProgress` |
 | Gün içi kayıt (mobilde uygulama kapanırsa) | `systems/save_system.gd` (`gunici_*`, `GUNICI_ARALIK`, `GUNICI_ATLA`) |
 | Baba'nın Defteri (kayıp tarifler: sayfa bulma, sipariş, prim, usta) | veri: `data/tarif.gd`; mantık: `systems/events/tarif_system.gd`; ekran: `rendering/ui/tarif_draw.gd`; kancalar: `recipe_system.f_makeOrder`, `customer_system.f_deliver` / `f_payCustomer`, `session_system.f_endDay`, `shop_draw`, `day_end_draw`, `order_draw` |
+| Uçan patates / "fritöze koy" animasyonu | çizim: `remake_gorsel.gd` (`f_hdUcanPatates`, `f_hdUcanCubuk`); mantık: `systems/equipment/potato_system.gd` (`FRITOZ_UCUS`, `f_fritozInis`, `f_inisNoktasi`), `core/game_loop.gd`; kanca adı `ucan_patates` (`HD_KAPALI` ile kapanır) |
+| Haptik (titreşim) | `core/haptics.gd` (`DESEN` tablosu: ses adı → titreşim deseni); ayar: `platform_shell.gd`; Android izni: `export_presets.cfg` |
 | Rakip bahisleri (hedef, ödül, süzgeç) | `systems/events/rival_system.gd` (`BAHIS_KAT`, `f_bahisHedefi`, `f_bahisGunuKaydet`), ödül: `progression_system.f_bahisPara` |
 | Çöp kutusu / ürün atma | `systems/event_system.gd` (`cop_eylemi`, `f_trashClick`, `f_dropOnTrash`), kumanda: `station_actions.gd` ("discard") |
 | Telefon / pencere / dokunma | `platform_shell.gd`, `device_input.gd`, `station_actions.gd` |
@@ -73,6 +75,8 @@ Kural: **bir hata bulursan önce onu yakalayan bir test (ya da mevcut teste kont
 | `tarif` | Baba'nın Defteri: sayfa bulma, ekipman, sipariş dağılımı, fiyat / usta / menü bonusu, kayıt, düğme-panel-kart akışı |
 | `bahis_input`, `bahis_hedef`, `dev_panel` | Bahis paneli girdisi, bahis hedefleri (son 3 gün ortalaması), geliştirici paneli |
 | `cop_kutusu` | Çöp kutusu: dokunmak boşaltır, sürükleyip bırakmak / basılı tutmak ürünü atar (fare, dokunma, kumanda) |
+| `ucan_patates`, `fritoze_koy` (+ `_visual`) | Uçan patates ve "fritöze koy" geçişi: mantık değişmez (süre, stok, kayıt), uçuş / iniş / belirginleşme pikselleri |
+| `haptik` | Titreşim: aygıt yokken sessiz, desen zamanlaması, hız sınırı, ayar kapalı, Android izni |
 | `fritoz_katman` | Eski (HD kapalı) fritöz çiziminde patates çubukları yağ penceresinin dışına taşmaz; F2 yalnız debug'da; HD durum etiketi |
 | `gun_ici_kayit` | Mobilde uygulama kapanırsa devam eden günün kalınan yerden açılması |
 | `platform_input`, `runtime_state`, `module_services`, `regression` | Cihaz girdisi, durum/kayıt, modüller |
