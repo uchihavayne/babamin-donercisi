@@ -1,6 +1,8 @@
 # Localization. See CODE_MAP.md.
 extends "res://scripts/core/game_module.gd"
 
+const WebOrtam = preload("res://scripts/web_ortam.gd")
+
 # i18n.js:4996
 func f_dilVar(p_k: Variant = null) -> Variant:
 	var v_i: Variant = null
@@ -74,6 +76,10 @@ func f_loadLang() -> Variant:
 	v_v = J.method(game.j_localStorage, "getItem", [game.j_LANGKEY])
 	if (J.truth(v_v) and J.truth(game.localization.f_dilVar(v_v))):
 		game.j_LANG = v_v
+	elif WebOrtam.web():
+		# tarayicida ilk acilis (kayitli secim yok): ?dil=xx ya da tarayici dili; kayitli secim her zaman onceliklidir
+		var v_web: String = WebOrtam.dil()
+		if v_web != "" and J.truth(game.localization.f_dilVar(v_web)): game.j_LANG = v_web
 	return null
 
 # i18n.js:5016

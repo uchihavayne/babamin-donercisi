@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="tr">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, viewport-fit=cover">
+		<meta name="theme-color" content="#100c0a">
+		<meta name="color-scheme" content="dark">
+		<meta name="mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+		<title>Babamın Dönercisi · My Father's Kebab Shop</title>
+		<style>
+/* Babamın Dönercisi, web kabuğu (özel HTML kabuğu: export_presets.cfg → Web → html/custom_html_shell).
+   Godot'un varsayılan beyaz açılış ekranı yerine oyunun renkleri ve Türkçe metinlerle; iframe içinde de aynı çalışır. */
+html, body, #canvas {
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+body {
+	color: #f3e6c8;
+	background-color: #100c0a;
+	overflow: hidden;
+	touch-action: none;
+	overscroll-behavior: none;
+	-webkit-user-select: none;
+	user-select: none;
+	-webkit-touch-callout: none;
+	-webkit-tap-highlight-color: transparent;
+	font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Courier New", monospace;
+}
+
+#canvas {
+	display: block;
+}
+
+#canvas:focus {
+	outline: none;
+}
+
+/* açılış ekranı */
+#durum {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: 14px;
+	padding: 0 24px;
+	text-align: center;
+	background: radial-gradient(ellipse at 50% 38%, #2a1b12 0%, #100c0a 72%);
+	z-index: 3;
+}
+
+#ad {
+	margin: 0;
+	font-size: clamp(26px, 7vw, 54px);
+	font-weight: 800;
+	letter-spacing: 0.1em;
+	color: #f6c744;
+	text-transform: uppercase;
+	text-shadow: 0 3px 0 #8c2a17, 0 0 24px rgba(216, 69, 44, 0.45);
+}
+
+#alt-ad {
+	margin: 0;
+	font-size: clamp(11px, 2.6vw, 16px);
+	letter-spacing: 0.32em;
+	color: #c9b48c;
+	text-transform: uppercase;
+}
+
+#cubuk {
+	width: min(62%, 420px);
+	height: 14px;
+	margin-top: 18px;
+	border: 2px solid #5a3b27;
+	border-radius: 3px;
+	background: #1c130d;
+	overflow: hidden;
+}
+
+#dolgu {
+	width: 0%;
+	height: 100%;
+	background: linear-gradient(#f08a3c, #d8452c);
+	transition: width 0.15s linear;
+}
+
+#yuzde {
+	margin: 0;
+	font-size: clamp(11px, 2.4vw, 14px);
+	letter-spacing: 0.12em;
+	color: #c9b48c;
+	min-height: 1.4em;
+}
+
+#ipucu {
+	margin: 0;
+	max-width: 30em;
+	font-size: clamp(10px, 2.2vw, 12px);
+	line-height: 1.5;
+	color: #8d7a5c;
+}
+
+#bildirim {
+	display: none;
+	max-width: 32em;
+	margin-top: 10px;
+	padding: 14px 18px;
+	border: 1px solid #9b3943;
+	border-radius: 8px;
+	background: #3a1d22;
+	color: #f1d9d9;
+	font-size: clamp(12px, 2.8vw, 15px);
+	line-height: 1.5;
+	user-select: text;
+	-webkit-user-select: text;
+}
+
+#durum.hata #cubuk, #durum.hata #yuzde, #durum.hata #ipucu {
+	display: none;
+}
+
+#durum.hata #bildirim {
+	display: block;
+}
+
+/* telefon dikeyken: yatay çevirme önerisi (kapatılabilir; oyun dikeyde de oynanır) */
+#yatay {
+	display: none;
+	position: absolute;
+	left: 12px;
+	right: 12px;
+	bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+	z-index: 2;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	padding: 10px 12px;
+	border: 1px solid #5a3b27;
+	border-radius: 8px;
+	background: rgba(16, 12, 10, 0.92);
+	font-size: 13px;
+	line-height: 1.35;
+}
+
+#yatay button {
+	flex: none;
+	padding: 8px 12px;
+	border: 0;
+	border-radius: 6px;
+	background: #d8452c;
+	color: #fff;
+	font: inherit;
+	font-weight: 700;
+	touch-action: manipulation;
+}
+
+@media (orientation: portrait) and (pointer: coarse) {
+	#yatay:not([hidden]) {
+		display: flex;
+	}
+}
+		</style>
+		$GODOT_HEAD_INCLUDE
+	</head>
+	<body>
+		<canvas id="canvas">
+			Tarayıcınız canvas desteklemiyor. · Your browser does not support the canvas tag.
+		</canvas>
+
+		<noscript>
+			Bu oyunu oynamak için JavaScript gerekli. · JavaScript is required to play this game.
+		</noscript>
+
+		<div id="durum" role="status" aria-live="polite">
+			<h1 id="ad">Babamın Dönercisi</h1>
+			<p id="alt-ad">My Father's Kebab Shop</p>
+			<div id="cubuk"><div id="dolgu"></div></div>
+			<p id="yuzde">…</p>
+			<p id="ipucu"></p>
+			<div id="bildirim"></div>
+		</div>
+
+		<div id="yatay" hidden>
+			<span id="yatay-metin"></span>
+			<button id="yatay-kapat" type="button"></button>
+		</div>
+
+		<script src="$GODOT_URL"></script>
+		<script>
+const GODOT_CONFIG = $GODOT_CONFIG;
+const GODOT_THREADS_ENABLED = $GODOT_THREADS_ENABLED;
+const engine = new Engine(GODOT_CONFIG);
+
+// kısa arayüz metinleri (oyunun 6 dili); dil: ?dil=xx adres parametresi, yoksa tarayıcı dili, yoksa İngilizce
+const METIN = {
+	tr: { ad: 'Babamın Dönercisi', alt: "My Father's Kebab Shop", yukleniyor: 'Yükleniyor…', ipucu: 'İlk açılış birkaç saniye sürebilir. Ses için sayfaya bir kez dokun ya da tıkla.', hata: 'Oyun başlatılamadı.', eksik: 'Tarayıcınız bu oyunu çalıştıramıyor. Eksik özellikler:', yatay: 'Daha rahat oynamak için telefonu yan çevir.', yatayKapat: 'Yine de oyna' },
+	en: { ad: "My Father's Kebab Shop", alt: 'Babamın Dönercisi', yukleniyor: 'Loading…', ipucu: 'The first launch can take a few seconds. Tap or click the page once to enable sound.', hata: 'The game could not start.', eksik: 'Your browser cannot run this game. Missing features:', yatay: 'Rotate your phone sideways for a better view.', yatayKapat: 'Play anyway' },
+	de: { ad: "My Father's Kebab Shop", alt: 'Babamın Dönercisi', yukleniyor: 'Wird geladen …', ipucu: 'Der erste Start kann einige Sekunden dauern. Tippe oder klicke einmal auf die Seite, um den Ton zu aktivieren.', hata: 'Das Spiel konnte nicht gestartet werden.', eksik: 'Dein Browser kann dieses Spiel nicht ausführen. Fehlende Funktionen:', yatay: 'Drehe dein Handy ins Querformat, dann spielt es sich besser.', yatayKapat: 'Trotzdem spielen' },
+	fr: { ad: "My Father's Kebab Shop", alt: 'Babamın Dönercisi', yukleniyor: 'Chargement…', ipucu: 'Le premier lancement peut prendre quelques secondes. Touchez ou cliquez une fois sur la page pour activer le son.', hata: "Le jeu n'a pas pu démarrer.", eksik: 'Votre navigateur ne peut pas exécuter ce jeu. Fonctionnalités manquantes :', yatay: 'Tournez votre téléphone à l’horizontale pour mieux jouer.', yatayKapat: 'Jouer quand même' },
+	es: { ad: "My Father's Kebab Shop", alt: 'Babamın Dönercisi', yukleniyor: 'Cargando…', ipucu: 'El primer inicio puede tardar unos segundos. Toca o haz clic una vez en la página para activar el sonido.', hata: 'No se pudo iniciar el juego.', eksik: 'Tu navegador no puede ejecutar este juego. Funciones que faltan:', yatay: 'Gira el teléfono en horizontal para jugar mejor.', yatayKapat: 'Jugar igualmente' },
+	pt: { ad: "My Father's Kebab Shop", alt: 'Babamın Dönercisi', yukleniyor: 'Carregando…', ipucu: 'A primeira abertura pode demorar alguns segundos. Toque ou clique uma vez na página para ativar o som.', hata: 'Não foi possível iniciar o jogo.', eksik: 'Seu navegador não consegue executar este jogo. Recursos que faltam:', yatay: 'Gire o celular na horizontal para jogar melhor.', yatayKapat: 'Jogar assim mesmo' },
+};
+const DIL = (function () {
+	let d = '';
+	try { d = new URLSearchParams(location.search).get('dil') || ''; } catch (e) { /* adres okunamadı */ }
+	if (!d) d = (navigator.languages && navigator.languages[0]) || navigator.language || 'en';
+	d = String(d).toLowerCase().slice(0, 2);
+	return METIN[d] ? d : 'en';
+}());
+const M = METIN[DIL];
+
+(function () {
+	document.documentElement.lang = DIL;
+	document.getElementById('ad').textContent = M.ad;
+	document.getElementById('alt-ad').textContent = M.alt;
+	document.getElementById('yuzde').textContent = M.yukleniyor;
+	document.getElementById('ipucu').textContent = M.ipucu;
+	document.getElementById('yatay-metin').textContent = M.yatay;
+	document.getElementById('yatay-kapat').textContent = M.yatayKapat;
+
+	const durum = document.getElementById('durum');
+	const dolgu = document.getElementById('dolgu');
+	const yuzde = document.getElementById('yuzde');
+	const bildirim = document.getElementById('bildirim');
+	const yatay = document.getElementById('yatay');
+
+	let baslangic = true;
+
+	// yatay çevirme önerisi: bu oturumda bir kez kapatılınca bir daha çıkmaz
+	let kapatildi = false;
+	try { kapatildi = sessionStorage.getItem('yatay-kapatildi') === '1'; } catch (e) { /* depolama kapalı olabilir (iframe / gizli sekme) */ }
+	if (!kapatildi) yatay.hidden = false;
+	document.getElementById('yatay-kapat').addEventListener('click', function () {
+		yatay.hidden = true;
+		try { sessionStorage.setItem('yatay-kapatildi', '1'); } catch (e) { /* önemsiz */ }
+	});
+
+	function ilerleme(simdiki, toplam) {
+		if (simdiki > 0 && toplam > 0) {
+			const oran = Math.max(0, Math.min(1, simdiki / toplam));
+			dolgu.style.width = (oran * 100).toFixed(1) + '%';
+			yuzde.textContent = M.yukleniyor + ' %' + Math.floor(oran * 100);
+		} else {
+			yuzde.textContent = M.yukleniyor;
+		}
+	}
+
+	function hata(err) {
+		console.error(err);
+		let metin;
+		if (err instanceof Error) metin = err.message;
+		else if (typeof err === 'string') metin = err;
+		else metin = String(err);
+		bildirim.textContent = '';
+		(M.hata + '\n' + metin).split('\n').forEach(function (satir, i) {
+			if (i > 0) bildirim.appendChild(document.createElement('br'));
+			bildirim.appendChild(document.createTextNode(satir));
+		});
+		durum.classList.add('hata');
+		baslangic = false;
+	}
+
+	const eksik = Engine.getMissingFeatures({ threads: GODOT_THREADS_ENABLED });
+	if (eksik.length !== 0) {
+		hata(M.eksik + '\n' + eksik.join('\n'));
+	} else {
+		engine.startGame({
+			'onProgress': ilerleme,
+		}).then(function () {
+			if (baslangic) { durum.remove(); baslangic = false; }
+		}, hata);
+	}
+}());
+		</script>
+	</body>
+</html>

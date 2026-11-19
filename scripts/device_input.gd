@@ -6,6 +6,7 @@ signal mode_changed(mode: String)
 signal help_requested
 
 const DEADZONE := 0.22
+const WebOrtam = preload("res://scripts/web_ortam.gd")
 var game: Node
 var mode := "mouse"
 var device := -1
@@ -35,7 +36,7 @@ var cut_return_position := Vector2.ZERO
 
 func _init(owner_game: Node) -> void:
 	game = owner_game
-	if OS.has_feature("mobile") or "--touch-preview" in OS.get_cmdline_user_args():
+	if OS.has_feature("mobile") or "--touch-preview" in OS.get_cmdline_user_args() or WebOrtam.dokunmatik():
 		set_mode("touch")
 	game.pointer(Vector2(240, 142))
 

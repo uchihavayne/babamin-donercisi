@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Babamın Dönercisi · gömme örneği</title>
+	<style>
+		:root { color-scheme: dark; }
+		body { margin: 0; background: #17110d; color: #eadfc8; font: 16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+		main { max-width: 980px; margin: 0 auto; padding: 24px 16px 48px; }
+		h1 { margin: 0 0 4px; font-size: 1.5rem; color: #f6c744; }
+		p.alt { margin: 0 0 18px; color: #bfa982; }
+		/* oyun 16:9'dur; kutu genişliğe uyar, yükseklik oranla gelir */
+		.kutu { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #100c0a; border: 2px solid #5a3b27; border-radius: 8px; overflow: hidden; }
+		.kutu iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
+		.araclar { display: flex; gap: 10px; margin: 12px 0 28px; flex-wrap: wrap; }
+		button { padding: 9px 14px; border: 0; border-radius: 6px; background: #d8452c; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+		button.ikincil { background: #3a2a1d; color: #eadfc8; }
+		h2 { font-size: 1.05rem; margin: 26px 0 8px; color: #f6c744; }
+		pre { margin: 0; padding: 14px; overflow-x: auto; background: #0e0a08; border: 1px solid #3a2a1d; border-radius: 6px; font: 13px/1.5 ui-monospace, Consolas, monospace; color: #d9ccb0; }
+		code { font-family: ui-monospace, Consolas, monospace; color: #f0b86e; }
+		li { margin: 4px 0; }
+	</style>
+</head>
+<body>
+<main>
+	<h1>Babamın Dönercisi</h1>
+	<p class="alt">My Father's Kebab Shop · tarayıcıda oynanır (HTML5 / WebAssembly)</p>
+
+	<!-- Gömme: oyunun klasörü (index.html) bir iframe ile sayfaya konur. src'yi kendi adresinle değiştir. -->
+	<div class="kutu">
+		<iframe id="oyun" src="index.html?dil=tr" title="Babamın Dönercisi" allow="fullscreen; autoplay; gamepad" loading="lazy"></iframe>
+	</div>
+	<div class="araclar">
+		<button type="button" id="tam-ekran">Tam ekran</button>
+		<button type="button" class="ikincil" id="yeniden">Oyunu yeniden yükle</button>
+	</div>
+
+	<h2>Kendi sayfana gömmek için</h2>
+	<pre>&lt;div style="position:relative; width:100%; max-width:960px; aspect-ratio:16/9"&gt;
+  &lt;iframe src="https://SENIN-ADRESIN/oyun/index.html?dil=tr"
+          title="Babamın Dönercisi"
+          allow="fullscreen; autoplay; gamepad"
+          style="position:absolute; inset:0; width:100%; height:100%; border:0"&gt;&lt;/iframe&gt;
+&lt;/div&gt;</pre>
+
+	<h2>Notlar</h2>
+	<ul>
+		<li><code>?dil=tr</code> ilk açılış dilini seçer (<code>tr, en, de, fr, es, pt</code>). Oyuncu oyunda dil seçtiyse onun seçimi geçerli olur; parametre yoksa tarayıcının dili kullanılır.</li>
+		<li><code>allow="fullscreen"</code> olmadan oyunun "Tam ekran" düğmesi iframe içinde çalışmaz. <code>autoplay</code> sesin ilk dokunuşta açılmasına, <code>gamepad</code> oyun koluna izin verir.</li>
+		<li>Sayfa <code>http://</code> ya da <code>https://</code> ile sunulmalı; dosyaya çift tıklayıp <code>file://</code> ile açılırsa tarayıcı oyunu yüklemez. Yerelde denemek için: <code>python web_sunucu.py</code> yazıp <code>http://127.0.0.1:8060/embed-ornek.html</code> adresini aç.</li>
+		<li>Kayıtlar (ilerleme, dil, ayarlar) tarayıcının IndexedDB'sinde, oyunun yayınlandığı adrese özel tutulur. Farklı adresten açılan kopya kendi kaydına sahiptir; tarayıcı verisi silinirse kayıt da gider.</li>
+		<li><code>sandbox</code> özelliği kullanırsan en az <code>allow-scripts allow-same-origin</code> ver.</li>
+	</ul>
+</main>
+<script>
+	var oyun = document.getElementById('oyun');
+	document.getElementById('tam-ekran').addEventListener('click', function () {
+		var kutu = oyun.parentElement;
+		if (kutu.requestFullscreen) kutu.requestFullscreen();
+	});
+	document.getElementById('yeniden').addEventListener('click', function () {
+		oyun.src = oyun.src;
+	});
+</script>
+</body>
+</html>

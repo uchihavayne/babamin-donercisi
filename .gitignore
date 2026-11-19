@@ -1,6 +1,7 @@
 # Godot imports and generated builds
 .godot/
-exports/
+exports/*
+!exports/.gdignore
 *.zip
 *.log
 

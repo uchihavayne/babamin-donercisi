@@ -1,6 +1,7 @@
 extends Control
 
 const Game = preload("res://scripts/platform_game.gd")
+const WebOrtam = preload("res://scripts/web_ortam.gd")
 const GAME_SIZE := Vector2(480, 270)
 # REMAKE: oyun 2x HD cizilir (960x540 alt gorunum); pencereye keskin-bilinear
 # shader ile basilir, kesirli olceklerde de pikseller esit kalir. Girdi
@@ -19,7 +20,7 @@ var name_entry: LineEdit
 var game_rect := Rect2()
 var safe_rect := Rect2()
 var ui_scale := 1.0
-var mobile := OS.has_feature("mobile") or "--touch-preview" in OS.get_cmdline_user_args()
+var mobile := OS.has_feature("mobile") or "--touch-preview" in OS.get_cmdline_user_args() or WebOrtam.dokunmatik()   # telefon TARAYICISI da mobil (web_ortam.gd)
 var integer_scale := false
 var tv_margin := false
 var fps_limit := 60

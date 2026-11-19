@@ -8,7 +8,7 @@
 - `platform_game.gd` → `order_flow.gd` → `counter_design.gd` → `game_sprites.gd` → `game.gd`: platform bağlantısı, mevcut GPU/sprite çizimi ve mevcut oyun kuralları. Oyun kodunu yeniden yazmak gerekmez.
 - `device_input.gd` ve `station_actions.gd`: tezgâhtaki görseller üzerinden doğrudan kullanım, nesne seçimi ve basılı tutma. Fareyle özgün sürükleme; özel alanlar için hassas imleç korunur. Büyük yazılı işlem paneli veya ekran altında kalıcı ipucu şeridi yoktur. Yardım ve ekran ayarları Mola menüsünden açılır; oyun alanı bu arayüzler için küçültülmez. Seçim sonrası kısa nesne ipucu 1,4 saniyede kaybolur.
 - `project.godot` içindeki **Input Map**: tuş atamaları editörden değiştirilebilir. Yerel arayüzün onay/geri tuşları da oyun koluna atanmıştır.
-- `export_presets.cfg`: Windows x86_64, macOS universal, Linux x86_64, Linux ARM64, Android ARM32/ARM64 ve iOS dışa aktarma profilleri.
+- `export_presets.cfg`: Windows x86_64, macOS universal, Linux x86_64, Linux ARM64, Android ARM32/ARM64, iOS ve **Web (HTML5)** dışa aktarma profilleri.
 
 Yeni tezgâhın bütün giriş yöntemleri aynı `j_ST` ölçülerini kullanır. Yerleşim 480×270 oyun alanında sabittir; ekran en-boy oranı nesneleri esnetmez. Yeni içecek/sos bölmeleri ve depo konumları hem nesne seçimine hem hassas imlece işlendi.
 
@@ -51,6 +51,26 @@ Malzemeye tek basış bir porsiyon ekler; basılı tutmak aynı tahtayı kapasit
 - **Titreşim (haptik):** her ses olayı kendi titreşim desenini de tetikler (`scripts/core/haptics.gd`). Telefon / tablette `Input.vibrate_handheld`, seçili oyun kolunda `Input.start_joy_vibration`; fare / klavyede hiçbir şey olmaz. Yağmur, motor, korna gibi ambiyans sesleri titretmez. Ayar: Mola → Yardım → Ekran ayarları → "Titreşim (telefon ve oyun kolu)" (varsayılan açık, `controls/haptics`). **Android'de `export_presets.cfg` profilinde `permissions/vibrate=true` şarttır** (yoksa titreşim sessizce çalışmaz; eklendi). iOS'ta ek izin gerekmez (iPad'de titreşim motoru olmadığından etkisizdir). Gerçek telefon, kol ve iPhone/iPad üzerinde denenmedi: darbe süreleri / genlikleri `DESEN` tablosundan cihazda ayarlanmalıdır.
 - `user://records.json` mevcut ilerlemeyi, `user://device_settings.cfg` ekran tercihlerini tutar. **Gün içi kayıt:** oyun sürerken her 12 saniyede, arka plana alırken ve ana menüye dönerken devam eden günün anlık görüntüsü aynı depoda ayrı bir anahtara (`doner_efsanesi_v1_gunici`) yazılır. Uygulama işletim sistemi tarafından kapatılırsa Devam Et günü molada, kalınan yerden açar; en çok son 12 saniyelik ilerleme kaybolur. Gün bitince, Yeni Oyun'da ve öğretici sürerken anlık görüntü yazılmaz/silinir; bozuk, başka güne ya da eski sürüme ait olan yok sayılır ve mevcut ilerleme kaydı yüklenir. Bulut kaydı veya cihazlar arasında kayıt eşitleme eklenmedi.
 
+## Web (tarayıcıda oynanır, iframe ile gömülür)
+
+Oyun tarayıcıda da çalışır (Godot Web, WebAssembly + WebGL 2). Çıktı bir klasördür; herhangi bir statik barındırmaya konur ve başka bir sayfaya `<iframe>` ile gömülür.
+
+```sh
+python tools/web_sablon_indir.py                      # yalnız web şablonları (~20 MB; editörün tam paketi ~1,3 GB)
+GODOT=/godot/yolu sh tools/web_derle.sh --zip         # exports/web + exports/babamin-donercisi-web.zip (14 MB)
+python tools/web_sunucu.py                            # yerelde dene: http://127.0.0.1:8060/ (file:// ile açılmaz)
+node tools/web_dene.js                                # gerçek tarayıcıda (Chromium) açılış / BAŞLA / konsol denemesi (Playwright gerekir)
+```
+
+- **Klasörün içi:** `index.html` (gömülecek sayfa), `index.js` + `index.wasm` (motor, 38 MB; sunucu gzip yaparsa ~10 MB) ve `index.pck` (oyun verisi, 5 MB), ses işleyicileri ve simgeler; ayrıca `embed-ornek.html` (iframe örneği), `OKU-BENI.txt` ve `web_sunucu.py`. İlk yükleme sıkıştırılmışsa ~15 MB, değilse ~45 MB.
+- **Neden iframe'e gömülebilir:** derleme **tek iş parçacıklı** (`variant/thread_support=false`): SharedArrayBuffer / COOP / COEP başlığı istemez, özel sunucu ayarı gerekmez. Çizim GL Compatibility → WebGL 2 (projenin zaten kullandığı yol). `tests/web_ortam.gd` bu ayarları kilitler.
+- **Gömme:** `<iframe src="…/index.html?dil=tr" allow="fullscreen; autoplay; gamepad" style="width:100%; aspect-ratio:16/9; border:0">`. `allow="fullscreen"` yoksa oyunun "Tam ekran" düğmesi iframe içinde çalışmaz; `sandbox` verilirse en az `allow-scripts allow-same-origin` gerekir.
+- **Özel kabuk** `web/kabuk.html`: Godot'un beyaz açılış ekranı yerine oyunun renklerinde, 6 dilde yükleme çubuğu; WebGL 2 yoksa nedenini yazar; telefon dikeyken "telefonu yan çevir" önerisi (kapatılabilir).
+- **Tarayıcıya özgü davranışlar** (`scripts/web_ortam.gd`; masaüstü ve yerel mobil derlemelerde hiçbir şey değişmez): telefon / tablet tarayıcısı (CSS `pointer: coarse`) dokunmatik ve mobil sayılır (dokunmatik kip, büyük düğmeler, 30 FPS hedefi); **ilk açılış dili** kayıtlı seçim → `?dil=xx` → tarayıcı dili → İngilizce sırasıyla belirlenir; sürekli kayıt (`user://`) tarayıcının IndexedDB'sine yazılır, adrese özeldir ve sayfa yenilenince kalır; ses ilk dokunuşta açılır (tarayıcı kuralı); titreşim yalnız Vibration API'yi destekleyen tarayıcılarda (Android Chrome) çalışır.
+- **Ölçüm** (`--olcum 300`: tam geliştirmeli dükkân, 3 müşteri; aynı sunucu CPU'su ve yazılımsal GL): web release 16,9 ms / kare, yerel debug 11,0 ms; yani web ~1,5× yavaş. Gerçek GPU'lu masaüstünde 60 FPS beklenir, telefonda uygulama 30 FPS hedefine iner.
+- **Doğrulandı** (masaüstü Chromium, yazılımsal WebGL 2): açılış ve HD çizim, BAŞLA → prolog → dükkân, dokunmatik telefon emülasyonu (yatay + dikey), farklı kökenli iframe, dil seçiminin sayfa yenilenince kalması (IndexedDB), ses bağlamının dokunuştan sonra çalışır duruma geçmesi, konsolda hata yok. **Doğrulanmadı:** gerçek telefon, iPhone Safari (bellek sınırı, titreşim yok), Firefox, Safari, gerçek GPU hızı, sesin kulakla duyulması, uzun oturum.
+- **Bilinen ayrıntılar:** açılışta Chromium "GPU stall due to ReadPixels" uyarısını birkaç kez yazar (sprite sayfaları yüklenirken; zararsız, yalnız yükleme anı). Telefon dikeyken oyun küçük görünür (yatay öneri çıkar). Oyunu güncelleyince eski dosyalar tarayıcı önbelleğinde kalabilir: yeni sürümü yeni klasöre koy.
+
 ## Dışa aktarma
 
 1. Projede kullanılan Godot sürümünün dışa aktarma şablonlarını **Editor → Manage Export Templates** üzerinden kur.
@@ -64,6 +84,7 @@ Malzemeye tek basış bir porsiyon ekler; basılı tutmak aynı tahtayı kapasit
 | Linux / ARM64 | `Linux`, `Linux ARM64` | İlgili şablon; GPU/sürücü ve ses testi |
 | Android | `Android` | Şablon, uyumlu JDK/Android SDK; yerel deneme APK. Play Store için Gradle/AAB ve kullanıcıya ait release keystore |
 | iPhone / iPad | `iOS` | Şablon, macOS/Xcode, Team ID ve provisioning. Profil Xcode projesi çıkarır; cihaz derleme ve imzası Xcode'da tamamlanır |
+| Web (HTML5) | `Web` | Web şablonları (`python tools/web_sablon_indir.py`), `sh tools/web_derle.sh --zip`; statik barındırma (HTTPS), iframe ile gömme. Bölüm: Web |
 | PS4 / PS5 | Ortak GDScript + kol altyapısı | Sony geliştirici onayı, yetkili Godot konsol portu, konsol SDK/export araçları ve devkit; platform servisleri ve sertifikasyon testleri |
 
 PS4/PS5 için sahte bir export profili eklenmedi. Godot'un standart açık kaynak dağıtımı konsol SDK'larını içermez. Sağlayıcının renderer, kayıt, kullanıcı hesabı, sistem klavyesi, trophy ve askıya alma gereksinimleri lisanslı port aşamasında uyarlanmalıdır. PC'de DualShock/DualSense kullanmak, konsol sürümü üretmekle aynı işlem değildir. [Godot konsol desteği](https://godotengine.org/consoles/).

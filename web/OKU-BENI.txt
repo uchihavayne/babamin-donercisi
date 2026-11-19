@@ -1,0 +1,52 @@
+BABAMIN DONERCISI - WEB (HTML5) SURUMU
+=====================================
+
+Bu klasor oyunun tarayicida calisan surumudur (Godot 4.7, WebAssembly + WebGL 2).
+Bir statik dosya sunucusuna oldugu gibi yukleyebilir ve baska bir sayfaya iframe ile gomebilirsin.
+
+ICINDEKILER
+  index.html                    Oyunun sayfasi (gomulecek olan bu)
+  index.js, index.wasm          Oyun motoru (yaklasik 38 MB; sunucu sikistirirsa ~10 MB iner)
+  index.pck                     Oyun verisi (yaklasik 5 MB)
+  index.audio*.js, index*.png   Ses isleyicisi ve simgeler
+  embed-ornek.html              Gomme ornegi (iframe + tam ekran dugmesi + notlar)
+  web_sunucu.py                 Yerelde denemek icin kucuk sunucu (Python 3 gerekir)
+
+YEREL DENEME
+  Tarayicilar dosyaya cift tiklayip (file://) acilan oyunu yuklemez; http ile sunmak gerekir:
+      python web_sunucu.py            (Mac / Linux: python3 web_sunucu.py)
+  sonra tarayicida   http://127.0.0.1:8060/index.html        (oyunun kendisi)
+                     http://127.0.0.1:8060/embed-ornek.html  (gomulu hali)
+  Durdurmak icin Ctrl+C. Python yoksa herhangi bir statik sunucu (npx serve, VS Code "Live Server" ...) calisir.
+
+YAYIN
+  Klasorun tamamini bir statik barindirmaya koy (kendi sunucun, GitHub Pages, Netlify, Cloudflare Pages, itch.io "HTML" yuklemesi ...).
+  - Ozel sunucu ayari gerekmez: bu derleme tek is parcacikli, SharedArrayBuffer / COOP / COEP basligi istemez.
+  - Sayfa HTTPS ile sunulmali (localhost haric); aksi halde tarayici bazi ozellikleri kapatir.
+  - .wasm dosyasi "application/wasm" turunde sunulmali (cogu sunucu bunu yapar).
+  - Sunucuda gzip / brotli acikse ilk yukleme ~15 MB'a iner; kapaliysa ~45 MB iner.
+  - Oyunu guncelleyince eski dosyalar tarayici onbelleginde kalabilir: yeni surumu yeni bir klasore koy ya da onbellegi temizle.
+  - itch.io: bu klasorun icindekileri (index.html kokte kalacak sekilde) ZIP'leyip "HTML" projesi olarak yukle,
+    "SharedArrayBuffer" secenegini ACMA, boyutu 960x540 yap.
+
+GOMME (IFRAME)
+  <iframe src="https://SENIN-ADRESIN/oyun/index.html?dil=tr" title="Babamin Donercisi"
+          allow="fullscreen; autoplay; gamepad" style="width:100%; aspect-ratio:16/9; border:0"></iframe>
+  - Oyun 16:9'dur; farkli oranda kutuya konursa kenarlarda bos alan kalir.
+  - ?dil=tr|en|de|fr|es|pt  ilk acilis dilini secer (oyuncunun kendi secimi her zaman onceliklidir).
+    Parametre yoksa tarayici dili kullanilir (desteklenmiyorsa Ingilizce).
+  - allow="fullscreen" olmadan oyunun "Tam ekran" dugmesi iframe icinde calismaz.
+  - iframe'e sandbox verirsen en az "allow-scripts allow-same-origin" ekle.
+
+KAYITLAR
+  Ilerleme, dil ve ayarlar tarayicinin IndexedDB'sinde, oyunun yayinlandigi adrese ozel saklanir.
+  Gizli sekme ya da "site verisini engelle" ayari kaydi kalici yapmaz; tarayici verisi silinirse kayit da gider.
+
+TELEFON
+  Telefon tarayicisi otomatik dokunmatik kipte acilir. Dikeyde oyun kucuk gorunur; sayfa "telefonu yan cevir" onerisi gosterir.
+  Titresim yalnizca Android Chrome gibi Vibration API'yi destekleyen tarayicilarda calisir (iPhone Safari desteklemez).
+
+BILINEN SINIRLAR
+  - WebGL 2 gerekir (2020 sonrasi tum yaygin tarayicilar). Yoksa sayfa nedenini yazar.
+  - Gercek telefon / iPhone Safari / dusuk donanimda performans dogrulanmadi; masaustu Chromium'da denendi.
+  - Oyun ici "Kare suresini goster" ayari (Mola > Ekran ayarlari) tarayicida da olcum verir.
