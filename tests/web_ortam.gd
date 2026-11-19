@@ -8,6 +8,7 @@
 #     canvas pencereyi doldurur, ozel kabuk web/kabuk.html
 #  5) kabuk: Godot'un gerektirdigi yer tutucular var, oyunun TUM dilleri icin yukleme metni var, ?dil= desteklenir
 #  6) gomme ornegi (web/embed-ornek.html) ve OKU-BENI.txt var; ornek iframe'i tam ekran / ses / kol izinleriyle gomer
+#  7) tek dosyalik surum: yukleyici (fetch / AudioWorklet yonlendirmesi) ve uretici (Python varsa kendi kendine sinama)
 #   godot --headless --path . --script tests/web_ortam.gd --quit-after 3000 -- --test
 extends SceneTree
 const WebOrtam = preload("res://scripts/web_ortam.gd")
@@ -81,7 +82,27 @@ func run() -> void:
 	check(ornek.contains("&lt;iframe") and ornek.contains("?dil=tr"), "sayfada kopyalanabilir iframe kodu ve ?dil= notu var")
 	check(oku("res://web/OKU-BENI.txt").contains("web_sunucu.py") and FileAccess.file_exists("res://tools/web_sunucu.py"), "OKU-BENI + yerel sunucu betigi var")
 	check(FileAccess.file_exists("res://tools/web_derle.sh") and FileAccess.file_exists("res://tools/web_sablon_indir.py") and FileAccess.file_exists("res://tools/web_dene.js"), "derleme / sablon / tarayici deneme araclari var")
+	# 7) TEK DOSYALIK surum (tools/web_tek_dosya.py): motor + oyun verisi gzip + base64 ile HTML'in icine gomulur
+	var yukleyici := oku("res://web/tek_dosya_yukleyici.js")
+	check(yukleyici != "", "web/tek_dosya_yukleyici.js okunur")
+	for parca in ["new DecompressionStream('gzip')", "'index.wasm'", "'index.pck'", "window.fetch = function", "AudioWorklet.prototype.addModule", "data:text/javascript;base64,", "getRegistration"]:
+		check(yukleyici.contains(parca), "yukleyicide var: " + parca)
+	check(not yukleyici.to_lower().contains("</script") and not yukleyici.contains("<!--"), "yukleyici satir ici gomulmeye guvenli (</script ve <!-- yok)")
+	check(kabuk.count("guvenli: '") == 6, "kabuk 'guvenli baglam' aciklamasini 6 dilde verir (%d)" % kabuk.count("guvenli: '"))
+	check(FileAccess.file_exists("res://exports/.gdignore"), "exports/.gdignore var (Godot disa aktarilan PNG'leri projeye ice aktarmasin)")
+	# uretici kendi kendine sinama (Python varsa): gomulu veri geri acilinca ayni, siralama, tekrarlanabilirlik, guvensiz girdi reddi
+	var py_sonuc := ""
+	var py_var := false
+	for py in ["python3", "python"]:
+		var cikis: Array = []
+		OS.execute(py, [ProjectSettings.globalize_path("res://tools/web_tek_dosya.py"), "--sina"], cikis, true)
+		py_sonuc = "".join(PackedStringArray(cikis))
+		if py_sonuc.contains("SINAMASI TAMAM") or py_sonuc.contains("Traceback") or py_sonuc.contains("Error"):
+			py_var = true
+			break
+	if py_var: check(py_sonuc.contains("TEK DOSYA SINAMASI TAMAM"), "tek dosya ureticisinin kendi kendine sinamasi: " + py_sonuc.left(300))
+	else: print("WEB ORTAM: Python bulunamadi, uretici sinamasi atlandi")
 	game.localization.f_setLang("tr")
 	for f in failures: push_error(f)
-	print("WEB ORTAM ", JSON.stringify({"failures": failures}))
+	print("WEB ORTAM ", JSON.stringify({"failures": failures, "uretici_sinamasi": py_var}))
 	game.free(); quit(0 if failures.is_empty() else 1)

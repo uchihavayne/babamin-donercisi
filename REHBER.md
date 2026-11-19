@@ -40,7 +40,7 @@ Oyun nesnesine her yerden `game.<modül>.<fonksiyon>` ile erişilir (örn. `game
 | Gün içi kayıt (mobilde uygulama kapanırsa) | `systems/save_system.gd` (`gunici_*`, `GUNICI_ARALIK`, `GUNICI_ATLA`) |
 | Baba'nın Defteri (kayıp tarifler: sayfa bulma, sipariş, prim, usta) | veri: `data/tarif.gd`; mantık: `systems/events/tarif_system.gd`; ekran: `rendering/ui/tarif_draw.gd`; kancalar: `recipe_system.f_makeOrder`, `customer_system.f_deliver` / `f_payCustomer`, `session_system.f_endDay`, `shop_draw`, `day_end_draw`, `order_draw` |
 | Uçan patates / "fritöze koy" animasyonu | çizim: `remake_gorsel.gd` (`f_hdUcanPatates`, `f_hdUcanCubuk`); mantık: `systems/equipment/potato_system.gd` (`FRITOZ_UCUS`, `f_fritozInis`, `f_inisNoktasi`), `core/game_loop.gd`; kanca adı `ucan_patates` (`HD_KAPALI` ile kapanır) |
-| Web (HTML5) sürümü | `web/kabuk.html` (özel HTML kabuğu), `web/embed-ornek.html`, `scripts/web_ortam.gd` (tarayıcı: dokunmatik / dil), `export_presets.cfg` (`Web` profili), araçlar: `tools/web_derle.sh`, `web_sablon_indir.py`, `web_sunucu.py`, `web_dene.js` |
+| Web (HTML5) sürümü | `web/kabuk.html` (özel HTML kabuğu), `web/embed-ornek.html`, `web/tek_dosya_yukleyici.js` (tek dosyalık sürüm), `scripts/web_ortam.gd` (tarayıcı: dokunmatik / dil), `export_presets.cfg` (`Web` profili), araçlar: `tools/web_derle.sh [--tek] [--zip]`, `web_tek_dosya.py`, `web_sablon_indir.py`, `web_sunucu.py`, `web_dene.js` |
 | Haptik (titreşim) | `core/haptics.gd` (`DESEN` tablosu: ses adı → titreşim deseni); ayar: `platform_shell.gd`; Android izni: `export_presets.cfg` |
 | Rakip bahisleri (hedef, ödül, süzgeç) | `systems/events/rival_system.gd` (`BAHIS_KAT`, `f_bahisHedefi`, `f_bahisGunuKaydet`), ödül: `progression_system.f_bahisPara` |
 | Çöp kutusu / ürün atma | `systems/event_system.gd` (`cop_eylemi`, `f_trashClick`, `f_dropOnTrash`), kumanda: `station_actions.gd` ("discard") |
@@ -77,7 +77,7 @@ Kural: **bir hata bulursan önce onu yakalayan bir test (ya da mevcut teste kont
 | `bahis_input`, `bahis_hedef`, `dev_panel` | Bahis paneli girdisi, bahis hedefleri (son 3 gün ortalaması), geliştirici paneli |
 | `cop_kutusu` | Çöp kutusu: dokunmak boşaltır, sürükleyip bırakmak / basılı tutmak ürünü atar (fare, dokunma, kumanda) |
 | `ucan_patates`, `fritoze_koy` (+ `_visual`) | Uçan patates ve "fritöze koy" geçişi: mantık değişmez (süre, stok, kayıt), uçuş / iniş / belirginleşme pikselleri |
-| `web_ortam` | Web sürümünün yapılandırması: tek iş parçacıklı Web profili, GL Compatibility, kabuk yer tutucuları ve 6 dil, gömme örneği; tarayıcı yardımcıları masaüstünde etkisiz |
+| `web_ortam` | Web sürümünün yapılandırması: tek iş parçacıklı Web profili, GL Compatibility, kabuk yer tutucuları ve 6 dil, gömme örneği, tek dosyalık sürümün yükleyicisi ve üreticisinin kendi kendine sınaması (Python varsa); tarayıcı yardımcıları masaüstünde etkisiz |
 | `haptik` | Titreşim: aygıt yokken sessiz, desen zamanlaması, hız sınırı, ayar kapalı, Android izni |
 | `fritoz_katman` | Eski (HD kapalı) fritöz çiziminde patates çubukları yağ penceresinin dışına taşmaz; F2 yalnız debug'da; HD durum etiketi |
 | `gun_ici_kayit` | Mobilde uygulama kapanırsa devam eden günün kalınan yerden açılması |
@@ -125,5 +125,5 @@ godot --path . --resolution 960x540 --script tools/ekran_senaryo.gd -- --test --
 3. **Android:** dışa aktarma şablonları + SDK + kendi imza anahtarın; Play Store için Gradle/AAB. Gerçek telefonda: kare süresi (Ayarlar → "Kare süresini göster"), pil, çentik, geri tuşu.
 4. **Steam:** Windows/Linux/macOS profilleri hazır. Steamworks (GodotSteam) bu pakette **yok**; başarım (64 adet) ve bulut kaydı sonradan bağlanır. Kol desteği ve 16:9 sığdırma hazır.
 5. **Gün içi kayıt:** uygulama işletim sistemi tarafından kapatılırsa gün molada, kalınan yerden geri gelir (anlık görüntü her 12 sn'de bir, arka plana alırken ve ana menüye dönerken yazılır; en çok son 12 sn kaybolur). Gerçek telefonda dene: oyunun ortasında uygulamayı kapat, yeniden aç, Devam Et.
-6. **Web:** `python tools/web_sablon_indir.py` + `GODOT=… sh tools/web_derle.sh --zip` → `exports/babamin-donercisi-web.zip`; yayından önce `node tools/web_dene.js` (gerçek tarayıcı denemesi). Ayrıntı: PLATFORMLAR.md → Web.
+6. **Web:** `python tools/web_sablon_indir.py` + `GODOT=… sh tools/web_derle.sh --tek --zip` → `exports/babamin-donercisi.html` (tek dosya) ve `exports/babamin-donercisi-web.zip`; yayından önce `node tools/web_dene.js` ve `node tools/web_dene.js exports/babamin-donercisi.html` (gerçek tarayıcı denemesi). Ayrıntı: PLATFORMLAR.md → Web.
 7. **Mağaza görselleri:** `tools/ekran_senaryo.gd` ile her dilde ekran görüntüsü al.

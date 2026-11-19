@@ -52,8 +52,8 @@ def main() -> int:
     ap.add_argument("--izole", action="store_true", help="COOP/COEP basliklarini ekle")
     a = ap.parse_args()
     kok = os.path.abspath(a.klasor)
-    if not os.path.isfile(os.path.join(kok, "index.html")):
-        print("HATA: %s icinde index.html yok (once web surumunu disa aktar: sh tools/web_derle.sh)" % kok, file=sys.stderr)
+    if not (os.path.isdir(kok) and any(ad.endswith(".html") for ad in os.listdir(kok))):
+        print("HATA: %s icinde .html dosyasi yok (once web surumunu disa aktar: sh tools/web_derle.sh)" % kok, file=sys.stderr)
         return 1
     Isleyici.izole = a.izole
     isleyici = functools.partial(Isleyici, directory=kok)

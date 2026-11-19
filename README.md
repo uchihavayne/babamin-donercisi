@@ -25,7 +25,7 @@ Güncellemeleri almak için klasörde `git pull`.
 
 **Yeni (12. tur, akıcılık cilası):** uçan patates HD'de gerçek patates sprite'ı olarak döner, "fritöze koy" geçişi animasyonlu (kızartma süresi aynı), telefonda ve oyun kolunda **titreşim** (Mola → Yardım → Ekran ayarları'ndan kapatılır; masaüstünde fareyle yok). Ayrıntı: [BIRLESIK.md](BIRLESIK.md).
 
-**Web sürümü:** oyun tarayıcıda da çalışır ve herhangi bir sayfaya iframe ile gömülür (HTML5 / WebAssembly, özel sunucu ayarı gerekmez): `GODOT=/godot/yolu sh tools/web_derle.sh --zip`. Ayrıntı: [PLATFORMLAR.md](PLATFORMLAR.md) → Web.
+**Web sürümü:** oyun tarayıcıda da çalışır ve herhangi bir sayfaya iframe ile gömülür (HTML5 / WebAssembly, özel sunucu ayarı gerekmez): `GODOT=/godot/yolu sh tools/web_derle.sh --tek --zip` (tek dosyalık `babamin-donercisi.html` + ZIP). Ayrıntı: [PLATFORMLAR.md](PLATFORMLAR.md) → Web.
 
 **Belgeler:** [BIRLESIK.md](BIRLESIK.md) (bu sürümde neler değişti, turlar), [ECONOMY.md](ECONOMY.md) (fiyatlar, tempo), [CODE_MAP.md](CODE_MAP.md) (hangi kod nerede), [PLATFORMLAR.md](PLATFORMLAR.md) (dışa aktarma).
 

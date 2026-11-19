@@ -12,6 +12,10 @@ ICINDEKILER
   embed-ornek.html              Gomme ornegi (iframe + tam ekran dugmesi + notlar)
   web_sunucu.py                 Yerelde denemek icin kucuk sunucu (Python 3 gerekir)
 
+TEK DOSYA
+  Ayni oyunun hicbir yan dosya istemeyen hali de var: babamin-donercisi.html (motor + oyun verisi icinde, ~19 MB).
+  Cift tiklayip acilir; bir sunucuya konur ya da iframe ile gomulur. Uretmek: sh tools/web_derle.sh --tek (proje icinde).
+
 YEREL DENEME
   Tarayicilar dosyaya cift tiklayip (file://) acilan oyunu yuklemez; http ile sunmak gerekir:
       python web_sunucu.py            (Mac / Linux: python3 web_sunucu.py)
