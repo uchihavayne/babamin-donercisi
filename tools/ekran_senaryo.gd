@@ -17,6 +17,7 @@
 #   gece_caldi son_saniye kapanis yardim ayarlar defter yeni_sayfa dukkan_defter tarif_balon
 #   patates_ucus fritoze_koy (akicilik: ucan patates / fritoze koyma kareleri; --adim N kare araligi, --say N goruntu)
 #   patates_tahta (tezgahtaki patates tahtasi, oyun donuk: --durum bos|patates|kesim|dolu, --seviye N = tum gelistirmeler N. kademe, yoksa hepsi tam)
+#   kesme_efekt (patates kesme animasyonu kare serisi: fare tahtada basili; --seviye N (varsayilan 2), --adim N oyun karesi / goruntu (2), --say N goruntu (110), --bekle N ilk kare)
 #   (defter: --sayfa 1-8, --gun N bulunan sayfalarin gunu; yeni_sayfa: --gun N, --sayfa 1-8, --kare N)
 # Linux'ta ekransiz sunucuda: xvfb-run -a -s "-screen 0 1280x720x24" godot --rendering-driver opengl3 ...
 extends SceneTree
@@ -320,6 +321,33 @@ func calis() -> void:
 			g.advance(0.0)
 			await process_frame
 			await kaydet("_" + durum + ("" if sev == "" else "_s" + sev))
+		"kesme_efekt":
+			# kesme animasyonu: patates tahtada, fare tahtanin ustunde BASILI (oyunun gercek kesme yolu); --adim oyun karesi arayla --say goruntu
+			kur(12.0, false, -1, int(arg("--seviye", "2")))
+			G.cut.potato = true; G.cut.prog = 0.0; G.cut.raw = 0.0; G.cut.land = 0.0
+			G.fryer.state = "idle"
+			g.j_BSQ.kuyruk = []
+			var tc: Dictionary = g.j_ST.cut
+			var fare: bool = arg("--fare", "0") == "1"
+			# varsayilan: imlec / ipucu goruntuyu kapatmasin diye basili fare kesme yolunu taklit eder (hold + her 0,17 sn'de f_slashAt);
+			# --fare 1: gercek fare yolu (imlec tahtanin ustunde)
+			g.j_IN.x = float(tc.x) + 18.0 if fare else 2.0
+			g.j_IN.y = float(tc.y) + 18.0 if fare else 2.0
+			g.j_IN.down = false
+			await adim(int(arg("--bekle", "6")))
+			if fare: g.j_IN.down = true; g.j_IN.downX = g.j_IN.x; g.j_IN.downY = g.j_IN.y
+			var kes_t := 0.0
+			for i in int(arg("--say", "110")):
+				for _a in int(arg("--adim", "2")):
+					if not fare and G.cut.potato:
+						G.cut.cutting = true; G.cut.hold = 0.12
+						kes_t -= 1.0 / 60.0
+						if kes_t <= 0.0:
+							kes_t = 0.17
+							g.potato_system.f_slashAt()
+					await adim(1)
+				g.j_BSQ.kuyruk = []
+				await kaydet("_%03d" % i)
 		"kalabalik":
 			# en yogun an: 5 musteri + sira + telefon fisi + kedi + rakip + mufettis
 			kur(25.0, true)

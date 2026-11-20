@@ -183,6 +183,10 @@ func f_drawCutBoard(x: Variant = null, y: Variant = null, w: Variant = null, h: 
 	var T: float = float(time)
 	_kesme_tahtasi(A, x, y, float(w))
 	var pk: Vector2 = potato_system.f_kapNoktasi(x, y, w)
+	# kesme efekti (salt gorsel): yalniz OYUN tahtasinda (dukkan ekrani sahte durumla cizer), hook adi "kesme_efekt"
+	var kd: bool = hd("kesme_efekt") and is_same(state, j_G.cut)
+	var kap_oy: float = potato_system.f_kapSallanma() if kd else 0.0
+	var raw_g: float = potato_system.f_sayacPorsiyon(float(state.raw)) if kd else float(state.raw)
 	var ax: float = x + potato_system.KESME_PATATES.x
 	var ay: float = y + potato_system.KESME_PATATES.y
 	# bos tahta: patatesin gelecegi yerde soluk izli patates (dil gerektirmez, "patates buraya" der).
@@ -192,14 +196,15 @@ func f_drawCutBoard(x: Variant = null, y: Variant = null, w: Variant = null, h: 
 	# celik kap: hazir cig cubuklar icinde, yani "kesilenler buraya gider" gorunur
 	if not TZ.is_empty() and TZ.parca.has("kesme_kap"):
 		var kp: Array = TZ.parca["kesme_kap"]
-		hd_ciz(TZ, "kesme_kap", pk.x - float(kp[4]), pk.y - float(kp[5]))
-		var n := mini(15, int(state.raw) * 2)
+		hd_ciz(TZ, "kesme_kap", pk.x - float(kp[4]), pk.y - float(kp[5]) + kap_oy)
+		var n := mini(15, int(raw_g) * 2)
 		for i in n:
 			var sira := int(i / 5)
-			hd_ciz(TZ, "cig_cubuk", pk.x + 2.0 + (i % 5) * 2.4, pk.y + 10.0 - sira * 4.0)
-		if state.raw > 0:
-			# kap acikligina oturan kucuk sayac: kac porsiyon cig patates hazir
-			text_draw.f_txt(str(int(state.raw)), pk.x + 16.0, pk.y - 4.5, "#f8ecc0", {"align": "r", "outline": "rgba(0,0,0,.55)"})
+			hd_ciz(TZ, "cig_cubuk", pk.x + 2.0 + (i % 5) * 2.4, pk.y + 10.0 - sira * 4.0 + kap_oy)
+		if raw_g >= 1.0:
+			# kap acikligina oturan kucuk sayac: kac porsiyon cig patates hazir (dilimler inerken yukari sayar, her inista parlar)
+			var vurgu: float = potato_system.kd_sayac if kd else 0.0
+			text_draw.f_txt(str(int(raw_g)), pk.x + 16.0, pk.y - 4.5 + kap_oy - (1.0 if vurgu > 0.55 else 0.0), "#ffffff" if vurgu > 0.25 else "#f8ecc0", {"align": "r", "outline": "rgba(0,0,0,.55)"})
 	var satir_x: float = x + potato_system.KESME_SATIR_X
 	var satir_y: float = y + h / 2 - 6
 	if state.potato and not TZ.is_empty():
@@ -215,25 +220,90 @@ func f_drawCutBoard(x: Variant = null, y: Variant = null, w: Variant = null, h: 
 			var alt: float = ay + float(pp[5]) + yuk               # alt kenar (tahtada sabit)
 			hd_ciz(TZ, "patates_11", ax, (alt - yuk * sy) / sy - float(pp[5]), 1.0, false, Color.WHITE, sy)
 		else:
-			hd_ciz(TZ, "patates_%d" % pw, ax, ay)
+			# kesme efekti: patates vuruslarla HAVADA asili kalir (yuk_p), sallanir (egim), vurusta ezilir (ez), inince ezilir (inis)
+			var ez: float = potato_system.f_kesimEzilme() if kd else 0.0
+			var yuk_p: float = potato_system.kd_py if kd else 0.0
+			var egim: float = potato_system.kd_pa if kd else 0.0
+			var inis: float = potato_system.kd_inis if kd else 0.0
+			var ad_p := "patates_%d" % pw
+			if (yuk_p > 0.0 or egim != 0.0 or inis > 0.0 or ez > 0.02) and TZ.parca.has(ad_p):
+				if yuk_p > 0.25:
+					# tahtadaki golge: yukseldikce kuculur ve silikles
+					draw_context.globalAlpha = maxf(0.07, 0.24 - yuk_p * 0.012)
+					f_ell(ax + 1.0, ay + 7.5, maxf(4.0, 8.5 - yuk_p * 0.28), maxf(1.0, 2.4 - yuk_p * 0.08), "#000")
+					draw_context.globalAlpha = 1.0
+				var sy: float = 1.0 - 0.14 * ez - 0.20 * inis * inis
+				var sarsi: float = (0.5 if potato_system.kd_vurusNo % 2 == 0 else -0.5) * ez
+				if absf(egim) < 0.002:
+					_patates_ezik(TZ, ad_p, ax + sarsi, ay - yuk_p, sy)
+				else:
+					# egik: parcanin merkezi etrafinda doner, alt kenar (olcek icin) sabit
+					var pp: Array = TZ.parca[ad_p]
+					var hd_k: float = float(TZ.hd)
+					var yuk_s: float = float(pp[3]) / hd_k
+					var ust: float = ay - yuk_p + float(pp[5])
+					draw_context.texture_hd_donuk(TZ.tex, Rect2(pp[0], pp[1], pp[2], pp[3]), ax + sarsi + float(pp[4]) + float(pp[2]) / hd_k / 2.0,
+						ust + yuk_s - yuk_s * sy / 2.0, egim, 1.0, sy, 1.0)
+			else:
+				hd_ciz(TZ, ad_p, ax, ay)
 		var kesik: float = ax - 11.0 + 2.0 * pw
-		# dogranmis dilimler: kesik yuzun saginda, hafif egik dizilir
+		# dogranmis dilimler: kesik yuzun saginda, hafif egik dizilir (havada olan dilim inene kadar yerinde cizilmez)
 		for i in int(floorf(prog * 7.0)):
+			if kd and potato_system.f_dilimHavada(i): continue
 			hd_ciz(TZ, "patates_dilim", kesik + 3.0 + i * 2.6, ay - 5.0 + (i % 2) * 0.5)
-		chopping_draw.f_drawSlash(state)
+		var kaldir: float = potato_system.kd_py if kd else 0.0
+		if kaldir > 0.2 and state.get("slash") != null:
+			# bicak izleri havadaki patatesin yuksekliginde cizilir (G'deki izler tahta seviyesinde dogar; kopya, G'ye dokunulmaz)
+			var izler: Array = []
+			for s0 in state.slash:
+				var s1: Dictionary = (s0 as Dictionary).duplicate()
+				s1.y = float(s1.y) - kaldir
+				izler.append(s1)
+			chopping_draw.f_drawSlash({"slash": izler})
+		else:
+			chopping_draw.f_drawSlash(state)
 		if prog > 0: counter_draw.f_bar(x + 5, y + h - 6, w - 10, 3, prog, "#eacf88")
 		if state.cutting:
 			# dogrudan kesik yuze iner: hizli inis, kisa bekleme, yavas kalkis
-			var p := fposmod(T * 5.0, 1.0)
+			# kesme efekti aciksa bicak GERCEK vurusla ayni anda iner (ses + ezilme + dilim ayni karede); degilse eski sabit tempo
+			var p := potato_system.f_bicakFazi() if kd else fposmod(T * 5.0, 1.0)
 			var yuk := (1.0 - p / 0.22) if p < 0.22 else (0.0 if p < 0.36 else (p - 0.36) / 0.64)
 			satir_x = kesik + 0.5
-			satir_y = y + 7.0 - yuk * 9.0
+			# bicak havadaki patatesin yuksekligini izler; ust sinir fritozun sayac ekranini (tahtanin 6-14 px ustu) kapatmasin diye y - 4'te kesilir
+			satir_y = maxf(y + 7.0 - yuk * 9.0 - kaldir, y - 4.0)
 			if p >= 0.22 and p < 0.5:
-				_dogrma_kirinti(kesik + 1.0, y + 17.0, (p - 0.22) / 0.28, floorf(T * 5.0))
+				_dogrma_kirinti(kesik + 1.0, y + 17.0 - kaldir, (p - 0.22) / 0.28, float(potato_system.kd_vurusNo) if kd else floorf(T * 5.0))
 	elif state.potato:
 		hd_ciz(A, "patates_butun", x + w / 2, y + h / 2)
 	hd_ciz(A, "satir", satir_x, f_hdYarimPx(satir_y))
+	if kd and not TZ.is_empty(): _kesme_ucanlar(TZ)
 	return null
+
+# dilim ucusu: ziplayan (kesik yuzden siraya) ve havaya firlayan (siradan celik kaba) dilimler; iz + inise dogru kuculme / solma
+func _kesme_ucanlar(TZ: Dictionary) -> void:
+	if not TZ.parca.has("patates_dilim"): return
+	var pr: Array = TZ.parca["patates_dilim"]
+	var src := Rect2(pr[0], pr[1], pr[2], pr[3])
+	for c in potato_system.kd_ucan:
+		var kap: bool = c.tur == "kap"
+		for iz in ([2, 1, 0] if kap else [1, 0]):
+			var cc: Dictionary = c.duplicate()
+			cc.t = float(c.t) - 0.022 * float(iz)
+			var kk: Variant = potato_system.f_dilimKonum(cc)
+			if kk == null: continue
+			var al: float = 1.0 if iz == 0 else (0.24 if iz == 1 else 0.1)
+			var ol: float = 1.0
+			if kap:
+				al *= 1.0 - clampf((float(kk.k) - 0.86) / 0.14, 0.0, 1.0)     # kabin icine inerken solar
+				ol = lerpf(1.2, 0.85, float(kk.k))                            # yayin ustunde iri (kameraya yakin), inerken kuculur
+			draw_context.texture_hd_donuk(TZ.tex, src, roundf(float(kk.x) * 2.0) / 2.0, roundf(float(kk.y) * 2.0) / 2.0, float(kk.aci), ol, ol, al)
+
+# alt kenari sabit, dikey olcekli patates (inis ve vurus ezilmesi)
+func _patates_ezik(TZ: Dictionary, ad: String, ax: float, ay: float, sy: float) -> void:
+	var pp: Array = TZ.parca[ad]
+	var yuk: float = float(pp[3]) / float(TZ.hd)
+	var alt: float = ay + float(pp[5]) + yuk
+	hd_ciz(TZ, ad, ax, (alt - yuk * sy) / sy - float(pp[5]), 1.0, false, Color.WHITE, sy)
 
 # genisletilmis tahta: kesme_tahta parcasi KES (46) sutunundan ikiye bolunur, aradaki 1 piksellik duz sutun
 # (cizik yok) yatay uzatilir. Tahta 51 mantik px'e esitse ya da kucukse parca aynen cizilir.

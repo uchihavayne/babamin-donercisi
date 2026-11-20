@@ -55,6 +55,217 @@ func f_fritozInis() -> void:
 	J.setv(game.j_G.fryer, "gir", 1.0)   # sepetteki patates 0.14 sn'de belirginlesir (ani "pat" diye belirmesin)
 	J.method(game.j_SFX, "sizzle", [])
 
+# ---------------------------------------------------------------- kesme efekti (SALT GORSEL)
+# Kullanici: "patatesi keserken patates havaya mi ucsun, guzel kesilme efekti ve animasyonu olsa, goze guzel gelen".
+# KURAL, SURE, RASTGELE SAYI DIZISI VE KAYIT DEGISMEZ: durum G'de degil bu modulde durur (gun ici kayda girmez) ve hicbir
+# yerde oyunun rastgele ureticisi cagrilmaz (sabit desenler). Uc olay:
+#  1) bicak vurusu (f_slashAt): patates ezilip toparlanir; bicak vurusla AYNI ANDA iner (once ayri, sabit 0,2 sn'lik tempo)
+#  2) tahtada yeni dilim belirince (floor(prog * 7) artinca) dilim kesik yuzden ziplayip siraya iner
+#  3) patates bitince (raw artar) siradaki dilimler havaya firlayip celik kaba yagar; kap sallanir, sayac yukari sayar
+#  4) BUTUN PATATES havada dograilir (kullanici: "havaya ucsun, havada keselim"): ilk vurus patatesi havaya firlatir, vuruslar surerken
+#     havada asili kalip sallanir (her vurus kucuk bir tekme), bicak patatesin yuksekligini izler, altinda golgesi kalir; vuruslar
+#     bitince iner ve ezilir. Dokunma alani / ilerleme / sure DEGISMEZ (tahta dikdortgeni ayni, ilerleme zamanla artar)
+const KD_YER := 520.0               # havadaki patatesin yercekimi (px/sn^2)
+const KD_KALDIR := 96.0             # bicak vurusunun patatesi yukari firlatma hizi (px/sn); yukseldikce tekme zayiflar: ~6-9 px'de asili kalir
+const KD_TAVAN := 14.0              # patatesin tahtadan en yuksek konumu (px)
+const KD_SALLA := 2.4               # vurusta patatesin egim darbesi (rad/sn)
+const KD_DILIM := 7                 # bir patatesten tahtada gorunen dilim sayisi (counter_design_hd: floor(prog * 7))
+const KD_ZIPLA := 0.24              # tek dilimin zipla suresi (sn)
+const KD_UCUS := 0.34               # patates bitince dilimlerin kaba ucus suresi (sn)
+const KD_ARALIK := 0.035            # dilimler arasi kalkis gecikmesi (sn)
+const KD_VURUS := 0.20              # bir vurusun bicak fazi: inis + bekleme + kalkis (sn)
+const KD_EN_COK := 28               # havadaki dilim tavani (guncelleme durursa / art arda bitince birikmesin)
+
+var kd_kapali := false              # hata ayiklama / test: true iken butun efekt kancalari bos doner
+var kd_ucan: Array = []             # ucan dilimler: {tur: "zipla" | "kap", i, t, dur, x0, y0, x1, y1, yay, aci0, spin, birim}
+var kd_vurus: float = 9.0           # son bicak vurusundan beri gecen sure (sn)
+var kd_vurusNo: int = 0             # vurus sayaci (kirinti desenini tohumlar)
+var kd_n: int = -1                  # tahtada gorulen dilim sayisi (-1: henuz gorulmedi, yuklemede ziplama olmasin)
+var kd_kesik: float = 0.0           # son karede kesik yuzun x'i (patates bitince dilimler buradan kalkar)
+var kd_kap: float = 0.0             # celik kap sallanmasi (1 -> 0)
+var kd_sayac: float = 0.0           # sayac vurgusu (1 -> 0)
+var kd_bekleyen: float = 0.0        # kaba dogru ucan porsiyon: sayac dilimler inene kadar yukari saymaz
+var kd_py: float = 0.0              # patatesin tahtadan yuksekligi (px, >= 0; 0 = tahtada)
+var kd_pv: float = 0.0              # dikey hizi (px/sn, yukari +)
+var kd_pa: float = 0.0              # egim acisi (rad)
+var kd_pw: float = 0.0              # egim hizi (rad/sn)
+var kd_inis: float = 0.0            # inis ezilmesi (1 -> 0)
+
+func f_kesimEfektTemizle() -> void:
+	kd_ucan = []
+	kd_vurus = 9.0
+	kd_n = -1
+	kd_kesik = 0.0
+	kd_kap = 0.0
+	kd_sayac = 0.0
+	kd_bekleyen = 0.0
+	kd_py = 0.0
+	kd_pv = 0.0
+	kd_pa = 0.0
+	kd_pw = 0.0
+	kd_inis = 0.0
+
+# kesik yuzun x'i: patates sagdan kisalir (counter_design_hd.f_drawCutBoard: ax - 11 + 2 * pw)
+func f_kesikYuzX(prog: float) -> float:
+	var c: Dictionary = game.j_ST.cut
+	var pw := clampi(int(maxf(2.0, floorf(11.0 * (1.0 - clampf(prog, 0.0, 1.0)) + 0.5))), 2, 11)
+	return float(c.x) + KESME_PATATES.x - 11.0 + 2.0 * pw
+
+# tahtadaki i. dilimin SOL-UST kosesi (counter_design_hd ile ayni formul): kesik yuzun saginda hafif egik dizilir
+func f_dilimYeri(i: int, kesik: float) -> Vector2:
+	var c: Dictionary = game.j_ST.cut
+	return Vector2(kesik + 3.0 + float(i) * 2.6, float(c.y) + KESME_PATATES.y - 5.0 + float(i % 2) * 0.5)
+
+# bicak vurusu: ezilme + bicagin inisi bu ana baglanir
+func f_kesimVurus() -> void:
+	if kd_kapali: return
+	kd_vurus = 0.0
+	kd_vurusNo += 1
+	if bool(game.j_G.cut.potato):
+		# tekme: yukseldikce zayifla (tavana vurmasin, ~9 px'de asili kalsin); egim darbesi vurus yonune gore degisir
+		kd_pv = maxf(kd_pv, KD_KALDIR * clampf(1.0 - kd_py / KD_TAVAN, 0.25, 1.0))
+		kd_pw = KD_SALLA * (1.0 if kd_vurusNo % 2 == 0 else -1.0)
+
+# ezilme (0..1): vurus anindan hemen sonra hizla artar, sonra yumusakca soner
+func f_kesimEzilme() -> float:
+	var t := kd_vurus
+	if t < 0.03: return t / 0.03
+	return pow(clampf(1.0 - (t - 0.03) / 0.16, 0.0, 1.0), 2.0)
+
+# bicagin fazi (0..1): 0 = vurus an, 0.22 = temas, 1 = bir sonraki vurusa hazir (counter_design_hd.f_drawCutBoard ile ayni egri)
+func f_bicakFazi() -> float:
+	return clampf(kd_vurus / KD_VURUS, 0.0, 0.999)
+
+# celik kabin saga/asagi oturmasi (yarim piksel adimlariyla; dilim inince 1 -> 0)
+func f_kapSallanma() -> float:
+	return roundf(kd_kap * kd_kap * 2.0) / 2.0
+
+# sayacin gosterecegi porsiyon: yoldaki dilimler inene kadar yukari saymaz
+func f_sayacPorsiyon(raw: float) -> float:
+	return maxf(0.0, raw - kd_bekleyen)
+
+# ucan dilimin merkezi (mantik piksel) ve donus acisi; t < 0 ise henuz kalkmadi (null)
+# zipla: kesik yuzden o anki sira yerine (hedef canli: tahta kisaldikca kesik yuz kayar), kap: pile'dan kabin icine
+func f_dilimKonum(c: Dictionary) -> Variant:
+	var k := clampf(float(c.t) / float(c.dur), 0.0, 1.0)
+	if float(c.t) < 0.0: return null
+	var x1: float = float(c.x1)
+	var y1: float = float(c.y1)
+	if c.tur == "zipla":
+		var hedef: Vector2 = f_dilimYeri(int(c.i), f_kesikYuzX(float(game.j_G.cut.prog))) + Vector2(1.0, 4.0)
+		x1 = hedef.x
+		y1 = hedef.y
+	var yay: float = 4.0 * k * (1.0 - k) * float(c.yay)
+	var x: float = lerpf(float(c.x0), x1, k)
+	var y: float = lerpf(float(c.y0), y1, k) - yay
+	var aci: float = float(c.aci0) * (1.0 - k) + float(c.spin) * k
+	return {"x": x, "y": y, "aci": aci, "k": k}
+
+# dilim i havada mi (tahtadaki yerinde henuz cizilmesin)
+func f_dilimHavada(i: int) -> bool:
+	for c in kd_ucan:
+		if c.tur == "zipla" and int(c.i) == i: return true
+	return false
+
+# kanca adi "kesme_efekt" (HD_KAPALI=kesme_efekt): cizimi VE parcaciklari tek basina kapatir (mantik / sayac durumu calismaya devam eder)
+func _kdGorunur() -> bool:
+	return not game._hd_kapali.has("kesme_efekt")
+
+func _kdIlis(c: Dictionary) -> void:
+	# kaba inen dilim: kap sallanir, sayac vurgulanir, kucuk parilti (sabit desen)
+	kd_kap = 1.0
+	kd_sayac = 1.0
+	kd_bekleyen = maxf(0.0, kd_bekleyen - float(c.birim))
+	if not _kdGorunur(): return
+	game.effects.f_part({"x": float(c.x1), "y": float(c.y1) - 2.0, "vx": 0.0, "vy": -7.0, "life": 0.2, "col": "#fff6c8", "g": 0.0, "sz": 1.0, "type": "star"})
+
+func f_kesimEfektGuncelle(dt: float) -> void:
+	if kd_kapali: return
+	var C: Dictionary = game.j_G.cut
+	kd_vurus += dt
+	kd_kap = maxf(0.0, kd_kap - dt / 0.20)
+	kd_sayac = maxf(0.0, kd_sayac - dt / 0.30)
+	kd_inis = maxf(0.0, kd_inis - dt / 0.18)
+	if bool(C.potato):
+		# havadaki patates: yercekimi, tavan, inis ezilmesi, yay gibi sonumlenen egim
+		if kd_py > 0.0 or kd_pv > 0.0:
+			kd_pv -= KD_YER * dt
+			kd_py += kd_pv * dt
+			if kd_py >= KD_TAVAN:
+				kd_py = KD_TAVAN
+				kd_pv = minf(kd_pv, 0.0)
+			if kd_py <= 0.0:
+				if kd_pv < -40.0: kd_inis = 1.0
+				kd_py = 0.0
+				kd_pv = 0.0
+		kd_pa += kd_pw * dt
+		kd_pw -= (kd_pa * 90.0 + kd_pw * 9.0) * dt
+		if absf(kd_pa) < 0.004 and absf(kd_pw) < 0.06 and kd_py == 0.0:
+			kd_pa = 0.0                     # tam durunca kesin 0: dinlenme gorunumune birebir doner
+			kd_pw = 0.0
+	else:
+		kd_py = 0.0
+		kd_pv = 0.0
+		kd_pa = 0.0
+		kd_pw = 0.0
+	if bool(C.potato):
+		var prog := float(C.prog)
+		var n := mini(KD_DILIM, int(floorf(prog * float(KD_DILIM))))
+		kd_kesik = f_kesikYuzX(prog)
+		var ay: float = float(game.j_ST.cut.y) + KESME_PATATES.y
+		if kd_n < 0 or n < kd_n:
+			kd_n = n                       # ilk gorus (yukleme) ya da yeni patates: ziplama yok
+		elif n > kd_n:
+			for j in range(kd_n, n):
+				kd_ucan.append({"tur": "zipla", "i": j, "t": 0.0, "dur": KD_ZIPLA, "x0": kd_kesik + 1.0, "y0": ay - 1.0 - kd_py, "x1": 0.0, "y1": 0.0,
+					"yay": 8.0 + float(j % 3) * 1.5, "aci0": -1.9 - 0.3 * float(j % 2), "spin": 0.0, "birim": 0.0})
+			kd_n = n
+	var i := kd_ucan.size() - 1
+	while i >= 0:
+		var c: Dictionary = kd_ucan[i]
+		c.t = float(c.t) + dt
+		if float(c.t) >= float(c.dur):
+			if c.tur == "kap": _kdIlis(c)
+			kd_ucan.remove_at(i)
+		i -= 1
+	var kapta := false
+	for d in kd_ucan:
+		if d.tur == "kap": kapta = true
+	if not kapta: kd_bekleyen = 0.0     # hicbir dilim yolda degil: sayac tam (kayan nokta artigi kalmasin)
+
+# patates bitti (raw artti): dilimler havaya firlar, celik kaba yagar. verim = eklenen porsiyon (sayac inen dilimle yukari sayar)
+func f_kesimTamam(verim: float) -> void:
+	if kd_kapali: return
+	var c: Dictionary = game.j_ST.cut
+	var pk: Vector2 = f_kapNoktasi(c.x, c.y, c.w)
+	var kesik: float = kd_kesik if kd_kesik > 0.0 else f_kesikYuzX(0.95)
+	var ay: float = float(c.y) + KESME_PATATES.y
+	var gorunen := maxi(kd_n, 0)
+	kd_ucan = kd_ucan.filter(func(d: Dictionary) -> bool: return d.tur != "zipla")
+	for j in KD_DILIM:
+		var bas: Vector2 = (f_dilimYeri(j, kesik) + Vector2(1.0, 4.0)) if j < gorunen else Vector2(kesik + 2.0, ay - 1.0 - kd_py)
+		var hedef := pk + Vector2(4.0 + float(j % 5) * 2.4, 11.5)
+		kd_ucan.append({"tur": "kap", "i": j, "t": -float(j) * KD_ARALIK, "dur": KD_UCUS, "x0": bas.x, "y0": bas.y, "x1": hedef.x, "y1": hedef.y,
+			"yay": 13.0 + float(j % 3) * 2.5, "aci0": -0.5 + 0.3 * float(j % 3), "spin": (3.2 + 0.7 * float(j % 4)) * (1.0 if j % 2 == 0 else -1.0), "birim": verim / float(KD_DILIM)})
+	kd_bekleyen += verim
+	kd_n = -1
+	kd_py = 0.0                          # patates bitti: havadaki patates gider (kalan kisim dilimlerle birlikte kaba ucar)
+	kd_pv = 0.0
+	kd_pa = 0.0
+	kd_pw = 0.0
+	kd_inis = 0.0
+	while kd_ucan.size() > KD_EN_COK:
+		var eski: Dictionary = kd_ucan.pop_front()
+		if eski.tur == "kap": kd_bekleyen = maxf(0.0, kd_bekleyen - float(eski.birim))
+	# kalkis "pof"u: dilimlerin kalktigi yerde parilti + nisasta tozu (sabit desen)
+	if not _kdGorunur(): return
+	var tx: float = kesik + 8.0
+	game.effects.f_part({"x": tx, "y": ay - 4.0, "vx": 0.0, "vy": -4.0, "life": 0.22, "col": "#fff6c8", "g": 0.0, "sz": 2.0, "type": "star"})
+	for q in 6:
+		var a: float = -PI / 2.0 + (float(q) - 2.5) * 0.42
+		game.effects.f_part({"x": tx + (float(q) - 2.5) * 1.5, "y": ay + 1.0, "vx": cos(a) * 20.0, "vy": sin(a) * (26.0 + float(q % 3) * 7.0),
+			"life": 0.34, "col": "#f6ecc6" if q % 2 == 0 else "#dcc681", "g": 150.0, "sz": 1.0})
+
 # game.js:1556
 func f_potatoTake() -> Variant:
 	if (J.truth(J.getv(J.getv(game.j_G, "cut"), "potato")) or J.truth(J.getv(game.j_G, "flyP"))):
@@ -84,6 +295,7 @@ func f_slashAt() -> Variant:
 		J.method(J.getv(v_c, "slash"), "push", [{"x": J.add(v_mx, game.math_utils.f_rnd((-J.n(4.0)), 6.0)), "y": J.add(J.add(J.getv(J.getv(game.j_ST, "cut"), "y"), 18.0), game.math_utils.f_rnd((-J.n(2.0)), 2.0)), "aci": J.add(((-J.n(2.42)) if J.gt(J.getv(v_c, "yon"), 0.0) else (-J.n(0.72))), game.math_utils.f_rnd((-J.n(0.2)), 0.2)), "boy": game.math_utils.f_rnd(20.0, 28.0), "t": 0.88}])
 	while J.gt(J.getv(J.getv(v_c, "slash"), "length"), 8.0):
 		J.method(J.getv(v_c, "slash"), "shift", [])
+	game.potato_system.f_kesimVurus()
 	game.effects.f_shake(0.1)
 	J.method(game.j_SFX, "potato", [])
 	v_i = 0.0
@@ -136,6 +348,7 @@ func f_updateCut(p_dt: Variant = null) -> Variant:
 			J.setv(v_c, "potato", false)
 			J.setv(v_c, "cutting", false)
 			J.setv(v_c, "raw", J.add(J.getv(v_c, "raw"), J.method(game.j_TUN, "cutYield", [game.j_G])))
+			game.potato_system.f_kesimTamam(float(J.method(game.j_TUN, "cutYield", [game.j_G])))
 			game.event_system.f_addTrash(game.j_TRASH_PER_PEEL)
 			game.event_system.f_copaAt(J.add(J.getv(J.getv(game.j_ST, "cut"), "x"), (float(J.getv(J.getv(game.j_ST, "cut"), "w")) / float(2.0))), J.add(J.getv(J.getv(game.j_ST, "cut"), "y"), 16.0), ["#b98b46", "#8a6432", "#d8ab63"])
 			J.method(game.j_SFX, "drop", [])

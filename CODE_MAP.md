@@ -19,6 +19,7 @@ Aşağıdaki yollar `scripts/` klasörüne göredir.
 | Sürükleme ve eldeki ürünü geri bırakma | `systems/orders/drag_system.gd` |
 | Döner kesme ve tepsiye et düşmesi | `systems/equipment/cutting_system.gd`: `MEAT_PER_CUT`, `f_updateShave`, `f_doSlice` |
 | Patates doğrama ve kızartma | `systems/equipment/potato_system.gd`: `f_updateCut`, `f_updateFryer` |
+| Patates kesme efekti (havada asılı doğranan bütün patates, zıplayan / havaya fırlayan dilimler, vuruş ezilmesi, sayaç sayımı; salt görsel) | durum ve olaylar `systems/equipment/potato_system.gd` (`kd_*`, `f_kesimVurus`, `f_kesimTamam`, `f_kesimEfektGuncelle`, `f_dilimKonum`, `f_sayacPorsiyon`), kancalar `f_slashAt` / `f_updateCut` / `core/game_loop.gd` / `systems/session_system.gd` (yeni gün temizliği); çizim `counter_design_hd.gd` (`f_drawCutBoard`, `_kesme_ucanlar`, `_patates_ezik`), yedek `counter_design.gd`; kanca adı `kesme_efekt`; testler `tests/kesme_efekt.gd`, `tests/kesme_efekt_visual.gd` |
 | Patates tahtasının yeri, boyu ve içi (sos / kâğıt / kutuyla çakışmama) | alanlar `counter_design.gd` (`positions`: `cut`, `sauce`, `paper`); HD çizim `counter_design_hd.gd` (`f_drawCutBoard`, `_kesme_tahtasi`); tahtanın içindeki sabit noktalar `systems/equipment/potato_system.gd` (`KESME_*`, `f_kapNoktasi`, `f_inisNoktasi`, `f_kesikX`); kilitleyen testler `tests/tezgah_yerlesim.gd`, `tests/patates_tahtasi_visual.gd` |
 | Izgara | `systems/equipment/grill_system.gd` |
 | İçecek doldurma | `systems/equipment/drink_system.gd` |

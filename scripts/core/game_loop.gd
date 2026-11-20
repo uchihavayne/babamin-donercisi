@@ -139,6 +139,7 @@ func f_updatePlay(p_dt: Variant = null) -> Variant:
 	# akicilik cilasi: patates tahtaya inince hafif ezilip toparlanir (counter_design_hd.f_drawCutBoard)
 	if J.gt(J.getv(J.getv(game.j_G, "cut"), "land"), 0.0):
 		J.setv(J.getv(game.j_G, "cut"), "land", max(0.0, (J.n(J.getv(J.getv(game.j_G, "cut"), "land")) - (float(v_dt) / float(0.2)))))
+	game.potato_system.f_kesimEfektGuncelle(float(v_dt))   # kesme efekti (salt gorsel): ziplayan / ucan dilimler, ezilme, kap sallanmasi
 	if J.truth(J.getv(game.j_G, "flyP")):
 		J.setv(J.getv(game.j_G, "flyP"), "t", J.add(J.getv(J.getv(game.j_G, "flyP"), "t"), (float(v_dt) / float(0.38))))
 		if J.ge(J.getv(J.getv(game.j_G, "flyP"), "t"), 1.0):

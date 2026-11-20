@@ -255,19 +255,40 @@ func f_drawCutBoard(x: Variant = null,y: Variant = null,w: Variant = null,h: Var
 	f_rrect(x,y+3,w,h-3,2,"#986c40")
 	f_rrect(x+1,y+3,w-2,h-6,2,"#d4ad73")
 	for i in range(8,int(h)-5,7): f_hl(x+3,y+i,w-6,"#c89b64")
+	# kesme efekti (salt gorsel; eski cizimde de): vurusta patates ezilir, dilimler pikseller halinde ziplar / kaba ucar
+	var kd: bool = not _hd_kapali.has("kesme_efekt") and is_same(state,j_G.cut)
+	var raw_g: float = potato_system.f_sayacPorsiyon(float(state.raw)) if kd else float(state.raw)
 	if state.potato:
-		f_ell(x+w/2,y+h/2,9,6,"#bb8841")
-		f_ell(x+w/2-2,y+h/2-2,6,3,"#e5bb78")
+		var ez: float = potato_system.f_kesimEzilme() if kd else 0.0
+		var yk: float = potato_system.kd_py if kd else 0.0           # havada asili patates: golge + yukselen elips
+		var ik: float = potato_system.kd_inis if kd else 0.0
+		if yk > 0.25:
+			draw_context.globalAlpha = maxf(0.07,0.22-yk*0.011)
+			f_ell(x+w/2,y+h/2+6.5,maxf(4.0,8.0-yk*0.25),maxf(1.0,2.0-yk*0.07),"#000")
+			draw_context.globalAlpha = 1.0
+		ez = clampf(ez+ik*ik*1.4,0.0,1.6)
+		f_ell(x+w/2,y+h/2+ez-yk,9.0+ez*1.5,6.0-ez*1.2,"#bb8841")
+		f_ell(x+w/2-2,y+h/2-2+ez-yk,6.0+ez,3.0-ez*0.6,"#e5bb78")
 		if state.prog>0: counter_draw.f_bar(x+5,y+h-6,w-10,3,state.prog,"#eacf88")
-	elif state.raw>0:
+	elif raw_g>=1.0:
 		# Freshly cut potato is pale cream, with no browned tips or fried palette.
-		for i in mini(12,int(state.raw)*2):
+		for i in mini(12,int(raw_g)*2):
 			var px: float=x+10+fmod(i*7.0,w-31)
 			var py: float=y+12+fmod(i*5.0,h-21)
 			ingredient_pixels.f_fryBar(px,py,11.0,0.25 if i%2 else -0.25,0.2,"#fff6d0","#f2e0a8","#dcc681","#e8d59a")
 	var cy: float=y+h/2+(sin(float(time)*25)*3 if state.cutting else 0)
 	f_fr(x+w-12,cy-6,7,13,"#dde3d5"); f_vl(x+w-12,cy-6,13,"#faf9e8")
 	f_fr(x+w-10,cy+7,3,7,"#5a3927")
+	if kd:
+		for c in potato_system.kd_ucan:
+			var kk: Variant = potato_system.f_dilimKonum(c)
+			if kk == null: continue
+			var kap: bool = c.tur == "kap"
+			var a: float = 1.0 - (clampf((float(kk.k)-0.86)/0.14,0.0,1.0) if kap else 0.0)
+			draw_context.globalAlpha = a
+			f_fr(floorf(float(kk.x)),floorf(float(kk.y))-2.0,2,5,"#f2e0a8")
+			f_vl(floorf(float(kk.x)),floorf(float(kk.y))-2.0,5,"#fff6d0")
+			draw_context.globalAlpha = 1.0
 	return null
 
 func f_drawPotatoBin(x: Variant = null,y: Variant = null,w: Variant = null,h: Variant = null,time: Variant = null) -> Variant:
