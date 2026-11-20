@@ -19,6 +19,7 @@ Aşağıdaki yollar `scripts/` klasörüne göredir.
 | Sürükleme ve eldeki ürünü geri bırakma | `systems/orders/drag_system.gd` |
 | Döner kesme ve tepsiye et düşmesi | `systems/equipment/cutting_system.gd`: `MEAT_PER_CUT`, `f_updateShave`, `f_doSlice` |
 | Patates doğrama ve kızartma | `systems/equipment/potato_system.gd`: `f_updateCut`, `f_updateFryer` |
+| Patates tahtasının yeri, boyu ve içi (sos / kâğıt / kutuyla çakışmama) | alanlar `counter_design.gd` (`positions`: `cut`, `sauce`, `paper`); HD çizim `counter_design_hd.gd` (`f_drawCutBoard`, `_kesme_tahtasi`); tahtanın içindeki sabit noktalar `systems/equipment/potato_system.gd` (`KESME_*`, `f_kapNoktasi`, `f_inisNoktasi`, `f_kesikX`); kilitleyen testler `tests/tezgah_yerlesim.gd`, `tests/patates_tahtasi_visual.gd` |
 | Izgara | `systems/equipment/grill_system.gd` |
 | İçecek doldurma | `systems/equipment/drink_system.gd` |
 | Kağıtla paketleme | `systems/equipment/paper_system.gd` |

@@ -92,11 +92,25 @@ func merkez(m: Array) -> Vector2:
 	for p in m: s += Vector2(p)
 	return s / maxf(1.0, float(m.size()))
 
+# sinir kutusu: tek tuk sicrayan pikseller (toz parcacigi, iz artigi) kutuyu sismesin diye, en az 5 piksel iceren
+# sutun / satirlar sayilir (patatesin kendisi her sutunda >= 5 piksel tasir)
 func sinirlar(m: Array) -> Rect2i:
 	if m.is_empty(): return Rect2i()
-	var r := Rect2i(m[0], Vector2i.ONE)
-	for p in m: r = r.expand(p)
-	return r
+	var kx := {}
+	var ky := {}
+	for p in m:
+		kx[p.x] = int(kx.get(p.x, 0)) + 1
+		ky[p.y] = int(ky.get(p.y, 0)) + 1
+	var x0 := 1000000; var x1 := -1000000; var y0 := 1000000; var y1 := -1000000
+	for x in kx:
+		if int(kx[x]) >= 5: x0 = mini(x0, int(x)); x1 = maxi(x1, int(x))
+	for y in ky:
+		if int(ky[y]) >= 5: y0 = mini(y0, int(y)); y1 = maxi(y1, int(y))
+	if x1 < x0 or y1 < y0:
+		var r := Rect2i(m[0], Vector2i.ONE)
+		for p in m: r = r.expand(p)
+		return r
+	return Rect2i(x0, y0, x1 - x0 + 1, y1 - y0 + 1)
 
 func run() -> void:
 	root.size = Vector2i(960, 540)
@@ -108,6 +122,7 @@ func run() -> void:
 	g = shell.game
 	g.j_MUTED = true
 	g.localization.f_setLang("tr")
+	g._hd_kapali.append("kesme_iz")   # bos tahtadaki soluk patates izi (akicilik sonrasi) baseline'i kirletmesin: bu test ucan patatesin KENDI piksellerini olcer
 	g.j_G.up = {}
 	g.f_startDay()
 	var G: Dictionary = g.j_G

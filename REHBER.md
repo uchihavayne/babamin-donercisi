@@ -39,6 +39,7 @@ Oyun nesnesine her yerden `game.<modül>.<fonksiyon>` ile erişilir (örn. `game
 | Kayıt alanı eklemek | `systems/save_system.gd` (`f_saveAll`, `f_loadAndGo`) + `session_system.f_resetProgress` |
 | Gün içi kayıt (mobilde uygulama kapanırsa) | `systems/save_system.gd` (`gunici_*`, `GUNICI_ARALIK`, `GUNICI_ATLA`) |
 | Baba'nın Defteri (kayıp tarifler: sayfa bulma, sipariş, prim, usta) | veri: `data/tarif.gd`; mantık: `systems/events/tarif_system.gd`; ekran: `rendering/ui/tarif_draw.gd`; kancalar: `recipe_system.f_makeOrder`, `customer_system.f_deliver` / `f_payCustomer`, `session_system.f_endDay`, `shop_draw`, `day_end_draw`, `order_draw` |
+| Patates tahtasının yeri / boyu / içi | alanlar: `counter_design.gd` (`cut`, `sauce`, `paper`); çizim: `counter_design_hd.gd` (`f_drawCutBoard`); iç noktalar: `potato_system.gd` (`KESME_*`). **Sağ-alt şerit doludur** (sos + kâğıt + tahta + kutu aralarında 2 px): birini büyütürsen önce `tests/tezgah_yerlesim.gd` ve `tests/patates_tahtasi_visual.gd`'yi çalıştır, çakışmayı onlar yakalar |
 | Uçan patates / "fritöze koy" animasyonu | çizim: `remake_gorsel.gd` (`f_hdUcanPatates`, `f_hdUcanCubuk`); mantık: `systems/equipment/potato_system.gd` (`FRITOZ_UCUS`, `f_fritozInis`, `f_inisNoktasi`), `core/game_loop.gd`; kanca adı `ucan_patates` (`HD_KAPALI` ile kapanır) |
 | Web (HTML5) sürümü | `web/kabuk.html` (özel HTML kabuğu), `web/embed-ornek.html`, `web/tek_dosya_yukleyici.js` (tek dosyalık sürüm), `scripts/web_ortam.gd` (tarayıcı: dokunmatik / dil), `export_presets.cfg` (`Web` profili), araçlar: `tools/web_derle.sh [--tek] [--zip]`, `web_tek_dosya.py`, `web_sablon_indir.py`, `web_sunucu.py`, `web_dene.js` |
 | Haptik (titreşim) | `core/haptics.gd` (`DESEN` tablosu: ses adı → titreşim deseni); ayar: `platform_shell.gd`; Android izni: `export_presets.cfg` |
@@ -77,6 +78,7 @@ Kural: **bir hata bulursan önce onu yakalayan bir test (ya da mevcut teste kont
 | `bahis_input`, `bahis_hedef`, `dev_panel` | Bahis paneli girdisi, bahis hedefleri (son 3 gün ortalaması), geliştirici paneli |
 | `cop_kutusu` | Çöp kutusu: dokunmak boşaltır, sürükleyip bırakmak / basılı tutmak ürünü atar (fare, dokunma, kumanda) |
 | `ucan_patates`, `fritoze_koy` (+ `_visual`) | Uçan patates ve "fritöze koy" geçişi: mantık değişmez (süre, stok, kayıt), uçuş / iniş / belirginleşme pikselleri |
+| `tezgah_yerlesim`, `patates_tahtasi_visual` | Tezgâh yerleşimi: hiçbir iki istasyonun alanı üst üste binmez, patates tahtası geniştir ve sos / kâğıt / kutudan en az 2 px uzaktadır, tüm geliştirmeler açıkken de aynı yerde durur; GPU pikselleriyle hiçbir geliştirme tahtanın kutusuna piksel koymaz, tahta kutusunun dışına taşmaz |
 | `web_ortam` | Web sürümünün yapılandırması: tek iş parçacıklı Web profili, GL Compatibility, kabuk yer tutucuları ve 6 dil, gömme örneği, tek dosyalık sürümün yükleyicisi ve üreticisinin kendi kendine sınaması (Python varsa); tarayıcı yardımcıları masaüstünde etkisiz |
 | `haptik` | Titreşim: aygıt yokken sessiz, desen zamanlaması, hız sınırı, ayar kapalı, Android izni |
 | `fritoz_katman` | Eski (HD kapalı) fritöz çiziminde patates çubukları yağ penceresinin dışına taşmaz; F2 yalnız debug'da; HD durum etiketi |
@@ -86,7 +88,7 @@ Kural: **bir hata bulursan önce onu yakalayan bir test (ya da mevcut teste kont
 | `dil_cift`, `ceviri_tarama` | Çeviri kapsamı: koddaki her (tr, en) çifti ve oyun verisi 5 sözlükte var mı |
 | `yazi_tasma` | 6 dilde ~7.400 yazı: ekrandan/pencereden/düğmeden taşma, üst üste binme, çevrilmemiş (Türkçe harfli) yazı |
 | `cila` | Yayın öncesi taramada bulunan kusurların geri gelmemesi (fiş başlığı, rozet sütunu, sayı biçimi, aygıt sözü, sürüm eşitliği…) |
-| `*_visual` | Gerçek GPU penceresiyle ekran kontrolleri (`--gpu-test`) |
+| `*_visual` | Gerçek GPU penceresiyle ekran kontrolleri (`--gpu-test`). Piksel karşılaştırırken oyunu dondur (`set_process(false)`, `advance(0.0)`), girdiyi kapat ve **döner ile sokak sahnesini pencerenin dışında bırak**: `shaders/sis.gdshader` motorun `TIME`'ını kullanır, sokak sahnesi de durmuşken değişir; ikisi aynı durumdaki iki karede bile farklı piksel verir |
 
 **Botlar:** `tests/usta_bot.gd` oyunu insan hızında baştan oynar (kural/çökme avı; `--tam`, `--sehir N`, `--tohum`); `tests/kaos.gd` rastgele eylemlerle kırmaya çalışır.
 

@@ -136,7 +136,7 @@ Kaynak HTML'de kapalı olan ve HTML'ye gömülmemiş özel karakter atlasları b
 | `scripts/core/` | Başlangıç verisi, dil, ses işaretleri ve ortak yardımcılar |
 | `scripts/order_flow.gd` | Sipariş modüllerini mevcut sahneye bağlayan kısa adaptör |
 | `scripts/rendering/order_draw.gd` | Sipariş balonları, malzeme simgeleri ve paket fişi |
-| `scripts/counter_design.gd` | Onaylanan tezgâh düzeni, istasyon ölçüleri ve yeni ekipman çizimleri |
+| `scripts/counter_design.gd` | Onaylanan tezgâh düzeni, istasyon ölçüleri ve yeni ekipman çizimleri (patates tahtası ve komşuları `tests/tezgah_yerlesim.gd` ile kilitli) |
 | `scripts/game_sprites.gd` | Sprite çizimi, müşteri pozları ve yoğurt önbelleği |
 | `scripts/gpu_canvas.gd` | GPU üzerinde çizim, atlas bölgeleri, kırpma ve renk filtresi |
 | `scripts/sprite_library.gd` | Düzenlenebilir PNG atlasları ve manifest yükleyicisi |

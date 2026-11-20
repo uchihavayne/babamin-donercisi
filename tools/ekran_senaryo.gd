@@ -16,6 +16,7 @@
 #   kisisel rekor borc ses_dukkan basarim ses rekor_baslik mola giris ogretici telefon
 #   gece_caldi son_saniye kapanis yardim ayarlar defter yeni_sayfa dukkan_defter tarif_balon
 #   patates_ucus fritoze_koy (akicilik: ucan patates / fritoze koyma kareleri; --adim N kare araligi, --say N goruntu)
+#   patates_tahta (tezgahtaki patates tahtasi, oyun donuk: --durum bos|patates|kesim|dolu, --seviye N = tum gelistirmeler N. kademe, yoksa hepsi tam)
 #   (defter: --sayfa 1-8, --gun N bulunan sayfalarin gunu; yeni_sayfa: --gun N, --sayfa 1-8, --kare N)
 # Linux'ta ekransiz sunucuda: xvfb-run -a -s "-screen 0 1280x720x24" godot --rendering-driver opengl3 ...
 extends SceneTree
@@ -302,6 +303,23 @@ func calis() -> void:
 				await adim(int(arg("--adim", "2")))
 				g.j_BSQ.kuyruk = []
 				await kaydet("_%02d" % i)
+		"patates_tahta":
+			# patates tahtasi + komsulari (sos, kagit, fritoz, kutu): oyun donuk, otomatik dograyici / fritoz tahtayi degistirmez
+			var sev := arg("--seviye", "")
+			kur(12.0, sev == "", -1, int(sev) if sev != "" else -1)
+			g.set_process(false)
+			var durum := arg("--durum", "dolu")
+			G.cut.potato = durum == "patates" or durum == "kesim" or durum == "dolu"
+			G.cut.prog = 0.5 if durum == "kesim" else 0.0
+			G.cut.raw = 14.0 if durum == "dolu" else (3.0 if durum == "kesim" else 0.0)
+			G.cut.land = 0.0; G.cut.cutting = false; G.cut.slash = []
+			G.flyP = null; G.flyF = null
+			G.fryer.state = "fry"; G.fryer.t = 0.0; G.fryer.dur = 99999.0; G.fryer.load = 3.0
+			g.j_BSQ.kuyruk = []
+			g.j_IN.x = 2.0; g.j_IN.y = 2.0
+			g.advance(0.0)
+			await process_frame
+			await kaydet("_" + durum + ("" if sev == "" else "_s" + sev))
 		"kalabalik":
 			# en yogun an: 5 musteri + sira + telefon fisi + kedi + rakip + mufettis
 			kur(25.0, true)

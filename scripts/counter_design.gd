@@ -14,9 +14,9 @@ func _ready() -> void:
 		"yogurt":Rect2(196,153,44,32), "friesT":Rect2(240,153,44,32),
 		"garnish":Rect2(284,153,44,27),
 		"bread":Rect2(80,194,48,40), "board":Rect2(130,187,150,48),
-		"paper":Rect2(308,208,24,27), "sauce":Rect2(288,180,44,27),
+		"paper":Rect2(298,208,24,27), "sauce":Rect2(286,180,38,27),
 		"fryer":Rect2(336,153,51,43), "grill":Rect2(391,151,48,45),
-		"cut":Rect2(336,198,51,37), "fbox":Rect2(391,199,46,36),
+		"cut":Rect2(326,198,63,37), "fbox":Rect2(391,199,46,36),
 		"drinkM":Rect2(418,92,56,58), "ayran":Rect2(461,108,13,54),
 		"sweet":Rect2(440,175,34,27), "potato":Rect2(391,241,46,28),
 		"crate":Rect2(337,241,49,28), "trash":Rect2(442,218,31,50)}

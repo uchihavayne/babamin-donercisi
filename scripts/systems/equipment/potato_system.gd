@@ -1,13 +1,31 @@
 # Potato system. See CODE_MAP.md.
 extends "res://scripts/core/game_module.gd"
 
+# PATATES TAHTASI ic yerlesimi (HD, mantik px, tahtanin sol-ust kosesine gore). Tahta 63 px genisligindedir ve soldan saga
+# uc bolgesi var: [patates + dilimler][satir][celik kap + cig cubuklar + sayac]. Cizim (counter_design_hd.f_drawCutBoard),
+# ucan patatesin inis noktasi, kesik izleri ve cubuk kalkis noktasi AYNI sabitleri kullanir.
+const KESME_PATATES := Vector2(17.0, 19.0)   # tahtadaki patatesin capasi (merkez)
+const KESME_SATIR_X := 33.0                   # satirin dinlenme konumu (sag bolgenin solu)
+const KESME_KAP_SAG := 20.0                   # celik kabin sag kenari, tahtanin sag kenarindan uzakligi + kap genisligi (16)
+const KESME_KAP_UST := 14.0                   # celik kabin ust kenari, tahtanin ustunden
+
+# celik kabin sol-ust kosesi (kesme_kap parcasi 16x16)
+func f_kapNoktasi(x: Variant, y: Variant, w: Variant) -> Vector2:
+	return Vector2(float(x) + float(w) - KESME_KAP_SAG, float(y) + KESME_KAP_UST)
+
 # Patatesin tahtada OTURDUGU nokta (merkez, mantik pikseli). Ucus tam buraya iner, boylece inis aninda
-# statik cizime "sicrama" olmaz: HD'de sprite capasi (counter_design_hd.f_drawCutBoard: x+17, y+19), eski
+# statik cizime "sicrama" olmaz: HD'de sprite capasi (counter_design_hd.f_drawCutBoard: KESME_PATATES), eski
 # cizimde elipsin merkezi (counter_design.f_drawCutBoard: x+w/2, y+h/2). (flyP.x1/y1 eski cizgi icin kalir.)
 func f_inisNoktasi() -> Vector2:
 	var c: Dictionary = game.j_ST.cut
-	if game.hd_ucan_acik(): return Vector2(float(c.x) + 17.0, float(c.y) + 19.0)
+	if game.hd_ucan_acik(): return Vector2(float(c.x), float(c.y)) + KESME_PATATES
 	return Vector2(float(c.x) + float(c.w) / 2.0, float(c.y) + float(c.h) / 2.0)
+
+# bicak izlerinin yatay merkezi: HD'de patatesin biraz sagi, eski cizimde elipsin biraz solu (iki cizimde de patatesin ustunde)
+func f_kesikX() -> float:
+	var c: Dictionary = game.j_ST.cut
+	if game.hd_ucan_acik(): return float(c.x) + KESME_PATATES.x + 2.5
+	return float(c.x) + float(c.w) / 2.0 - 6.0
 
 # ---------------------------------------------------------------- fritoze koyma ucusu
 # Kullanici: "fritoze koy gecisi anlik". MANTIK AYNEN: f_fryerClick cubuklari alir, kizartma t=0'da baslar.
@@ -18,7 +36,7 @@ const FRITOZ_UCUS := 0.30
 # cubuklarin kalktigi nokta (tahtadaki ham yigin) ve sepet agzi; HD ile eski cizim biraz farkli yerlestirir
 func f_cubukBaslangic() -> Vector2:
 	var c: Dictionary = game.j_ST.cut
-	if game.hd_ucan_acik(): return Vector2(float(c.x) + 40.0, float(c.y) + 20.0)   # HD: tahtanin sagindaki cig_cubuk yigini
+	if game.hd_ucan_acik(): return f_kapNoktasi(c.x, c.y, c.w) + Vector2(8.0, 10.0)   # HD: celik kaptaki cig_cubuk yigini
 	return Vector2(float(c.x) + 20.0, float(c.y) + 22.0)                           # eski cizim: tahtaya serpili cubuklar
 
 func f_sepetNoktasi() -> Vector2:
@@ -57,7 +75,7 @@ func f_slashAt() -> Variant:
 	v_c = J.getv(game.j_G, "cut")
 	if (not J.truth(J.getv(v_c, "slash"))):
 		J.setv(v_c, "slash", [])
-	v_mx = (J.add(J.getv(J.getv(game.j_ST, "cut"), "x"), (float(J.getv(J.getv(game.j_ST, "cut"), "w")) / float(2.0))) - 6.0)
+	v_mx = game.potato_system.f_kesikX()
 	J.setv(v_c, "yon", ((-J.n(1.0)) if J.eq(J.getv(v_c, "yon"), 1.0) else 1.0))
 	v_taban = ((-J.n(0.72)) if J.gt(J.getv(v_c, "yon"), 0.0) else (-J.n(2.42)))
 	J.method(J.getv(v_c, "slash"), "push", [{"x": J.add(v_mx, game.math_utils.f_rnd((-J.n(6.0)), 8.0)), "y": J.add(J.add(J.getv(J.getv(game.j_ST, "cut"), "y"), 18.0), game.math_utils.f_rnd((-J.n(3.0)), 3.0)), "aci": J.add(v_taban, game.math_utils.f_rnd((-J.n(0.26)), 0.26)), "boy": game.math_utils.f_rnd(24.0, 34.0), "t": 1.0}])

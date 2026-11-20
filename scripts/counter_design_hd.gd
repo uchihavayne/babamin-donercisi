@@ -171,26 +171,40 @@ func f_drawGrill(x: Variant = null, y: Variant = null, w: Variant = null, h: Var
 # ekle"): remake'in kesim asamalari (patates sagdan kisalir, kesik yuzu acik),
 # dogranan dilimler yanda birikir, oyunun kendi bicak izleri (C.slash) cizilir,
 # satir kesim yuzune inip kalkar; darbe aninda kirintilar (zaman+hash, oyunun
-# rastgele ureticisine dokunmaz). Hazir cig cubuklar tahtanin sagina dizilir.
+# rastgele ureticisine dokunmaz).
+# TAHTA GENISLETILDI (kullanici: "patates kesme tahtasini daha buyuk, genis, anlasilabilir yap, ama upgradeler
+# ustuste binmesin"): tahta 51 -> 63 mantik px; sol sutun / sag taraf 1:1, aradaki duz sutun yatay uzatilir.
+# Ic yerlesim soldan saga UC BOLGE: [patates + dilimler][satir][celik kap + cig cubuklar + sayac].
+# Sabit noktalar potato_system'de (KESME_*): ucan patatesin inis noktasi, kesik izleri, cubuk kalkis noktasi.
 func f_drawCutBoard(x: Variant = null, y: Variant = null, w: Variant = null, h: Variant = null, state: Variant = null, time: Variant = null) -> Variant:
 	if not t2_hd(): return super.f_drawCutBoard(x, y, w, h, state, time)
 	var A := _t2()
 	var TZ := atlas("tezgah")
 	var T: float = float(time)
-	hd_ciz(A, "kesme_tahta", x, y)
-	# hazir cig cubuklar: sag tarafta duzgun yigin (en fazla 12)
-	if state.raw > 0 and not TZ.is_empty():
-		var n := mini(12, int(state.raw) * 2)
+	_kesme_tahtasi(A, x, y, float(w))
+	var pk: Vector2 = potato_system.f_kapNoktasi(x, y, w)
+	var ax: float = x + potato_system.KESME_PATATES.x
+	var ay: float = y + potato_system.KESME_PATATES.y
+	# bos tahta: patatesin gelecegi yerde soluk izli patates (dil gerektirmez, "patates buraya" der).
+	# Kanca adi "kesme_iz" (HD_KAPALI=kesme_iz ile kapanir; piksel olcen testler baseline'i izsiz almak icin kapatir)
+	if hd("kesme_iz") and not state.potato and j_G.get("flyP") == null and not TZ.is_empty() and A.parca.has("patates_butun"):
+		hd_ciz(A, "patates_butun", ax + 2.0, ay + 0.5, 0.26, false, Color(0.62, 0.42, 0.24))
+	# celik kap: hazir cig cubuklar icinde, yani "kesilenler buraya gider" gorunur
+	if not TZ.is_empty() and TZ.parca.has("kesme_kap"):
+		var kp: Array = TZ.parca["kesme_kap"]
+		hd_ciz(TZ, "kesme_kap", pk.x - float(kp[4]), pk.y - float(kp[5]))
+		var n := mini(15, int(state.raw) * 2)
 		for i in n:
-			var sira := int(i / 6)
-			hd_ciz(TZ, "cig_cubuk", x + 32.0 + (i % 6) * 2.6 - sira * 1.3, y + 22.0 - sira * 4.0)
-	var satir_x: float = x + w - 12
+			var sira := int(i / 5)
+			hd_ciz(TZ, "cig_cubuk", pk.x + 2.0 + (i % 5) * 2.4, pk.y + 10.0 - sira * 4.0)
+		if state.raw > 0:
+			# kap acikligina oturan kucuk sayac: kac porsiyon cig patates hazir
+			text_draw.f_txt(str(int(state.raw)), pk.x + 16.0, pk.y - 4.5, "#f8ecc0", {"align": "r", "outline": "rgba(0,0,0,.55)"})
+	var satir_x: float = x + potato_system.KESME_SATIR_X
 	var satir_y: float = y + h / 2 - 6
 	if state.potato and not TZ.is_empty():
 		var prog: float = clampf(float(state.prog), 0.0, 1.0)
 		var pw := clampi(int(maxf(2.0, floorf(11.0 * (1.0 - prog) + .5))), 2, 11)
-		var ax: float = x + 17.0
-		var ay: float = y + 19.0
 		# inis ezilmesi (akicilik cilasi): patates tahtaya inince alt kenari sabit kalip kisaca ezilir, hafif yaylanir
 		var ln: float = clampf(J.n(state.get("land", 0.0)), 0.0, 1.0)
 		if ln > 0.0 and pw == 11 and TZ.parca.has("patates_11"):
@@ -220,6 +234,22 @@ func f_drawCutBoard(x: Variant = null, y: Variant = null, w: Variant = null, h: 
 		hd_ciz(A, "patates_butun", x + w / 2, y + h / 2)
 	hd_ciz(A, "satir", satir_x, f_hdYarimPx(satir_y))
 	return null
+
+# genisletilmis tahta: kesme_tahta parcasi KES (46) sutunundan ikiye bolunur, aradaki 1 piksellik duz sutun
+# (cizik yok) yatay uzatilir. Tahta 51 mantik px'e esitse ya da kucukse parca aynen cizilir.
+func _kesme_tahtasi(A: Dictionary, x: float, y: float, w: float) -> void:
+	var p: Array = A.parca["kesme_tahta"]
+	var hdk: float = float(A.hd)
+	var ekstra: int = roundi((w - float(p[2]) / hdk) * hdk)      # eklenecek HD piksel
+	if ekstra <= 0:
+		hd_ciz(A, "kesme_tahta", x, y)
+		return
+	const KES := 46
+	var lx: float = x + float(p[4])
+	var ly: float = y + float(p[5])
+	draw_context.texture_hd(A.tex, Rect2(p[0], p[1], KES, p[3]), lx, ly)
+	draw_context.texture_hd_rect(A.tex, Rect2(float(p[0]) + KES, p[1], 1, p[3]), lx + KES / hdk, ly, ekstra / hdk, float(p[3]) / hdk)
+	draw_context.texture_hd(A.tex, Rect2(float(p[0]) + KES, p[1], float(p[2]) - KES, p[3]), lx + (KES + ekstra) / hdk, ly)
 
 # darbe kirintilari: 5 minik nisasta parcasi kesik yuzden disari savrulur
 func _dogrma_kirinti(x: float, y: float, k: float, vurus: float) -> void:
