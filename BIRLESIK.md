@@ -540,3 +540,23 @@ Eskiden şehir yalnız görseldi (sokak, hava, müşteri görünümü); "Burada 
 - **Arayüz:** şube panelinde her açık / sıradaki şehirde amber rozet; panel altında prim notu; gün giriş kartında "ŞEHİR KURALI: …" + açıklama + prim satırı (hava / maç satırlarıyla birlikte, kart genişliğe göre ayarlanır); giriş kartı artık "Kalan borç … • N şube" satırına göre de genişler (Fransızca / İspanyolcada 1-3 px taşıyordu).
 - **Çeviri:** 27 metin × 5 dil (8 ad, 8 rozet, 8 açıklama, 3 genel). **Test:** `tests/sehir_kural.gd` (202 denetim: veri + çeviri, her kuralın etkisi evle karşılaştırmalı, Paris cezası aralığı, Tokyo teslim, evsiz, prim, gün sonu, çizimler) + 20 bozma denemesi (hepsi yakalandı) + `yazi_tasma`'ya 8 şehir × 4 hava giriş kartı.
 
+### Hikâye yayıldı + kapanış Demirkent'e bağlandı (4/4)
+
+Eleştiri: hikâye iki yerde duruyordu (açılış ve kapanış); aradaki 80 gün sessizdi, Baba / icra / rakip yalnız etiketti, Demirkent hiçbir şeye bağlı değildi. Şimdi gün sonunda, koşul **ilk** sağlandığında bir kez, 8 kısa yazı kartı çıkar (TAMAM'a kadar "DÜKKÂNA GİT" yok):
+
+| Kart | Ne zaman | Ton |
+| --- | --- | --- |
+| İCRA DAİRESİ | 6. gün sonu (taksit birikmeye başlar) | resmi; icra kuralının anlatımı (ilk ziyaret 13. sabah, ihtar → mühür) |
+| KARŞIDAKİ DÜKKÂN | rakip ilk göründüğünde | Kâmil Usta: babamın eski çırağı, küsmüştü, şimdi bahse tutuşuyor |
+| BABA'NIN SÖZÜ | ilk şube açılınca | "Bir tezgâh mahalleyi doyurur, iyi bir ad şehirleri." |
+| HAMDİ BEY | 3. icra ziyaretinden sonra | memurun insan yüzü: "Kural kural. Ama ben senin yanındayım." |
+| KÂMİL USTA | rakip kepenk indirince | "Baban haklıydı, usta." |
+| YARI YOL | borç yarıya inince | "Yarı yol, yol sayılmaz." |
+| DEMİRKENT'TEN MEKTUP | 8. şube açılınca | devlet mührü; ferman, 2,5 milyon |
+| DEMİRKENT'İN İLK GÜNÜ | Demirkent'te ilk gün sonu | ev kirası, yemek, ısınma, ilaç: dükkân kazanırsa sofra kurulur |
+
+- **Arayüz:** üç görünüm (resmi gri-mavi + kırmızı mühür, mektup krem + zarf, Baba parşömen + altın yıldız); satırlar sırayla belirir, karta basmak hepsini gösterir (aynı basış TAMAM'a basmaz). Ayrı kart olmadığı için `modal_fx` panel geçişi ve karartması aynen kullanılır; kartın yeri alttaki başarım bildiriminin üstünde kalacak şekilde seçildi.
+- **Kayıt:** `G.hikaye = {gorulen, sira}` ilerleme kaydında. **Eski kayıtta** o an sağlanan koşullar "görüldü" sayılır (eski oyuncuya bir anda kart yığını gösterilmez). Bu iş sırasında **bulunan hata:** `rakipTanisti` yeni oyunda sıfırlanmıyordu (önceki oyundan kalıyor, rakibin ilk selamı / bu kart ikinci oyunda hiç çıkmıyordu) → `f_resetProgress` artık sıfırlıyor.
+- **Kapanış → Demirkent:** Demirkent'e gidilmişse (`stats.fgunEn > 0` ya da şehir listesinde 8) kapanış hikâyesine, son iki sahnenin önüne, oyuncunun orada **ne yaptığına göre** bir sahne eklenir: kapıya **mühür yedi** (`stats.muhur ≥ 1`: "Kepengi yine kaldırdım; o şehirde ısrar şart"), **5+ aç doyurdu** (`stats.fed ≥ 5`: "Ferman ne derse desin, Baba'nın sözü eskidir") ya da **fermana uydu**; üçüncü satır **ailenin** durumu (`G.hane`: hepsi yaşıyorsa "Sofra eksiksiz", biri gittiyse "Ama sofrada boş sandalyeler kaldı"). Resim: tek tip gri gökdelenler, kırmızı ferman bayrağı; mühür yiyende kepenkte sarı-siyah şerit, aç doyurmuşsa pencerede buharlı kase. Hiç gitmemişse kapanış eskisi gibi 5 sahne (`j_EPI_TEMEL`).
+- **Çeviri:** 49 metin × 5 dil. **Test:** `tests/hikaye.gd` (352 denetim: veri + çeviri, 8 koşulun sınırları, sıra / tekrar, gün sonu akışı ve tıklama, kayıt / bozuk / eski kayıt, kapanış varyantları ve çizimleri, `rakipTanisti` sıfırlama) + 22 bozma denemesi (hepsi yakalandı) + `yazi_tasma` (8 kart + 3 kapanış varyantı, 6 dil; kısaltma yok).
+

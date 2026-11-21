@@ -33,7 +33,7 @@ func f_saveUyar() -> Variant:
 
 # game.js:233
 func f_saveAll() -> Variant:
-	game.f_saveGame({"day": J.getv(game.j_G, "day"), "money": J.getv(game.j_G, "money"), "up": J.getv(game.j_G, "up"), "best": J.getv(game.j_G, "best"), "totalSold": J.getv(game.j_G, "totalSold"), "debt": J.getv(game.j_G, "debt"), "stats": J.getv(game.j_G, "stats"), "custom": J.getv(game.j_G, "custom"), "moto": J.getv(game.j_G, "moto"), "prologueSeen": J.getv(game.j_G, "prologueSeen"), "luck": J.getv(game.j_G, "luck"), "branch": J.getv(game.j_G, "branch"), "city": J.getv(game.j_G, "city"), "dersGorulmus": J.getv(game.j_G, "dersGorulmus"), "fpara": J.getv(game.j_G, "fpara"), "fgun": J.getv(game.j_G, "fgun"), "hane": J.getv(game.j_G, "hane"), "fbatik": J.getv(game.j_G, "fbatik"), "ev": J.getv(game.j_G, "ev"), "bs": J.getv(game.j_G, "bs"), "ozelHedef": J.getv(game.j_G, "ozelHedef"), "ozelGecmis": J.getv(game.j_G, "ozelGecmis"), "bahisGecmis": J.getv(game.j_G, "bahisGecmis"), "tarif": J.getv(game.j_G, "tarif"), "rakipHedef": J.getv(game.j_G, "rakipHedef"), "rakipKapandi": J.getv(game.j_G, "rakipKapandi"), "rakipSeri": J.getv(game.j_G, "rakipSeri"), "macHedef": J.getv(game.j_G, "macHedef"), "icra": game.icra_system.f_kayit()})
+	game.f_saveGame({"day": J.getv(game.j_G, "day"), "money": J.getv(game.j_G, "money"), "up": J.getv(game.j_G, "up"), "best": J.getv(game.j_G, "best"), "totalSold": J.getv(game.j_G, "totalSold"), "debt": J.getv(game.j_G, "debt"), "stats": J.getv(game.j_G, "stats"), "custom": J.getv(game.j_G, "custom"), "moto": J.getv(game.j_G, "moto"), "prologueSeen": J.getv(game.j_G, "prologueSeen"), "luck": J.getv(game.j_G, "luck"), "branch": J.getv(game.j_G, "branch"), "city": J.getv(game.j_G, "city"), "dersGorulmus": J.getv(game.j_G, "dersGorulmus"), "fpara": J.getv(game.j_G, "fpara"), "fgun": J.getv(game.j_G, "fgun"), "hane": J.getv(game.j_G, "hane"), "fbatik": J.getv(game.j_G, "fbatik"), "ev": J.getv(game.j_G, "ev"), "bs": J.getv(game.j_G, "bs"), "ozelHedef": J.getv(game.j_G, "ozelHedef"), "ozelGecmis": J.getv(game.j_G, "ozelGecmis"), "bahisGecmis": J.getv(game.j_G, "bahisGecmis"), "tarif": J.getv(game.j_G, "tarif"), "rakipHedef": J.getv(game.j_G, "rakipHedef"), "rakipKapandi": J.getv(game.j_G, "rakipKapandi"), "rakipSeri": J.getv(game.j_G, "rakipSeri"), "macHedef": J.getv(game.j_G, "macHedef"), "icra": game.icra_system.f_kayit(), "hikaye": game.hikaye_system.f_kayit()})
 	if J.eq(J.kind(J.ref(game.save_system.f_saveUyar, 0)), "function"):
 		game.save_system.f_saveUyar()
 	return null
@@ -65,6 +65,7 @@ func f_loadAndGo() -> Variant:
 		J.setv(game.j_G, "rakipKapandi", (not (not J.truth(J.getv(v_s, "rakipKapandi")))))
 		J.setv(game.j_G, "rakipSeri", (J.getv(v_s, "rakipSeri") if J.truth(J.getv(v_s, "rakipSeri")) else 0.0))
 		J.setv(game.j_G, "macHedef", (J.getv(v_s, "macHedef") if J.truth(J.getv(v_s, "macHedef")) else 0.0))
+		game.hikaye_system.f_yukle(J.getv(v_s, "hikaye"))   # gorulen hikaye kartlari (eski kayitta su an saglanan kosullar goruldu sayilir)
 		game.icra_system.f_yukle(J.getv(v_s, "icra"), J.n(J.getv(game.j_G, "day")))   # taksit birikimi / ihtar / muhur (eski kayitta taze, ilk ziyaret en erken 1 hafta sonra)
 		J.setv(game.j_G, "ozelGecmis", (J.getv(v_s, "ozelGecmis") if J.truth(J.getv(v_s, "ozelGecmis")) else {}))
 		var v_bg: Variant = J.getv(v_s, "bahisGecmis")

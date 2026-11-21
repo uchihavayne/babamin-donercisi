@@ -209,7 +209,12 @@ func f_drawIntro(p_t: Variant = null) -> Variant:
 	if J.truth(J.getv(game.j_G, "macGun")): v_acik.append("gün ortasında taraftar akını — acele ederler, bahşiş bol")
 	var v_pw := 192.0
 	for v_a in v_acik: v_pw = maxf(v_pw, J.n(game.f_textW(v_a)) + 24.0)
-	if not v_kural.is_empty(): v_pw = maxf(v_pw, J.n(game.f_textW(str(game.localization.f_T(str(v_kural.acik))))) + 24.0)
+	if not v_kural.is_empty():
+		# sehir kurali satirlari (baslik / aciklama / prim) kisaltilmadan sigsin: kart en genis satira gore genisler
+		v_pw = maxf(v_pw, J.n(game.f_textW(str(game.localization.f_T(str(v_kural.acik))))) + 24.0)
+		v_pw = maxf(v_pw, J.n(game.f_textW(str(game.localization.f_T("ŞEHİR KURALI: ")) + str(game.localization.f_T(str(v_kural.ad))))) + 24.0)
+		if game.city_rules.f_ziyaretTaban(game.j_G) > 0.0:
+			v_pw = maxf(v_pw, J.n(game.f_textW(str(game.localization.f_T("bu şubede çalışırsan geliri %50 artar")))) + 24.0)
 	# "Kalan borc: $... • N sube" satiri (Fransizca / Ispanyolcada 192 px'lik karta 1-3 px siğmiyordu): kart bu satira gore de genisler
 	if J.gt(J.getv(game.j_G, "debt"), 0.0):
 		var v_borcS: String = str(game.localization.f_T("Kalan borç: $")) + str(game.math_utils.f_fmtMoney(J.getv(game.j_G, "debt"))) + (("   •   " + str(J.getv(game.j_G, "branch")) + str(game.localization.f_T(" şube"))) if J.truth(J.getv(game.j_G, "branch")) else "")

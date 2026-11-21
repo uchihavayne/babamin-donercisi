@@ -132,6 +132,7 @@ func run() -> void:
 		dukkan_ekrani(dil)
 		gun_sonu_ve_gece(dil)
 		icra_ekranlari(dil)
+		hikaye_ekranlari(dil)
 	game.localization.f_setLang("tr")
 	for f in failures: push_error(f)
 	print("YAZI TASMA ", JSON.stringify({"olculen": olculen, "failures": failures}))
@@ -237,6 +238,31 @@ func dukkan_ekrani(dil: String) -> void:
 	G.debt = 5000000.0
 	game.j_CUSTOM.open = true; olc(dil, "kisisellestir"); game.j_CUSTOM.open = false
 	game.j_SESP.open = true; olc(dil, "dukkan ses"); game.j_SESP.open = false
+	pencereler_kapali()
+
+# Hikaye kartlari (12. tur): sekiz kart (TAMAM dugmesi satirlar belirince gelir) + kapanis hikayesinin Demirkent sahnesi (uc varyant)
+func hikaye_ekranlari(dil: String) -> void:
+	for h in game.j_HIKAYE:
+		kur(30.0, 2)
+		var G: Dictionary = game.j_G
+		G.scene = "dayend"; G.sceneT = 5.0
+		G.hikaye = {"gorulen": [], "sira": [str(h.id)]}
+		game.hikaye_draw._kimlik = ""
+		olc(dil, "hikaye karti %s" % h.id, 260)
+		G.hikaye = {"gorulen": [], "sira": []}
+	for varyant in ["uyum", "sifa", "direnis"]:
+		kur(90.0, 3)
+		var G: Dictionary = game.j_G
+		G.stats.fgunEn = 12.0
+		G.stats.fed = 7.0 if varyant == "sifa" else 0.0
+		G.stats.muhur = 2.0 if varyant == "direnis" else 0.0
+		G.hane = game.progression_system.f_haneKur()
+		G.hane[1].gitti = (varyant == "direnis")
+		game.story_draw.f_epiStart()
+		for i in game.j_EPI_SCENES.size():
+			game.j_PRO.i = float(i); game.j_PRO.t = 30.0; game.j_PRO.ch = 1000.0
+			olc(dil, "kapanis sahnesi %d (%s)" % [i, varyant], 3)
+		game.story_draw.f_epiFinish()
 	pencereler_kapali()
 
 # Icra (12. tur): sabah memur karti (uc sonuc, buyuk tutarlar), dukkan cubugu uyarisi, oyun ici etiket, borc paneli, gun sonu satiri

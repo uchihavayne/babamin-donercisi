@@ -23,6 +23,7 @@
 #   ret (reddedilen islem: lavassiz et eklemeye calisir, imlecin ustunde kirmizi X + sallanan uyari yazisi; --say N goruntu (20), --adim N (1); HD_KAPALI=ret_fx eski hal)
 #   icra_tamam / icra_ihtar / icra_muhur (sabah kapida icra memuru karti; --bekle N kare), icra_uyari (dukkan cubugu: --gun N, --kasa $), icra_hud (oyun ici etiket: --gun N, --kasa $),
 #   icra_gunsonu (gun sonu karti: taksit birikti satiri)
+#   hikaye (gun sonu hikaye karti: --yazi KIMLIK), epilog_demirkent (kapanis hikayesinin Demirkent sahnesi: --varyant uyum|sifa|direnis, --eksik 1)
 #   sehir_giris / sehir_gunsonu (oynanan sehrin kurali giris kartinda / ziyaret primi yildizi gun sonunda; --sehir N, --gun N); subeler (kural rozetleri)
 #   (defter: --sayfa 1-8, --gun N bulunan sayfalarin gunu; yeni_sayfa: --gun N, --sayfa 1-8, --kare N)
 # Linux'ta ekransiz sunucuda: xvfb-run -a -s "-screen 0 1280x720x24" godot --rendering-driver opengl3 ...
@@ -175,6 +176,27 @@ func calis() -> void:
 				g.session_system.f_endDay()
 				G.tarif.yeni = []
 				await adim(500)
+			await kaydet()
+		"hikaye":
+			# gun sonu hikaye karti (data/hikaye.gd); --yazi KIMLIK (icra_zarf, rakip_tanisma, ilk_sube, icra_memur, rakip_kapandi, yari_yol, demirkent_mektup, demirkent_ilk)
+			kur(30.0, false, -1, 2)
+			G.stat.wraps = 21.0; G.stat.earned = 1840.0; G.money = 1840.0
+			g.session_system.f_endDay()
+			G.tarif.yeni = []
+			G.hikaye = {"gorulen": [], "sira": [arg("--yazi", "icra_zarf")]}
+			await adim(int(arg("--bekle", "300")))
+			await kaydet()
+		"epilog_demirkent":
+			# kapanis hikayesinin Demirkent sahnesi; --varyant uyum | sifa | direnis, --kare N (bekleme)
+			kur(90.0, true)
+			G.stats.fgunEn = 12.0
+			G.stats.fed = 7.0 if arg("--varyant", "uyum") == "sifa" else 0.0
+			G.stats.muhur = 2.0 if arg("--varyant", "uyum") == "direnis" else 0.0
+			G.hane = g.progression_system.f_haneKur()
+			if arg("--eksik", "0") == "1": G.hane[1].gitti = true
+			g.story_draw.f_epiStart()
+			g.j_PRO.i = 3.0
+			await adim(int(arg("--kare", "320")))
 			await kaydet()
 		"icra_gunsonu":
 			kur(8.0, false, -1, 2)

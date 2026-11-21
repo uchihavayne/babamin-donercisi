@@ -94,7 +94,7 @@ func f_drawDayEnd(p_t: Variant = null) -> Variant:
 	elif J.gt(J.getv(game.j_G, "sceneT"), 1.7) and J.gt(J.getv(game.j_G, "debt"), 0.0) and J.lt(J.getv(game.j_G, "day"), game.session_system.TAKSIT_GUN) and not J.truth(game.progression_system.f_fermanSehri(game.j_G)):
 		game.text_draw.f_txt("BORÇ TAKSİTİ", ((float(game.j_W) / float(2.0)) - 92.0), J.add(J.add(v_ly, 26.0), v_dy2), "#a83a2a")
 		game.text_draw.f_txt(game.localization.f_T("6. günden başlar"), J.add((float(game.j_W) / float(2.0)), 92.0), J.add(J.add(v_ly, 26.0), v_dy2), J.getv(game.j_P, "ui3"), {"align": "r"})
-	if ((((not J.truth(J.getv(game.j_G, "tutanak"))) and J.gt(J.getv(game.j_G, "sceneT"), 1.9)) and (not J.truth(J.getv(game.j_G, "celeb")))) and (not game.tarif_system.f_yeniVar()) and J.truth(game.f_button(((float(game.j_W) / float(2.0)) - 46.0), J.add(J.add(v_y, 156.0), v_extraH), 92.0, 18.0, "DÜKKÂNA GİT", J.getv(game.j_P, "red1"), true))):
+	if ((((not J.truth(J.getv(game.j_G, "tutanak"))) and J.gt(J.getv(game.j_G, "sceneT"), 1.9)) and (not J.truth(J.getv(game.j_G, "celeb")))) and (not game.tarif_system.f_yeniVar()) and (not game.hikaye_system.f_kartAcik()) and J.truth(game.f_button(((float(game.j_W) / float(2.0)) - 46.0), J.add(J.add(v_y, 156.0), v_extraH), 92.0, 18.0, "DÜKKÂNA GİT", J.getv(game.j_P, "red1"), true))):
 		J.method(game.j_SFX, "ui", [])
 		J.setv(game.j_G, "scene", "shop")
 		J.setv(game.j_G, "sceneT", 0.0)
@@ -105,6 +105,8 @@ func f_drawDayEnd(p_t: Variant = null) -> Variant:
 		game.day_end_draw.f_drawTutanak(v_t)
 	if J.truth(J.getv(game.j_G, "celeb")):
 		game.title_draw.f_drawDebtFree(v_t)
+	elif (not J.truth(J.getv(game.j_G, "tutanak"))) and J.gt(J.getv(game.j_G, "sceneT"), 1.9) and game.hikaye_system.f_kartAcik():
+		game.hikaye_draw.f_drawKart(v_t)   # kisa hikaye karti (data/hikaye.gd): TAMAM'a kadar dukkana gecilmez
 	elif (not J.truth(J.getv(game.j_G, "tutanak"))) and J.gt(J.getv(game.j_G, "sceneT"), 1.9) and game.tarif_system.f_yeniVar():
 		game.tarif_draw.f_drawYeniSayfa(v_t)   # Baba'nin Defteri: bulunan yeni sayfa (TAMAM'a kadar dukkana gecilmez)
 	return null

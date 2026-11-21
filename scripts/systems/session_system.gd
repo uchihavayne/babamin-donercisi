@@ -206,6 +206,7 @@ func f_endDay() -> Variant:
 			v_tj = J.add(v_tj, 1.0)
 		game.regulation_system.f_fermanIhlal(v_tf2, (float(game.j_W) / float(2.0)), 110.0, "telefon")
 	J.setv(game.j_G, "hesap", (game.household_system.f_hesapKur() if J.truth(game.progression_system.f_fermanSehri(game.j_G)) else null))
+	game.hikaye_system.f_tara()   # yeni saglanan hikaye kartlari (data/hikaye.gd): gun sonu ekraninda TAMAM'a kadar dukkana gecilmez
 	J.setv(game.j_G, "scene", "dayend")
 	J.setv(game.j_G, "sceneT", 0.0)
 	J.method(game.j_SFX, "shutter", [])
@@ -241,6 +242,7 @@ func f_resetProgress() -> Variant:
 	J.setv(game.j_G, "city", (-J.n(1.0)))
 	J.setv(game.j_G, "debt", game.j_DEBT_START)
 	J.setv(game.j_G, "icra", game.icra_system.f_yeni())
+	J.setv(game.j_G, "hikaye", {"gorulen": [], "sira": []})
 	J.setv(game.j_G, "debtCleared", false)
 	J.setv(game.j_G, "celeb", null)
 	J.setv(game.j_G, "luck", 0.0)
@@ -255,6 +257,7 @@ func f_resetProgress() -> Variant:
 	J.setv(game.j_G, "rakipKapandi", false)
 	J.setv(game.j_G, "rakipSeri", 0.0)
 	J.setv(game.j_G, "rakipAcik", false)
+	J.setv(game.j_G, "rakipTanisti", false)   # 12. tur: yeni oyunda rakip yeniden tanisilir (eskiden onceki oyundan kaliyor, ilk selam / hikaye karti hic cikmiyordu)
 	J.setv(game.j_G, "rakip", null)
 	J.setv(game.j_G, "bahis", null)
 	J.setv(game.j_G, "bahisSonuc", null)
