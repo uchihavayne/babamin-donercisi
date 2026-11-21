@@ -6,8 +6,8 @@
 # tahsil eder. Toplam taksit orani ayni kalir; degisen yalniz ZAMANLAMA: o haftanin taksiti dukkandan cikmadan once
 # kasada KALMALIDIR (gunun kazanci o aksam harcanmissa memur gelirken kasa bostur): "rezerv ayir" gerilimi.
 #   - kasa yeter            -> HESAP TAMAM (ihtar silinir)
-#   - kasa yetmez, 1. kusur -> tahsilat kasadaki kadar olur, kalan + %20 gecikme zammi birikir; IHTAR
-#   - kasa yetmez, ust uste 2. kusur -> KEPENK MUHURU: 1 / 2 / 3 gun (her muhurde bir uzar) gelirsiz kaybedilir
+#   - kasa yetmez, 1. kusur -> tahsilat kasadaki kadar olur, kalan + %50 gecikme zammi birikir; IHTAR
+#   - kasa yetmez, ust uste 2. kusur -> KEPENK MUHURU: 2 / 3 / 4 gun (her muhurde bir uzar) gelirsiz kaybedilir
 #     (takvim ilerler, gun sayaci atlar), ihtar sifirlanir, devreden borc birikmeye devam eder.
 #   - borcun tamami birikmis ve kasadaysa memur beklemez: son taksit gun sonunda hemen tahsil edilir (eski davranis)
 # Oyun bitmez (icradan satis yok): ceza, kaybedilen gunlerdir (yaris hissi) ve kaybedilen gelirdir.
@@ -18,8 +18,8 @@ extends "res://scripts/core/game_module.gd"
 const ILK_GUN := 13.0              # ilk icra: 13. gunun sabahi (6.-12. gunlerin taksiti birikmistir)
 const HAFTA := 7.0                 # icra gunleri arasi gun
 const TOLERANS := 0.02             # istenenin %2'sinden azi eksik kalirsa (yuvarlama payi) kusur sayilmaz
-const GECIKME := 0.20              # odenemeyen kismin %20'si gecikme zammi olarak birikene eklenir
-const MUHUR_GUN := [1.0, 2.0, 3.0] # n. muhur kac gun surer (sonrakiler hep sonuncusu)
+const GECIKME := 0.50              # odenemeyen kismin %50'si gecikme zammi olarak birikene eklenir (olcum: %20 iken savurgan oyuncuya ceza ~0 gunluk tempo)
+const MUHUR_GUN := [2.0, 3.0, 4.0] # n. muhur kac gun surer (sonrakiler hep sonuncusu)
 
 func f_yeni() -> Dictionary:
 	return {"birikim": 0.0, "sonraki": ILK_GUN, "ihtar": 0.0, "muhur": 0.0, "atla": 0.0, "ziyaret": 0.0, "ihtarSayisi": 0.0, "sonuc": null}

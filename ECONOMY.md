@@ -206,3 +206,63 @@ Gece hırsızı ile (şubeye biriktir): borç 91 / 81 / 75. günde biter (hırs�
 - **Hırsız notu güncellendi**: çalınan miktar kasanın oranı (`THIEF_MIN..MAX`); 200 günde toplam $55 bin / $4 bin / $12,4 milyon (%55 / %70 / %85). Eski "13-88 bin, geç oyunda önemsiz" notu bugün yanlış okunur: oran sabit, kasa büyüdükçe mutlak tutar büyüyor; ama hep borç bittikten sonra, yani oyun üzerinde etkisi yok. Borç bitişini 1-5 gün geciktiriyor.
 
 Model sınırları: gerçek oyunda telefon / Dayı / bahşiş / olaylar / tarif primi geliri artırır, hatalar azaltır; oyuncu sabit oranda yetişmez (becerisi yükseltmelerle büyür). Rakamlar **yön** gösterir, kesin gün vermez.
+
+## 13. tur: icra, net şube geliri, şehir primi (`tests/tempo.gd --gun 200 --rezerv --hirsiz --beceriler 0.40,0.55,0.70,0.85,0.95,1.00`)
+
+Kullanıcı: "önerdiğin şeyleri uygula". Ekonomiyi değiştiren üç parça; hepsi tek yerde ayarlanır:
+
+| Parça | Sabit | Değer | Yer |
+| --- | --- | --- | --- |
+| İcra: ilk ziyaret / aralık | `ILK_GUN` / `HAFTA` | 13. gün sabahı / 7 gün | `icra_system.gd` |
+| İcra: yuvarlama payı | `TOLERANS` | istenenin %2'si (en az $1) | `icra_system.gd` |
+| İcra: ihtar zammı | `GECIKME` | eksik kalanın **%50'si** birikene eklenir | `icra_system.gd` |
+| İcra: kepenk mühürü | `MUHUR_GUN` | **2 / 3 / 4** gün (sonrakiler 4) | `icra_system.gd` |
+| Taksit oranı / başlangıcı | `j_DEBT_CUT` / `TAKSIT_GUN` | %18 / 6. gün (eskisiyle aynı) | `game_setup.gd`, `session_system.gd` |
+| Şube hacim hedefi | `BR_HEDEF_ILK` / `BR_HEDEF_SON` | gelenin %35'i (≤ 20. gün) → %75'i (≥ 70. gün) | `progression_system.gd` |
+| Şube çarpanı uçları | `BR_MIN` / `BR_MAX` | 0,35 / **1,35** (eskiden 1,15) | `game_setup.gd` |
+| Zincir gideri | `BR_GIDER_SABIT` / `BR_GIDER_DEGISKEN` | taban gelirin %30'u + %18'i × performans | `progression_system.gd` |
+| Şube taban gelirleri | `inc` | eski tablo **×1,6** | `game_setup.gd` |
+| Şehir ziyaret primi | `ZIYARET_PRIM` | çalışılan şubenin taban geliri +%50 | `city_rules.gd` |
+
+Şehir kuralları ve ziyaret primi tempo modeline **girmez** (model ev dükkânında oynar; kural yok, prim yok): prim yalnız başka şehirde çalışan oyuncuya ek gelir ya da (yoğun şehirde) daha büyük hedef demektir. Aynı modelin diğer sınırları 12. turdaki gibi (telefon / Dayı / bahşiş / olay / tarif primi / bahis yok). Sipariş üretimi rastgele olduğundan bir koşudan ötekine **±1-3 gün** oynama olağan.
+
+**Dikkatli oyuncu** (icra sabahına kadar birikmiş taksiti kasada ayırır → 0 ihtar, 0 mühür): borç bitiş günü
+
+| Yetişme | En ucuz yükseltme | Şubeye biriktir | 12. tur: en ucuz | 12. tur: biriktir |
+| --- | --- | --- | --- | --- |
+| %40 | 153 | 134 | – | – |
+| %55 | 103 | 90 | 99 | 86 |
+| %70 | 82 | 75 | 87 | 80 |
+| %85 | 72 | 68 | 78 | 72 |
+| %95 | 69 | 64 | – | – |
+| %100 | 66 | 62 | – | – |
+
+Beceri aralığı açıldı (%55 → %85 arası en ucuz alımda 21 gün → 31 gün, %40 → %100 arası 87 gün); ortalama oyuncu (%70) eskisinden birkaç gün **hızlı** (şube artık gelenin %75'ine kadar hizmeti ödüllendirdiği için yükseltmeler anlamlı), düşük beceri daha **yavaş**. Şube performans çarpanı (gün 40, tüm yükseltmeler, 175 gelen; hedef o gün %51): gelenin %0'ına yetişen 0,35 · %10 0,47 · %20 0,60 · %35 0,83 · %50 1,12 · %70 1,21 · %100 1,35 (eskiden %35'ten sonra düz 1,0-1,15).
+
+**Savurgan oyuncu** (harcayabildiğini harcar, kasa her akşam boş): borç bitiş günü (ihtar / mühür / kayıp gün)
+
+| Yetişme | En ucuz: savurgan | dikkatli | Biriktir: savurgan | dikkatli |
+| --- | --- | --- | --- | --- |
+| %40 | 171 (11 / 5 / 17) | 153 | 131 (5 / 1 / 2) | 134 |
+| %55 | 113 (7 / 3 / 9) | 103 | 91 (3 / 1 / 2) | 90 |
+| %70 | 84 (5 / 2 / 5) | 82 | 73 (1 / 0 / 0) | 75 |
+| %85 | 75 (5 / 2 / 5) | 72 | 65 (3 / 0 / 0) | 68 |
+| %95 | 70 (5 / 2 / 5) | 69 | 63 (0 / 0 / 0) | 64 |
+| %100 | 66 (4 / 1 / 2) | 66 | 60 (2 / 0 / 0) | 62 |
+
+Gece hırsızı ile (biriktir, savurgan): 137 / 92 / 74 / 65 / 64 / 62 (hırsızsız 131 / 91 / 73 / 65 / 63 / 60): 0-6 gün, 12. turdaki 1-5 günle aynı mertebe. Çalınan tutar kasayla orantılı, yani hep geç ve borç bittikten sonra büyük.
+
+**Ceza ayarı nasıl seçildi.** İlk sürüm (%20 zam, mühür 1 / 2 / 3 gün) savurgan oyuncuyu neredeyse hiç yavaşlatmıyordu (en ucuz alım, %55 / %70 / %85: 110 / 82 / 73 gün; dikkatli oyuncu 103-106 / 82 / 72). Yalıtılmış kopyalarda üç sertleştirme denendi (savurgan, en ucuz alım, %55 / %70 / %85):
+
+| Sürüm | Borç bitiş günü |
+| --- | --- |
+| %20 zam · 1 / 2 / 3 gün (ilk) | 110 / 82 / 73 |
+| **%50 zam · 2 / 3 / 4 gün (seçilen)** | **113 / 84 / 75** |
+| %35 zam · 2 / 3 / 5 gün | 114 / 84 / 75 |
+| %100 zam · 2 / 3 / 4 gün | 126 / 88 / 76 |
+
+Seçilen sürüm "ceza yumuşatılmaz" ilkesine uygun sertleşme, ama %100 zam gibi ilk kez ihtar alan yeni oyuncuya (13. gün) orantısız olurdu; mühür süresi zaten asıl acı (kaybedilen gün + gelir).
+
+**Dürüst bulgu / risk — ihtar iyi optimize eden için kısa vadeli kredi.** "Şubeye biriktir" kuralını oynayan savurgan oyuncu cezadan **kaçıyor** (91 / 73 / 65, dikkatli oyuncu 90 / 75 / 68): birikmiş taksiti kasada ayırmak şube alımını geciktiriyor; bir ihtar (kalanın %50'si zam, borç tutarını aşmaz) bu gecikmeden ucuz; ardışık **ikinci** kusur (mühür) ise biriktirene nadiren geliyor (kasa bir hafta içinde yeniden dolar). Ceza gerçek oyuncuda hissediliyor (ihtar kartı, zam, en ucuz alımda %55 için +10 gün, %40'ta +18 gün ve 17 gün mühür), ama şubeyi gözüne kestirmiş bir optimize edici için caydırıcı değil. Kolay kaldıraçlar: `GECIKME` (zammı yalnız eksikten değil birikmiş taksit toplamından ya da günlük kazançtan hesaplamak), ihtarı tek kusurda 1 günlük mühüre çevirmek, `TOLERANS`'ı sıfırlamak. Dokunulmadı: bu, bir oyun sertliği kararı; kullanıcıya bırakıldı.
+
+**Para sinki**: zincir gideri (taban gelirin %30-48'i) şube gelirini küçültüyor, ama borç bittikten sonra kasa hâlâ boşta birikiyor (en ucuz alımda %70 yetişmede 100. gün ~$45M, 120. gün ~$78M). Gerçek bir harcama kalemi (şube yenileme, reklam, personel) bu turda yok; ayrı karar.

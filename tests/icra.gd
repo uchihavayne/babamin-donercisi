@@ -85,11 +85,11 @@ func run() -> void:
 	# ---- 4) ilk kusur: ihtar, gecikme zammi, kasadaki kadar tahsilat
 	s = sabah(300.0, 1000.0)
 	G2 = game.j_G
-	check(s.durum == "ihtar" and s.odenen == 300.0 and s.eksik == 700.0 and s.zam == 140.0, "short cash: all the cash is taken, 20 percent late fee on the rest, WARNING")
-	check(G2.money == 0.0 and G2.icra.birikim == 840.0 and G2.icra.ihtar == 1.0 and G2.icra.ihtarSayisi == 1.0 and G2.icra.atla == 0.0, "warning: remainder + fee keep accruing, no seal yet")
+	check(s.durum == "ihtar" and s.odenen == 300.0 and s.eksik == 700.0 and s.zam == 350.0, "short cash: all the cash is taken, 50 percent late fee on the rest, WARNING")
+	check(G2.money == 0.0 and G2.icra.birikim == 1050.0 and G2.icra.ihtar == 1.0 and G2.icra.ihtarSayisi == 1.0 and G2.icra.atla == 0.0, "warning: remainder + fee keep accruing, no seal yet")
 	check(G2.debt == 5000000.0 - 300.0, "the taken cash reduces the debt")
-	# ---- 5) ust uste ikinci kusur: kepenk muhru; sureler 1, 2, 3, 3
-	var beklenen := [1.0, 2.0, 3.0, 3.0]
+	# ---- 5) ust uste ikinci kusur: kepenk muhru; sureler 2, 3, 4, 4
+	var beklenen := [2.0, 3.0, 4.0, 4.0]
 	G2.day = 19.0
 	for k in 4:
 		G2.money = 10.0
@@ -149,7 +149,7 @@ func run() -> void:
 	var y: Dictionary = I.f_yukle(json, 20.0)
 	check(y.birikim == 1234.0 and y.sonraki == 27.0 and y.ihtar == 1.0 and y.muhur == 2.0 and y.atla == 2.0 and y.ziyaret == 3.0 and y.ihtarSayisi == 4.0 and y.sonuc == null, "save round trip is exact")
 	y = I.f_yukle({"birikim": -5.0, "sonraki": "x", "ihtar": 7.0, "atla": 99.0, "muhur": NAN}, 20.0)
-	check(y.birikim == 0.0 and y.sonraki == 13.0 and y.ihtar == 1.0 and y.atla == 3.0 and y.muhur == 0.0, "corrupt save fields are sanitized")
+	check(y.birikim == 0.0 and y.sonraki == 13.0 and y.ihtar == 1.0 and y.atla == 4.0 and y.muhur == 0.0, "corrupt save fields are sanitized")
 	y = I.f_yukle(null, 20.0)
 	check(y.sonraki == 27.0 and y.birikim == 0.0, "an old save (no icra data) starts a week after the load day")
 	y = I.f_yukle(null, 3.0)
@@ -175,7 +175,7 @@ func run() -> void:
 		check(I.f_kartAcik() and G.icra.sonuc.durum == durum, "%s: the card outcome" % durum)
 		step(40)   # kart cizimi hatasiz (ses / sarsinti ilk karede)
 		click(Vector2(240, 200))   # TAMAM
-		var beklenen_gun := 13.0 + (1.0 if durum == "muhur" else 0.0)
+		var beklenen_gun := 13.0 + (2.0 if durum == "muhur" else 0.0)
 		check(not I.f_kartAcik() and G.day == beklenen_gun and (G.scene == "intro" or G.scene == "night"), "%s: OK starts the day (%d)" % [durum, int(beklenen_gun)])
 	# icra yoksa dugme dogrudan gunu baslatir
 	G = taze(8.0)
