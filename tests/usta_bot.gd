@@ -47,6 +47,8 @@ func denetle() -> void:
 	var ferman: bool = J.truth(game.progression_system.f_fermanSehri(G))
 	ihlal(is_finite(float(G.money)) and (ferman or float(G.money) >= 0.0), "para gecersiz: %s" % G.money)
 	ihlal(float(G.debt) >= 0.0, "borc eksi")
+	var ic: Dictionary = G.icra if G.get("icra") is Dictionary else {}   # icra (events/icra_system.gd): birikim hic eksi / borcu asan olmaz
+	ihlal(ic.is_empty() or (float(ic.birikim) >= 0.0 and float(ic.birikim) <= float(G.debt) + 0.01 and float(ic.ihtar) in [0.0, 1.0] and float(ic.atla) >= 0.0), "icra durumu gecersiz: %s" % str(ic))
 	ihlal(float(G.meat) >= 0.0 and float(G.meat) <= float(tun("meatCap")) + 0.01, "et tepsisi sinir disi: %s" % G.meat)
 	ihlal(float(G.friesTray) >= 0.0 and float(G.friesTray) <= float(tun("friesCap")) + 0.01, "patates tepsisi sinir disi: %s" % G.friesTray)
 	for it in game.stock_system.f_crateItems():
@@ -385,8 +387,15 @@ func dukkan_ve_gece() -> Dictionary:
 			if float(p) < en_fiyat: en_fiyat = float(p); en = u
 		if en == null or not game.upgrade_system.buy(en.id): break
 		alinan.append(en.id)
+	# icra sabahi: memur birikmis taksiti kasadan alir (ihtar / kepenk muhru); bot karti okuyup gecer, muhur gunleri atlanir
+	var memur := {}
+	if game.icra_system.f_sabahZiyareti():
+		var sn: Dictionary = G.icra.sonuc
+		memur = {"durum": str(sn.durum), "istenen": int(sn.istenen), "odenen": int(sn.odenen), "atla": int(sn.atla)}
+		game.icra_system.f_kartKapat()
+	while game.hikaye_system.f_kartAcik(): game.hikaye_system.f_kartKapat()   # gun sonu hikaye kartlari
 	var once := float(G.money)
-	G.day += 1.0
+	G.day += game.icra_system.f_gunAtla()
 	game.event_system.f_rollNight()
 	var gece := {}
 	if J.truth(G.get("night")):
@@ -394,7 +403,7 @@ func dukkan_ve_gece() -> Dictionary:
 		for i in 60 * 14: game.advance(1.0 / 60.0)
 		gece = {"hirsiz": true, "caldi": J.truth(G.night.stole), "kayip": int(once - float(G.money))}
 	G.scene = "intro"
-	return {"alinan": alinan, "gece": gece}
+	return {"alinan": alinan, "gece": gece, "memur": memur}
 
 func run() -> void:
 	game = load("res://scripts/platform_game.gd").new()
@@ -432,6 +441,8 @@ func run() -> void:
 		var dk := dukkan_ve_gece()
 		r["alinan"] = dk.alinan
 		if not dk.gece.is_empty(): r["gece"] = dk.gece
+		if not dk.memur.is_empty(): r["icra"] = dk.memur
+		r["birikim"] = int(G.icra.birikim)
 		r["kasa"] = int(G.money)
 		print("GUN ", JSON.stringify(r))
 	print("IHLAL ", JSON.stringify(ihlaller))
