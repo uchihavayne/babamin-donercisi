@@ -180,3 +180,29 @@ Sipariş başına ortalama gelir (30 000 sipariş, aynı rastgele akış; hepsi 
 
 Yorum: artış, tarif sayfaları gün 3 – 72 arasında açıldığı ve usta seviyesi tarif başına 40 doğru servis gerektirdiği için kademelidir; erken oyunda (yalnız Acılı / Sarımsaklı) etki küçük, tam kadroda ~%9-12'dir. Prim yalnız **kusursuz** teslimde alınır; yanlış sos, eksik malzeme ya da kızgın müşteri primi sıfırlar ve ek hazırlık / dikkat ister (sert kural yumuşatılmadı). Ayar noktaları: `data/tarif.gd` (`carpan`, `menu`, `gun`), `tarif_system.gd` (`SANS`, `USTA_ESIK`, `USTA_ARTIS`).
 
+
+## 12. tur: tempo güncel kodla yeniden ölçüldü (`tests/tempo.gd --gun 200 --hirsiz --gunluk`)
+
+Kullanıcı: "tempoyu güncel kodla yeniden ölç". Model aynı (gerçek sipariş üretimi, fiyat, gün sonu, yükseltme / şube alımı; oyuncu gelen müşterinin sabit bir oranına yetişir; telefon, Dayı, bahşiş, olaylar, tarif primi ve bahis YOK). Kayıp tarifler, rakip bahisleri, kesme efekti, panel / ret geri bildirimi, haptik, web sürümü sonrası ölçüldü:
+
+| Alım kuralı | Yetişme | İlk şube | Borç biter | 60. gün kalan borç (ödenen) | 8. tur: borç biter |
+| --- | --- | --- | --- | --- | --- |
+| En ucuz yükseltme | %55 | 27. gün | 99. gün | $4,92M (%1,6) | 98 |
+| En ucuz yükseltme | %70 | 23. gün | 87. gün | $4,80M (%4,0) | 87 |
+| En ucuz yükseltme | %85 | 21. gün | 78. gün | $4,51M (%9,8) | 78 |
+| Şubeye biriktir | %55 | 21. gün | 86. gün | $4,79M (%4,3) | 86 |
+| Şubeye biriktir | %70 | 18. gün | 80. gün | $4,54M (%9,2) | 79 |
+| Şubeye biriktir | %85 | 16. gün | 72. gün | $3,77M (%24,6) | 73 |
+
+Gece hırsızı ile (şubeye biriktir): borç 91 / 81 / 75. günde biter (hırsızsız 86 / 80 / 72). 70 yükseltme seviyesinin tamamı: en ucuz alımda %70 ve %85 için ≤ 45. gün (%55 için ≤ 60), şubeye biriktirirken ~60. gün (%55 için 61-90).
+
+**Bulgular**
+
+- **Tempo 8. tur ölçümüyle ±1 gün aynı**: sonraki işler (tarif, bahis, efektler) temel akışın hızını değiştirmedi. Eski 6. tur tablosundaki "borç ilk 60 günde %10'dan az eriyor" bugün de doğru: en ucuz alımda %1,6 / %4,0 / %9,8, şubeye biriktirirken %4,3 / %9,2 / %24,6.
+- **Aktif oyun ilk ~30 günde büyüyor, sonra tavan yapıyor, 50. günden sonra gelirin küçük kısmı**: `--gunluk` (beceri 0,70, en ucuz alım): elle kazanç 30. günden sonra ~$10 bin/gün'de sabit (175 gelen müşteri, 122 servis); şube geliri 40. gün $2,7 bin (%20 pay), 50. gün $18 bin (%64), 60. gün $95 bin (%90), 70. gün $282 bin (%96), 80. günden sonra $1,69 milyon/gün (%99). Yani borcun kapanma hızını 50. günden sonra neredeyse yalnız şube alım zamanlaması belirliyor.
+- **Şube performans çarpanı çabuk doyuyor** (`BR_MIN` 0,35, `BR_MAX` 1,15; hedef = gelenlerin %35'i): hiç servis vermeyen gün 0,35, gelenlerin %35'ine yetişmek 0,92, %70'i 1,04, %100'ü 1,15. Yani %35 ile %100 arası beceri yalnız ~%25 fark yaratıyor.
+- **Kasa anlamsızlaşıyor**: borç bittikten sonra para birikiyor (100. gün ~$41M, 120. gün ~$75M); harcanacak yer yok (yükseltmeler 45-60. günde bitiyor, malzeme bedava, kira / maaş yok).
+- **Şubeye biriktirmek her yetişme oranında 6-13 gün daha hızlı** (baskın strateji).
+- **Hırsız notu güncellendi**: çalınan miktar kasanın oranı (`THIEF_MIN..MAX`); 200 günde toplam $55 bin / $4 bin / $12,4 milyon (%55 / %70 / %85). Eski "13-88 bin, geç oyunda önemsiz" notu bugün yanlış okunur: oran sabit, kasa büyüdükçe mutlak tutar büyüyor; ama hep borç bittikten sonra, yani oyun üzerinde etkisi yok. Borç bitişini 1-5 gün geciktiriyor.
+
+Model sınırları: gerçek oyunda telefon / Dayı / bahşiş / olaylar / tarif primi geliri artırır, hatalar azaltır; oyuncu sabit oranda yetişmez (becerisi yükseltmelerle büyür). Rakamlar **yön** gösterir, kesin gün vermez.

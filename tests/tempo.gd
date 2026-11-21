@@ -5,7 +5,9 @@
 # gelen musterilerinin ((len - 25) / rate, dayCfg) "beceri" kadarina yetisir,
 # gerisi kacar. Alim: once acilabilen sube, sonra en ucuz yukseltme seviyesi.
 # Telefon/Dayi geliri, bahsis, olaylar, cezalar yok (temkinli tahmin).
-#   godot --headless --path . --script tests/tempo.gd --quit-after 100000 -- --test [--gun 200]
+#   godot --headless --path . --script tests/tempo.gd --quit-after 100000 -- --test [--gun 200] [--hirsiz] [--gunluk]
+# --gunluk: elle kazanc / sube geliri / kasa gun gun (beceri 0,70, iki alim kurali) ve sube performans carpani egrisi (12. tur: "aktif oyun
+# ne zamana kadar ilerlemeyi belirliyor?")
 extends SceneTree
 const J = preload("res://scripts/js_compat.gd")
 var game: Node
@@ -36,6 +38,7 @@ func gun_oyna(beceri: float) -> void:
 	G.stat.wraps = float(servis)
 	G.stat.lost = float(gelen - servis)
 	game.session_system.f_endDay()
+	gunluk[int(G.day)] = {"ciro": ciro, "sube": float(G.stat.get("branch", 0.0)), "gelen": gelen, "servis": servis, "para": float(G.money), "borc": float(G.debt)}
 	if hirsiz:
 		# gece: gercek olay zari (guvenlik yukseltmesi azaltir); calinan para duser
 		game.event_system.f_rollNight()
@@ -47,6 +50,7 @@ func gun_oyna(beceri: float) -> void:
 var biriktir := false   # true: sube acilabiliyorsa yukseltme almadan ona biriktir
 var hirsiz := false     # true: gece hirsizi (f_rollNight) dahil
 var calinan := 0.0
+var gunluk := {}        # gun -> {ciro (elle), sube (sube geliri), gelen, servis, para, borc}; --gunluk icin
 
 func alisveris() -> Array:
 	var G: Dictionary = game.j_G
@@ -110,6 +114,8 @@ func run() -> void:
 		print("TEMPO --- alim kurali: %s" % ("subeye biriktir" if kip else "en ucuz yukseltme"))
 		for beceri in [0.55, 0.7, 0.85]:
 			tek(beceri, gunler)
+	if "--gunluk" in OS.get_cmdline_user_args():
+		gunluk_tablo()
 	if "--hirsiz" in OS.get_cmdline_user_args():
 		hirsiz = true
 		biriktir = true
@@ -119,6 +125,29 @@ func run() -> void:
 			tek(beceri, gunler)
 			print("  calinan toplam: %d" % calinan)
 	game.free(); quit(0)
+
+# beceri 0,70 profili, iki alim kurali: gun gun "elle" ve "sube" geliri; sonra sube performans carpani egrisi
+func gunluk_tablo() -> void:
+	hirsiz = false
+	for kip in [false, true]:
+		biriktir = kip
+		gunluk = {}
+		var s := simule(0.7, 130)
+		print("TEMPO GUNLUK beceri 0.70, kural: %s, borc bitti: gun %s" % ["subeye biriktir" if kip else "en ucuz yukseltme", str(s.borc_bitti)])
+		for d in [1, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120]:
+			if not gunluk.has(d): continue
+			var g: Dictionary = gunluk[d]
+			var toplam: float = g.ciro + g.sube
+			print("  gun %3d: elle $%9d  sube $%9d  (sube payi %%%3d)  gelen %3d servis %3d  kasa $%12d  borc $%9d" % [d, int(g.ciro), int(g.sube), int(100.0 * g.sube / maxf(toplam, 1.0)), g.gelen, g.servis, int(g.para), int(g.borc)])
+	game.session_system.f_resetProgress()
+	for u in game.j_UPG: game.j_G.up[u.id] = float(u.lv.size())
+	var cfg: Dictionary = game.progression_system.f_dayCfg(40.0, game.j_G)
+	var gelen := int(floor((float(cfg.len) - 25.0) / float(cfg.rate)))
+	print("TEMPO SUBE CARPANI (gun 40, tum yukseltmeler, gelen %d; hic yetismeyen: %.2f, en iyi: %.2f):" % [gelen, game.j_BR_MIN, game.j_BR_MAX])
+	for oran in [0.0, 0.1, 0.2, 0.35, 0.5, 0.7, 1.0]:
+		var servis := int(round(gelen * oran))
+		var p: float = float(game.progression_system.f_branchPerf(float(servis), float(gelen - servis), 40.0, game.j_G))
+		print("  gelenlerin %%%3d'ine yetisen: carpan %.2f" % [int(oran * 100), p])
 
 func tek(beceri: float, gunler: int) -> void:
 	var s := simule(beceri, gunler)
