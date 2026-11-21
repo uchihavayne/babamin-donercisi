@@ -100,6 +100,9 @@ func f_drawShop(p_t: Variant = null) -> Variant:
 		J.method(game.j_ctx, "drawImage", [J.getv(game.j_SHOP, "bake"), 0.0, 0.0])
 	if (((((((((not J.truth(J.getv(game.j_G, "dersGorulmus"))) and (not J.truth(J.getv(game.j_G, "ders")))) and J.le(J.getv(game.j_G, "day"), 2.0)) and (not J.truth(J.getv(game.j_CUSTOM, "open")))) and (not J.truth(J.getv(game.j_STATS, "open")))) and (not J.truth(J.getv(game.j_BSP, "open")))) and (not J.truth(J.getv(game.j_SESP, "open")))) and (not J.truth(J.getv(game.j_BRP, "open")))) and (not J.truth(J.getv(game.j_PAYP, "open")))) and (not J.truth(J.getv(game.j_TARIFP, "open"))):
 		J.setv(game.j_G, "ders", {"adim": 0.0, "t": 0.0, "verildi": false})
+	if game.icra_system.f_kartAcik():
+		game.icra_draw.f_drawKart(v_t)   # sabah kapida icra memuru (events/icra_system.gd): TAMAM'a kadar baska panel / gun baslangici yok
+		return null
 	if J.truth(J.getv(game.j_CUSTOM, "open")):
 		game.settings_draw.f_drawCustomPanel(v_t)
 		return null
@@ -267,18 +270,25 @@ func f_drawShop(p_t: Variant = null) -> Variant:
 		game.f_fr(J.add(v_hx, 4.0), J.add(v_hy2, 1.0), 2.0, 6.0, "#ffe9a0")
 		game.text_draw.f_txt(J.s(v_hazir), J.add(v_hx, 14.0), J.add(v_hy2, 1.0), J.getv(game.j_P, "au0"))
 	if J.truth(game.f_button((v_Wr2 - 58.0), J.add(v_ub, 4.0), 54.0, 17.0, J.add(game.localization.f_T("GÜN "), J.add(J.getv(game.j_G, "day"), 1.0)), "#3f8a4a", true)):
-		J.method(game.j_SFX, "bell", [])
-		J.setv(game.j_G, "day", J.add(J.getv(game.j_G, "day"), 1.0))
-		game.event_system.f_rollNight()
-		J.setv(game.j_G, "scene", ("night" if J.truth(J.getv(game.j_G, "night")) else "intro"))
-		J.setv(game.j_G, "sceneT", 0.0)
-		J.setv(game.j_G, "best", max(J.getv(game.j_G, "best"), J.getv(game.j_G, "day")))
-		game.save_system.f_saveAll()
+		# icra sabahiysa memur kapida bekler: karti kapatilana kadar gun baslamaz (events/icra_system.gd)
+		if not J.truth(game.icra_system.f_sabahZiyareti()):
+			game.shop_draw.f_gunBaslat()
+	game.icra_draw.f_dukkanUyari(((v_ub - 15.0) if J.truth(v_barAlt) else J.add(v_ub, 28.0)), v_t)   # icra yaklasiyorsa: kasada kalmasi gereken taksit
 	if J.truth(v_dersAcik):
 		game.shop_draw.f_drawDers(v_t)
 	game.effects.f_psDraw()
 	game.effects.f_ftDraw()
 	return null
+
+# dukkandan cikip yeni gunu baslatir (dugme ya da icra memuru karti TAMAM): kepenk muhru varsa kaybedilen gunler de atlanir
+func f_gunBaslat() -> void:
+	J.method(game.j_SFX, "bell", [])
+	J.setv(game.j_G, "day", J.add(J.getv(game.j_G, "day"), game.icra_system.f_gunAtla()))
+	game.event_system.f_rollNight()
+	J.setv(game.j_G, "scene", ("night" if J.truth(J.getv(game.j_G, "night")) else "intro"))
+	J.setv(game.j_G, "sceneT", 0.0)
+	J.setv(game.j_G, "best", max(J.getv(game.j_G, "best"), J.getv(game.j_G, "day")))
+	game.save_system.f_saveAll()
 
 # ui.js:1637
 func f_dersHedefEtiket(p_id: Variant = null) -> Variant:

@@ -47,6 +47,7 @@ Oyun nesnesine her yerden `game.<modül>.<fonksiyon>` ile erişilir (örn. `game
 | Web (HTML5) sürümü | `web/kabuk.html` (özel HTML kabuğu), `web/embed-ornek.html`, `web/tek_dosya_yukleyici.js` (tek dosyalık sürüm), `scripts/web_ortam.gd` (tarayıcı: dokunmatik / dil), `export_presets.cfg` (`Web` profili), araçlar: `tools/web_derle.sh [--tek] [--zip]`, `web_tek_dosya.py`, `web_sablon_indir.py`, `web_sunucu.py`, `web_dene.js` |
 | Haptik (titreşim) | `core/haptics.gd` (`DESEN` tablosu: ses adı → titreşim deseni); ayar: `platform_shell.gd`; Android izni: `export_presets.cfg` |
 | Rakip bahisleri (hedef, ödül, süzgeç) | `systems/events/rival_system.gd` (`BAHIS_KAT`, `f_bahisHedefi`, `f_bahisGunuKaydet`), ödül: `progression_system.f_bahisPara` |
+| İcra (taksit birikimi, haftalık memur, ihtar, kepenk mühürü) | `systems/events/icra_system.gd` (`ILK_GUN`, `HAFTA`, `GECIKME`, `TOLERANS`, `MUHUR_GUN`); ekran: `rendering/ui/icra_draw.gd` (memur kartı, dükkân / oyun içi uyarı); kancalar: `session_system.f_endDay` → `f_gunSonu`, `shop_draw` gün düğmesi → `f_sabahZiyareti` / `f_gunBaslat`, `branch_draw.f_payDebt` → `f_odendi`; test: `tests/icra.gd` |
 | Çöp kutusu / ürün atma | `systems/event_system.gd` (`cop_eylemi`, `f_trashClick`, `f_dropOnTrash`), kumanda: `station_actions.gd` ("discard") |
 | Telefon / pencere / dokunma | `platform_shell.gd`, `device_input.gd`, `station_actions.gd` |
 

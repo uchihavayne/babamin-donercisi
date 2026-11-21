@@ -238,6 +238,7 @@ func f_drawHUD(p_t: Variant = null) -> Variant:
 		v_prog = (1.0 - game.math_utils.f_clamp((float(J.getv(game.j_G, "debt")) / float(game.j_DEBT_START)), 0.0, 1.0))
 		game.f_fr(J.add(v_dx, 2.0), 18.0, (v_dw - 4.0), 2.0, "rgba(0,0,0,.5)")
 		game.f_fr(J.add(v_dx, 2.0), 18.0, floor(((v_dw - 4.0) * v_prog) + 0.5), 2.0, J.getv(game.j_P, "ok"))
+		game.icra_draw.f_hudEtiket(v_dx, 22.0, v_t)   # icra yaklasiyorsa: "ICRA YARIN" / "ICRA 2g" (kasa yetmiyorsa kirmizi)
 	v_sold = (J.add(J.add(J.add(J.getv(J.getv(game.j_G, "stat"), "wraps"), J.getv(J.getv(game.j_G, "stat"), "drinks")), J.getv(J.getv(game.j_G, "stat"), "boxes")), (J.getv(J.getv(game.j_G, "stat"), "sweets") if J.truth(J.getv(J.getv(game.j_G, "stat"), "sweets")) else 0.0)) if J.truth(J.getv(game.j_G, "stat")) else 0.0)
 	v_ss = J.add("", v_sold)
 	v_sw = J.add(game.f_textW(v_ss, 1.0, true), 26.0)

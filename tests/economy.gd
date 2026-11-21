@@ -52,8 +52,9 @@ func test_payments() -> void:
 	fresh(); game.j_G.day = 6.0
 	sale([{"kind":"wrap"}], 0.7)
 	game.session_system.f_endDay()
-	check(game.j_G.money == 19 and game.j_G.stat.debtPaid == 4,
-		"from day six the day-end debt is 18 percent; displayed and spendable income agree")
+	# BIRLESIK (12. tur): taksit gunluk kesilmez, BIRIKIR (icra sabahi kasadan alinir; bkz. tests/icra.gd)
+	check(game.j_G.money == 23 and game.j_G.stat.debtPaid == 0 and game.j_G.stat.taksitBirikti == 4 and game.icra_system.f_birikim() == 4,
+		"from day six 18 percent of the day's income accrues as installment; the whole income stays spendable until the icra visit")
 	var exact := true
 	for total in range(1, 301):
 		var count := clampi(int(floor(total / 10.0 + 0.5)), 1, 6)

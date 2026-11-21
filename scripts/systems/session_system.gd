@@ -148,17 +148,9 @@ func f_endDay() -> Variant:
 		else:
 			J.setv(game.j_G, "money", J.add(J.getv(game.j_G, "money"), J.getv(J.getv(game.j_G, "stat"), "branch")))
 		J.setv(J.getv(game.j_G, "stat"), "earned", J.add(J.getv(J.getv(game.j_G, "stat"), "earned"), J.getv(J.getv(game.j_G, "stat"), "branch")))
-	v_pay = 0.0
-	if (J.gt(J.getv(game.j_G, "debt"), 0.0) and (not J.truth(game.progression_system.f_fermanSehri(game.j_G))) and J.ge(J.getv(game.j_G, "day"), TAKSIT_GUN)):
-		v_pay = min(J.getv(game.j_G, "debt"), floor((J.getv(J.getv(game.j_G, "stat"), "earned") * game.j_DEBT_CUT) + 0.5))
-		J.setv(game.j_G, "debt", (J.getv(game.j_G, "debt") - v_pay))
-		J.setv(game.j_G, "money", max(0.0, (J.getv(game.j_G, "money") - v_pay)))
-		J.setv(J.getv(game.j_G, "stat"), "debtPaid", v_pay)
-		if J.le(J.getv(game.j_G, "debt"), 0.0):
-			J.setv(game.j_G, "debt", 0.0)
-			if (not J.truth(J.getv(game.j_G, "debtCleared"))):
-				J.setv(game.j_G, "debtCleared", true)
-				J.setv(game.j_G, "celeb", {"t": 0.0})
+	# BIRLESIK (12. tur): taksit artik gunluk kesilmez, BIRIKIR; icra gunu (haftada bir) ya da son taksitte kasadan tahsil
+	# edilir; kasa yetmezse ihtar, ust uste ikincisinde kepenk muhuru (events/icra_system.gd)
+	v_pay = game.icra_system.f_gunSonu()
 	v_S = J.getv(game.j_G, "stats")
 	J.setv(v_S, "wraps", J.add(J.getv(v_S, "wraps"), J.getv(J.getv(game.j_G, "stat"), "wraps")))
 	J.setv(v_S, "drinks", J.add(J.getv(v_S, "drinks"), J.getv(J.getv(game.j_G, "stat"), "drinks")))
@@ -238,6 +230,7 @@ func f_resetProgress() -> Variant:
 	J.setv(game.j_G, "branch", 0.0)
 	J.setv(game.j_G, "city", (-J.n(1.0)))
 	J.setv(game.j_G, "debt", game.j_DEBT_START)
+	J.setv(game.j_G, "icra", game.icra_system.f_yeni())
 	J.setv(game.j_G, "debtCleared", false)
 	J.setv(game.j_G, "celeb", null)
 	J.setv(game.j_G, "luck", 0.0)

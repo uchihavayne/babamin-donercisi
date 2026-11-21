@@ -10,6 +10,7 @@ func f_payDebt(p_amount: Variant = null) -> Variant:
 		return false
 	J.setv(game.j_G, "money", (J.getv(game.j_G, "money") - v_amount))
 	J.setv(game.j_G, "debt", (J.getv(game.j_G, "debt") - v_amount))
+	game.icra_system.f_odendi(v_amount)   # elle odeme once bu haftanin birikmis taksitinden duser
 	J.setv(J.getv(game.j_G, "stats"), "debtPaid", J.add((J.getv(J.getv(game.j_G, "stats"), "debtPaid") if J.truth(J.getv(J.getv(game.j_G, "stats"), "debtPaid")) else 0.0), v_amount))
 	J.method(game.j_SFX, "cash", [])
 	game.effects.f_burst((float(game.j_W) / float(2.0)), 130.0, 22.0, [J.getv(game.j_P, "au0"), J.getv(game.j_P, "au1"), "#fff"], {"spMax": 90.0, "type": "star", "sz": 2.0})
@@ -56,13 +57,18 @@ func f_drawPayPanel(p_t: Variant = null) -> Variant:
 	J.setv(game.j_ctx, "globalAlpha", 0.3)
 	game.f_hl(J.add(v_x, 14.0), J.add(v_y, 76.0), (v_w - 28.0), J.getv(game.j_P, "ui2"))
 	J.setv(game.j_ctx, "globalAlpha", 1.0)
-	game.text_draw.f_txt(J.add(J.add(game.localization.f_T("Gün sonunda kazancının %"), floor((game.j_DEBT_CUT * 100.0) + 0.5)), game.localization.f_T("'i zaten gider.")), J.add(v_x, (float(v_w) / float(2.0))), J.add(v_y, 82.0), J.getv(game.j_P, "ui4"), {"align": "c"})
-	game.text_draw.f_txt("Buradan istediğin kadarını hemen kapatabilirsin.", J.add(v_x, (float(v_w) / float(2.0))), J.add(v_y, 92.0), J.getv(game.j_P, "ui4"), {"align": "c"})
-	v_amts = [["%25", floor((J.getv(game.j_G, "money") * 0.25))], ["%50", floor((J.getv(game.j_G, "money") * 0.5))], ["TÜMÜ", J.getv(game.j_G, "money")]]
+	# BIRLESIK (12. tur): taksit gunluk kesilmez, birikir; icra sabahi kasadan alinir (events/icra_system.gd)
+	game.text_draw.f_txt(J.add(J.add(game.localization.f_T("Kazancının %"), floor((game.j_DEBT_CUT * 100.0) + 0.5)), game.localization.f_T("'i taksit olarak birikir.")), J.add(v_x, (float(v_w) / float(2.0))), J.add(v_y, 82.0), J.getv(game.j_P, "ui4"), {"align": "c"})
+	var v_birikim: float = game.icra_system.f_birikim()
+	if v_birikim > 0.0 and game.icra_system.f_aktif():
+		game.text_draw.f_txt(str(game.localization.f_T("Biriken taksit: $")) + str(game.math_utils.f_fmtMoney(v_birikim)), J.add(v_x, (float(v_w) / float(2.0))), J.add(v_y, 92.0), "#a8763a", {"align": "c", "maxw": v_w - 20.0})
+	else:
+		game.text_draw.f_txt("Buradan istediğin kadarını hemen kapatabilirsin.", J.add(v_x, (float(v_w) / float(2.0))), J.add(v_y, 92.0), J.getv(game.j_P, "ui4"), {"align": "c"})
+	v_amts = [["%25", floor((J.getv(game.j_G, "money") * 0.25))], ["%50", floor((J.getv(game.j_G, "money") * 0.5))], ["TÜMÜ", J.getv(game.j_G, "money")], ["TAKSİT", min(v_birikim, J.getv(game.j_G, "money"))]]
 	v_i = 0.0
 	while J.lt(v_i, J.getv(v_amts, "length")):
-		v_bw = 76.0
-		v_bx = J.add(J.add(v_x, 20.0), (v_i * J.add(v_bw, 12.0)))
+		v_bw = 60.0
+		v_bx = J.add(J.add(v_x, 12.0), (v_i * J.add(v_bw, 8.0)))
 		v_v = min(J.getv(J.getv(v_amts, v_i), 1.0), J.getv(game.j_G, "debt"))
 		v_can = J.gt(v_v, 0.0)
 		if J.truth(game.f_button(v_bx, J.add(v_y, 106.0), v_bw, 20.0, J.getv(J.getv(v_amts, v_i), 0.0), ("#3f8a4a" if J.truth(v_can) else "#4a4038"), v_can)):

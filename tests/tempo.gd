@@ -38,6 +38,7 @@ func gun_oyna(beceri: float) -> void:
 	G.stat.wraps = float(servis)
 	G.stat.lost = float(gelen - servis)
 	game.session_system.f_endDay()
+	son_kazanc = float(G.stat.earned)
 	gunluk[int(G.day)] = {"ciro": ciro, "sube": float(G.stat.get("branch", 0.0)), "gelen": gelen, "servis": servis, "para": float(G.money), "borc": float(G.debt)}
 	if hirsiz:
 		# gece: gercek olay zari (guvenlik yukseltmesi azaltir); calinan para duser
@@ -48,6 +49,9 @@ func gun_oyna(beceri: float) -> void:
 			calinan += float(N.amount)
 
 var biriktir := false   # true: sube acilabiliyorsa yukseltme almadan ona biriktir
+var rezerv := false     # true: icra gunune yaklasirken birikmis taksidi kasada ayirir (dikkatli oyuncu); false: harcayabildigini harcar
+var son_kazanc := 0.0   # son gunun toplam kazanci (rezerv tahmini)
+var kayip_gun := 0      # kepenk muhruyle atlanan gunler (simule sonunda)
 var hirsiz := false     # true: gece hirsizi (f_rollNight) dahil
 var calinan := 0.0
 var gunluk := {}        # gun -> {ciro (elle), sube (sube geliri), gelen, servis, para, borc}; --gunluk icin
@@ -59,15 +63,21 @@ func alisveris() -> Array:
 	# sube
 	var n := int(J.n(G.get("branch", 0)))
 	var hedef := 0.0
+	if rezerv and game.icra_system.f_aktif():
+		# dikkatli oyuncu: memur gelmeden once (bu aksam + kalan gunlerin guvenli %80 kazanci) birikmis taksidi karsilayacak kasayi ayirir
+		# k = icra sabahina kalan sabah sayisi (1: bu aksam dukkandan cikarken memur bekler)
+		var k: int = game.icra_system.f_kalanGun()
+		if k >= 1 and k <= 3:
+			hedef = maxf(0.0, game.icra_system.f_birikim() + float(k - 1) * 0.18 * son_kazanc - float(k - 1) * 0.8 * son_kazanc)
 	if n < game.j_BRANCH.size():
 		var b: Dictionary = game.j_BRANCH[n]
 		if not J.truth(game.progression_system.f_branchLocked(n, G)):
-			if G.money >= b.p:
+			if G.money - hedef >= b.p:
 				G.money -= b.p
 				G.branch = float(n + 1)
 				alinan.append("SUBE:" + str(b.name))
 			elif biriktir:
-				hedef = b.p
+				hedef = maxf(hedef, b.p)
 	# yukseltmeler: en ucuz seviye, para yettikce
 	while true:
 		var en: Variant = null
@@ -86,7 +96,9 @@ func simule(beceri: float, gunler: int) -> Dictionary:
 	game.session_system.f_resetProgress()
 	game.j_G.branch = 0.0
 	var sonuc := {"sube": {}, "borc_bitti": -1, "ilk_alim": -1, "para": {}, "seviye": {}}
-	for d in range(1, gunler + 1):
+	kayip_gun = 0
+	var d := 1
+	while d <= gunler:
 		game.j_G.day = float(d)
 		gun_oyna(beceri)
 		var borc_once := float(game.j_G.debt)
@@ -98,6 +110,13 @@ func simule(beceri: float, gunler: int) -> Dictionary:
 		if d in [10, 20, 30, 45, 60, 90, 120, 150, 200]:
 			sonuc.para[d] = int(game.j_G.debt)
 			sonuc.seviye[d] = int(J.n(game.equipment_system.f_upgTotalLv(game.j_G)))
+		# dukkandan cikis: icra sabahiysa memur kasadan alir (ihtar / muhur); sonra gun artar
+		if game.icra_system.f_sabahZiyareti(): game.icra_system.f_kartKapat()
+		var adim := int(game.icra_system.f_gunAtla())   # 1 + kepenk muhruyle kaybedilen gunler
+		kayip_gun += adim - 1
+		d += adim
+	var I: Dictionary = game.icra_system.f_durum()
+	sonuc["ihtar"] = int(I.ihtarSayisi); sonuc["muhur"] = int(I.muhur); sonuc["kayip"] = kayip_gun
 	return sonuc
 
 func run() -> void:
@@ -114,6 +133,14 @@ func run() -> void:
 		print("TEMPO --- alim kurali: %s" % ("subeye biriktir" if kip else "en ucuz yukseltme"))
 		for beceri in [0.55, 0.7, 0.85]:
 			tek(beceri, gunler)
+	if "--rezerv" in OS.get_cmdline_user_args():
+		rezerv = true
+		for kip in [false, true]:
+			biriktir = kip
+			print("TEMPO --- dikkatli oyuncu (icra gunune rezerv ayirir), alim kurali: %s" % ("subeye biriktir" if kip else "en ucuz yukseltme"))
+			for beceri in [0.55, 0.7, 0.85]:
+				tek(beceri, gunler)
+		rezerv = false
 	if "--gunluk" in OS.get_cmdline_user_args():
 		gunluk_tablo()
 	if "--hirsiz" in OS.get_cmdline_user_args():
@@ -155,3 +182,4 @@ func tek(beceri: float, gunler: int) -> void:
 	print("  subeler: ", JSON.stringify(s.sube))
 	print("  kalan borc: ", JSON.stringify(s.para))
 	print("  seviye:     ", JSON.stringify(s.seviye))
+	print("  icra: ihtar %d, muhur %d, kayip gun %d" % [s.ihtar, s.muhur, s.kayip])

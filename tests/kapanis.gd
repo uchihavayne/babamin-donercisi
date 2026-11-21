@@ -30,6 +30,7 @@ func run() -> void:
 	game.j_G.tut = 99; game.j_G.shutT = 0
 	# son taksit: gunun kazanci borcun kalanini kapatir
 	game.j_G.debt = 50.0
+	game.j_G.money = 5000.0   # taksit artik kasadan tahsil edilir (events/icra_system.gd): gunun kazanci kasadadir
 	game.j_G.stat.earned = 5000.0
 	game.session_system.f_endDay()
 	game.j_G.scene = "dayend"; game.j_G.sceneT = 3.0

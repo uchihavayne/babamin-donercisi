@@ -496,3 +496,20 @@ Bilerek dokunulmayanlar: eldeki / sürüklenen ürünün imleci rijit izlemesi (
 ### Tempo güncel kodla yeniden ölçüldü (kullanıcı: "tempoyu güncel kodla yeniden ölç")
 
 `tests/tempo.gd` yeniden koşturuldu (`--gun 200 --hirsiz`) ve yeni bir `--gunluk` seçeneği eklendi (elle kazanç / şube geliri / kasa gün gün, şube performans çarpanı eğrisi). Sonuç: tempo 8. tur ölçümüyle **±1 gün aynı** (borç bitişi en ucuz alımda 99 / 87 / 78, şubeye biriktirirken 86 / 80 / 72. gün); asıl yeni bulgu gelirin yapısı: elle kazanç 30. günden sonra ~$10 bin/gün'de tavan yapıyor, şube geliri 50. günde %64, 60. günde %90, 80. günden sonra %99 pay alıyor; şube çarpanı gelenlerin %35'ine yetişince doyuyor. Ayrıntı ve tablo: [ECONOMY.md](ECONOMY.md) "12. tur: tempo güncel kodla yeniden ölçüldü". Oyun kodu değişmedi (yalnız ölçüm aracı ve belge).
+
+## On üçüncü tur (2026-11-21): mekanik ve hikâye derinliği
+
+Kullanıcı: "önerdiğin şeyleri uygula" — önceki turdaki dürüst eleştirinin dört maddesi: **icra gerçek bir mekanik olsun**, **geç oyunda beceri geri gelsin ve para sinki olsun**, **her şehrin metnindeki vaat bir kural olsun**, **hikâye yayılsın ve epilog Demirkent seçimlerine bağlansın**. Ayarlanabilir her sabit tek yerde, tempo modeli (`tests/tempo.gd`) ile ölçüldü; cezalar yumuşatılmadı.
+
+### İcra (1/4): birikir, sabah memur gelir, kasada yoksa ihtar → kepenk mühürü
+
+Eskiden borç taksiti (kazancın %18'i) her gün kasadan otomatik kesiliyordu: borç hiçbir zaman "tehdit" değildi. Şimdi oran **aynı**, zamanlama değişti:
+
+- **Taksit birikir** (6. günden itibaren, `G.icra.birikim`); **her 7 günde bir sabah** (ilk: 13. günün sabahı) icra memuru kapıda bekler ve birikeni **kasadan** alır. Memur, dükkân çubuğundaki "GÜN N" düğmesine basınca gelir (gece olayından / hırsızdan **önce**): gün sonunun kazancı o akşam harcandıysa kasa boştur.
+- **Kasa yeter** → HESAP TAMAM, ihtar silinir. **Yetmez** → kasadaki kadar alınır, kalan + %20 gecikme zammı birikmeye devam eder; **1. kusur İHTAR**, **ardışık 2. kusur KEPENK MÜHÜRÜ**: 1 / 2 / 3 gün (her mühürde bir uzar) gelirsiz kaybedilir, takvim ilerler, sonraki icra tam bir hafta sonra. Oyun bitmez (icradan satış yok): ceza kaybedilen günler ve gelirdir. İstenenin %2'sinden az eksik (yuvarlama payı) kusur sayılmaz.
+- **Arayüz:** yaklaşırken (en çok 2 sabah) dükkân çubuğunun altında "İCRA YARIN SABAH — kasada kalmalı: $X" (kasa yetmiyorsa kırmızı, yarınsa titrer); oyun içinde borç kutusunun altında küçük etiket; gün sonu kartında "TAKSİT BİRİKTİ +$ · icra N gün sonra: $"; BORÇ ÖDE panelinde **TAKSİT** düğmesi (birikeni hemen öder; elle ödeme zaten önce birikenden düşer). Memur kartı: İstenen / Kasadan alınan / Eksik / Gecikme zammı / Kalan borç + durum şeridi (HESAP TAMAM, İHTAR!, sarı-siyah şeritli KEPENK MÜHÜRLENDİ) + memurun sözü; TAMAM'a basılana kadar gün başlamaz.
+- **Son taksit** beklemez: borcun tamamı birikmiş ve kasadaysa gün sonunda hemen tahsil edilir (kutlama eskisi gibi). Oynanan şehir **Demirkent (ferman)** ise ya da borç bittiyse icra yoktur.
+- **Kayıt:** `G.icra` ilerleme kaydında (eski kayıtta taze durum, ilk ziyaret yüklemeden en erken 1 hafta sonra); kart (`sonuc`) kayda girmez. `validation/module-snapshot-baseline.json` içinde yalnız `save` satırı yeni alan için güncellendi (5 piksel / durum anlık görüntüsü aynı).
+- **Tempo modeli** (`tests/tempo.gd --rezerv`): "harcayabildiğini harcar" oyuncu (kasa her akşam sıfır) 160 günde **4-7 ihtar, 2-3 mühür (3-6 gün kayıp)**; "icra sabahı için rezerv ayıran" oyuncu **0 ihtar / 0 mühür** ve borcu eskisiyle aynı günlerde (±2) bitirir (97 / 84 / 76 ↔ 99 / 87 / 78). Yani ceza yalnız savurgan oyuna uygulanır; sistematik bir vergi yok (aynı %18, yalnız zamanlama).
+- **Test:** `tests/icra.gd` (69 denetim: birikim, vade, tamam / ihtar / mühür ve süreleri, tolerans, elle ödeme, son taksit, Demirkent, kayıt / bozuk kayıt, düğme → kart → TAMAM akışı, çizimler) + `tests/yazi_tasma.gd`'ya icra ekranları (6 dilde taşma yok) + 30 bozma denemesi (`tests/icra.gd` hepsini yakaladı). `economy` / `kapanis` testleri yeni anlama güncellendi.
+

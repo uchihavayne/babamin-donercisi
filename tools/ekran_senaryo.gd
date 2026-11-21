@@ -21,6 +21,8 @@
 #   panel_gecis (panel / mola acilis gecisi kare serisi: --panel mola|ses|rekor|basarim|sube|kisisel|borc (mola), --say N goruntu (14), --adim N oyun karesi / goruntu (1);
 #                kanca kapali eski sert kesme icin HD_KAPALI=panel_gecis)
 #   ret (reddedilen islem: lavassiz et eklemeye calisir, imlecin ustunde kirmizi X + sallanan uyari yazisi; --say N goruntu (20), --adim N (1); HD_KAPALI=ret_fx eski hal)
+#   icra_tamam / icra_ihtar / icra_muhur (sabah kapida icra memuru karti; --bekle N kare), icra_uyari (dukkan cubugu: --gun N, --kasa $), icra_hud (oyun ici etiket: --gun N, --kasa $),
+#   icra_gunsonu (gun sonu karti: taksit birikti satiri)
 #   (defter: --sayfa 1-8, --gun N bulunan sayfalarin gunu; yeni_sayfa: --gun N, --sayfa 1-8, --kare N)
 # Linux'ta ekransiz sunucuda: xvfb-run -a -s "-screen 0 1280x720x24" godot --rendering-driver opengl3 ...
 extends SceneTree
@@ -129,6 +131,36 @@ func calis() -> void:
 			await kaydet("_a")
 			await adim(400)
 			await kaydet("_b")
+		"icra_tamam", "icra_ihtar", "icra_muhur":
+			# sabah kapida icra memuru (events/icra_system.gd): hesap tamam / ihtar / kepenk muhru karti
+			kur(12.0, false, -1, 3)
+			G.money = 4200.0 if ad == "icra_tamam" else 120.0
+			G.icra.birikim = 1850.0
+			G.icra.ihtar = 1.0 if ad == "icra_muhur" else 0.0
+			G.scene = "shop"; G.sceneT = 3.0
+			await adim(20)
+			g.icra_system.f_sabahZiyareti()
+			await adim(int(arg("--bekle", "70")))
+			await kaydet()
+		"icra_uyari", "icra_hud":
+			# icra yaklasirken: dukkan cubugu uyarisi (kasada kalmasi gereken taksit) / oyun ici etiket
+			kur(float(arg("--gun", "12")), false, -1, 3)
+			G.money = float(arg("--kasa", "400")); G.icra.birikim = 1850.0
+			if ad == "icra_hud":
+				doldur(2)
+			else:
+				G.scene = "shop"; G.sceneT = 3.0
+			await adim(70)
+			await kaydet()
+		"icra_gunsonu":
+			kur(8.0, false, -1, 2)
+			G.stat.wraps = 21.0; G.stat.isk = 4.0; G.stat.drinks = 9.0; G.stat.boxes = 6.0; G.stat.sweets = 3.0
+			G.stat.lost = 2.0; G.stat.earned = 1840.0; G.stat.tips = 212.0
+			G.money = 1840.0; G.icra.birikim = 1130.0
+			g.session_system.f_endDay()
+			G.tarif.yeni = []   # yeni sayfa karti gun sonu satirlarini kapatmasin
+			await adim(500)
+			await kaydet()
 		"gunsonu":
 			kur(18.0, false, -1, 2)
 			G.stat.wraps = 21.0; G.stat.isk = 4.0; G.stat.drinks = 9.0; G.stat.boxes = 6.0; G.stat.sweets = 3.0

@@ -79,6 +79,13 @@ func f_drawDayEnd(p_t: Variant = null) -> Variant:
 		game.text_draw.f_txt("BORÇ TAKSİTİ", ((float(game.j_W) / float(2.0)) - 92.0), J.add(J.add(v_ly, 26.0), v_dy2), "#a83a2a")
 		game.text_draw.f_txt(J.add("-$", game.math_utils.f_fmtMoney(J.getv(v_st, "debtPaid"))), J.add((float(game.j_W) / float(2.0)), 92.0), J.add(J.add(v_ly, 26.0), v_dy2), "#a83a2a", {"align": "r"})
 		game.text_draw.f_txt(J.add(game.localization.f_T("kalan borç: $"), game.math_utils.f_fmtMoney(J.getv(game.j_G, "debt"))), J.add((float(game.j_W) / float(2.0)), 92.0), J.add(J.add(v_ly, 36.0), v_dy2), J.getv(game.j_P, "ui3"), {"align": "r"})
+	elif J.gt(J.getv(game.j_G, "sceneT"), 1.7) and J.n(v_st.get("taksitBirikti", 0.0)) > 0.0:
+		# BIRLESIK (12. tur): taksit gunluk kesilmez, birikir; icra sabahi kasadan alinir (events/icra_system.gd)
+		var v_ik: int = game.icra_system.f_kalanGun()
+		var v_icra: String = (str(game.localization.f_T("icra yarın sabah: $")) if v_ik <= 1 else str(game.localization.f_T("icra ")) + str(v_ik) + str(game.localization.f_T(" gün sonra: $"))) + str(game.math_utils.f_fmtShort(game.icra_system.f_birikim()))
+		game.text_draw.f_txt("TAKSİT BİRİKTİ", ((float(game.j_W) / float(2.0)) - 92.0), J.add(J.add(v_ly, 26.0), v_dy2), "#a8763a")
+		game.text_draw.f_txt(J.add("+$", game.math_utils.f_fmtMoney(v_st.taksitBirikti)), J.add((float(game.j_W) / float(2.0)), 92.0), J.add(J.add(v_ly, 26.0), v_dy2), "#a8763a", {"align": "r"})
+		game.text_draw.f_txt(v_icra, J.add((float(game.j_W) / float(2.0)), 92.0), J.add(J.add(v_ly, 36.0), v_dy2), J.getv(game.j_P, "ui3"), {"align": "r", "maxw": 184.0})
 	elif J.gt(J.getv(game.j_G, "sceneT"), 1.7) and J.gt(J.getv(game.j_G, "debt"), 0.0) and J.lt(J.getv(game.j_G, "day"), game.session_system.TAKSIT_GUN) and not J.truth(game.progression_system.f_fermanSehri(game.j_G)):
 		game.text_draw.f_txt("BORÇ TAKSİTİ", ((float(game.j_W) / float(2.0)) - 92.0), J.add(J.add(v_ly, 26.0), v_dy2), "#a83a2a")
 		game.text_draw.f_txt(game.localization.f_T("6. günden başlar"), J.add((float(game.j_W) / float(2.0)), 92.0), J.add(J.add(v_ly, 26.0), v_dy2), J.getv(game.j_P, "ui3"), {"align": "r"})

@@ -131,6 +131,7 @@ func run() -> void:
 		oyun_ekrani(dil)
 		dukkan_ekrani(dil)
 		gun_sonu_ve_gece(dil)
+		icra_ekranlari(dil)
 	game.localization.f_setLang("tr")
 	for f in failures: push_error(f)
 	print("YAZI TASMA ", JSON.stringify({"olculen": olculen, "failures": failures}))
@@ -236,6 +237,46 @@ func dukkan_ekrani(dil: String) -> void:
 	G.debt = 5000000.0
 	game.j_CUSTOM.open = true; olc(dil, "kisisellestir"); game.j_CUSTOM.open = false
 	game.j_SESP.open = true; olc(dil, "dukkan ses"); game.j_SESP.open = false
+	pencereler_kapali()
+
+# Icra (12. tur): sabah memur karti (uc sonuc, buyuk tutarlar), dukkan cubugu uyarisi, oyun ici etiket, borc paneli, gun sonu satiri
+func icra_ekranlari(dil: String) -> void:
+	for durum in ["tamam", "ihtar", "muhur"]:
+		for kasa in [4200.0, 120.0]:
+			kur(40.0, 3)
+			var G: Dictionary = game.j_G
+			G.scene = "shop"; G.sceneT = 5.0
+			G.money = kasa
+			G.icra.birikim = 8765432.0 if kasa > 1000.0 else 1850.0
+			G.debt = 4999880.0
+			G.icra.ihtar = 1.0 if durum == "muhur" else 0.0
+			if durum == "tamam": G.money = 99999999.0
+			G.icra.sonraki = G.day + 1.0
+			game.icra_system.f_sabahZiyareti()
+			if game.icra_system.f_kartAcik() and String(G.icra.sonuc.durum) == durum:
+				olc(dil, "icra karti %s kasa %d" % [durum, int(kasa)], 40)
+			game.icra_system.f_kartKapat()
+	for k in [1, 2, 5]:
+		for kasa in [100.0, 9999999.0]:
+			kur(30.0, 3)
+			var G: Dictionary = game.j_G
+			G.icra.birikim = 4567890.0; G.icra.sonraki = G.day + float(k); G.money = kasa
+			G.scene = "shop"; G.sceneT = 5.0
+			olc(dil, "dukkan icra uyarisi %d sabah" % k)
+			G.scene = "play"
+			olc(dil, "oyun ici icra etiketi %d sabah" % k, 20)
+	kur(30.0, 3)
+	var G2: Dictionary = game.j_G
+	G2.scene = "shop"; G2.sceneT = 5.0; G2.money = 61000.0
+	G2.icra.birikim = 1234567.0
+	game.j_PAYP.open = true; olc(dil, "borc ode (birikmis taksit)"); game.j_PAYP.open = false
+	kur(11.0, 3)
+	G2 = game.j_G
+	G2.money = 61000.0; G2.stat.earned = 1840000.0
+	game.session_system.f_endDay()
+	G2.sceneT = 5.0
+	game.tarif_system.f_durum().yeni = []
+	olc(dil, "gun sonu taksit birikti")
 	pencereler_kapali()
 
 func gun_sonu_ve_gece(dil: String) -> void:
