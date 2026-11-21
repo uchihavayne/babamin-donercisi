@@ -71,6 +71,12 @@ var tutulan: Array = []
 # oynatirken kamera sarsintisi gibi otelemeler eklenir.
 var _kayitta := false
 var _kayit: Array = []
+# GRUP OPAKLIGI (panel girisi, rendering/ui/modal_fx.gd): grup_basla ile grup_bitir arasinda cizilenler kendi
+# cizim ogelerine konur ve ogenin modulate'i ile toplu soldurulur (globalAlpha'ya dokunulmaz: panel icindeki
+# kodlar onu sik sik 1'e geri yaziyor). Opaklik 1 iken hicbir sey yapilmaz (cizim birebir ayni).
+var _grup_ilk := -1
+var _grup_a := 1.0
+var _grup_ogeler: Array[int] = []
 var mono_material: RID
 var mono_kar_material: RID
 var mono_kar_shader: RID
@@ -194,6 +200,9 @@ func getContext(_kind: Variant = null, _opts: Variant = null) -> Variant:
 # ---------------------------------------------------------------- kare
 func begin_frame() -> void:
 	for i in used: RenderingServer.canvas_item_clear(pool[i])
+	for i in _grup_ogeler: RenderingServer.canvas_item_set_modulate(pool[i], Color.WHITE)
+	_grup_ogeler.clear()
+	_grup_ilk = -1
 	used = 0
 	bp.clear(); bc.clear(); bi.clear()
 	transform = Transform2D.IDENTITY
@@ -756,6 +765,23 @@ func getImageData(_x: Variant, _y: Variant, w: Variant, h: Variant) -> Variant:
 func putImageData(_value: Variant, _x: Variant, _y: Variant) -> Variant:
 	return null
 
+
+# ---------------------------------------------------------------- grup opakligi
+func grup_basla(a: float) -> void:
+	if a >= 1.0 or _grup_ilk >= 0: return
+	_segment(item_mat)   # temiz bir oge: grup oncekilerle ayni ogeyi paylasmaz
+	_grup_ilk = used - 1
+	_grup_a = clampf(a, 0.0, 1.0)
+
+func grup_bitir() -> void:
+	if _grup_ilk < 0: return
+	_flush()
+	var renk := Color(1, 1, 1, _grup_a)
+	for i in range(_grup_ilk, used):
+		RenderingServer.canvas_item_set_modulate(pool[i], renk)
+		_grup_ogeler.append(i)
+	_grup_ilk = -1
+	_segment(item_mat)   # sonrakiler modulate'siz yeni ogeye
 
 # ---------------------------------------------------------------- kayit
 func kayit_basla() -> void:

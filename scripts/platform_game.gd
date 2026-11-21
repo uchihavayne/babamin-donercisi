@@ -98,9 +98,8 @@ func f_drawPause(time: Variant = null) -> Variant:
 	if j_BSP.open: achievement_draw.f_drawBasarimPanel(time); return null
 	if j_STATS.open: achievement_draw.f_drawStatsPanel(time); return null
 	if j_SESP.open: settings_draw.f_drawSesPanel(time); return null
-	j_ctx.globalAlpha = 0.62
-	f_fr(0,0,j_W,j_H,"#140a06")
-	j_ctx.globalAlpha = 1.0
+	modal_fx.f_dim(0.62, "#140a06")   # karartma yumusak acilir / kapanir (rendering/ui/modal_fx.gd)
+	modal_fx.f_basla("mola")
 	interface_draw.f_panel(170,46,140,166,"MOLA")
 	if f_button(190,66,100,20,"DEVAM ET","#3f8a4a",true): j_G.scene = "play"
 	if f_button(190,90,100,20,"SES AYARLARI","#3f6fbd"): j_SESP.open = true
@@ -113,6 +112,7 @@ func f_drawPause(time: Variant = null) -> Variant:
 	if f_button(190,186,100,20,"ANA MENÜ","#8a4a4a"):
 		save_system.gunici_kaydet()   # Ana Menu'den Devam Et: gun kalinan yerden surer
 		j_G.scene = "title"
+	modal_fx.f_bitir()
 	return null
 
 func f_drawHoverHint(time: Variant = null) -> Variant:

@@ -392,6 +392,7 @@ func f_drawPlay(p_t: Variant = null) -> Variant:
 	game.tutorial_draw.f_drawTut(_cells["t"][0])
 	game.f_drawHoverHint(_cells["t"][0])
 	game.regulation_draw.f_drawFermanKagit(_cells["t"][0])
+	game.ret_fx.f_ciz()   # reddedilen islemin X isareti (en ustte; rendering/ui/ret_fx.gd)
 	return null
 
 func _closure_250(_args: Array, _captures: Dictionary = {}) -> Variant:

@@ -31,17 +31,21 @@ func f_drawHoverHint(p_t: Variant = null) -> Variant:
 	var v_ty: Variant = null
 	var v_hw: Variant = null
 	var v_hy: Variant = null
+	var v_sx: float = 0.0
 	var v_t: Variant = p_t
 	if (J.truth(J.getv(J.getv(game.j_G, "crate"), "open")) or J.truth(J.getv(game.j_G, "drag"))):
 		return null
 	if (J.truth(game.j_TOUCH) and (not J.truth(J.getv(game.j_IN, "down")))):
 		if J.gt(J.getv(game.j_G, "hintT"), 0.0):
+			v_sx = game.ret_fx.f_toastDx()   # reddedilen islemde toast "hayir" der gibi sallanir (rendering/ui/ret_fx.gd)
+			if v_sx != 0.0: J.method(game.j_ctx, "translate", [v_sx, 0.0])
 			J.setv(game.j_ctx, "globalAlpha", min(1.0, (J.getv(game.j_G, "hintT") * 2.0)))
 			v_hw0 = J.add(game.f_textW(J.getv(game.j_G, "hint")), 12.0)
 			v_hy0 = ((game.j_H - J.getv(game.j_VIEW, "bot")) - 20.0)
 			game.f_rrect(((float(game.j_W) / float(2.0)) - (float(v_hw0) / float(2.0))), v_hy0, v_hw0, 13.0, 3.0, "rgba(20,14,12,.88)")
 			game.text_draw.f_txt(J.getv(game.j_G, "hint"), (float(game.j_W) / float(2.0)), J.add(v_hy0, 3.0), J.getv(game.j_P, "ui0"), {"align": "c"})
 			J.setv(game.j_ctx, "globalAlpha", 1.0)
+			if v_sx != 0.0: J.method(game.j_ctx, "translate", [-v_sx, 0.0])
 		return null
 	v_h = game.tutorial_draw.f_hoverStation()
 	if J.eq(v_h, "spit"):
@@ -83,12 +87,15 @@ func f_drawHoverHint(p_t: Variant = null) -> Variant:
 			game.text_draw.f_txt(v_nm, J.add(v_tx, 3.0), J.add(v_ty, 2.0), J.getv(game.j_P, "ui0"))
 			J.setv(game.j_ctx, "globalAlpha", 1.0)
 	if J.gt(J.getv(game.j_G, "hintT"), 0.0):
+		v_sx = game.ret_fx.f_toastDx()   # reddedilen islemde toast "hayir" der gibi sallanir (rendering/ui/ret_fx.gd)
+		if v_sx != 0.0: J.method(game.j_ctx, "translate", [v_sx, 0.0])
 		J.setv(game.j_ctx, "globalAlpha", min(1.0, (J.getv(game.j_G, "hintT") * 2.0)))
 		v_hw = J.add(game.f_textW(J.getv(game.j_G, "hint")), 12.0)
 		v_hy = ((game.j_H - J.getv(game.j_VIEW, "bot")) - 20.0)
 		game.f_rrect(((float(game.j_W) / float(2.0)) - (float(v_hw) / float(2.0))), v_hy, v_hw, 13.0, 3.0, "rgba(20,14,12,.88)")
 		game.text_draw.f_txt(J.getv(game.j_G, "hint"), (float(game.j_W) / float(2.0)), J.add(v_hy, 3.0), J.getv(game.j_P, "ui0"), {"align": "c"})
 		J.setv(game.j_ctx, "globalAlpha", 1.0)
+		if v_sx != 0.0: J.method(game.j_ctx, "translate", [-v_sx, 0.0])
 	return null
 
 # game.js:3491

@@ -20,6 +20,10 @@ func run() -> void:
 	game.storage.path = "res://artifacts/module-snapshot-save.json"; game.storage.values = {}
 	root.add_child(game); game.set_process(false); game.j_MUTED = true
 	game.localization.f_setLang("tr")
+	# Referans 0.5.4 modul esdegerligini olcer. Reddedilen islemin X isareti / toast sallamasi (ret_fx) yeni bir GORSEL katmandir: betikli
+	# akislarda (fazla malzeme eklemek...) reddedilen islemden hemen sonra cekilen karelerde gorunur; kendi testleri var (tests/ret_fx*.gd).
+	# (Dogrulandi: HD_KAPALI=ret_fx ile 6/6 birebir; panel / mola gecisleri (modal_fx) bu karelere hic dokunmaz.)
+	game.ret_fx.kapali_zorla = true
 	capture("title")
 	game.j_G.prologueSeen = true; game.session_system.f_resetProgress(); game.session_system.f_goIntro()
 	capture("new-game-intro")

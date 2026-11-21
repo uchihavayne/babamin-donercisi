@@ -185,6 +185,8 @@ func f_frame(p_now: Variant = null) -> Variant:
 		v_dt = 0.0
 	if J.gt(v_dt, 0.06):
 		v_dt = 0.06
+	game.modal_fx.f_tick(v_dt)   # panel / mola gecisleri (rendering/ui/modal_fx.gd): kare basi
+	game.ret_fx.f_tick(v_dt)   # reddedilen islem geri bildirimi (rendering/ui/ret_fx.gd): kare basi
 	J.setv(game.j_G, "t", J.add(J.getv(game.j_G, "t"), v_dt))
 	game.j__frames = J.add(game.j__frames, 1.0)
 	game.j__fpsT = J.add(game.j__fpsT, v_dt)
@@ -241,6 +243,7 @@ func f_frame(p_now: Variant = null) -> Variant:
 			game.story_draw.f_drawPrologue(J.getv(game.j_G, "t"))
 		"pause":
 			game.f_drawPause(J.getv(game.j_G, "t"))
+	game.modal_fx.f_son()   # panel kapaninca karartma sertce kesilmez, soner
 	if J.eq(J.kind(J.ref(game.achievement_system.f_basarimTara, 1)), "function"):
 		J.setv(game.j_G, "bsT", J.add((J.getv(game.j_G, "bsT") if J.truth(J.getv(game.j_G, "bsT")) else 0.0), v_dt))
 		if J.gt(J.getv(game.j_G, "bsT"), 0.5):

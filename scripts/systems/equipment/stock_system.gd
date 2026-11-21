@@ -71,6 +71,7 @@ func f_crateClick(p_mx: Variant = null, p_my: Variant = null) -> Variant:
 			v_m = game.stock_system.f_crateMax(v_k)
 			if J.ge(J.getv(J.getv(game.j_G, "stock"), v_k), v_m):
 				J.method(game.j_SFX, "bad", [])
+				game.ret_fx.f_ret()   # yazisiz reddedilen islem: X isareti (rendering/ui/ret_fx.gd)
 				return null
 			v_add = min(J.method(game.j_TUN, "refillPer", [game.j_G]), (v_m - J.getv(J.getv(game.j_G, "stock"), v_k)))
 			J.setv(J.getv(game.j_G, "stock"), v_k, J.add(J.getv(J.getv(game.j_G, "stock"), v_k), v_add))

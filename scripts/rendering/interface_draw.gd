@@ -383,9 +383,8 @@ func f_drawPause(p_t: Variant = null) -> Variant:
 	if J.truth(J.getv(game.j_SESP, "open")):
 		game.settings_draw.f_drawSesPanel(v_t)
 		return null
-	J.setv(game.j_ctx, "globalAlpha", 0.62)
-	game.f_fr(0.0, 0.0, game.j_W, game.j_H, "#140a06")
-	J.setv(game.j_ctx, "globalAlpha", 1.0)
+	game.modal_fx.f_dim(0.62, "#140a06")   # karartma yumusak acilir / kapanir (rendering/ui/modal_fx.gd)
+	game.modal_fx.f_basla("mola")
 	game.interface_draw.f_panel(((float(game.j_W) / float(2.0)) - 70.0), 58.0, 140.0, 140.0, "MOLA")
 	if J.truth(game.f_button(((float(game.j_W) / float(2.0)) - 50.0), 76.0, 100.0, 20.0, "DEVAM ET", "#3f8a4a", true)):
 		J.method(game.j_SFX, "ui", [])
@@ -405,5 +404,6 @@ func f_drawPause(p_t: Variant = null) -> Variant:
 	if J.truth(game.f_button(((float(game.j_W) / float(2.0)) - 50.0), 172.0, 100.0, 20.0, "ANA MENÜ", "#8a4a4a")):
 		J.method(game.j_SFX, "uiBack", [])
 		J.setv(game.j_G, "scene", "title")
+	game.modal_fx.f_bitir()
 	return null
 

@@ -31,9 +31,8 @@ func f_drawCustomPanel(p_t: Variant = null) -> Variant:
 	v_y = 34.0
 	v_w = 360.0
 	v_h = 200.0
-	J.setv(game.j_ctx, "globalAlpha", 0.8)
-	game.f_fr(0.0, 0.0, game.j_W, game.j_H, "#0d0a08")
-	J.setv(game.j_ctx, "globalAlpha", 1.0)
+	game.modal_fx.f_dim(0.8, "#0d0a08")
+	game.modal_fx.f_basla("kisisel")
 	game.interface_draw.f_panel(v_x, v_y, v_w, v_h, "DÜKKÂNI KİŞİSELLEŞTİR")
 	game.text_draw.f_txt("Tabela adı", J.add(v_x, 14.0), J.add(v_y, 16.0), J.getv(game.j_P, "ui4"))
 	v_fx = J.add(v_x, 14.0)
@@ -153,6 +152,7 @@ func f_drawCustomPanel(p_t: Variant = null) -> Variant:
 		J.setv(game.j_CUSTOM, "open", false)
 		J.method(game.j_SFX, "uiBack", [])
 		game.save_system.f_saveAll()
+	game.modal_fx.f_bitir()
 	return null
 
 # ui.js:2129
@@ -260,9 +260,8 @@ func f_drawSesPanel(p_t: Variant = null) -> Variant:
 	v_y = 52.0
 	v_w = 224.0
 	v_h = 152.0
-	J.setv(game.j_ctx, "globalAlpha", 0.84)
-	game.f_fr(0.0, 0.0, game.j_W, game.j_H, "#0d0a08")
-	J.setv(game.j_ctx, "globalAlpha", 1.0)
+	game.modal_fx.f_dim(0.84, "#0d0a08")
+	game.modal_fx.f_basla("ses")
 	game.interface_draw.f_panel(v_x, v_y, v_w, v_h, "SES")
 	game.settings_draw.f_simgeNota(J.add(v_x, 20.0), J.add(v_y, 26.0), ((not J.truth(game.j_MUTED)) if J.gt(J.getv(game.j_VOL, "mus"), 0.0) else J.gt(J.getv(game.j_VOL, "mus"), 0.0)))
 	# BIRLESIK (11. tur): etiketler 3 px saga alindi; ses kapaliyken hoparlorun
@@ -284,5 +283,6 @@ func f_drawSesPanel(p_t: Variant = null) -> Variant:
 		J.setv(game.j_SESP, "open", false)
 		J.setv(game.j_SESP, "tutulan", null)
 		J.method(game.j_SFX, "uiBack", [])
+	game.modal_fx.f_bitir()
 	return null
 

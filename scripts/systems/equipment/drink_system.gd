@@ -48,6 +48,7 @@ func f_pourStart(p_type: Variant = null) -> Variant:
 	v_d = J.getv(game.j_G, "drinkM")
 	if not J.eq(J.getv(J.getv(v_d, "pours"), v_type), null):
 		J.method(game.j_SFX, "bad", [])
+		game.ret_fx.f_ret()   # yazisiz reddedilen islem: X isareti (rendering/ui/ret_fx.gd)
 		return null
 	if J.truth(J.getv(J.getv(game.j_G, "cups"), v_type)):
 		J.method(game.j_SFX, "bad", [])

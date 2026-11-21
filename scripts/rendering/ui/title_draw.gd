@@ -17,9 +17,7 @@ func f_drawTitle(p_t: Variant = null) -> Variant:
 	if J.truth(J.getv(game.j_SESP, "open")):
 		game.settings_draw.f_drawSesPanel(v_t)
 		return null
-	J.setv(game.j_ctx, "globalAlpha", 0.52)
-	game.f_fr(0.0, 0.0, game.j_W, game.j_H, "#180d07")
-	J.setv(game.j_ctx, "globalAlpha", 1.0)
+	game.modal_fx.f_dim(0.52, "#180d07")   # baslik ekraninin tabani da ayni yerden: paneller arasi gecis surekli olur
 	v_i = 0.0
 	# BIRLESIK (6. tur performans): 60 cerceveden yalniz ilk 8'i ekrana dusuyor
 	# (koseler 8 px yaricapli; 8. cerceveden sonrasi tamamen ekran disi) -> ayni

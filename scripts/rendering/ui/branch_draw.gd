@@ -42,9 +42,8 @@ func f_drawPayPanel(p_t: Variant = null) -> Variant:
 	v_y = 46.0
 	v_w = 288.0
 	v_h = 176.0
-	J.setv(game.j_ctx, "globalAlpha", 0.84)
-	game.f_fr(0.0, 0.0, game.j_W, game.j_H, "#0d0a08")
-	J.setv(game.j_ctx, "globalAlpha", 1.0)
+	game.modal_fx.f_dim(0.84, "#0d0a08")
+	game.modal_fx.f_basla("borc")
 	game.interface_draw.f_panel(v_x, v_y, v_w, v_h, "BORÇ ÖDE")
 	game.text_draw.f_txt("Kasandaki para", J.add(v_x, 16.0), J.add(v_y, 18.0), J.getv(game.j_P, "ui4"))
 	game.icon_draw.f_icon("coin", (J.add(v_x, v_w) - 92.0), J.add(v_y, 22.0), v_t)
@@ -76,6 +75,7 @@ func f_drawPayPanel(p_t: Variant = null) -> Variant:
 	if J.truth(game.f_button((J.add(v_x, (float(v_w) / float(2.0))) - 40.0), (J.add(v_y, v_h) - 22.0), 80.0, 18.0, "KAPAT", J.getv(game.j_P, "red1"), true)):
 		J.setv(game.j_PAYP, "open", false)
 		J.method(game.j_SFX, "uiBack", [])
+	game.modal_fx.f_bitir()
 	return null
 
 # ui.js:2308
@@ -171,9 +171,8 @@ func f_drawBranchPanel(p_t: Variant = null) -> Variant:
 	# ve eylem sutununa kadar olan genislige sigdirilir.
 	v_x = 24.0
 	v_w = 432.0
-	J.setv(game.j_ctx, "globalAlpha", 0.84)
-	game.f_fr(0.0, 0.0, game.j_W, game.j_H, "#0d0a08")
-	J.setv(game.j_ctx, "globalAlpha", 1.0)
+	game.modal_fx.f_dim(0.84, "#0d0a08")
+	game.modal_fx.f_basla("sube")
 	game.interface_draw.f_panel(v_x, v_y, v_w, v_h, "ŞUBELER")
 	v_owned = (J.getv(game.j_G, "branch") if J.truth(J.getv(game.j_G, "branch")) else 0.0)
 	v_base = game.progression_system.f_branchBase(game.j_G)
@@ -312,4 +311,5 @@ func f_drawBranchPanel(p_t: Variant = null) -> Variant:
 		if J.truth(game.f_button((J.add(v_x, (float(v_w) / float(2.0))) - 40.0), (J.add(v_y, v_h) - 20.0), 80.0, 17.0, "KAPAT", J.getv(game.j_P, "red1"), true)):
 			J.setv(game.j_BRP, "open", false)
 			J.method(game.j_SFX, "uiBack", [])
+	game.modal_fx.f_bitir()
 	return null

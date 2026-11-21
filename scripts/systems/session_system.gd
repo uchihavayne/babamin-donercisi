@@ -30,6 +30,7 @@ func f_say(p_s: Variant = null) -> Variant:
 		_ogretici_sayac[v_s] = n + 1
 	J.setv(game.j_G, "hint", game.localization.f_T(v_s))
 	J.setv(game.j_G, "hintT", 1.8)
+	game.ret_fx.f_soz()   # ayni karede 'bad' sesi varsa: reddedilen islem (X isareti + toast sallamasi)
 	return null
 
 # game.js:35

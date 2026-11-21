@@ -6,7 +6,7 @@ kalan=""
 sh tests/kontrol.sh >/dev/null || kalan="$kalan kontrol"
 for t in order_flow cutting module_services stations counter_input ingredient_input bread_preparation \
          economy mouse_slicing platform_input runtime_state module_snapshot regression mouse_knife \
-         bahis_input akilli_hedef kapanis dil_cift toplu_siparis eksik_teslim dev_panel tek_tik fare_akisi kapanis_sira cila ceviri_tarama cop_kutusu gun_ici_kayit bahis_hedef fritoz_katman ice_aktarma tarif ucan_patates fritoze_koy haptik web_ortam tezgah_yerlesim kesme_efekt; do
+         bahis_input akilli_hedef kapanis dil_cift toplu_siparis eksik_teslim dev_panel tek_tik fare_akisi kapanis_sira cila ceviri_tarama cop_kutusu gun_ici_kayit bahis_hedef fritoz_katman ice_aktarma tarif ucan_patates fritoze_koy haptik web_ortam tezgah_yerlesim kesme_efekt modal_fx ret_fx; do
 	timeout 300 "$GODOT" --headless --path . --script tests/$t.gd --quit-after 3000 -- --test >/tmp/t_$t.log 2>&1 || kalan="$kalan $t"
 	grep -q "SCRIPT ERROR" /tmp/t_$t.log && kalan="$kalan $t(hata)"
 done
@@ -16,7 +16,7 @@ for d in tr en de fr es pt; do
 	grep -q "SCRIPT ERROR" /tmp/t_yazi_$d.log && kalan="$kalan yazi_tasma($d)(hata)"
 done
 for t in counter_design_visual economy_visual mouse_slicing_visual order_flow_visual stations_visual \
-         platform_visual ingredient_input_visual ucan_patates_visual fritoze_koy_visual patates_tahtasi_visual kesme_efekt_visual; do
+         platform_visual ingredient_input_visual ucan_patates_visual fritoze_koy_visual patates_tahtasi_visual kesme_efekt_visual modal_fx_visual ret_fx_visual; do
 	timeout 300 "$GODOT" --path . --script tests/$t.gd --quit-after 3000 -- --test --gpu-test >/tmp/t_$t.log 2>&1 || kalan="$kalan $t"
 	grep -q "SCRIPT ERROR" /tmp/t_$t.log && kalan="$kalan $t(hata)"
 done

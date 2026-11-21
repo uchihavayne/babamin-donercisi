@@ -42,9 +42,8 @@ func f_drawStatsPanel(p_t: Variant = null) -> Variant:
 	v_dar = J.lt(v_h, 238.0)
 	v_rowSp = (18.0 if J.truth(v_dar) else 20.0)
 	v_satSp = (14.0 if J.truth(v_dar) else 16.0)
-	J.setv(game.j_ctx, "globalAlpha", 0.82)
-	game.f_fr(0.0, 0.0, game.j_W, game.j_H, "#0d0a08")
-	J.setv(game.j_ctx, "globalAlpha", 1.0)
+	game.modal_fx.f_dim(0.82, "#0d0a08")
+	game.modal_fx.f_basla("rekor")
 	game.interface_draw.f_panel(v_x, v_y, v_w, v_h, "REKORLAR")
 	v_rows = [["wrap", "Toplam dürüm", (J.getv(v_S, "wraps") if J.truth(J.getv(v_S, "wraps")) else 0.0)], ["iskender", "İskender", (J.getv(v_S, "isk") if J.truth(J.getv(v_S, "isk")) else 0.0)], ["cola", "Toplam içecek", (J.getv(v_S, "drinks") if J.truth(J.getv(v_S, "drinks")) else 0.0)], ["fbox", "Patates porsiyon", (J.getv(v_S, "boxes") if J.truth(J.getv(v_S, "boxes")) else 0.0)], ["sweet", "Tatlı", (J.getv(v_S, "sweets") if J.truth(J.getv(v_S, "sweets")) else 0.0)], [null, "Oynanan gün", (J.getv(v_S, "days") if J.truth(J.getv(v_S, "days")) else 0.0)], [null, "Kaçan müşteri", (J.getv(v_S, "lost") if J.truth(J.getv(v_S, "lost")) else 0.0)], [null, "Kaçan (günlük ort.)", gunluk_kacan(v_S)]]
 	v_i = 0.0
@@ -85,6 +84,7 @@ func f_drawStatsPanel(p_t: Variant = null) -> Variant:
 	if J.truth(game.f_button((J.add(v_x, (float(v_w) / float(2.0))) - 40.0), (J.add(v_y, v_h) - 22.0), 80.0, 18.0, "KAPAT", J.getv(game.j_P, "red1"), true)):
 		J.setv(game.j_STATS, "open", false)
 		J.method(game.j_SFX, "uiBack", [])
+	game.modal_fx.f_bitir()
 	return null
 
 # ui.js:2755
@@ -194,9 +194,8 @@ func f_drawBasarimPanel(p_t: Variant = null) -> Variant:
 	v_basY = J.add(v_y, 14.0)
 	v_kalan = (((J.add(v_y, v_h) - 6.0) - v_seritH) - v_basY)
 	v_rowH = game.math_utils.f_clamp(floor((float(v_kalan) / float(J.getv(game.j_BS_GRUP, "length")))), 17.0, 24.0)
-	J.setv(game.j_ctx, "globalAlpha", 0.84)
-	game.f_fr(0.0, 0.0, game.j_W, game.j_H, "#0d0a08")
-	J.setv(game.j_ctx, "globalAlpha", 1.0)
+	game.modal_fx.f_dim(0.84, "#0d0a08")
+	game.modal_fx.f_basla("basarim")
 	game.interface_draw.f_panel(v_x, v_y, v_w, v_h, "BAŞARIMLAR")
 	v_acikN = game.achievement_system.f_basarimSayisi()
 	game.text_draw.f_txt(J.add(J.add(v_acikN, " / "), J.getv(game.j_BASARIM, "length")), (J.add(v_x, v_w) - 32.0), J.add(v_y, 4.0), (J.getv(game.j_P, "au3") if J.ge(v_acikN, J.getv(game.j_BASARIM, "length")) else J.getv(game.j_P, "ui3")), {"align": "r"})
@@ -261,6 +260,7 @@ func f_drawBasarimPanel(p_t: Variant = null) -> Variant:
 		J.setv(game.j_BSP, "open", false)
 		J.setv(game.j_BSP, "sec", null)
 		J.method(game.j_SFX, "uiBack", [])
+	game.modal_fx.f_bitir()
 	return null
 
 # Basarim bildiriminin alt kenari ile ekranin alti arasi (ipucu satiri 20 px + 2 px bosluk)

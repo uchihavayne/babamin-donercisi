@@ -169,9 +169,8 @@ func f_drawDefter(p_t: Variant = null) -> Variant:
 	var w := 324.0
 	var x: float = floorf((float(game.j_W) - w) / 2.0)
 	var dar: bool = h < 232.0
-	J.setv(game.j_ctx, "globalAlpha", 0.82)
-	game.f_fr(0.0, 0.0, game.j_W, game.j_H, "#0d0a08")
-	J.setv(game.j_ctx, "globalAlpha", 1.0)
+	game.modal_fx.f_dim(0.82, "#0d0a08")
+	game.modal_fx.f_basla("defter")
 	game.interface_draw.f_panel(x, y, w, h, "BABA'NIN DEFTERİ")
 	var d: Dictionary = T.f_durum()
 	# sekmeler: 2 satir x 4 sutun, yalniz sayfa numarasi (dilden bagimsiz) + usta yildizlari / kilit
@@ -242,6 +241,7 @@ func f_drawDefter(p_t: Variant = null) -> Variant:
 	if game.f_button(x + w / 2.0 - 40.0, y + h - 22.0, 80.0, 18.0, "KAPAT", J.getv(game.j_P, "red1"), true):
 		P.open = false
 		J.method(game.j_SFX, "uiBack", [])
+	game.modal_fx.f_bitir()
 	return null
 
 # ---------------------------------------------------------------- gun sonu: yeni sayfa karti

@@ -18,6 +18,9 @@
 #   patates_ucus fritoze_koy (akicilik: ucan patates / fritoze koyma kareleri; --adim N kare araligi, --say N goruntu)
 #   patates_tahta (tezgahtaki patates tahtasi, oyun donuk: --durum bos|patates|kesim|dolu, --seviye N = tum gelistirmeler N. kademe, yoksa hepsi tam)
 #   kesme_efekt (patates kesme animasyonu kare serisi: fare tahtada basili; --seviye N (varsayilan 2), --adim N oyun karesi / goruntu (2), --say N goruntu (110), --bekle N ilk kare)
+#   panel_gecis (panel / mola acilis gecisi kare serisi: --panel mola|ses|rekor|basarim|sube|kisisel|borc (mola), --say N goruntu (14), --adim N oyun karesi / goruntu (1);
+#                kanca kapali eski sert kesme icin HD_KAPALI=panel_gecis)
+#   ret (reddedilen islem: lavassiz et eklemeye calisir, imlecin ustunde kirmizi X + sallanan uyari yazisi; --say N goruntu (20), --adim N (1); HD_KAPALI=ret_fx eski hal)
 #   (defter: --sayfa 1-8, --gun N bulunan sayfalarin gunu; yeni_sayfa: --gun N, --sayfa 1-8, --kare N)
 # Linux'ta ekransiz sunucuda: xvfb-run -a -s "-screen 0 1280x720x24" godot --rendering-driver opengl3 ...
 extends SceneTree
@@ -348,6 +351,41 @@ func calis() -> void:
 					await adim(1)
 				g.j_BSQ.kuyruk = []
 				await kaydet("_%03d" % i)
+		"panel_gecis":
+			# panel / mola acilis gecisi (rendering/ui/modal_fx.gd): once dinlenme kareleri, sonra panel acilir; --say goruntu, --adim oyun karesi arayla
+			var panel: String = arg("--panel", "mola")
+			if panel in ["sube", "kisisel", "borc"]:
+				kur(19.0, false, -1, 2)
+				G.money = 3200.0
+				G.scene = "shop"; G.sceneT = 0.0
+			else:
+				kur(12.0, true)
+				doldur()
+				if panel != "mola": G.scene = "pause"; G.sceneT = 0.0
+			await adim(45)
+			await kaydet("_once")
+			match panel:
+				"mola": G.scene = "pause"; G.sceneT = 0.0
+				"ses": g.j_SESP.open = true
+				"rekor": g.j_STATS.open = true
+				"basarim": g.j_BSP.open = true
+				"sube": g.j_BRP.open = true
+				"kisisel": g.j_CUSTOM.open = true
+				"borc": g.j_PAYP.open = true
+			for i in int(arg("--say", "14")):
+				await adim(int(arg("--adim", "1")))
+				await kaydet("_%02d" % i)
+		"ret":
+			# reddedilen islem: tezgah bos, lavassiz et eklemek reddedilir (bad + uyari yazisi) -> imlecin ustunde kirmizi X, yazi sallanir
+			kur(12.0, true)
+			G.boards = [null, null, null]
+			g.pointer(Vector2(float(arg("--x", "300")), float(arg("--y", "205"))))
+			await adim(30)
+			await kaydet("_once")
+			g.assembly_system.f_addMeat()
+			for i in int(arg("--say", "20")):
+				await adim(int(arg("--adim", "1")))
+				await kaydet("_%02d" % i)
 		"kalabalik":
 			# en yogun an: 5 musteri + sira + telefon fisi + kedi + rakip + mufettis
 			kur(25.0, true)

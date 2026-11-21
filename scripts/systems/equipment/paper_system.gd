@@ -63,6 +63,7 @@ func f_paperClick() -> Variant:
 		return null
 	if J.gt(J.getv(J.getv(game.j_G, "paper"), "busy"), 0.0):
 		J.method(game.j_SFX, "bad", [])
+		game.ret_fx.f_ret()   # yazisiz reddedilen islem: X isareti (rendering/ui/ret_fx.gd)
 		return null
 	game.paper_system.f_startPaper(v_idx)
 	return null

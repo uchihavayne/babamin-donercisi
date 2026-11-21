@@ -70,6 +70,7 @@ func f_addMeat() -> Variant:
 		return null
 	if not J.eq(J.getv(v_w, "state"), "open"):
 		J.method(game.j_SFX, "bad", [])
+		game.ret_fx.f_ret()   # yazisiz reddedilen islem: X isareti (rendering/ui/ret_fx.gd)
 		return null
 	if J.eq(J.getv(v_w, "kind"), "pide"):
 		J.method(game.j_SFX, "bad", [])
@@ -113,6 +114,7 @@ func f_addIng(p_k: Variant = null) -> Variant:
 		return null
 	if not J.eq(J.getv(v_w, "state"), "open"):
 		J.method(game.j_SFX, "bad", [])
+		game.ret_fx.f_ret()   # yazisiz reddedilen islem: X isareti (rendering/ui/ret_fx.gd)
 		return null
 	if J.eq(J.getv(v_w, "kind"), "pide"):
 		J.method(game.j_SFX, "bad", [])
@@ -357,6 +359,7 @@ func f_sauceClick(p_mx: Variant = null) -> Variant:
 	v_sarili = (J.eq(J.getv(v_w, "kind"), "wrap") if (J.eq(J.getv(v_w, "state"), "rolled") and J.truth(J.method(game.j_TUN, "sauceLate", [game.j_G]))) else (J.method(game.j_TUN, "sauceLate", [game.j_G]) if J.eq(J.getv(v_w, "state"), "rolled") else J.eq(J.getv(v_w, "state"), "rolled")))
 	if (not J.eq(J.getv(v_w, "state"), "open") and (not J.truth(v_sarili))):
 		J.method(game.j_SFX, "bad", [])
+		game.ret_fx.f_ret()   # yazisiz reddedilen islem: X isareti (rendering/ui/ret_fx.gd)
 		return null
 	if J.eq(J.getv(v_w, "kind"), "pide"):
 		J.method(game.j_SFX, "bad", [])
