@@ -226,6 +226,16 @@ func f_drawBranchPanel(p_t: Variant = null) -> Variant:
 				J.setv(game.j_ctx, "globalAlpha", 1.0)
 		game.branch_draw.f_branchIcon(J.add(v_x, 30.0), J.add(v_ry, 10.0), v_have, J.add(v_k, v_i))
 		game.text_draw.f_txt(J.getv(v_b, "name"), J.add(v_x, 48.0), J.add(v_ry, (4.0 if J.truth(v_darP) else 2.0)), (J.getv(game.j_P, "ink") if J.truth(v_have) else (J.getv(game.j_P, "ink") if J.truth(v_isNext) else "#6a6058")))
+		# 12. tur: sehir kurali rozeti (systems/city_rules.gd); acik ya da siradaki subede
+		var v_kr: Dictionary = game.city_rules.f_kuralIndeks(int(v_i))
+		if (J.truth(v_have) or J.truth(v_isNext)) and not v_kr.is_empty():
+			var v_rx: float = J.n(v_x) + 48.0 + J.n(game.f_textW(J.getv(v_b, "name"))) + 6.0
+			var v_ry2: float = J.n(v_ry) + (3.0 if J.truth(v_darP) else 1.0)
+			var v_rm: String = str(game.text_draw.kisalt(str(game.localization.f_T(str(v_kr.kisa))), (J.n(v_x) + J.n(v_w) - 104.0 - 62.0) - v_rx - 8.0))
+			var v_rw: float = J.n(game.f_textW(v_rm)) + 8.0
+			game.f_rrect(v_rx, v_ry2, v_rw, 10.0, 3.0, "#3a2c12" if J.truth(v_have) else "#2e2618")
+			game.f_rrectOut(v_rx, v_ry2, v_rw, 10.0, 3.0, "#b0862a" if J.truth(v_have) else "#6a5a3a")
+			game.text_draw.f_txt(v_rm, v_rx + 4.0, v_ry2 + 2.0, "#ffd75e" if J.truth(v_have) else "#a8967a")
 		if (not J.truth(v_darP)):
 			game.text_draw.f_txt((J.getv(v_b, "desc") if (J.truth(v_have) or J.truth(v_isNext)) else "???"), J.add(v_x, 48.0), J.add(v_ry, 12.0), (J.getv(game.j_P, "ui4") if J.truth(v_have) else "#5a5450"), {"maxw": (v_w - 156.0)})
 		game.text_draw.f_txt(J.add(J.add("+$", game.math_utils.f_fmtShort(J.getv(v_b, "inc"))), game.localization.f_T("/gün")), (J.add(v_x, v_w) - 104.0), J.add(v_ry, (6.0 if J.truth(v_darP) else 2.0)), (J.getv(game.j_P, "au2") if J.truth(v_have) else "#6a6058"), {"align": "r"})
@@ -307,6 +317,8 @@ func f_drawBranchPanel(p_t: Variant = null) -> Variant:
 		game.f_hl(J.add(v_x, 12.0), (v_fy - 6.0), (v_w - 24.0), J.getv(game.j_P, "ui2"))
 		J.setv(game.j_ctx, "globalAlpha", 1.0)
 		game.text_draw.f_txt((game.localization.f_T("Gelir o günkü servise göre artar; kira, maaş, malzeme düşülür.") if J.ge(J.getv(game.j_G, "city"), 0.0) else game.localization.f_T("Yeni şube açmak için önce dükkânı geliştir.")), J.add(v_x, (float(v_w) / float(2.0))), v_fy, J.getv(game.j_P, "ui4"), {"align": "c"})
+		if J.gt(v_owned, 0.0):
+			game.text_draw.f_txt(game.localization.f_T("Bir şubede çalışırsan o şubenin geliri %50 artar."), J.add(v_x, (float(v_w) / float(2.0))), J.add(v_fy, 10.0), "#c8a44a", {"align": "c", "maxw": v_w - 24.0})
 	if J.ge(J.getv(game.j_G, "city"), 0.0):
 		if J.truth(game.f_button((J.add(v_x, (float(v_w) / float(2.0))) - 132.0), (J.add(v_y, v_h) - 20.0), 124.0, 17.0, game.localization.f_T("BABANIN DÜKKÂNI"), "#6a4a2a", true)):
 			game.branch_draw.f_sehreGit((-J.n(1.0)))

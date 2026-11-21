@@ -62,7 +62,10 @@ func f_drawDayEnd(p_t: Variant = null) -> Variant:
 		game.text_draw.f_txt(J.add(J.add(game.localization.f_T("(bahşiş dahil $"), game.math_utils.f_fmtMoney(J.getv(v_st, "tips"))), ")"), J.add((float(game.j_W) / float(2.0)), 92.0), J.add(v_ly, 14.0), J.getv(game.j_P, "ui3"), {"align": "r"})
 	v_dy2 = 0.0
 	if (J.gt(J.n(v_st.get("branchBrut", 0.0)), 0.0) and J.gt(J.getv(game.j_G, "sceneT"), 1.65)):
-		game.text_draw.f_txt(J.add((J.getv(game.j_G, "branch") if J.truth(J.getv(game.j_G, "branch")) else 0.0), game.localization.f_T(" ŞUBE GELİRİ")), ((float(game.j_W) / float(2.0)) - 92.0), J.add(v_ly, 26.0), J.getv(game.j_P, "au2"))
+		var v_sg: Variant = game.text_draw.f_txt(J.add((J.getv(game.j_G, "branch") if J.truth(J.getv(game.j_G, "branch")) else 0.0), game.localization.f_T(" ŞUBE GELİRİ")), ((float(game.j_W) / float(2.0)) - 92.0), J.add(v_ly, 26.0), J.getv(game.j_P, "au2"))
+		if J.n(v_st.get("ziyaretPrim", 0.0)) > 0.0:
+			# 12. tur: calisilan subenin ziyaret primi (altin yildiz; systems/city_rules.gd)
+			game.tarif_draw.f_yildiz(((float(game.j_W) / float(2.0)) - 92.0) + J.n(v_sg) + 4.0, J.add(v_ly, 25.0), game.tarif_draw.ALTIN, 1.0)
 		game.text_draw.f_txt(J.add("+$", game.math_utils.f_fmtMoney(J.getv(v_st, "branch"))), J.add((float(game.j_W) / float(2.0)), 92.0), J.add(v_ly, 26.0), J.getv(game.j_P, "au2"), {"align": "r"})
 		# zincir gideri (kira + maas + malzeme) solda, performans sagda
 		game.text_draw.f_txt(str(game.localization.f_T("gider $")) + str(game.math_utils.f_fmtShort(J.n(v_st.get("branchGider", 0.0)))), ((float(game.j_W) / float(2.0)) - 92.0), J.add(v_ly, 36.0), "#a83a2a")

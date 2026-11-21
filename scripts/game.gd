@@ -19,6 +19,7 @@ var achievement_system = preload("res://scripts/systems/achievement_system.gd").
 var appearance_system = preload("res://scripts/systems/customers/appearance_system.gd").new(self)
 var assembly_system = preload("res://scripts/systems/orders/assembly_system.gd").new(self)
 var city_system = preload("res://scripts/systems/city_system.gd").new(self)
+var city_rules = preload("res://scripts/systems/city_rules.gd").new(self)
 var customer_system = preload("res://scripts/systems/customer_system.gd").new(self)
 var cutting_system = preload("res://scripts/systems/equipment/cutting_system.gd").new(self)
 var drag_system = preload("res://scripts/systems/orders/drag_system.gd").new(self)

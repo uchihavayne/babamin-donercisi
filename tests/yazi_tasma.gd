@@ -256,6 +256,14 @@ func icra_ekranlari(dil: String) -> void:
 			if game.icra_system.f_kartAcik() and String(G.icra.sonuc.durum) == durum:
 				olc(dil, "icra karti %s kasa %d" % [durum, int(kasa)], 40)
 			game.icra_system.f_kartKapat()
+	# sehir kurallari (12. tur): her sube sehrinde gun giris karti (kural + prim satiri), hava / mac satirlariyla birlikte
+	for sehir in 8:
+		for hava in ["sun", "rain", "kar", "sicak"]:
+			kur(40.0, 3, sehir)
+			var Gs: Dictionary = game.j_G
+			Gs.weather = hava; Gs.macGun = (hava == "sun")
+			Gs.scene = "intro"; Gs.sceneT = 5.0
+			olc(dil, "gun girisi sehir %d %s" % [sehir, hava], 10)
 	for k in [1, 2, 5]:
 		for kasa in [100.0, 9999999.0]:
 			kur(30.0, 3)

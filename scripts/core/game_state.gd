@@ -208,6 +208,7 @@ var j_POSTERS: Variant = null
 var j_COUNTER_STYLES: Variant = null
 var j_TIPS_LOAD: Variant = null
 var j_BRANCH: Variant = null
+var j_SEHIR_KURAL: Variant = null   # data/sehir_kural.gd (sehir kurallari; systems/city_rules.gd)
 var j_FERMAN_CEZA_SINIR: Variant = null
 var j_FERMAN_CEZA_PARA: Variant = null
 var j_FERMANLAR: Variant = null

@@ -166,7 +166,7 @@ func f_maybeInspector(p_dt: Variant = null) -> Variant:
 			v_dirty = J.gt(J.getv(game.j_G, "trash"), 0.55)
 			J.setv(v_I, "dirty", v_dirty)
 			if J.truth(v_dirty):
-				J.setv(v_I, "fine", floor(game.math_utils.f_rnd(game.j_FINE_MIN, game.j_FINE_MAX) + 0.5))
+				J.setv(v_I, "fine", floor(game.math_utils.f_rnd(game.j_FINE_MIN, game.j_FINE_MAX) * game.city_rules.f_carpan("ceza") + 0.5))   # 12. tur: sehir kurali (Paris)
 				J.setv(game.j_G, "debt", J.add(J.getv(game.j_G, "debt"), J.getv(v_I, "fine")))
 				J.setv(J.getv(game.j_G, "stat"), "fine", J.add((J.getv(J.getv(game.j_G, "stat"), "fine") if J.truth(J.getv(J.getv(game.j_G, "stat"), "fine")) else 0.0), J.getv(v_I, "fine")))
 				J.setv(v_I, "line", game.math_utils.f_pick(game.j_LINES_INSPECT_BAD))

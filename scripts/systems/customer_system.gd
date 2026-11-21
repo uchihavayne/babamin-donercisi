@@ -418,6 +418,10 @@ func f_deliver(p_c: Variant = null) -> Variant:
 		v_price = game.tarif_system.f_odul(str(v_ord.tarif), J.n(v_price), v_c)
 	if J.truth(J.getv(v_c, "homeless")):
 		v_price = 0.0
+	# 12. tur sehir kurali (Tokyo): kusursuz teslim (tam kalite + istenen secim + dogru sos) fazla, kusurlu teslim eksik oder
+	var v_tk: float = game.city_rules.f_teslimCarpani(J.ge(v_q, 0.99) and J.truth(v_secimOk) and J.truth(v_sauceOk))
+	if v_tk != 1.0 and J.n(v_price) > 0.0:
+		v_price = max(2.0, floor(J.n(v_price) * v_tk + 0.5))
 	J.setv(v_c, "earn", J.add((J.getv(v_c, "earn") if J.truth(J.getv(v_c, "earn")) else 0.0), v_price))
 	if J.eq(J.getv(v_it, "kind"), "wrap"):
 		J.setv(J.getv(game.j_G, "stat"), "wraps", J.add(J.getv(J.getv(game.j_G, "stat"), "wraps"), 1.0))

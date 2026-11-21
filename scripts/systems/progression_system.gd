@@ -31,7 +31,7 @@ func f_bahisTip(p_id: Variant = null) -> Variant:
 # data.js:102
 func f_bahisPara(p_G: Variant = null) -> Variant:
 	var v_G: Variant = p_G
-	return (floor((float(J.add(200.0, (J.getv(v_G, "day") * 34.0))) / float(10.0)) + 0.5) * 10.0)
+	return (floor((float(J.add(200.0, (J.getv(v_G, "day") * 34.0))) * game.city_rules.f_carpan("iddia", v_G) / float(10.0)) + 0.5) * 10.0)   # 12. tur: sehir kurali (Berlin)
 	return null
 
 # data.js:447
@@ -41,6 +41,7 @@ func f_dayCfg(p_d: Variant = null, p_G: Variant = null) -> Variant:
 	var v_d: Variant = p_d
 	var v_G: Variant = p_G
 	v_len = min(210.0, J.add(J.add(60.0, (v_d * 2.0)), (game.equipment_system.f_upgTotalLv(v_G) * 2.0)))
+	v_len = floor(v_len * game.city_rules.f_carpan("sure", v_G) + 0.5)   # 12. tur: sehir kurali (Londra / New York)
 	# BIRLESIK (8. tur): ilk gunler 5-6 musteriyle bos geciyordu ("en basit sey
 	# icin 7-8 tur"). Ilk gunlerde musteri daha sik; ~16. gunden sonra eski egri.
 	v_rate = (float(max(2.0, min(6.8 - (v_d * 0.22), 4.6 - (v_d * 0.08)))) / float(J.method(game.j_TUN, "custMul", [v_G])))

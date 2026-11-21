@@ -59,7 +59,7 @@ func f_startDay() -> Variant:
 	J.setv(game.j_G, "coins", [])
 	J.setv(game.j_G, "customers", [])
 	J.setv(game.j_G, "spawnT", (999.0 if J.eq(J.getv(game.j_G, "day"), 1.0) else game.j_ILK_MUSTERI))
-	J.setv(game.j_G, "stat", {"wraps": 0.0, "drinks": 0.0, "boxes": 0.0, "sweets": 0.0, "isk": 0.0, "lost": 0.0, "earned": 0.0, "tips": 0.0, "debtPaid": 0.0, "branch": 0.0, "branchBrut": 0.0, "branchGider": 0.0, "brPerf": 1.0, "yerYok": 0.0})
+	J.setv(game.j_G, "stat", {"wraps": 0.0, "drinks": 0.0, "boxes": 0.0, "sweets": 0.0, "isk": 0.0, "lost": 0.0, "earned": 0.0, "tips": 0.0, "debtPaid": 0.0, "branch": 0.0, "branchBrut": 0.0, "branchGider": 0.0, "ziyaretPrim": 0.0, "brPerf": 1.0, "yerYok": 0.0})
 	J.setv(game.j_G, "sauceFx", {"hot": 0.0, "garlic": 0.0, "butter": 0.0})
 	J.setv(game.j_G, "shutT", 1.0)
 	J.setv(game.j_G, "kapanis", null)
@@ -143,11 +143,15 @@ func f_endDay() -> Variant:
 	J.setv(J.getv(game.j_G, "stat"), "brPerf", game.progression_system.f_branchPerf(v_served, (J.getv(J.getv(game.j_G, "stat"), "lost") if J.truth(J.getv(J.getv(game.j_G, "stat"), "lost")) else 0.0), J.getv(game.j_G, "day"), game.j_G))
 	# BIRLESIK (12. tur): sube geliri NET'tir (brut - zincir gideri: kira + maas + malzeme; progression_system.f_branchGider)
 	var v_brBase: float = J.n(game.progression_system.f_branchBase(game.j_G))
+	var v_prim: float = game.city_rules.f_ziyaretTaban(game.j_G)   # calisilan subenin ziyaret primi (taban gelire eklenir; gider de buna gore)
+	v_brBase += v_prim
+	J.setv(J.getv(game.j_G, "stat"), "ziyaretPrim", floorf(v_prim * J.n(J.getv(J.getv(game.j_G, "stat"), "brPerf")) + 0.5))
 	var v_brBrut: float = floorf(v_brBase * J.n(J.getv(J.getv(game.j_G, "stat"), "brPerf")) + 0.5)
 	var v_brGider: float = minf(v_brBrut, game.progression_system.f_branchGider(v_brBase, J.getv(J.getv(game.j_G, "stat"), "brPerf")))
 	if J.truth(game.progression_system.f_fermanSehri(game.j_G)):
 		v_brBrut = 0.0
 		v_brGider = 0.0
+		J.setv(J.getv(game.j_G, "stat"), "ziyaretPrim", 0.0)
 	J.setv(J.getv(game.j_G, "stat"), "branchBrut", v_brBrut)
 	J.setv(J.getv(game.j_G, "stat"), "branchGider", v_brGider)
 	J.setv(J.getv(game.j_G, "stat"), "branch", v_brBrut - v_brGider)

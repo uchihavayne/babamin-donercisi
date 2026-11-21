@@ -23,6 +23,7 @@
 #   ret (reddedilen islem: lavassiz et eklemeye calisir, imlecin ustunde kirmizi X + sallanan uyari yazisi; --say N goruntu (20), --adim N (1); HD_KAPALI=ret_fx eski hal)
 #   icra_tamam / icra_ihtar / icra_muhur (sabah kapida icra memuru karti; --bekle N kare), icra_uyari (dukkan cubugu: --gun N, --kasa $), icra_hud (oyun ici etiket: --gun N, --kasa $),
 #   icra_gunsonu (gun sonu karti: taksit birikti satiri)
+#   sehir_giris / sehir_gunsonu (oynanan sehrin kurali giris kartinda / ziyaret primi yildizi gun sonunda; --sehir N, --gun N); subeler (kural rozetleri)
 #   (defter: --sayfa 1-8, --gun N bulunan sayfalarin gunu; yeni_sayfa: --gun N, --sayfa 1-8, --kare N)
 # Linux'ta ekransiz sunucuda: xvfb-run -a -s "-screen 0 1280x720x24" godot --rendering-driver opengl3 ...
 extends SceneTree
@@ -161,6 +162,19 @@ func calis() -> void:
 			g.session_system.f_endDay()
 			G.tarif.yeni = []
 			await adim(500)
+			await kaydet()
+		"sehir_giris", "sehir_gunsonu":
+			# oynanan sehrin kurali (gun giris karti) / ziyaret primi yildizi (gun sonu) - 12. tur; --sehir N (0 Istanbul ... 7 New York)
+			kur(float(arg("--gun", "60")), true, int(arg("--sehir", "0")))
+			if ad == "sehir_giris":
+				G.scene = "intro"; G.sceneT = 3.0
+				await adim(70)
+			else:
+				G.stat.wraps = 60.0; G.stat.isk = 14.0; G.stat.drinks = 30.0; G.stat.lost = 12.0; G.stat.earned = 9800.0; G.stat.tips = 412.0
+				G.money = 9800.0
+				g.session_system.f_endDay()
+				G.tarif.yeni = []
+				await adim(500)
 			await kaydet()
 		"icra_gunsonu":
 			kur(8.0, false, -1, 2)

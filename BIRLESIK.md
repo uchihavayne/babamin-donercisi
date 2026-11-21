@@ -521,3 +521,22 @@ Eskiden borç taksiti (kazancın %18'i) her gün kasadan otomatik kesiliyordu: b
 - **Şube tablosu ×1,6** (`inc`: 1.000 / 3.100 / 8.700 / 15.700 / 28.000 / 90.000 / 288.000 / 912.000 / 1.250.000): ortalama oyuncunun (%70) net geliri ve borç bitiş günü (82) korunur, **beceri aralığı açılır**: dikkatli oyuncuda %40 / %50 / %55 / %70 / %85 / %100 yetişme için borç **153 / 118 / 103 / 82 / 72 / 66**. günde biter (eski eğri, %55 / %70 / %85 için 95 / 83 / 76). Şube panelinde üst satır "Günlük **brüt** gelir", alt not "gider düşülür" der.
 - **Test:** `tests/sube_ekonomi.gd` (31 denetim: hedef eğrisi, uçlar, beceri ayrımı, gider formülü, net ≥ 0, gün sonu muhasebesi, Demirkent, ölü gün, tablo) + 12 bozma denemesi (hepsi yakalandı) + `yazi_tasma` (şube giderleri satırı, 6 dil).
 
+### Şehir kuralları + ziyaret primi (3/4): metindeki vaat artık bir kural
+
+Eskiden şehir yalnız görseldi (sokak, hava, müşteri görünümü); "Burada iddia büyük", "kuyruk hiç bitmez" gibi açıklamalar boş vaatti. Şimdi her şube şehri, oynanan şehir olduğu gün geçerli **bir kural** taşır (Babanın Dükkânı ve Demirkent kuralsız). Kurallar mevcut ayar katmanına (`j_TUN`) ve birkaç noktaya bağlıdır; hiçbir yeni mekanik / çizim gerekmedi.
+
+| Şehir | Kural (rozet) | Ne yapar |
+| --- | --- | --- |
+| İstanbul | KUYRUK · MÜŞTERİ +%25 | müşteri akışı ×1,25, sabır ×0,92 |
+| Berlin | İDDİA ×2 | rakip bahsinin kazancı ve cezası ×2 |
+| Londra | KAPANMAYAN KÖŞE · GÜN +%25 | gün süresi ×1,25 |
+| Manila | BİTMEYEN KUYRUK · MÜŞTERİ +%40 | akış ×1,4, sabır ×0,85 |
+| Paris | KÜÇÜK VE TİTİZ · YER −1 • CEZA ×2 | sıradaki yer −1 (en az 2), hijyen cezası ×2, fiyat ×1,15 |
+| Dubai | TURİST AKINI · BAHŞİŞ +%80 | bahşiş ×1,8, sabır ×0,85 |
+| Tokyo | KUSURSUZLUK · KUSURSUZ +%25 | kusursuz teslim (tam kalite + istenen seçim + doğru sos) ×1,25, kusurlu ×0,8; evsize bedava yemek aynı |
+| New York | UYUMAYAN ŞEHİR · GÜN VE MÜŞTERİ +%15 | süre ×1,15, akış ×1,15 |
+
+- **Ziyaret primi:** açık bir şube şehrinde çalışılan gün o şubenin **taban geliri %50 artar** (`city_rules.ZIYARET_PRIM`; gider de buna göre). Gün sonu kartında şube satırında altın ★. Böylece şehir seçmek gerçek bir karar: zor kural ↔ prim; ev dükkânı her zaman kuralsız, primsiz taban (tempo modelinin ölçtüğü). Aynı hizmetle başka şubede çalışmak net geliri artırır; ama kural yoğunluğu artırıyorsa (İstanbul / Manila / New York) hedef de büyür ve çarpan düşebilir — beceri yoksa prim yetmez.
+- **Arayüz:** şube panelinde her açık / sıradaki şehirde amber rozet; panel altında prim notu; gün giriş kartında "ŞEHİR KURALI: …" + açıklama + prim satırı (hava / maç satırlarıyla birlikte, kart genişliğe göre ayarlanır); giriş kartı artık "Kalan borç … • N şube" satırına göre de genişler (Fransızca / İspanyolcada 1-3 px taşıyordu).
+- **Çeviri:** 27 metin × 5 dil (8 ad, 8 rozet, 8 açıklama, 3 genel). **Test:** `tests/sehir_kural.gd` (202 denetim: veri + çeviri, her kuralın etkisi evle karşılaştırmalı, Paris cezası aralığı, Tokyo teslim, evsiz, prim, gün sonu, çizimler) + 20 bozma denemesi (hepsi yakalandı) + `yazi_tasma`'ya 8 şehir × 4 hava giriş kartı.
+

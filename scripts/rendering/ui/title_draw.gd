@@ -195,6 +195,8 @@ func f_drawIntro(p_t: Variant = null) -> Variant:
 	v_yagmur = J.eq(J.getv(game.j_G, "weather"), "rain")
 	v_havaVar = ((v_yagmur if J.truth(v_yagmur) else J.eq(J.getv(game.j_G, "weather"), "kar")) if (J.truth(v_yagmur) or J.eq(J.getv(game.j_G, "weather"), "kar")) else J.eq(J.getv(game.j_G, "weather"), "sicak"))
 	v_satir = J.add((1.0 if J.truth(v_havaVar) else 0.0), (1.0 if J.truth(J.getv(game.j_G, "macGun")) else 0.0))
+	var v_kural: Dictionary = game.city_rules.f_kural(game.j_G)   # 12. tur: oynanan sehrin kurali (systems/city_rules.gd)
+	if not v_kural.is_empty(): v_satir = J.add(v_satir, 1.5)
 	v_ph = J.add(84.0, (v_satir * 24.0))
 	v_y = game.math_utils.f_lerp((-J.n(60.0)), ((68.0 - ((v_satir - 1.0) * 8.0)) if J.truth(v_satir) else 80.0), game.math_utils.f_easeOutBack(v_k))
 	# BIRLESIK (11. tur): hava / mac aciklamasi (TR 250 px, cevirilerde daha
@@ -207,6 +209,11 @@ func f_drawIntro(p_t: Variant = null) -> Variant:
 	if J.truth(J.getv(game.j_G, "macGun")): v_acik.append("gün ortasında taraftar akını — acele ederler, bahşiş bol")
 	var v_pw := 192.0
 	for v_a in v_acik: v_pw = maxf(v_pw, J.n(game.f_textW(v_a)) + 24.0)
+	if not v_kural.is_empty(): v_pw = maxf(v_pw, J.n(game.f_textW(str(game.localization.f_T(str(v_kural.acik))))) + 24.0)
+	# "Kalan borc: $... • N sube" satiri (Fransizca / Ispanyolcada 192 px'lik karta 1-3 px siğmiyordu): kart bu satira gore de genisler
+	if J.gt(J.getv(game.j_G, "debt"), 0.0):
+		var v_borcS: String = str(game.localization.f_T("Kalan borç: $")) + str(game.math_utils.f_fmtMoney(J.getv(game.j_G, "debt"))) + (("   •   " + str(J.getv(game.j_G, "branch")) + str(game.localization.f_T(" şube"))) if J.truth(J.getv(game.j_G, "branch")) else "")
+		v_pw = maxf(v_pw, J.n(game.f_textW(v_borcS)) + 24.0)
 	v_pw = minf(v_pw, float(game.j_W) - 16.0)
 	var v_mw := {"align": "c", "maxw": v_pw - 16.0}
 	game.interface_draw.f_panel(((float(game.j_W) / float(2.0)) - v_pw / 2.0), v_y, v_pw, v_ph)
@@ -242,6 +249,15 @@ func f_drawIntro(p_t: Variant = null) -> Variant:
 		v_sy2 = J.add(v_sy2, 10.0)
 		game.text_draw.f_txt("gün ortasında taraftar akını — acele ederler, bahşiş bol", (float(game.j_W) / float(2.0)), v_sy2, J.getv(game.j_P, "ui3"), v_mw)
 		v_sy2 = J.add(v_sy2, 12.0)
+	if not v_kural.is_empty():
+		# 12. tur: oynanan sehrin kurali + ziyaret primi
+		game.text_draw.f_txt(str(game.localization.f_T("ŞEHİR KURALI: ")) + str(game.localization.f_T(str(v_kural.ad))), (float(game.j_W) / float(2.0)), v_sy2, "#ffd75e", {"align": "c", "maxw": v_pw - 16.0})
+		v_sy2 = J.add(v_sy2, 10.0)
+		game.text_draw.f_txt(str(game.localization.f_T(str(v_kural.acik))), (float(game.j_W) / float(2.0)), v_sy2, J.getv(game.j_P, "ui3"), v_mw)
+		v_sy2 = J.add(v_sy2, 11.0)
+		if game.city_rules.f_ziyaretTaban(game.j_G) > 0.0:
+			game.text_draw.f_txt("bu şubede çalışırsan geliri %50 artar", (float(game.j_W) / float(2.0)), v_sy2, "#8ad86a", v_mw)
+			v_sy2 = J.add(v_sy2, 12.0)
 	if (J.gt(J.getv(game.j_G, "sceneT"), 0.4) and J.truth(game.f_button(((float(game.j_W) / float(2.0)) - 46.0), J.add(v_sy2, 2.0), 92.0, 18.0, "DÜKKÂNI AÇ", "#3f8a4a", true))):
 		J.method(game.j_SFX, "bell", [])
 		game.f_startDay()

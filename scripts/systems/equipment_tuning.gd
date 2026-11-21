@@ -310,7 +310,7 @@ func hava_sabir(_args: Array, _captures: Dictionary = {}) -> Variant:
 func hava_bahsis(_args: Array, _captures: Dictionary = {}) -> Variant:
 	var v_G: Variant = null
 	v_G = J.arg(_args, 0)
-	return (1.45 if (J.truth(v_G) and J.eq(J.getv(v_G, "weather"), "kar")) else 1.0)
+	return (1.45 if (J.truth(v_G) and J.eq(J.getv(v_G, "weather"), "kar")) else 1.0) * game.city_rules.f_carpan("bahsis", v_G)   # 12. tur: sehir kurali (Dubai)
 	return null
 
 func secim_on(_args: Array, _captures: Dictionary = {}) -> Variant:
@@ -402,7 +402,7 @@ func sec_name(_args: Array, _captures: Dictionary = {}) -> Variant:
 func patience(_args: Array, _captures: Dictionary = {}) -> Variant:
 	var v_G: Variant = null
 	v_G = J.arg(_args, 0)
-	return game.equipment_system.f_LV([1.0, 1.15, 1.3, 1.5], game.equipment_system.f_UV(v_G, "paint"))
+	return game.equipment_system.f_LV([1.0, 1.15, 1.3, 1.5], game.equipment_system.f_UV(v_G, "paint")) * game.city_rules.f_carpan("sabir", v_G)   # 12. tur: sehir kurali
 	return null
 
 func wall_style(_args: Array, _captures: Dictionary = {}) -> Variant:
@@ -414,17 +414,17 @@ func wall_style(_args: Array, _captures: Dictionary = {}) -> Variant:
 func slots(_args: Array, _captures: Dictionary = {}) -> Variant:
 	var v_G: Variant = null
 	v_G = J.arg(_args, 0)
-	return game.equipment_system.f_LV([2.0, 3.0, 4.0, 5.0], game.equipment_system.f_UV(v_G, "expand"))
+	return maxf(2.0, game.equipment_system.f_LV([2.0, 3.0, 4.0, 5.0], game.equipment_system.f_UV(v_G, "expand")) + game.city_rules.f_yer(v_G))   # 12. tur: sehir kurali (Paris -1)
 	return null
 
 func price_mul(_args: Array, _captures: Dictionary = {}) -> Variant:
 	var v_G: Variant = null
 	v_G = J.arg(_args, 0)
-	return game.equipment_system.f_LV([1.0, 1.16, 1.34, 1.6], game.equipment_system.f_UV(v_G, "sign"))
+	return game.equipment_system.f_LV([1.0, 1.16, 1.34, 1.6], game.equipment_system.f_UV(v_G, "sign")) * game.city_rules.f_carpan("fiyat", v_G)   # 12. tur: sehir kurali
 	return null
 
 func cust_mul(_args: Array, _captures: Dictionary = {}) -> Variant:
 	var v_G: Variant = null
 	v_G = J.arg(_args, 0)
-	return game.equipment_system.f_LV([1.0, 1.25, 1.5, 1.9], game.equipment_system.f_UV(v_G, "sign"))
+	return game.equipment_system.f_LV([1.0, 1.25, 1.5, 1.9], game.equipment_system.f_UV(v_G, "sign")) * game.city_rules.f_carpan("gelis", v_G)   # 12. tur: sehir kurali
 	return null
