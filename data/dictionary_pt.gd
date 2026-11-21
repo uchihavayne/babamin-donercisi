@@ -1232,4 +1232,9 @@ const VALUE = {
 	"'i taksit olarak birikir.": "% vira parcela acumulada.",
 	"Biriken taksit: $": "Acumulado: $",
 	"TAKSİT": "PARCELA",
+	# Sube giderleri: kira + maas + malzeme (birlesik surum, 12. tur)
+	"gider $": "custos $",
+	# Sube paneli: brut gelir + gider notu (birlesik surum, 12. tur)
+	"Günlük brüt gelir: $": "Receita bruta/dia: $",
+	"Gelir o günkü servise göre artar; kira, maaş, malzeme düşülür.": "Receita pelo serviço do dia, menos aluguel, salários e insumos.",
 }

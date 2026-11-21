@@ -1232,4 +1232,9 @@ const VALUE = {
 	"'i taksit olarak birikir.": "% werden als Rate angespart.",
 	"Biriken taksit: $": "Angespart: $",
 	"TAKSİT": "RATE",
+	# Sube giderleri: kira + maas + malzeme (birlesik surum, 12. tur)
+	"gider $": "Kosten $",
+	# Sube paneli: brut gelir + gider notu (birlesik surum, 12. tur)
+	"Günlük brüt gelir: $": "Brutto pro Tag: $",
+	"Gelir o günkü servise göre artar; kira, maaş, malzeme düşülür.": "Einnahmen folgen dem Tagesservice, abzüglich Miete, Löhne, Material.",
 }

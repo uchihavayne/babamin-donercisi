@@ -190,7 +190,7 @@ func f_drawBranchPanel(p_t: Variant = null) -> Variant:
 	# 8 sube acikken 6 px ust uste biniyordu. Gelir once tam yazilir; iki yazi
 	# yan yana sigmazsa gelir kisa biciminde ("$1,62M"), o da yetmezse soldaki kisalir.
 	var v_solMetin: String = J.s(J.add(J.add(J.add(J.add(J.add(game.localization.f_T("Açık şube: "), min(v_owned, v_nList)), "/"), v_nList), game.localization.f_T("    Dükkân seviyesi: ")), v_seviye))
-	var v_sagEtiket: String = J.s(game.localization.f_T("Günlük şube geliri: $"))
+	var v_sagEtiket: String = J.s(game.localization.f_T("Günlük brüt gelir: $"))
 	var v_sagMetin: String = v_sagEtiket + J.s(game.math_utils.f_fmtMoney(v_base))
 	var v_satirW: float = (v_w - 28.0) - 12.0
 	if float(game.f_textW(v_solMetin)) + float(game.f_textW(v_sagMetin)) > v_satirW:
@@ -306,7 +306,7 @@ func f_drawBranchPanel(p_t: Variant = null) -> Variant:
 		J.setv(game.j_ctx, "globalAlpha", 0.3)
 		game.f_hl(J.add(v_x, 12.0), (v_fy - 6.0), (v_w - 24.0), J.getv(game.j_P, "ui2"))
 		J.setv(game.j_ctx, "globalAlpha", 1.0)
-		game.text_draw.f_txt((game.localization.f_T("Şube geliri o günkü satışına göre artar.") if J.ge(J.getv(game.j_G, "city"), 0.0) else game.localization.f_T("Yeni şube açmak için önce dükkânı geliştir.")), J.add(v_x, (float(v_w) / float(2.0))), v_fy, J.getv(game.j_P, "ui4"), {"align": "c"})
+		game.text_draw.f_txt((game.localization.f_T("Gelir o günkü servise göre artar; kira, maaş, malzeme düşülür.") if J.ge(J.getv(game.j_G, "city"), 0.0) else game.localization.f_T("Yeni şube açmak için önce dükkânı geliştir.")), J.add(v_x, (float(v_w) / float(2.0))), v_fy, J.getv(game.j_P, "ui4"), {"align": "c"})
 	if J.ge(J.getv(game.j_G, "city"), 0.0):
 		if J.truth(game.f_button((J.add(v_x, (float(v_w) / float(2.0))) - 132.0), (J.add(v_y, v_h) - 20.0), 124.0, 17.0, game.localization.f_T("BABANIN DÜKKÂNI"), "#6a4a2a", true)):
 			game.branch_draw.f_sehreGit((-J.n(1.0)))

@@ -152,6 +152,16 @@ func calis() -> void:
 				G.scene = "shop"; G.sceneT = 3.0
 			await adim(70)
 			await kaydet()
+		"sube_gunsonu":
+			# sube geliri net + zincir gideri + performans satirlari (12. tur)
+			kur(float(arg("--gun", "60")), true)
+			G.branch = float(arg("--sube", "6"))
+			G.stat.wraps = 60.0; G.stat.isk = 14.0; G.stat.drinks = 30.0; G.stat.lost = float(arg("--kacan", "12")); G.stat.earned = 9800.0; G.stat.tips = 412.0
+			G.money = 9800.0
+			g.session_system.f_endDay()
+			G.tarif.yeni = []
+			await adim(500)
+			await kaydet()
 		"icra_gunsonu":
 			kur(8.0, false, -1, 2)
 			G.stat.wraps = 21.0; G.stat.isk = 4.0; G.stat.drinks = 9.0; G.stat.boxes = 6.0; G.stat.sweets = 3.0

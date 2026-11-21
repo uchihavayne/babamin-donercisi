@@ -22,7 +22,7 @@ func f_drawDayEnd(p_t: Variant = null) -> Variant:
 	J.setv(game.j_ctx, "globalAlpha", 1.0)
 	v_k = game.math_utils.f_clamp((J.getv(game.j_G, "sceneT") * 2.0), 0.0, 1.0)
 	v_y = game.math_utils.f_lerp((-J.n(100.0)), 48.0, game.math_utils.f_easeOutBack(v_k))
-	v_extraH = J.add(J.add(J.add((24.0 if J.gt(J.getv(J.getv(game.j_G, "stat"), "branch"), 0.0) else 0.0), (14.0 if J.gt(J.getv(J.getv(game.j_G, "stat"), "fine"), 0.0) else 0.0)), (12.0 if (J.truth(J.getv(game.j_G, "ferman")) and J.truth(J.getv(J.getv(game.j_G, "ferman"), "kapandi"))) else 0.0)), ((36.0 if J.truth(J.getv(J.getv(game.j_G, "bahisSonuc"), "kapandi")) else 24.0) if J.truth(J.getv(game.j_G, "bahisSonuc")) else 0.0))
+	v_extraH = J.add(J.add(J.add((24.0 if J.gt(J.getv(J.getv(game.j_G, "stat"), "branchBrut"), 0.0) else 0.0), (14.0 if J.gt(J.getv(J.getv(game.j_G, "stat"), "fine"), 0.0) else 0.0)), (12.0 if (J.truth(J.getv(game.j_G, "ferman")) and J.truth(J.getv(J.getv(game.j_G, "ferman"), "kapandi"))) else 0.0)), ((36.0 if J.truth(J.getv(J.getv(game.j_G, "bahisSonuc"), "kapandi")) else 24.0) if J.truth(J.getv(game.j_G, "bahisSonuc")) else 0.0))
 	game.interface_draw.f_panel(((float(game.j_W) / float(2.0)) - 108.0), v_y, 216.0, J.add(178.0, v_extraH), J.add(J.add(game.localization.f_T("GÜN "), J.getv(game.j_G, "day")), game.localization.f_T(" BİTTİ")))
 	v_st = J.getv(game.j_G, "stat")
 	v_rows = [["wrap", "Dürüm", J.getv(v_st, "wraps")]]
@@ -61,9 +61,11 @@ func f_drawDayEnd(p_t: Variant = null) -> Variant:
 	if J.gt(J.getv(game.j_G, "sceneT"), 1.6):
 		game.text_draw.f_txt(J.add(J.add(game.localization.f_T("(bahşiş dahil $"), game.math_utils.f_fmtMoney(J.getv(v_st, "tips"))), ")"), J.add((float(game.j_W) / float(2.0)), 92.0), J.add(v_ly, 14.0), J.getv(game.j_P, "ui3"), {"align": "r"})
 	v_dy2 = 0.0
-	if (J.gt(J.getv(v_st, "branch"), 0.0) and J.gt(J.getv(game.j_G, "sceneT"), 1.65)):
+	if (J.gt(J.n(v_st.get("branchBrut", 0.0)), 0.0) and J.gt(J.getv(game.j_G, "sceneT"), 1.65)):
 		game.text_draw.f_txt(J.add((J.getv(game.j_G, "branch") if J.truth(J.getv(game.j_G, "branch")) else 0.0), game.localization.f_T(" ŞUBE GELİRİ")), ((float(game.j_W) / float(2.0)) - 92.0), J.add(v_ly, 26.0), J.getv(game.j_P, "au2"))
 		game.text_draw.f_txt(J.add("+$", game.math_utils.f_fmtMoney(J.getv(v_st, "branch"))), J.add((float(game.j_W) / float(2.0)), 92.0), J.add(v_ly, 26.0), J.getv(game.j_P, "au2"), {"align": "r"})
+		# zincir gideri (kira + maas + malzeme) solda, performans sagda
+		game.text_draw.f_txt(str(game.localization.f_T("gider $")) + str(game.math_utils.f_fmtShort(J.n(v_st.get("branchGider", 0.0)))), ((float(game.j_W) / float(2.0)) - 92.0), J.add(v_ly, 36.0), "#a83a2a")
 		game.text_draw.f_txt(J.add(J.add(game.localization.f_T("performans %"), floor(((J.getv(v_st, "brPerf") if J.truth(J.getv(v_st, "brPerf")) else 1.0) * 100.0) + 0.5)), game.math_utils.yuzde_sonu()), J.add((float(game.j_W) / float(2.0)), 92.0), J.add(v_ly, 36.0), J.getv(game.j_P, "ui3"), {"align": "r"})
 		v_dy2 = 24.0
 	if (J.gt(J.getv(game.j_G, "sceneT"), 1.68) and J.gt(J.getv(v_st, "fine"), 0.0)):

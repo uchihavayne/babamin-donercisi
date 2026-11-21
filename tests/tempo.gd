@@ -125,20 +125,25 @@ func run() -> void:
 	root.add_child(game); game.set_process(false); game.j_MUTED = true
 	game.localization.f_setLang("tr")
 	var gunler := int(arg("--gun", "200"))
+	# kalibrasyon: --kat X sube taban gelirlerini (inc) X ile carpar (yalniz bu calisma)
+	var kat := float(arg("--kat", "1"))
+	if kat != 1.0:
+		for b in game.j_BRANCH: b["inc"] = roundf(float(b["inc"]) * kat)
+		print("TEMPO sube geliri katsayisi: ", kat)
 	var toplam_seviye := 0
 	for u in game.j_UPG: toplam_seviye += u.lv.size()
 	print("TEMPO toplam yukseltme seviyesi: %d, sube: %d" % [toplam_seviye, game.j_BRANCH.size()])
 	for kip in [false, true]:
 		biriktir = kip
 		print("TEMPO --- alim kurali: %s" % ("subeye biriktir" if kip else "en ucuz yukseltme"))
-		for beceri in [0.55, 0.7, 0.85]:
+		for beceri in beceriler():
 			tek(beceri, gunler)
 	if "--rezerv" in OS.get_cmdline_user_args():
 		rezerv = true
 		for kip in [false, true]:
 			biriktir = kip
 			print("TEMPO --- dikkatli oyuncu (icra gunune rezerv ayirir), alim kurali: %s" % ("subeye biriktir" if kip else "en ucuz yukseltme"))
-			for beceri in [0.55, 0.7, 0.85]:
+			for beceri in beceriler():
 				tek(beceri, gunler)
 		rezerv = false
 	if "--gunluk" in OS.get_cmdline_user_args():
@@ -147,7 +152,7 @@ func run() -> void:
 		hirsiz = true
 		biriktir = true
 		print("TEMPO --- subeye biriktir + gece hirsizi")
-		for beceri in [0.55, 0.7, 0.85]:
+		for beceri in beceriler():
 			calinan = 0.0
 			tek(beceri, gunler)
 			print("  calinan toplam: %d" % calinan)
@@ -175,6 +180,14 @@ func gunluk_tablo() -> void:
 		var servis := int(round(gelen * oran))
 		var p: float = float(game.progression_system.f_branchPerf(float(servis), float(gelen - servis), 40.0, game.j_G))
 		print("  gelenlerin %%%3d'ine yetisen: carpan %.2f" % [int(oran * 100), p])
+
+# --beceriler 0.4,0.5,0.7: profil listesi (varsayilan 0.55, 0.7, 0.85)
+func beceriler() -> Array:
+	var v := arg("--beceriler", "")
+	if v == "": return [0.55, 0.7, 0.85]
+	var l: Array = []
+	for p in v.split(","): l.append(float(p))
+	return l
 
 func tek(beceri: float, gunler: int) -> void:
 	var s := simule(beceri, gunler)

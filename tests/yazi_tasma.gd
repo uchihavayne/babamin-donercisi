@@ -289,6 +289,24 @@ func gun_sonu_ve_gece(dil: String) -> void:
 	game.j_G.sceneT = 5.0
 	game.tarif_system.f_durum().yeni = []    # yeni sayfa karti ayri olculur (asagida)
 	olc(dil, "gun sonu")
+	# zincir giderleri: sube geliri (net) + gider + performans satirlari, buyuk sayilarla
+	kur(60.0, 3)
+	G = game.j_G
+	G.branch = 8.0
+	G.stat.wraps = 121.0; G.stat.isk = 34.0; G.stat.drinks = 99.0; G.stat.boxes = 66.0; G.stat.sweets = 33.0
+	G.stat.lost = 12.0; G.stat.earned = 18400.0; G.stat.tips = 2120.0; G.money = 18400.0
+	game.session_system.f_endDay()
+	game.j_G.sceneT = 5.0
+	game.tarif_system.f_durum().yeni = []
+	olc(dil, "gun sonu sube giderleri")
+	kur(18.0, 2)
+	G = game.j_G
+	G.stat.wraps = 121.0; G.stat.isk = 34.0; G.stat.drinks = 99.0; G.stat.boxes = 66.0; G.stat.sweets = 33.0
+	G.stat.lost = 12.0; G.stat.yerYok = 117.0; G.stat.earned = 18400.0; G.stat.tips = 2120.0
+	G.money = 18400.0
+	game.session_system.f_endDay()
+	game.j_G.sceneT = 5.0
+	game.tarif_system.f_durum().yeni = []
 	# Baba'nin Defteri: gun sonunda bulunan her yeni sayfanin karti (TAMAM dugmesi yarim saniye sonra gelir)
 	var tarif_g: Dictionary = game.tarif_system.f_durum()
 	for tf in game.j_TARIF:

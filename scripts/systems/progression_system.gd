@@ -268,6 +268,28 @@ func f_branchBase(p_g: Variant = null) -> Variant:
 	return v_t
 	return null
 
+# BIRLESIK (12. tur, "gec oyunda beceri geri gelsin + para sinki"): sube geliri artik NET (brut - zincir gideri) ve
+# performans egrisi gec oyunda daha cok hizmet ister.
+#  - gider = taban gelir x (BR_GIDER_SABIT + BR_GIDER_DEGISKEN x performans): sabit kisim kira + maas (performanstan bagimsiz),
+#    degisken kisim malzeme (cok servis, cok malzeme). Performans ~%37'nin altina dusunce sube kar etmez (net 0; para eksiye dusmez).
+#  - hacim hedefi (gelenlerin orani) BR_HEDEF_GUN0. gunden BR_HEDEF_GUN1. gune kadar BR_HEDEF_ILK'ten BR_HEDEF_SON'a cikar:
+#    erken oyunda gelenlerin %35'i yeter, gec oyunda %75'i gerekir; bu yuzden "yetisen" ile "yetismeyen" gec oyunda da ayrilir.
+const BR_GIDER_SABIT := 0.30
+const BR_GIDER_DEGISKEN := 0.18
+const BR_HEDEF_ILK := 0.35
+const BR_HEDEF_SON := 0.75
+const BR_HEDEF_GUN0 := 20.0
+const BR_HEDEF_GUN1 := 70.0
+
+# gun icin hacim hedefinin gelen musteriye orani
+func f_branchHedefOran(p_day: Variant = null) -> float:
+	var t: float = clampf((J.n(p_day) - BR_HEDEF_GUN0) / (BR_HEDEF_GUN1 - BR_HEDEF_GUN0), 0.0, 1.0)
+	return BR_HEDEF_ILK + (BR_HEDEF_SON - BR_HEDEF_ILK) * t
+
+# bir gunun zincir gideri (kira + maas + malzeme); taban = f_branchBase, perf = f_branchPerf
+func f_branchGider(p_base: Variant = null, p_perf: Variant = null) -> float:
+	return floorf(J.n(p_base) * (BR_GIDER_SABIT + BR_GIDER_DEGISKEN * J.n(p_perf)) + 0.5)
+
 # data.js:928
 func f_branchPerf(p_served: Variant = null, p_lost: Variant = null, p_day: Variant = null, p_g: Variant = null) -> Variant:
 	var v_tot: Variant = null
@@ -284,7 +306,7 @@ func f_branchPerf(p_served: Variant = null, p_lost: Variant = null, p_day: Varia
 	v_hacim = v_memnun
 	if J.truth(v_day):
 		v_cfg = game.progression_system.f_dayCfg(v_day, (v_g if J.truth(v_g) else {"up": {}}))
-		v_hedef = max(5.0, floor(((float((J.getv(v_cfg, "len") - 25.0)) / float(J.getv(v_cfg, "rate"))) * 0.35)))
+		v_hedef = max(5.0, floor(((float((J.getv(v_cfg, "len") - 25.0)) / float(J.getv(v_cfg, "rate"))) * f_branchHedefOran(v_day))))
 		v_hacim = game.math_utils.f_clamp((float(v_served) / float(v_hedef)), 0.0, 1.0)
 	return J.add(game.j_BR_MIN, (((game.j_BR_MAX - game.j_BR_MIN) * v_hacim) * J.add(0.55, (0.45 * v_memnun))))
 	return null
